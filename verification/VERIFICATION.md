@@ -26,3 +26,6 @@
 
 ## ממשק
 `tools/ui-check.mjs`: axe-core (WCAG 2.1 A/AA) – 0 הפרות ב־10 מסכים + 2 גיליונות, ברוחב 320 ו־390; אין גלישה אופקית ב־320/360/390; טעינה מחדש אופליין (Service Worker) – עובד.
+
+## אתר חי
+`node tools/ui-check.mjs https://dudidd-wq.github.io/chitas-reader/` (2026-11-02, גרסת SW 1.0.4): axe 0 הפרות ב־22 בדיקות, אין גלישה, אופליין עובד – ALL UI CHECKS PASS. צילומי מסך מהאתר החי: `screenshots/live/`.
