@@ -41,6 +41,8 @@ button, select, input { font: inherit; color: inherit; }
 .hero .hd { font-family: var(--text-font); font-size: 1.9rem; font-weight: 700; margin: 0; }
 .hero .sub { color: var(--muted); margin: .25rem 0 0; }
 .datebar { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: .75rem 0 1rem; flex-wrap: wrap; }
+.datebar input[type="date"] { flex: 0 1 11rem; min-width: 0; }
+@media (max-width: 480px) { .datebar > .btn:not(.today) span { display: none; } .datebar > .btn:not(.today) { padding-inline: .7rem; } .datebar .today { flex-basis: 100%; justify-content: center; } }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 44px; min-width: 44px; padding: .4rem .9rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); cursor: pointer; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); }
 .btn:hover { border-color: var(--accent); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -113,7 +115,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .seg.inline { display: inline; margin: 0; }
 .r-content .vn, .r-content .hn { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .25em; vertical-align: .25em; }
 .r-content .rashi { font-size: .78em; line-height: 1.75; margin: .25em 0 .7em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 88%, var(--muted)); }
-.r-content .rashi p { margin: 0 0 .3em; }
+.r-content .rashi p { margin: 0 0 .3em; orphans: 1; widows: 1; }
 .r-content .rashi .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
 .r-content b { font-weight: 700; }
 .r-content .ketiv { color: var(--muted); font-size: .8em; }

@@ -67,7 +67,7 @@ async function renderHome() {
       <label class="sr" for="datepick">תאריך</label>
       <input type="date" id="datepick" value="${currentDate}">
       <a class="btn" href="#/d/${shiftIso(currentDate, 1)}" aria-label="היום הבא"><span>הבא</span>${ICON.next}</a>
-      ${isToday ? '' : `<a class="btn" href="#/d/${todayIso()}">חזרה להיום</a>`}
+      ${isToday ? '' : `<a class="btn today" href="#/d/${todayIso()}">חזרה להיום</a>`}
     </nav>
     <section class="cards" aria-label="שיעורי היום">${unitsFor().map(u => `
       <article class="card" id="card-${u}">
@@ -313,7 +313,7 @@ async function renderDoc() {
       if (!open) { html += '<p>'; open = true; }
       html += `<span class="seg inline" data-id="${b.id}">${num}<span class="t">${fmt(b.text, true)}</span></span> `;
     } else {
-      const rashi = showRashi && b.sub?.length ? `<div class="rashi"><span class="lbl">רש״י </span>${b.sub.map(r => `<p>${fmt(r, false)}</p>`).join('')}</div>` : '';
+      const rashi = showRashi && b.sub?.length ? `<div class="rashi">${b.sub.map((r, i) => `<p>${i ? '' : '<span class="lbl">רש״י </span>'}${fmt(r, false)}</p>`).join('')}</div>` : '';
       html += `<div class="seg" data-id="${b.id}"><div class="t">${num}${fmt(b.text, !!d.tanakh)}</div>${rashi}</div>`;
     }
   }

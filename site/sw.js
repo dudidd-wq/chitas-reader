@@ -1,5 +1,5 @@
 // Service worker: app shell precache + cache-first for static text data.
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const SHELL = `shell-${VERSION}`;
 const DATA = 'data-v1';
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/gloss.js', 'js/hnorm.js', 'js/vendor/hebcal.js',
