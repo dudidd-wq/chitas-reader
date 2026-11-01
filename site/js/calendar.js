@@ -150,4 +150,4 @@ export function dayPlan(date, { il = true } = {}) {
     rambam1: rambam1(hd), rambam3: rambam3(hd),
   };
 }
-export { HDate };
+export { HDate, Locale };

@@ -136,3 +136,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 #toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--paper); padding: .5rem 1rem; border-radius: 10px; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90vw; text-align: center; }
 #toast.show { opacity: .95; }
 @media (max-width: 400px) { .btn { padding: .3rem .55rem; } .hero .hd { font-size: 1.6rem; } }
+@media (max-width: 640px) {
+  .page table.src thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .page table.src, .page table.src tbody, .page table.src tr, .page table.src td { display: block; width: auto; }
+  .page table.src tr { border: 1px solid var(--rule); border-radius: 12px; padding: .5rem .7rem; margin-bottom: .7rem; background: var(--card); }
+  .page table.src td { border: 0; padding: .15rem 0; text-align: start; }
+  .page table.src td::before { content: attr(data-h) ": "; font-weight: 600; color: var(--muted); }
+}

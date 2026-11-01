@@ -1,4 +1,4 @@
-import { dayPlan, isoDate, toHDate, HDate } from './calendar.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data } from './texts.js';
 import { prefs, setPref, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices } from './tts.js';
@@ -201,16 +201,16 @@ function renderSettings() {
 async function renderSources() {
   shell('מקורות ורישיונות', '<p>טוען…</p>');
   let s = {}; try { s = await data('sources.json'); } catch { /* offline */ }
-  const row = (what, m, note = '') => m ? `<tr><td>${what}</td><td>${esc(m.versionTitleInHebrew || m.versionTitle)}</td><td>${esc(m.license)}</td><td><a href="${esc(m.versionSource)}" rel="noopener" target="_blank">מקור</a> · <a href="${esc(m.sefariaUrl || 'https://www.sefaria.org')}" rel="noopener" target="_blank">ספריא</a></td><td>${note}</td></tr>` : '';
+  const row = (what, m, note = '') => m ? `<tr><td data-h="חלק">${what}</td><td data-h="גרסה">${esc(m.versionTitleInHebrew || m.versionTitle)}</td><td data-h="רישיון">${esc(m.license)}</td><td data-h="קישור"><a href="${esc(m.versionSource)}" rel="noopener" target="_blank">מקור</a> · <a href="${esc(m.sefariaUrl || 'https://www.sefaria.org')}" rel="noopener" target="_blank">ספריא</a></td><td data-h="הערות">${note}</td></tr>` : '';
   const ov = Object.entries(s.rambamOverrides || {});
   $('.page').innerHTML = `<h1>מקורות ורישיונות</h1>
   <p>כל הטקסטים נלקחו מגרסאות ברישיון פתוח דרך ה-API של <a href="https://www.sefaria.org" rel="noopener" target="_blank">ספריא</a>, נשמרו מראש כקבצים סטטיים ומוגשים מהאתר עצמו. לא נוסף ניקוד ידני ולא שונה נוסח.</p>
-  <table><thead><tr><th>חלק</th><th>גרסה</th><th>רישיון</th><th>קישור</th><th>הערות</th></tr></thead><tbody>
+  <table class="src"><thead><tr><th>חלק</th><th>גרסה</th><th>רישיון</th><th>קישור</th><th>הערות</th></tr></thead><tbody>
   ${row('חומש ותהילים', s.tanakh, 'מנוקד ומוטעם')}
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
-  ${ov.map(([n, m]) => row('רמב״ם – ' + n, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, /Torat Emet/.test(m.versionTitle) ? 'מנוקד' : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון פתוח')).join('')}
+  ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, /Torat Emet/.test(m.versionTitle) ? 'מנוקד' : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון פתוח')).join('')}
   </tbody></table>
   <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (CC BY-SA 4.0). לכל ביאור מצורף קישור לערך המקור. רשימת הביאורים חלקית – ראו ״אודות ומגבלות״.</p>
   <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> (‎@hebcal/core – GPL-2.0, ‎@hebcal/learning ו-‎@hebcal/leyning – BSD-2). החישוב נעשה במכשיר, ללא רשת.</p>
