@@ -1,0 +1,116 @@
+{
+ "tanakh": {
+  "versionTitle": "Miqra according to the Masorah",
+  "license": "CC-BY-SA",
+  "versionSource": "https://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%AA%D7%9E%D7%A9:Dovi/%D7%9E%D7%A7%D7%A8%D7%90_%D7%A2%D7%9C_%D7%A4%D7%99_%D7%94%D7%9E%D7%A1%D7%95%D7%A8%D7%94",
+  "versionTitleInHebrew": "מקרא על פי המסורה",
+  "sefariaUrl": "https://www.sefaria.org/Genesis?vhe=Miqra%20according%20to%20the%20Masorah",
+  "fetchedAt": "2026-11-01"
+ },
+ "rashiByBook": {
+  "Genesis": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934",
+  "Exodus": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934",
+  "Leviticus": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934",
+  "Numbers": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann -- corrected vocalization",
+  "Deuteronomy": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934"
+ },
+ "rashi": {
+  "versionTitle": "Pentateuch with Rashi's commentary by M. Rosenbaum and A.M. Silbermann, 1929-1934",
+  "license": "Public Domain",
+  "versionSource": "https://www.nli.org.il/he/books/NNL_ALEPH001969084",
+  "versionTitleInHebrew": null,
+  "sefariaUrl": "https://www.sefaria.org/Rashi_on_Genesis?vhe=Pentateuch%20with%20Rashi's%20commentary%20by%20M.%20Rosenbaum%20and%20A.M.%20Silbermann%2C%201929-1934",
+  "fetchedAt": "2026-11-01"
+ },
+ "tanya": {
+  "versionTitle": "Kehot Publication Society",
+  "license": "CC-BY-NC",
+  "versionSource": "http://kehot.com",
+  "versionTitleInHebrew": null,
+  "sefariaUrl": "https://www.sefaria.org/Tanya%2C_Part_I%3B_Likkutei_Amarim?vhe=Kehot%20Publication%20Society",
+  "fetchedAt": "2026-11-01"
+ },
+ "rambam": {
+  "versionTitle": "Torat Emet 363",
+  "license": "Public Domain",
+  "versionSource": "http://www.toratemetfreeware.com/index.html?downloads",
+  "versionTitleInHebrew": "תורת אמת 363",
+  "sefariaUrl": "https://www.sefaria.org/Mishneh_Torah,_Foundations_of_the_Torah?vhe=Torat%20Emet%20363",
+  "fetchedAt": "2026-11-01"
+ },
+ "rambamOverrides": {
+  "Transmission of the Oral Law": {
+   "versionTitle": "Mechon Mamre Mishneh Torah",
+   "license": "Public Domain",
+   "versionSource": "http://www.mechon-mamre.org/i/0000n.htm",
+   "versionTitleInHebrew": null
+  },
+  "Positive Mitzvot": {
+   "versionTitle": "Mechon-mamre Mishneh Torah",
+   "license": "Public Domain",
+   "versionSource": "http://www.mechon-mamre.org/i/0001n.htm",
+   "versionTitleInHebrew": null
+  },
+  "Negative Mitzvot": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%A8%D7%9E%D7%91%22%D7%9D_%D7%94%D7%A7%D7%93%D7%9E%D7%94_%D7%9C%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_(%D7%AA%D7%95%D7%9B%D7%9F_%D7%94%D7%97%D7%99%D7%91%D7%95%D7%A8)",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "Overview of Mishneh Torah Contents": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%A8%D7%9E%D7%91%22%D7%9D_%D7%94%D7%A7%D7%93%D7%9E%D7%94_%D7%9C%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_(%D7%AA%D7%95%D7%9B%D7%9F_%D7%94%D7%97%D7%99%D7%91%D7%95%D7%A8)",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "Reading the Shema": {
+   "versionTitle": "Torat Emet 370",
+   "license": "Public Domain",
+   "versionSource": "http://www.toratemetfreeware.com/index.html?downloads",
+   "versionTitleInHebrew": "תורת אמת 370"
+  },
+  "Prayer and the Priestly Blessing": {
+   "versionTitle": "Torat Emet 370",
+   "license": "Public Domain",
+   "versionSource": "http://www.toratemetfreeware.com/index.html?downloads",
+   "versionTitleInHebrew": "תורת אמת 370"
+  },
+  "Tefillin, Mezuzah and the Torah Scroll": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_%D7%9C%D7%A8%D7%9E%D7%91%22%D7%9D",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "Fringes": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_%D7%9C%D7%A8%D7%9E%D7%91%22%D7%9D",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "Blessings": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_%D7%9C%D7%A8%D7%9E%D7%91%22%D7%9D",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "Circumcision": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%9E%D7%A9%D7%A0%D7%94_%D7%AA%D7%95%D7%A8%D7%94_%D7%9C%D7%A8%D7%9E%D7%91%22%D7%9D",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  },
+  "The Order of Prayer": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%A8%D7%9E%D7%91%22%D7%9D_%D7%A1%D7%93%D7%A8_%D7%94%D7%AA%D7%A4%D7%99%D7%9C%D7%94_(%D7%91)",
+   "versionTitleInHebrew": "משנה תורה (ויקיטקסט)"
+  }
+ },
+ "rambamChapterOverrides": {
+  "Leavened and Unleavened Bread 9": {
+   "versionTitle": "Wikisource Mishneh Torah",
+   "license": "CC-BY-SA",
+   "versionSource": "http://he.wikisource.org/wiki/%D7%A8%D7%9E%D7%91%22%D7%9D_%D7%94%D7%9C%D7%9B%D7%95%D7%AA_%D7%97%D7%9E%D7%A5_%D7%95%D7%9E%D7%A6%D7%94_%D7%90"
+  }
+ }
+}

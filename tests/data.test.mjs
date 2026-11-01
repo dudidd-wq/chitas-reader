@@ -1,0 +1,47 @@
+// Text integrity: every portion from 2025-09-01 to 2027-10-31 (both locations) resolves to existing, non-empty text.
+// Also reports which portions are not vocalized (niqqud ratio) — see NOTES.md / sources page.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { dayPlan, TANYA_ORDER } from '../site/js/calendar.js';
+
+const root = new URL('../site/', import.meta.url);
+globalThis.fetch = async p => { const f = new URL(p, root); const ok = fs.existsSync(f); return { ok, json: async () => JSON.parse(fs.readFileSync(f)) }; };
+const { buildDoc, UNITS } = await import('../site/js/texts.js');
+const niq = t => { const s = t.replace(/<[^>]+>/g, ''); const l = (s.match(/[\u05D0-\u05EA]/g) || []).length; return l ? (s.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length / l : 1; };
+
+test('tanya index order matches the reading order', () => {
+  const idx = JSON.parse(fs.readFileSync(new URL('data/tanya/index.json', root)));
+  assert.deepEqual(Object.keys(idx), TANYA_ORDER);
+});
+
+test('no blank segments in the data except the known numbering gap (Talmud Torah 7:8, absent in the common printed edition)', () => {
+  const blanks = [];
+  const walk = dir => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = dir + '/' + e.name; if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json') && !/index|sources|glossary/.test(e.name)) { const j = JSON.parse(fs.readFileSync(p)); (j.s || j.v || []).forEach((x, i) => { if (typeof x !== 'string' || !x.trim()) blanks.push(p.split('/data/')[1] + '#' + (i + 1)); }); } } };
+  walk(new URL('data', root).pathname);
+  assert.deepEqual(blanks, ['rambam/Torah_Study/7.json#8']);
+});
+
+test('every portion resolves to non-empty text (both Israel and diaspora)', async () => {
+  const unvoc = {}; let n = 0;
+  for (let d = new Date('2025-09-01T12:00:00'); d <= new Date('2027-10-31T12:00:00'); d.setDate(d.getDate() + 1)) {
+    for (const il of [false, true]) {
+      const plan = dayPlan(new Date(d), { il });
+      for (const unit of Object.keys(UNITS)) {
+        if (il && unit !== 'chumash') continue; // only Chumash depends on location
+        const doc = await buildDoc(plan, unit);
+        const segs = doc.blocks.filter(b => b.type !== 'h');
+        assert.ok(segs.length > 0, `${plan.iso} ${unit} empty`);
+        for (const b of segs) {
+          assert.equal(typeof b.text, 'string', `${plan.iso} ${unit} ${b.id} missing`);
+          assert.ok(b.text.trim().length > 0, `${plan.iso} ${unit} ${b.id} blank`);
+        }
+        const r = segs.reduce((a, b) => a + niq(b.text), 0) / segs.length;
+        if (r < 0.3) (unvoc[unit + ': ' + doc.subtitle] ??= []).push(plan.iso);
+        n++;
+      }
+    }
+  }
+  console.log(`  ${n} portions checked`);
+  console.log('  unvocalized portions:', JSON.stringify(Object.fromEntries(Object.entries(unvoc).map(([k, v]) => [k, v.length + ' days, e.g. ' + v[0]])), null, 1));
+});

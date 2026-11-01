@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>חת״ת ורמב״ם – קריאה יומית</title>
+<meta name="description" content="חומש, תהילים, תניא ורמב״ם יומי בטקסט מנוקד, בתצוגת קריאה דמוית נייר, עם הקראה של הדפדפן. ללא מעקב, עובד גם ללא רשת.">
+<meta name="theme-color" content="#f6f1e3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preload" href="fonts/NotoSerifHebrew.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip" href="#view">דלג לתוכן</a>
+<div id="app">
+  <main id="view" tabindex="-1"></main>
+</div>
+<div id="reader" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:2rem">האתר דורש JavaScript כדי לחשב את השיעורים היומיים.</p></noscript>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

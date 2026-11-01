@@ -1,0 +1,29 @@
+{
+  "name": "chitas-reader",
+  "version": "1.0.0",
+  "description": "קורא חת\"ת ורמב\"ם יומי – PWA סטטי",
+  "scripts": {
+    "vendor": "esbuild tools/vendor-entry.mjs --bundle --format=esm --minify --legal-comments=eof --outfile=site/js/vendor/hebcal.js",
+    "data": "node tools/build-data.mjs all && node tools/patch-missing-chapters.mjs",
+    "glossary": "node tools/build-glossary.mjs",
+    "rss": "node tools/fetch-chabad-rss.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "ui": "node tools/ui-check.mjs",
+    "shots": "node tools/shots.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "axe-core": "^4.14.0",
+    "esbuild": "^0.28.2",
+    "playwright-core": "^1.64.1"
+  },
+  "dependencies": {
+    "@hebcal/core": "^6.14.7",
+    "@hebcal/learning": "^6.13.1",
+    "@hebcal/leyning": "^10.1.0"
+  }
+}
