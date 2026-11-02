@@ -239,3 +239,34 @@ export function chunkText(t, max = 180) {
   }
   return out;
 }
+
+/** Round 3: Rashi's headwords (דיבור המתחיל) are printed without vowels, so a voice guesses their reading. When the
+ *  headword's words are the verse's own words (same consonants, in order), read them with the verse's vowels
+ *  (cantillation removed). Matching is word by word from the start of the headword; unmatched words stay as printed. */
+const ETC = /^(וגו['׳]?|וגומר|וכו['׳]?)$/;
+const NAME = /^[ובלמכש]{0,2}ה['׳]$/;
+// same consonants; plene/defective spelling (ו/י) may differ for words of 3+ letters (Rashi often writes מלא)
+const noMatres = x => x.length >= 3 ? x[0] + x.slice(1).replace(/[וי]/g, '') : x;
+const eq = (w, h, v) => v === h || (NAME.test(w) && v === h.slice(0, -1) + 'יהוה') || (h.length >= 3 && noMatres(v) === noMatres(h));
+export function vowelHeadword(rashiHtml, verseHtml) {
+  const m = rashiHtml.match(/^(\s*(?:<span[^>]*>[^<]*<\/span>)?\s*<b>)([^<]+)(<\/b>)/);
+  if (!m) return rashiHtml;
+  const key = w => w.replace(/[^\u05D0-\u05EA]/g, '');
+  const verse = verseHtml.replace(/<[^>]+>/g, '').replace(RE_TAAMIM, '').replace(/[\u05C0\u05C3|]/g, ' ').split(/[\s\u05BE]+/).filter(w => key(w));
+  const vk = verse.map(key);
+  const hw = m[2].trim().replace(/[.:]$/, '').split(/\s+/);
+  const hk = hw.map(key);
+  // prefer a full match anywhere in the verse; else the longest matching start (at least two words)
+  let best = null;
+  for (let i = 0; i < vk.length; i++) {
+    let n = 0; while (n < hk.length && i + n < vk.length && hk[n] && eq(hw[n], hk[n], vk[i + n])) n++;
+    const etc = hw.slice(n).every(w => ETC.test(w));
+    if (n && (n === hk.length || n >= 2 || etc) && (!best || n > best.n)) best = { i, n };
+    if (best?.n === hk.length) break;
+  }
+  if (!best) return rashiHtml;
+  // the Name stays as the headword writes it (ה'), so the usual reading rules apply
+  const words = verse.slice(best.i, best.i + best.n).map((w, k) => NAME.test(hw[k]) ? hw[k] : w.replace(/[^\u05D0-\u05EA\u05B0-\u05BC\u05C1\u05C2\u05C7]/g, ''));
+  const rest = hw.slice(best.n);
+  return m[1] + [...words, ...rest].join(' ') + (/[.:]\s*$/.test(m[2]) ? '.' : '') + m[3] + rashiHtml.slice(m[0].length);
+}

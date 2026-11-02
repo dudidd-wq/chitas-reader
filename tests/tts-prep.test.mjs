@@ -87,3 +87,30 @@ test('inverted nun (U+05C6) is stripped; citation numerals after a unit word are
   assert.equal(P('בְּעָמוֹס סוֹף סִימָן ה׳. פֵּירוּשׁ', T), 'בעמוס סוף סימן הא. פירוש');
   assert.equal(P('וְהָיָה כ"ג', T), 'והיה כ"ג', 'a numeral in running text without a unit word is left alone');
 });
+
+test('round 3: Rashi headwords are read with the verse\'s vowels when they are the verse\'s words', async () => {
+  const { vowelHeadword } = await import('../site/js/tts-prep.js');
+  const fs = await import('node:fs');
+  const g23 = JSON.parse(fs.readFileSync(new URL('../site/data/torah/Genesis/23.json', import.meta.url)));
+  // full match, cantillation removed, explanation untouched
+  const nf = x => x.normalize('NFC');
+  const V = (a, b) => nf(vowelHeadword(a, b));
+  const r = V(g23.r[1][0], g23.v[1]);
+  assert.ok(r.startsWith(nf('<b>בְּקִרְיַת אַרְבַּע.</b> עַל שֵׁם')), r);
+  assert.doesNotMatch(r.match(/<b>(.*?)<\/b>/)[1], /[\u0591-\u05AF]/);
+  // with the "רש״י" label span in front, and maqaf-joined verse words
+  assert.equal(V('<span class="lbl">רש״י </span><b>ויבא אברהם.</b> מִבְּאֵר שֶׁבַע:', g23.v[1]), nf('<span class="lbl">רש״י </span><b>וַיָּבֹא אַבְרָהָם.</b> מִבְּאֵר שֶׁבַע:'));
+  // "וגו'" stays; the Name stays as written (ה'); plene spelling in Rashi matches a defective verse word
+  assert.equal(V('<b>ותפקחנה וגו\'.</b> x', 'וַתִּפָּקַ֨חְנָה֙ עֵינֵ֣י'), nf('<b>וַתִּפָּקַחְנָה וגו\'.</b> x'));
+  assert.equal(V('<b>כאשר צוה ה\'.</b> x', 'כַּאֲשֶׁ֛ר צִוָּ֥ה יְהֹוָ֖ה'), nf('<b>כַּאֲשֶׁר צִוָּה ה\'.</b> x'));
+  assert.equal(V('<b>ארץ המוריה.</b> x', 'אֶ֖רֶץ הַמֹּרִיָּ֑ה'), nf('<b>אֶרֶץ הַמֹּרִיָּה.</b> x'));
+  // not the verse's words: unchanged
+  assert.equal(V('<b>דבר אחר.</b> x', 'וַיְהִ֣י'), nf('<b>דבר אחר.</b> x'));
+  // coverage across the Torah: at least 90% of headwords get vowels
+  let tot = 0, ch = 0;
+  for (const b of ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy']) for (const f of fs.readdirSync(new URL(`../site/data/torah/${b}`, import.meta.url))) {
+    const d = JSON.parse(fs.readFileSync(new URL(`../site/data/torah/${b}/${f}`, import.meta.url)));
+    d.r.forEach((rs, i) => rs.forEach(x => { tot++; if (vowelHeadword(x, d.v[i]) !== x) ch++; }));
+  }
+  assert.ok(ch / tot > 0.9, `${ch}/${tot}`);
+});
