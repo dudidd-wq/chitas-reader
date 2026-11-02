@@ -193,7 +193,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .rashi .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
 .r-content b { font-weight: 700; }
 .r-content .ketiv { color: var(--muted); font-size: .8em; }
-.r-content .pe { color: var(--muted); font-size: .6em; font-family: var(--ui); margin: 0 .3em; }
+.r-content .pe { display: inline-block; width: 2em; } /* setuma: a gap inside the line, as in a Torah scroll */
+.r-content .pe-p { width: 3.5em; } /* petucha: a wider gap */
 .r-content .speaking { background: var(--hl); box-shadow: 0 0 0 .12em var(--hl); }
 .r-content .gl { text-decoration: underline dotted var(--gloss); text-underline-offset: .3em; cursor: help; }
 .r-content.gloss-inline .gl { display: inline-flex; flex-direction: column-reverse; align-items: center; line-height: 1.1; vertical-align: bottom; text-decoration: none; }

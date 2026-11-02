@@ -18,6 +18,7 @@ import { norm, cons } from '../site/js/hnorm.js';
 import { buildGlossary } from './gloss-review.mjs';
 import { occurrencesOf } from './gloss-occ.mjs';
 import { SENSE_FLAGS, ENTRY_FLAGS } from './gloss-flags.mjs';
+import { cleanLemma } from './gloss-lemma.mjs';
 const PREF = 'והבלמכש';
 function variants(n) {
   const out = [n]; let w = n;
@@ -94,7 +95,7 @@ for (const page of Object.values(cache)) {
       const def = sense.split('\n')[0];
       const g = shortGloss(clean(def.slice(1)));
       if (!g) return;
-      const rec = { g, l: head, src: `https://he.wiktionary.org/wiki/${encodeURIComponent(page.title)}#${encodeURIComponent(head.replace(/ /g, '_'))}` };
+      const rec = { g, l: cleanLemma(head), src: `https://he.wiktionary.org/wiki/${encodeURIComponent(page.title)}#${encodeURIComponent(head.replace(/ /g, '_'))}` };
       if (REG.test(def) || si > 0) for (const m of sense.matchAll(/\{\{צט\/תנ"ך\|([^{}]*)\}\}/g)) {
         const f = m[1].split('|'); if (f.length < 4) continue;
         const book = BOOKS[f[1].trim()]; if (!book) continue;
@@ -154,5 +155,8 @@ console.log('occurrence-specific', splitOcc, 'dropped (ambiguous occurrence/conf
 // Publish only hand-reviewed entries (tools/gloss-review.json); new/changed candidates are skipped until reviewed.
 const res = buildGlossary(passV, { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
     stats: { tanakh: { verses: verses.size, verseWordForms: tokV, wiktionaryVerseCited: matchedV + flagged.length, droppedFlagged: flagged.length, checkA: matchedV, checkB: xPass, failedB: xFail + xMissing } }, verification: XC.meta || null });
+// the Rambam part (round 5) is written by tools/gloss-rambam-xcheck.py and kept as is here
+const prevG = fs.existsSync(new URL('data/glossary.json', root)) ? JSON.parse(fs.readFileSync(new URL('data/glossary.json', root))) : {};
+if (prevG.rambam) res.rambam = prevG.rambam;
 fs.writeFileSync(new URL('data/glossary.json', root), JSON.stringify(res));
 console.log(JSON.stringify(res.meta.stats), JSON.stringify(res.meta.curated));

@@ -1,0 +1,2837 @@
+{
+ "meta": {
+  "built": "2026-11-02",
+  "checkA": {
+   "quotes": 126,
+   "noShortGloss": 79,
+   "notFound": 8,
+   "hilchotMismatch": 1,
+   "ok": 37,
+   "notMT": 5,
+   "unparsed": 5,
+   "flagged": 4,
+   "conflicts": 0,
+   "candidates": 37
+  },
+  "candidates": 37,
+  "pass": 21,
+  "fail": 16,
+  "sources": {
+   "lexicon": "English Wiktionary Hebrew entries via kaikki.org (CC BY-SA)",
+   "translation": "Mishneh Torah, trans. Eliyahu Touger (Moznaim), via Sefaria (CC BY-NC) — read for the check only, not shipped",
+   "wordnet": "Princeton WordNet 3.0"
+  }
+ },
+ "entries": {
+  "Rambam Marriage.16.1|אִם#1": {
+   "g": "במקרה ש-, בתנאי-",
+   "l": "אִם",
+   "glossEn": [
+    "accidentally",
+    "antecedent",
+    "aspect",
+    "condition",
+    "conditional",
+    "consequent",
+    "depends",
+    "half",
+    "prerequisite",
+    "proviso",
+    "requirement",
+    "situation",
+    "statement"
+   ],
+   "bridge": [
+    "במקרה",
+    "תנאי"
+   ],
+   "lemmaEn": [
+    "ancestor",
+    "case",
+    "codifier",
+    "father",
+    "mother",
+    "originator",
+    "progenitor",
+    "prototype",
+    "whether"
+   ],
+   "lemmaAgree": [
+    [
+     "statement",
+     "case"
+    ],
+    [
+     "antecedent",
+     "father"
+    ],
+    [
+     "antecedent",
+     "progenitor"
+    ],
+    [
+     "antecedent",
+     "ancestor"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "consequent",
+     "leaving"
+    ],
+    [
+     "situation",
+     "property"
+    ],
+    [
+     "situation",
+     "placed"
+    ],
+    [
+     "condition",
+     "considered"
+    ],
+    [
+     "condition",
+     "term"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Marriage.16.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Marriage.16.1|וְאִם#2": {
+   "g": "במקרה ש-, בתנאי-",
+   "l": "אִם",
+   "glossEn": [
+    "accidentally",
+    "antecedent",
+    "aspect",
+    "condition",
+    "conditional",
+    "consequent",
+    "depends",
+    "half",
+    "prerequisite",
+    "proviso",
+    "requirement",
+    "situation",
+    "statement"
+   ],
+   "bridge": [
+    "במקרה",
+    "תנאי"
+   ],
+   "lemmaEn": [
+    "ancestor",
+    "case",
+    "codifier",
+    "father",
+    "mother",
+    "originator",
+    "progenitor",
+    "prototype",
+    "whether"
+   ],
+   "lemmaAgree": [
+    [
+     "statement",
+     "case"
+    ],
+    [
+     "antecedent",
+     "father"
+    ],
+    [
+     "antecedent",
+     "progenitor"
+    ],
+    [
+     "antecedent",
+     "ancestor"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "consequent",
+     "leaving"
+    ],
+    [
+     "situation",
+     "property"
+    ],
+    [
+     "situation",
+     "placed"
+    ],
+    [
+     "condition",
+     "considered"
+    ],
+    [
+     "condition",
+     "term"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Marriage.16.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Marriage.16.1|וְאִם#3": {
+   "g": "במקרה ש-, בתנאי-",
+   "l": "אִם",
+   "glossEn": [
+    "accidentally",
+    "antecedent",
+    "aspect",
+    "condition",
+    "conditional",
+    "consequent",
+    "depends",
+    "half",
+    "prerequisite",
+    "proviso",
+    "requirement",
+    "situation",
+    "statement"
+   ],
+   "bridge": [
+    "במקרה",
+    "תנאי"
+   ],
+   "lemmaEn": [
+    "ancestor",
+    "case",
+    "codifier",
+    "father",
+    "mother",
+    "originator",
+    "progenitor",
+    "prototype",
+    "whether"
+   ],
+   "lemmaAgree": [
+    [
+     "statement",
+     "case"
+    ],
+    [
+     "antecedent",
+     "father"
+    ],
+    [
+     "antecedent",
+     "progenitor"
+    ],
+    [
+     "antecedent",
+     "ancestor"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "consequent",
+     "leaving"
+    ],
+    [
+     "situation",
+     "property"
+    ],
+    [
+     "situation",
+     "placed"
+    ],
+    [
+     "condition",
+     "considered"
+    ],
+    [
+     "condition",
+     "term"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Marriage.16.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Marriage.16.1|אִם#2": {
+   "g": "במקרה ש-, בתנאי-",
+   "l": "אִם",
+   "glossEn": [
+    "accidentally",
+    "antecedent",
+    "aspect",
+    "condition",
+    "conditional",
+    "consequent",
+    "depends",
+    "half",
+    "prerequisite",
+    "proviso",
+    "requirement",
+    "situation",
+    "statement"
+   ],
+   "bridge": [
+    "במקרה",
+    "תנאי"
+   ],
+   "lemmaEn": [
+    "ancestor",
+    "case",
+    "codifier",
+    "father",
+    "mother",
+    "originator",
+    "progenitor",
+    "prototype",
+    "whether"
+   ],
+   "lemmaAgree": [
+    [
+     "statement",
+     "case"
+    ],
+    [
+     "antecedent",
+     "father"
+    ],
+    [
+     "antecedent",
+     "progenitor"
+    ],
+    [
+     "antecedent",
+     "ancestor"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "consequent",
+     "leaving"
+    ],
+    [
+     "situation",
+     "property"
+    ],
+    [
+     "situation",
+     "placed"
+    ],
+    [
+     "condition",
+     "considered"
+    ],
+    [
+     "condition",
+     "term"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Marriage.16.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Marriage.16.1|וְאִם#4": {
+   "g": "במקרה ש-, בתנאי-",
+   "l": "אִם",
+   "glossEn": [
+    "accidentally",
+    "antecedent",
+    "aspect",
+    "condition",
+    "conditional",
+    "consequent",
+    "depends",
+    "half",
+    "prerequisite",
+    "proviso",
+    "requirement",
+    "situation",
+    "statement"
+   ],
+   "bridge": [
+    "במקרה",
+    "תנאי"
+   ],
+   "lemmaEn": [
+    "ancestor",
+    "case",
+    "codifier",
+    "father",
+    "mother",
+    "originator",
+    "progenitor",
+    "prototype",
+    "whether"
+   ],
+   "lemmaAgree": [
+    [
+     "statement",
+     "case"
+    ],
+    [
+     "antecedent",
+     "father"
+    ],
+    [
+     "antecedent",
+     "progenitor"
+    ],
+    [
+     "antecedent",
+     "ancestor"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "consequent",
+     "leaving"
+    ],
+    [
+     "situation",
+     "property"
+    ],
+    [
+     "situation",
+     "placed"
+    ],
+    [
+     "condition",
+     "considered"
+    ],
+    [
+     "condition",
+     "term"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Marriage.16.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Ownerless_Property_and_Gifts.1.2|בַבֵיבָרִים": {
+   "g": "גן חיות",
+   "l": "בֵּיבָר",
+   "glossEn": [
+    "alive",
+    "animal",
+    "ellipsis",
+    "garden",
+    "gene",
+    "kindergarten",
+    "life",
+    "lifespan",
+    "live",
+    "livelihood",
+    "lively",
+    "living",
+    "pleasure",
+    "preschool",
+    "raw",
+    "vitality"
+   ],
+   "bridge": [
+    "גנ",
+    "חיות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "animal",
+     "beasts"
+    ],
+    [
+     "animal",
+     "animal"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Ownerless Property and Gifts.1.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Ownerless_Property_and_Gifts.1.2|שֶׁבַבֵיבָרִים": {
+   "g": "גן חיות",
+   "l": "בֵּיבָר",
+   "glossEn": [
+    "alive",
+    "animal",
+    "ellipsis",
+    "garden",
+    "gene",
+    "kindergarten",
+    "life",
+    "lifespan",
+    "live",
+    "livelihood",
+    "lively",
+    "living",
+    "pleasure",
+    "preschool",
+    "raw",
+    "vitality"
+   ],
+   "bridge": [
+    "גנ",
+    "חיות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "animal",
+     "beasts"
+    ],
+    [
+     "animal",
+     "animal"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Ownerless Property and Gifts.1.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Ownerless_Property_and_Gifts.1.2|בֵיבָר": {
+   "g": "גן חיות",
+   "l": "בֵּיבָר",
+   "glossEn": [
+    "alive",
+    "animal",
+    "ellipsis",
+    "garden",
+    "gene",
+    "kindergarten",
+    "life",
+    "lifespan",
+    "live",
+    "livelihood",
+    "lively",
+    "living",
+    "pleasure",
+    "preschool",
+    "raw",
+    "vitality"
+   ],
+   "bridge": [
+    "גנ",
+    "חיות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "animal",
+     "beasts"
+    ],
+    [
+     "animal",
+     "animal"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Ownerless Property and Gifts.1.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Ownerless_Property_and_Gifts.1.2|הַבֵיבָרִים": {
+   "g": "גן חיות",
+   "l": "בֵּיבָר",
+   "glossEn": [
+    "alive",
+    "animal",
+    "ellipsis",
+    "garden",
+    "gene",
+    "kindergarten",
+    "life",
+    "lifespan",
+    "live",
+    "livelihood",
+    "lively",
+    "living",
+    "pleasure",
+    "preschool",
+    "raw",
+    "vitality"
+   ],
+   "bridge": [
+    "גנ",
+    "חיות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "animal",
+     "beasts"
+    ],
+    [
+     "animal",
+     "animal"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Ownerless Property and Gifts.1.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Circumcision.2.5|מהול#1": {
+   "g": "אדם שנכרתה ערלתו",
+   "l": "מָהוּל",
+   "glossEn": [
+    "adam",
+    "blush",
+    "carnelian",
+    "color",
+    "cut",
+    "down",
+    "earth",
+    "english",
+    "equivalent",
+    "fume",
+    "given",
+    "human",
+    "humanity",
+    "land",
+    "lipstick",
+    "male",
+    "man",
+    "mankind",
+    "mist",
+    "name",
+    "off",
+    "pause",
+    "personhood",
+    "red",
+    "redness",
+    "related",
+    "ruby",
+    "sardonyx",
+    "soil",
+    "vapour"
+   ],
+   "bridge": [
+    "אדמ",
+    "נכרתה"
+   ],
+   "lemmaEn": [
+    "attenuate",
+    "circumcise",
+    "circumcised",
+    "dilute",
+    "diluted"
+   ],
+   "lemmaAgree": [
+    [
+     "cut",
+     "dilute"
+    ],
+    [
+     "cut",
+     "diluted"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "male",
+     "entire"
+    ],
+    [
+     "name",
+     "observe"
+    ],
+    [
+     "off",
+     "off"
+    ],
+    [
+     "cut",
+     "sides"
+    ],
+    [
+     "cut",
+     "cut"
+    ],
+    [
+     "english",
+     "sides"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Circumcision.2.5",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Circumcision.2.5|מהול#2": {
+   "g": "אדם שנכרתה ערלתו",
+   "l": "מָהוּל",
+   "glossEn": [
+    "adam",
+    "blush",
+    "carnelian",
+    "color",
+    "cut",
+    "down",
+    "earth",
+    "english",
+    "equivalent",
+    "fume",
+    "given",
+    "human",
+    "humanity",
+    "land",
+    "lipstick",
+    "male",
+    "man",
+    "mankind",
+    "mist",
+    "name",
+    "off",
+    "pause",
+    "personhood",
+    "red",
+    "redness",
+    "related",
+    "ruby",
+    "sardonyx",
+    "soil",
+    "vapour"
+   ],
+   "bridge": [
+    "אדמ",
+    "נכרתה"
+   ],
+   "lemmaEn": [
+    "attenuate",
+    "circumcise",
+    "circumcised",
+    "dilute",
+    "diluted"
+   ],
+   "lemmaAgree": [
+    [
+     "cut",
+     "dilute"
+    ],
+    [
+     "cut",
+     "diluted"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "male",
+     "entire"
+    ],
+    [
+     "name",
+     "observe"
+    ],
+    [
+     "off",
+     "off"
+    ],
+    [
+     "cut",
+     "sides"
+    ],
+    [
+     "cut",
+     "cut"
+    ],
+    [
+     "english",
+     "sides"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Circumcision.2.5",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Leavened_and_Unleavened_Bread.5.4|קָלָהו": {
+   "g": "חימם מזון בחום האש",
+   "l": "קָלָה",
+   "glossEn": [
+    "brown",
+    "colored",
+    "energy",
+    "fever",
+    "feverishness",
+    "food",
+    "heat",
+    "heated",
+    "hot",
+    "interaction",
+    "nourishment",
+    "property",
+    "thermal",
+    "transferred",
+    "warm",
+    "warmth"
+   ],
+   "bridge": [
+    "חיממ",
+    "מזונ",
+    "חומ"
+   ],
+   "lemmaEn": [
+    "easy",
+    "light",
+    "toast"
+   ],
+   "lemmaAgree": [
+    [
+     "energy",
+     "light"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "energy",
+     "juice"
+    ],
+    [
+     "energy",
+     "cause"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Leavened and Unleavened Bread.5.4",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Sales.24.5|יְמַעֵט": {
+   "g": "גָּרַע מֵהַכַּמּוּת, הִפְחִית",
+   "l": "מִעֵט",
+   "glossEn": [
+    "amount",
+    "decrease",
+    "like",
+    "lower",
+    "quantity",
+    "reduce"
+   ],
+   "bridge": [
+    "כמות",
+    "הפחית"
+   ],
+   "lemmaEn": [
+    "few",
+    "little",
+    "shorten"
+   ],
+   "lemmaAgree": [
+    [
+     "reduce",
+     "shorten"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "lower",
+     "small"
+    ],
+    [
+     "reduce",
+     "cut"
+    ],
+    [
+     "decrease",
+     "cut"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Sales.24.5",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Defilement_by_Leprosy.11.1|תַעַר": {
+   "g": "סכין גילוח",
+   "l": "תַּעַר",
+   "glossEn": [
+    "blade",
+    "knife",
+    "shave",
+    "shaving"
+   ],
+   "bridge": [
+    "סכינ",
+    "גילוח"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "shaving",
+     "shaving"
+    ],
+    [
+     "shaving",
+     "shaves"
+    ],
+    [
+     "shaving",
+     "shave"
+    ],
+    [
+     "shave",
+     "shaving"
+    ],
+    [
+     "shave",
+     "shaves"
+    ],
+    [
+     "shave",
+     "shave"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Defilement by Leprosy.11.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Plaintiff_and_Defendant.13.10|לִרְדוֹת": {
+   "g": "הֵבִיא לְהַכְנָעָה",
+   "l": "רִדָּה",
+   "glossEn": [
+    "bring",
+    "cite",
+    "humble",
+    "low",
+    "quote",
+    "subdue"
+   ],
+   "bridge": [
+    "הביא",
+    "הכנעה"
+   ],
+   "lemmaEn": [
+    "against",
+    "crumble",
+    "dominion",
+    "down",
+    "off",
+    "prevail",
+    "reign",
+    "rule",
+    "specifically",
+    "subjugate",
+    "take",
+    "tread",
+    "unload"
+   ],
+   "lemmaAgree": [
+    [
+     "bring",
+     "take"
+    ],
+    [
+     "subdue",
+     "subjugate"
+    ],
+    [
+     "low",
+     "down"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "bring",
+     "took"
+    ],
+    [
+     "bring",
+     "take"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Plaintiff and Defendant.13.10",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Repentance.5.2|כְלוֹמַר": {
+   "g": "פירוש הדבר",
+   "l": "כְּלוֹמַר",
+   "glossEn": [
+    "commentary",
+    "gloss",
+    "interpret",
+    "interpretation",
+    "leader",
+    "specify",
+    "speech"
+   ],
+   "bridge": [
+    "פירוש",
+    "הדבר"
+   ],
+   "lemmaEn": [
+    "meaning",
+    "namely",
+    "say"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "leader",
+     "leads"
+    ],
+    [
+     "speech",
+     "prompts"
+    ],
+    [
+     "speech",
+     "mouth"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Repentance.5.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Plaintiff_and_Defendant.11.8|שֶׁמִחָה": {
+   "g": "הביע התנגדות",
+   "l": "מָחָה גם מִחָה",
+   "glossEn": [
+    "action",
+    "conflict",
+    "convey",
+    "express",
+    "oppose",
+    "opposed",
+    "opposing",
+    "opposition",
+    "quality"
+   ],
+   "bridge": [
+    "הביע",
+    "התנגדות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "action",
+     "record"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Plaintiff and Defendant.11.8",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Plaintiff_and_Defendant.11.8|מִחָה#1": {
+   "g": "הביע התנגדות",
+   "l": "מָחָה גם מִחָה",
+   "glossEn": [
+    "action",
+    "conflict",
+    "convey",
+    "express",
+    "oppose",
+    "opposed",
+    "opposing",
+    "opposition",
+    "quality"
+   ],
+   "bridge": [
+    "הביע",
+    "התנגדות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "action",
+     "record"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Plaintiff and Defendant.11.8",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Plaintiff_and_Defendant.11.8|מִחָה#2": {
+   "g": "הביע התנגדות",
+   "l": "מָחָה גם מִחָה",
+   "glossEn": [
+    "action",
+    "conflict",
+    "convey",
+    "express",
+    "oppose",
+    "opposed",
+    "opposing",
+    "opposition",
+    "quality"
+   ],
+   "bridge": [
+    "הביע",
+    "התנגדות"
+   ],
+   "lemmaEn": [],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "action",
+     "record"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Plaintiff and Defendant.11.8",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Kings_and_Wars.6.4|וְטַפָם": {
+   "g": "ילדים קטנים",
+   "l": "טַף",
+   "glossEn": [
+    "age",
+    "become",
+    "boy",
+    "child",
+    "diminutive",
+    "group",
+    "insignificant",
+    "kid",
+    "kin",
+    "little",
+    "note",
+    "occasionally",
+    "offspring",
+    "own",
+    "peer",
+    "regarding",
+    "see",
+    "small",
+    "son",
+    "unimportant",
+    "unworthy",
+    "usage",
+    "young"
+   ],
+   "bridge": [
+    "ילדימ",
+    "קטנימ"
+   ],
+   "lemmaEn": [
+    "babies",
+    "children",
+    "infants",
+    "small"
+   ],
+   "lemmaAgree": [
+    [
+     "child",
+     "infants"
+    ],
+    [
+     "child",
+     "babies"
+    ],
+    [
+     "child",
+     "children"
+    ],
+    [
+     "little",
+     "small"
+    ],
+    [
+     "offspring",
+     "infants"
+    ],
+    [
+     "offspring",
+     "babies"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "child",
+     "children"
+    ],
+    [
+     "regarding",
+     "regard"
+    ],
+    [
+     "see",
+     "regard"
+    ],
+    [
+     "offspring",
+     "children"
+    ],
+    [
+     "note",
+     "refer"
+    ],
+    [
+     "note",
+     "referring"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Kings and Wars.6.4",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Defilement_of_Foods.7.1|הַנִגָרִין": {
+   "g": "זָרַם מַטָּה",
+   "l": "נִגַּר",
+   "glossEn": [
+    "alien",
+    "bed",
+    "below",
+    "bend",
+    "bouquet",
+    "current",
+    "down",
+    "downwards",
+    "earthly",
+    "flow",
+    "foreigner",
+    "headquarters",
+    "ideological",
+    "inflect",
+    "movement",
+    "religious",
+    "slant",
+    "staff",
+    "stick",
+    "stream",
+    "tilt",
+    "tribe",
+    "twist",
+    "wand",
+    "wreath"
+   ],
+   "bridge": [
+    "זרמ",
+    "מטה"
+   ],
+   "lemmaEn": [
+    "carpenter",
+    "carpentry",
+    "skilled"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "stream",
+     "poured"
+    ],
+    [
+     "stream",
+     "pouring"
+    ],
+    [
+     "movement",
+     "air"
+    ],
+    [
+     "movement",
+     "crawling"
+    ],
+    [
+     "flow",
+     "poured"
+    ],
+    [
+     "flow",
+     "pouring"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Defilement of Foods.7.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Murderer_and_the_Preservation_of_Life.2.6|הַהוֹרֵג": {
+   "g": "הֵמִית, שׂם קץ לחיים",
+   "l": "הָרַג",
+   "glossEn": [
+    "activity",
+    "appraise",
+    "assess",
+    "blessing",
+    "cheek",
+    "cut",
+    "death",
+    "don",
+    "doorpost",
+    "end",
+    "expression",
+    "filled",
+    "finish",
+    "goodwill",
+    "jaw",
+    "kill",
+    "name",
+    "off",
+    "place",
+    "put",
+    "shem",
+    "sigh",
+    "there",
+    "toast",
+    "turn",
+    "yearn"
+   ],
+   "bridge": [
+    "המית",
+    "שמ",
+    "קצ",
+    "לחיימ"
+   ],
+   "lemmaEn": [
+    "absolute",
+    "die",
+    "dissatisfaction",
+    "feelings",
+    "infinitive",
+    "kill",
+    "killed",
+    "killing",
+    "massacre",
+    "murder",
+    "produce",
+    "related",
+    "revulsion",
+    "slaughter",
+    "suddenly",
+    "violently"
+   ],
+   "lemmaAgree": [
+    [
+     "death",
+     "die"
+    ],
+    [
+     "death",
+     "killing"
+    ],
+    [
+     "finish",
+     "die"
+    ],
+    [
+     "finish",
+     "slaughter"
+    ],
+    [
+     "off",
+     "murder"
+    ],
+    [
+     "off",
+     "killing"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "death",
+     "passed"
+    ],
+    [
+     "don",
+     "born"
+    ],
+    [
+     "off",
+     "killer"
+    ],
+    [
+     "off",
+     "killed"
+    ],
+    [
+     "off",
+     "kills"
+    ],
+    [
+     "off",
+     "executed"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Murderer and the Preservation of Life.2.6",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Murderer_and_the_Preservation_of_Life.2.6|הָרַג#1": {
+   "g": "הֵמִית, שׂם קץ לחיים",
+   "l": "הָרַג",
+   "glossEn": [
+    "activity",
+    "appraise",
+    "assess",
+    "blessing",
+    "cheek",
+    "cut",
+    "death",
+    "don",
+    "doorpost",
+    "end",
+    "expression",
+    "filled",
+    "finish",
+    "goodwill",
+    "jaw",
+    "kill",
+    "name",
+    "off",
+    "place",
+    "put",
+    "shem",
+    "sigh",
+    "there",
+    "toast",
+    "turn",
+    "yearn"
+   ],
+   "bridge": [
+    "המית",
+    "שמ",
+    "קצ",
+    "לחיימ"
+   ],
+   "lemmaEn": [
+    "absolute",
+    "die",
+    "dissatisfaction",
+    "feelings",
+    "infinitive",
+    "kill",
+    "killed",
+    "killing",
+    "massacre",
+    "murder",
+    "produce",
+    "related",
+    "revulsion",
+    "slaughter",
+    "suddenly",
+    "violently"
+   ],
+   "lemmaAgree": [
+    [
+     "death",
+     "die"
+    ],
+    [
+     "death",
+     "killing"
+    ],
+    [
+     "finish",
+     "die"
+    ],
+    [
+     "finish",
+     "slaughter"
+    ],
+    [
+     "off",
+     "murder"
+    ],
+    [
+     "off",
+     "killing"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "death",
+     "passed"
+    ],
+    [
+     "don",
+     "born"
+    ],
+    [
+     "off",
+     "killer"
+    ],
+    [
+     "off",
+     "killed"
+    ],
+    [
+     "off",
+     "kills"
+    ],
+    [
+     "off",
+     "executed"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Murderer and the Preservation of Life.2.6",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Neighbors.5.7|ומַבִיט": {
+   "g": "בָּחַן דֶּרֶךְ עֵינָיו דְּבַר-מָה",
+   "l": "הִבִּיט",
+   "glossEn": [
+    "bees",
+    "castles",
+    "cock",
+    "conducting",
+    "custom",
+    "destruction",
+    "draw",
+    "examination",
+    "eye",
+    "following",
+    "fortress",
+    "fortresses",
+    "guiding",
+    "imperative",
+    "inspection",
+    "journey",
+    "leader",
+    "path",
+    "paths",
+    "pestilence",
+    "plague",
+    "related",
+    "road",
+    "saying",
+    "speak",
+    "speaking",
+    "speech",
+    "spoken",
+    "step",
+    "stepping",
+    "test",
+    "testing",
+    "through",
+    "towers",
+    "tread",
+    "via",
+    "walk",
+    "watchtower"
+   ],
+   "bridge": [
+    "בחנ",
+    "דרכ",
+    "עיניו",
+    "דבר"
+   ],
+   "lemmaEn": [
+    "look"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "bees",
+     "represents"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Neighbors.5.7",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein.10.11|ומַבִיט": {
+   "g": "בָּחַן דֶּרֶךְ עֵינָיו דְּבַר-מָה",
+   "l": "הִבִּיט",
+   "glossEn": [
+    "bees",
+    "castles",
+    "cock",
+    "conducting",
+    "custom",
+    "destruction",
+    "draw",
+    "examination",
+    "eye",
+    "following",
+    "fortress",
+    "fortresses",
+    "guiding",
+    "imperative",
+    "inspection",
+    "journey",
+    "leader",
+    "path",
+    "paths",
+    "pestilence",
+    "plague",
+    "related",
+    "road",
+    "saying",
+    "speak",
+    "speaking",
+    "speech",
+    "spoken",
+    "step",
+    "stepping",
+    "test",
+    "testing",
+    "through",
+    "towers",
+    "tread",
+    "via",
+    "walk",
+    "watchtower"
+   ],
+   "bridge": [
+    "בחנ",
+    "דרכ",
+    "עיניו",
+    "דבר"
+   ],
+   "lemmaEn": [
+    "look"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "following",
+     "see"
+    ],
+    [
+     "draw",
+     "making"
+    ],
+    [
+     "speaking",
+     "speak"
+    ],
+    [
+     "examination",
+     "inquiry"
+    ],
+    [
+     "examination",
+     "see"
+    ],
+    [
+     "speech",
+     "speak"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Vessels of the Sanctuary and Those who Serve Therein.10.11",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Torah_Study.1.12|מִתְבוֹנֵן": {
+   "g": "הִבִּיט",
+   "l": "הִתְבּוֹנֵן",
+   "glossEn": [
+    "look"
+   ],
+   "bridge": [
+    "הביט"
+   ],
+   "lemmaEn": [
+    "contemplate"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "look",
+     "regards"
+    ],
+    [
+     "look",
+     "see"
+    ],
+    [
+     "look",
+     "attention"
+    ],
+    [
+     "look",
+     "life"
+    ],
+    [
+     "look",
+     "aspect"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Torah Study.1.12",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Divorce.7.9|עִרְעור": {
+   "g": "אי הסכמה עם טענה",
+   "l": "עִרְעוּר",
+   "glossEn": [
+    "accord",
+    "acronym",
+    "adjectives",
+    "against",
+    "agree",
+    "agreement",
+    "among",
+    "approval",
+    "argue",
+    "argument",
+    "assert",
+    "charge",
+    "claim",
+    "consent",
+    "contend",
+    "contract",
+    "denoting",
+    "eer",
+    "egyptian",
+    "forming",
+    "ian",
+    "indicate",
+    "island",
+    "jackal",
+    "load",
+    "loader",
+    "maintain",
+    "nation",
+    "near",
+    "next",
+    "non",
+    "occupation",
+    "orders",
+    "permission",
+    "place",
+    "plead",
+    "profession",
+    "proposition",
+    "related",
+    "same",
+    "signaller",
+    "taxonomic",
+    "time",
+    "together",
+    "togetherness",
+    "where"
+   ],
+   "bridge": [
+    "אי",
+    "הסכמה",
+    "עמ",
+    "טענה"
+   ],
+   "lemmaEn": [
+    "appeal"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "charge",
+     "raised"
+    ],
+    [
+     "contract",
+     "get"
+    ],
+    [
+     "contract",
+     "signed"
+    ],
+    [
+     "consent",
+     "accepted"
+    ],
+    [
+     "indicate",
+     "statements"
+    ],
+    [
+     "indicate",
+     "signed"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Divorce.7.9",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Heave_Offerings.11.19|נִקְיוֹן": {
+   "g": "פעולת הסרת זיהום ולכלוך",
+   "l": "נִקָּיוֹן",
+   "glossEn": [
+    "become",
+    "cause",
+    "contaminate",
+    "contamination",
+    "dirt",
+    "dirty",
+    "divert",
+    "get",
+    "infect",
+    "infection",
+    "pollute",
+    "pollution",
+    "remove",
+    "soil"
+   ],
+   "bridge": [
+    "הסרת",
+    "זיהומ",
+    "לכלוכ"
+   ],
+   "lemmaEn": [
+    "clean",
+    "cleaning",
+    "cleanliness"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "get",
+     "father"
+    ],
+    [
+     "get",
+     "feel"
+    ],
+    [
+     "get",
+     "take"
+    ],
+    [
+     "remove",
+     "take"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Heave Offerings.11.19",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Circumcision.3.7|לחתוך": {
+   "g": "עשה חתך, גזר",
+   "l": "חָתַךְ",
+   "glossEn": [
+    "accordance",
+    "attend",
+    "become",
+    "brought",
+    "carrot",
+    "carver",
+    "change",
+    "class",
+    "create",
+    "created",
+    "cross",
+    "cut",
+    "cutting",
+    "decree",
+    "derive",
+    "direction",
+    "doing",
+    "done",
+    "end",
+    "executed",
+    "forming",
+    "halakhah",
+    "intersect",
+    "issue",
+    "main",
+    "making",
+    "off",
+    "performed",
+    "pertaining",
+    "point",
+    "precisely",
+    "pronounce",
+    "say",
+    "section",
+    "shear",
+    "short",
+    "shred",
+    "skip",
+    "stop",
+    "suddenly",
+    "terminate",
+    "trim",
+    "turn"
+   ],
+   "bridge": [
+    "עשה",
+    "חתכ",
+    "גזר"
+   ],
+   "lemmaEn": [
+    "accordance",
+    "attend",
+    "carver",
+    "change",
+    "class",
+    "cross",
+    "cut",
+    "cutting",
+    "direction",
+    "end",
+    "halakhah",
+    "intersect",
+    "main",
+    "off",
+    "point",
+    "precisely",
+    "pronounce",
+    "section",
+    "short",
+    "skip",
+    "stop",
+    "suddenly",
+    "terminate"
+   ],
+   "lemmaAgree": [
+    [
+     "issue",
+     "cut"
+    ],
+    [
+     "issue",
+     "attend"
+    ],
+    [
+     "issue",
+     "cutting"
+    ],
+    [
+     "change",
+     "change"
+    ],
+    [
+     "section",
+     "section"
+    ],
+    [
+     "section",
+     "point"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "issue",
+     "matter"
+    ],
+    [
+     "issue",
+     "free"
+    ],
+    [
+     "issue",
+     "writes"
+    ],
+    [
+     "issue",
+     "given"
+    ],
+    [
+     "issue",
+     "consequences"
+    ],
+    [
+     "change",
+     "death"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Circumcision.3.7",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Sabbath.11.7|שֶׁיַחְתֹךְ": {
+   "g": "עשה חתך, גזר",
+   "l": "חָתַךְ",
+   "glossEn": [
+    "accordance",
+    "attend",
+    "become",
+    "brought",
+    "carrot",
+    "carver",
+    "change",
+    "class",
+    "create",
+    "created",
+    "cross",
+    "cut",
+    "cutting",
+    "decree",
+    "derive",
+    "direction",
+    "doing",
+    "done",
+    "end",
+    "executed",
+    "forming",
+    "halakhah",
+    "intersect",
+    "issue",
+    "main",
+    "making",
+    "off",
+    "performed",
+    "pertaining",
+    "point",
+    "precisely",
+    "pronounce",
+    "say",
+    "section",
+    "shear",
+    "short",
+    "shred",
+    "skip",
+    "stop",
+    "suddenly",
+    "terminate",
+    "trim",
+    "turn"
+   ],
+   "bridge": [
+    "עשה",
+    "חתכ",
+    "גזר"
+   ],
+   "lemmaEn": [
+    "accordance",
+    "attend",
+    "carver",
+    "change",
+    "class",
+    "cross",
+    "cut",
+    "cutting",
+    "direction",
+    "end",
+    "halakhah",
+    "intersect",
+    "main",
+    "off",
+    "point",
+    "precisely",
+    "pronounce",
+    "section",
+    "short",
+    "skip",
+    "stop",
+    "suddenly",
+    "terminate"
+   ],
+   "lemmaAgree": [
+    [
+     "issue",
+     "cut"
+    ],
+    [
+     "issue",
+     "attend"
+    ],
+    [
+     "issue",
+     "cutting"
+    ],
+    [
+     "change",
+     "change"
+    ],
+    [
+     "section",
+     "section"
+    ],
+    [
+     "section",
+     "point"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "issue",
+     "takes"
+    ],
+    [
+     "issue",
+     "cutting"
+    ],
+    [
+     "issue",
+     "provided"
+    ],
+    [
+     "issue",
+     "cuts"
+    ],
+    [
+     "done",
+     "doing"
+    ],
+    [
+     "done",
+     "performing"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Sabbath.11.7",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Sabbath.19.2|רָפוי": {
+   "g": "הָיָה רָעוּעַ וְלֹא יַצִּיב",
+   "l": "רָפָה",
+   "glossEn": [
+    "condition",
+    "dilapidated",
+    "else",
+    "erect",
+    "place",
+    "poor",
+    "rickety",
+    "set",
+    "stable",
+    "unstable",
+    "weak"
+   ],
+   "bridge": [
+    "רעוע",
+    "ולא",
+    "יציב"
+   ],
+   "lemmaEn": [
+    "bar",
+    "benchmark",
+    "diacritical",
+    "loose",
+    "loosen",
+    "mark",
+    "rafe",
+    "slacken",
+    "standard",
+    "threshold",
+    "weak"
+   ],
+   "lemmaAgree": [
+    [
+     "set",
+     "mark"
+    ],
+    [
+     "weak",
+     "weak"
+    ],
+    [
+     "rickety",
+     "weak"
+    ],
+    [
+     "place",
+     "mark"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "set",
+     "place"
+    ],
+    [
+     "set",
+     "fasten"
+    ],
+    [
+     "condition",
+     "study"
+    ],
+    [
+     "place",
+     "place"
+    ],
+    [
+     "place",
+     "post"
+    ],
+    [
+     "place",
+     "discovered"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Sabbath.19.2",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Testimony.14.5|לְזַיֵף": {
+   "g": "יצר חיקוי",
+   "l": "זִיֵּף",
+   "glossEn": [
+    "copy",
+    "create",
+    "created",
+    "emulation",
+    "fashion",
+    "generate",
+    "imitate",
+    "imitation",
+    "impulse",
+    "instinct",
+    "manufactured",
+    "mimic",
+    "mimicry",
+    "mold",
+    "nature",
+    "produce",
+    "produced",
+    "urge"
+   ],
+   "bridge": [
+    "יצר",
+    "חיקוי"
+   ],
+   "lemmaEn": [
+    "bristle",
+    "counterfeit",
+    "forge",
+    "play",
+    "sing",
+    "stubble",
+    "tune"
+   ],
+   "lemmaAgree": [
+    [
+     "imitation",
+     "forge"
+    ],
+    [
+     "imitation",
+     "counterfeit"
+    ],
+    [
+     "produced",
+     "forge"
+    ],
+    [
+     "produce",
+     "forge"
+    ],
+    [
+     "create",
+     "forge"
+    ],
+    [
+     "mold",
+     "forge"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "imitation",
+     "forging"
+    ],
+    [
+     "produced",
+     "forging"
+    ],
+    [
+     "produce",
+     "forging"
+    ],
+    [
+     "create",
+     "forging"
+    ],
+    [
+     "generate",
+     "father"
+    ],
+    [
+     "mold",
+     "forging"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Testimony.14.5",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Foundations_of_the_Torah.8.1|נִגַשׁ": {
+   "g": "התקרב, בא לקראת־",
+   "l": "נִגַּשׁ",
+   "glossEn": [
+    "approach",
+    "become",
+    "closer",
+    "come",
+    "coming",
+    "direction",
+    "draw",
+    "enter",
+    "imperative",
+    "meet",
+    "moving",
+    "near",
+    "next",
+    "opposite",
+    "toward",
+    "upcoming",
+    "want"
+   ],
+   "bridge": [
+    "התקרב",
+    "בא",
+    "לקראת"
+   ],
+   "lemmaEn": [
+    "approach",
+    "come",
+    "participate",
+    "sit",
+    "tackle",
+    "take"
+   ],
+   "lemmaAgree": [
+    [
+     "meet",
+     "take"
+    ],
+    [
+     "coming",
+     "approach"
+    ],
+    [
+     "coming",
+     "come"
+    ],
+    [
+     "enter",
+     "participate"
+    ],
+    [
+     "near",
+     "approach"
+    ],
+    [
+     "near",
+     "come"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "next",
+     "following"
+    ],
+    [
+     "meet",
+     "saw"
+    ],
+    [
+     "meet",
+     "happened"
+    ],
+    [
+     "coming",
+     "come"
+    ],
+    [
+     "coming",
+     "following"
+    ],
+    [
+     "enter",
+     "entered"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Foundations of the Torah.8.1",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Defilement_of_Foods.6.16|שֶׁעֲטָנָן": {
+   "g": "לשים במעטן",
+   "l": "עָטַן",
+   "glossEn": [
+    "containers",
+    "don",
+    "forming",
+    "infinitive",
+    "knead",
+    "olives",
+    "pack",
+    "packing",
+    "place",
+    "put",
+    "relating",
+    "turn",
+    "vat"
+   ],
+   "bridge": [
+    "לשימ",
+    "עטנ"
+   ],
+   "lemmaEn": [
+    "containers",
+    "forming",
+    "olives",
+    "pack",
+    "packing",
+    "relating",
+    "vat"
+   ],
+   "lemmaAgree": [
+    [
+     "pack",
+     "pack"
+    ],
+    [
+     "pack",
+     "packing"
+    ],
+    [
+     "put",
+     "forming"
+    ],
+    [
+     "containers",
+     "pack"
+    ],
+    [
+     "containers",
+     "containers"
+    ],
+    [
+     "containers",
+     "vat"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "pack",
+     "mound"
+    ],
+    [
+     "pack",
+     "mass"
+    ],
+    [
+     "put",
+     "formed"
+    ],
+    [
+     "put",
+     "placed"
+    ],
+    [
+     "olives",
+     "olives"
+    ],
+    [
+     "forming",
+     "formed"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Defilement of Foods.6.16",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Forbidden_Intercourse.13.4|ולְהִסְתוֹפֵף": {
+   "g": "מָצָא לוֹ מִסְתּוֹר וּמָעוֹז",
+   "l": "הִסְתּוֹפֵף",
+   "glossEn": [
+    "discovered",
+    "find",
+    "finding",
+    "fortress",
+    "found",
+    "hiding",
+    "located",
+    "place",
+    "refuge",
+    "related",
+    "situated",
+    "stronghold",
+    "turn"
+   ],
+   "bridge": [
+    "מצא",
+    "מסתור",
+    "מעוז"
+   ],
+   "lemmaEn": [
+    "entrance",
+    "night",
+    "spend",
+    "stand",
+    "stay",
+    "threshold"
+   ],
+   "lemmaAgree": [
+    [
+     "place",
+     "stand"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "related",
+     "yoke"
+    ],
+    [
+     "turn",
+     "numbers"
+    ],
+    [
+     "place",
+     "take"
+    ],
+    [
+     "place",
+     "wings"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Forbidden Intercourse.13.4",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  },
+  "Rambam Firstlings.6.15|הַלוֹקֵחַ#1": {
+   "g": "שֶׁנִּקְנָה, שֶׁרָכְשׁוּ אוֹתוֹ",
+   "l": "לָקוּחַ",
+   "glossEn": [
+    "accept",
+    "acquire",
+    "acquired",
+    "appoint",
+    "appointed",
+    "assign",
+    "assigned",
+    "believe",
+    "bought",
+    "buy",
+    "captivate",
+    "certain",
+    "definite",
+    "direct",
+    "get",
+    "including",
+    "introduce",
+    "learned",
+    "object",
+    "obtain",
+    "obtained",
+    "personal",
+    "position",
+    "possess",
+    "pronoun",
+    "purchase",
+    "purchased",
+    "same",
+    "semantically",
+    "true",
+    "work"
+   ],
+   "bridge": [
+    "נקנה",
+    "רכשו",
+    "אותו"
+   ],
+   "lemmaEn": [
+    "client",
+    "customer"
+   ],
+   "lemmaAgree": [],
+   "translationAgree": [
+    [
+     "acquired",
+     "age"
+    ],
+    [
+     "purchased",
+     "purchaser"
+    ],
+    [
+     "purchased",
+     "purchased"
+    ],
+    [
+     "purchased",
+     "purchases"
+    ],
+    [
+     "purchase",
+     "purchaser"
+    ],
+    [
+     "purchase",
+     "purchased"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Firstlings.6.15",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": false,
+   "why": [
+    "English Wiktionary lemma disagrees / missing"
+   ]
+  },
+  "Rambam Kings_and_Wars.7.3|לְהִלָחֵם#1": {
+   "g": "נאבק תוך שימוש בכוח",
+   "l": "נִלְחַם",
+   "glossEn": [
+    "ability",
+    "authority",
+    "betweenness",
+    "capacity",
+    "capital",
+    "centrality",
+    "character",
+    "fight",
+    "force",
+    "inside",
+    "lift",
+    "lizard",
+    "making",
+    "mark",
+    "mediate",
+    "middleness",
+    "midst",
+    "military",
+    "monitor",
+    "note",
+    "physical",
+    "police",
+    "power",
+    "powerful",
+    "property",
+    "quality",
+    "related",
+    "serve",
+    "sign",
+    "strength",
+    "strong",
+    "struggle",
+    "using",
+    "utilization",
+    "validity",
+    "value",
+    "walk",
+    "wealth",
+    "work",
+    "wrestle"
+   ],
+   "bridge": [
+    "נאבק",
+    "תוכ",
+    "שימוש",
+    "כוח"
+   ],
+   "lemmaEn": [
+    "fight",
+    "wage",
+    "war"
+   ],
+   "lemmaAgree": [
+    [
+     "force",
+     "fight"
+    ],
+    [
+     "struggle",
+     "fight"
+    ],
+    [
+     "struggle",
+     "wage"
+    ],
+    [
+     "struggle",
+     "war"
+    ],
+    [
+     "fight",
+     "fight"
+    ],
+    [
+     "fight",
+     "wage"
+    ]
+   ],
+   "translationAgree": [
+    [
+     "lift",
+     "elevated"
+    ],
+    [
+     "authority",
+     "lord"
+    ],
+    [
+     "authority",
+     "army"
+    ],
+    [
+     "authority",
+     "armies"
+    ],
+    [
+     "mark",
+     "positions"
+    ],
+    [
+     "mark",
+     "ranks"
+    ]
+   ],
+   "translation": {
+    "ref": "Mishneh Torah, Kings and Wars.7.3",
+    "version": "Mishneh Torah, trans. by Eliyahu Touger. Jerusalem, Moznaim Pub. c1986-c2007",
+    "license": "CC-BY-NC"
+   },
+   "pass": true,
+   "why": []
+  }
+ }
+}

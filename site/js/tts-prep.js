@@ -153,7 +153,18 @@ export function numberWords(n) {
   if (h) parts.push(HUNDREDS[h]);
   if (r >= 10 && r < 20) parts.push(TEENS_F[u]);
   else { if (t) parts.push(TENS[t]); if (u) parts.push(ONES_F[u]); }
-  return parts.map((p, i) => (i && i === parts.length - 1 ? 'וְ' + p : p)).join(' ');
+  return parts.map((p, i) => (i && i === parts.length - 1 ? vav(p) : p)).join(' ');
+}
+/** The conjunction ו before a number word, by the grammar rule (round 5): וּ before a shva or before ב/מ/פ
+ *  (וּשְׁתַּיִם, וּשְׁמוֹנֶה, וּמֵאָה), וַ / וֶ / וָ before a hataf (וַחֲמִשִּׁים), otherwise וְ (וְאַחַת, וְשָׁלוֹשׁ, וְתֵשַׁע). */
+export function vav(word) {
+  word = word.replace(/^([בגדכפת][\u05B0-\u05BB\u05C1\u05C2\u05C7]*)\u05BC/, '$1'); // after ו a בגדכפ״ת letter loses its dagesh (וְתֵשַׁע)
+  const first = word.match(/^[\u05D0-\u05EA][\u05B0-\u05BC\u05C1\u05C2\u05C7]*/)?.[0] || '';
+  if (/^[במפ]/.test(first) || /\u05B0/.test(first)) return 'וּ' + word;
+  if (/\u05B2/.test(first)) return 'וַ' + word;
+  if (/\u05B1/.test(first)) return 'וֶ' + word;
+  if (/\u05B3/.test(first)) return 'וָ' + word;
+  return 'וְ' + word;
 }
 const CITE_UNIT = /^(ו|ב|וב|ל|מ)?(פרק|פ'|סימן|סי'|דף|עמוד|אות|מאמר|משנה|הלכה|פסוק|סעיף|פרשה)$/;
 const COUNT_PREV = /^(מנת|המסלול|מסלול)$/;
@@ -162,7 +173,7 @@ const COUNT_NEXT = /^(מעלות|מעלה|חלקים|תעניות|ימים|שנ�
 export function numeralReading(words, i) {
   const w = words[i];
   const m = /^([^\u05D0-\u05EA]*)([\u05D0-\u05EA\u0591-\u05C7]+["'][\u05D0-\u05EA\u0591-\u05C7]?)(.*)$/s.exec(w);
-  if (!m) return null;
+  if (!m) return plainNumeral(words, i);
   const sk = skeleton(m[2]).replace(/״/g, '"').replace(/׳/g, "'");
   const n = gematria(sk);
   if (!n) return null;
@@ -191,6 +202,18 @@ export function numeralReading(words, i) {
     if (open || (/^\(/.test(m[1]))) return m[1] + names() + m[3];
   }
   return null;
+}
+
+// Round 5: a numeral written WITHOUT geresh/gershayim ("אגרת כט") is read as a number only after "אגרת" (the Tanya's
+// letters are numbered this way). Not after פרק / סימן / דף / הלכה: in the texts here every such case is a word
+// ("פרק זה", "הלכה לה", "סימן יש", "פרק קמא" = the first chapter), so converting there would do harm.
+function plainNumeral(words, i) {
+  const m = /^([^\u05D0-\u05EA]*)([\u05D0-\u05EA]{1,3})([.,:;)]*)$/.exec(words[i] || '');
+  if (!m) return null;
+  let j = i - 1; while (j >= 0 && /^\s*$/.test(words[j])) j--;
+  if (j < 0 || !/^(ו|ב|וב|ל|מ)?(אגרת|אגרות)$/.test(skeleton(words[j]).replace(/^[([]+/, ''))) return null;
+  const ls = m[2], n = gematria(ls.length === 1 ? ls + "'" : ls.slice(0, -1) + '"' + ls.slice(-1));
+  return n ? m[1] + numberWords(n) + m[3] : null;
 }
 
 // ---- round 4: source citations in parentheses – "(שמות כ׳)", "(מכילתא)", "(דברים ו ה)", "(זבחים קט״ו)" – are not read

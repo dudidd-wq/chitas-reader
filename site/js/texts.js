@@ -143,7 +143,7 @@ async function rambamDoc(plan, unit) {
       }
     }
   }
-  return { title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits, fixes };
+  return { book: 'Rambam', title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits, fixes }; // book: the gloss key prefix ('Rambam <slug>.<c>.<s>')
 }
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);

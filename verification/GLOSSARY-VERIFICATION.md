@@ -45,3 +45,15 @@ python3 tools/gloss-xcheck.py          # בדיקה ב → tools/gloss-xcheck.js
 node tools/build-glossary.mjs          # מפרסם רק: א ✓ + ב ✓ + החלטה ידנית "keep" → site/data/glossary.json
 ```
 הבדיקות `tests/gloss-two-check.test.mjs` ו-`tests/glossary.test.mjs` נכשלות אם ביאור שפורסם לא עבר את שתי הבדיקות, אם הוא מגיע מהגדרה מסומנת, או אם המספרים בעמוד "מקורות" לא תואמים לנתונים.
+
+## Rambam (round 5) – a small, careful extension
+
+The Tanakh rule, applied to Mishneh Torah. Nothing ships unless it passes all three steps:
+
+1. **Check A – location** (`tools/gloss-rambam.mjs`): a Hebrew-Wiktionary sense whose quote names the Rambam/Mishneh Torah and puts the word in bold, with no defect template and a short gloss (≤ 4 words). The bold word must be found in **our** halacha through a run of ≥ 5 consonant-folded words that is unique across all 14,367 halachot, and the hilchot name in the quote must match. 126 quotes → 37 located.
+2. **Check B – independent agreement** (`tools/gloss-rambam-xcheck.py` → `tools/gloss-rambam-xcheck.json`): the gloss must agree (same WordNet machinery as for the Tanakh) with **both** the English Wiktionary entry for the headword and Eliyahu Touger's English translation of that halacha (Sefaria, CC BY-NC; used only as a witness, not shown in the app). 37 → 21.
+3. **Manual review** (`tools/gloss-rambam-review.json`): each survivor was read against the halacha and the translation. 12 were rejected: 11 because the word is trivial (אם, הרג, חתך, נלחם, ניגש – a pop-up there is noise), and 1 because the form doesn't match (רפוי is an adjective, glossed with a verb definition). Several of the automated agreements behind the rejects were weak; the kept ones were checked by hand against the translation's wording (recorded in the `why` field).
+
+**Published: 9 glosses (8 words)** – stored under `rambam` in `site/data/glossary.json`, keyed `Rambam <slug>.<chapter>.<halacha>`. The test `tests/round5.test.mjs` checks that every published gloss has a passing check B entry with evidence and a manual `keep`.
+
+**Tanya: none.** Hebrew Wiktionary has no quotes from the Tanya to anchor a gloss to (the 19 hits for "תניא" are the Talmudic "תניא"), so the rule can't be met and nothing is published.

@@ -59,7 +59,7 @@ test('Sources page states the two-check method with the real counts; About is ho
     for (const w of ['STEPBible TAHOT', 'JPS 1917', 'פירוש לקוי', 'VERIFICATION.md', 'CC BY 4.0']) assert.ok(page.includes(w), w);
     await p.goto(srv.url + '#/about'); await p.waitForFunction(n => document.querySelector('#gloss-n')?.textContent === n, f(m.manualReview.published));
     const a = await p.textContent('.page');
-    assert.match(a, /הכיסוי קטן, בכוונה/); assert.match(a, /ברש״י, בתניא וברמב״ם אין ביאורים כלל/);
+    assert.match(a, /הכיסוי קטן, בכוונה/); assert.match(a, /בתניא וברש״י אין ביאורים כלל/); assert.ok(a.includes(`ועוד ${f(G.rambam.meta.published)} ביאורים בכל הרמב״ם`));
     assert.doesNotMatch(a, /כ־800/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }

@@ -44,7 +44,7 @@ test('reader DOM: every glossary key marks exactly one word, and the right copy 
     const G = await loadGlossary(); const bad = [];
     const root = document.createElement('div'); document.body.appendChild(root);
     root.innerHTML = Object.entries(verses).map(([ref, t]) => `<span class="seg" data-id="x" data-ref="${ref}"><span class="t">${t
-      .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv">($1)</span> <span>$2</span>').replace(/\{([פס])\}/g, '<span class="pe">$1</span>')}</span></span>`).join(' ');
+      .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv">($1)</span> <span>$2</span>').replace(/\{([פס])\}/g, '<span class="pe"></span>')}</span></span>`).join(' ');
     applyGlosses(root, 'x');
     for (const seg of root.querySelectorAll('.seg')) {
       const keys = Object.keys(G.verses[seg.dataset.ref]), gl = [...seg.querySelectorAll('.gl')];

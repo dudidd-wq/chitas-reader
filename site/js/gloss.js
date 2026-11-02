@@ -18,14 +18,14 @@ export function glossFor(book, id, word) {
 // `occ` = 1-based occurrence of this form in the verse: a form repeated in a verse is keyed "form#k" and only the
 // occurrence the Wiktionary citation points at is glossed (tools/gloss-occ.mjs).
 export function glossRef(ref, word, occ = 1) {
-  const m = G?.verses?.[ref]; if (!m) return null;
+  const m = G?.verses?.[ref] || G?.rambam?.verses?.[ref]; if (!m) return null; // Torah/Tehillim, or the Rambam part (round 5)
   const n = norm(word); return cons(n).length > 1 ? m[n] || m[`${n}#${occ}`] || null : null;
 }
 export function applyGlosses(root, book) {
   if (!G?.verses || !book) return;
   for (const seg of root.querySelectorAll('.seg[data-id]')) {
     const ref = seg.dataset.ref || `${book} ${seg.dataset.id}`;
-    if (!G.verses[ref]) continue;
+    if (!G.verses[ref] && !G.rambam?.verses?.[ref]) continue;
     const t = seg.querySelector('.t') || seg;
     const walker = document.createTreeWalker(t, NodeFilter.SHOW_TEXT, {
       acceptNode: n => (n.parentElement.closest('.vn, .hn, .sr, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),

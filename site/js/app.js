@@ -221,7 +221,8 @@ function displayForm() {
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
-  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}`;
+  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
+  ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
 }
 function ttsForm() {
   return `
@@ -332,8 +333,9 @@ async function errataCounts() {
 /** One honest sentence with the glossary pipeline counts, read from glossary.json (so the page cannot drift from the data). */
 async function glossCounts() {
   try {
-    const m = (await data('glossary.json')).meta, t = m.stats.tanakh, h = m.manualReview, n = x => x.toLocaleString('he-IL');
-    return `במספרים (תורה ותהילים, ${n(t.verseWordForms)} מילים): ${n(t.wiktionaryVerseCited)} הגדרות בוויקימילון מצטטות את הפסוק; ${n(t.droppedFlagged)} מהן נפסלו בגלל תבנית אזהרה; מתוך ${n(t.checkA)} הנותרות ${n(t.checkB)} עברו את ההצלבה עם TAHOT ו-JPS; בבדיקה הידנית נדחו עוד ${n(h.rejectedByHand)}${h.notReviewedSoNotPublished ? ` (ו-${n(h.notReviewedSoNotPublished)} שטרם נבדקו לא פורסמו)` : ''}. פורסמו ${n(h.published)} ביאורים.`;
+    const g = await data('glossary.json'), m = g.meta, t = m.stats.tanakh, h = m.manualReview, n = x => x.toLocaleString('he-IL'), r = g.rambam?.meta;
+    const rb = r ? ` ברמב״ם (ניסיון זהיר, סבב 5): ${n(r.wiktionaryRambamQuotes)} הגדרות בוויקימילון מצטטות את משנה תורה; ${n(r.checkA)} אותרו בוודאות בהלכה שלנו (בדיקה א); ${n(r.checkB)} עברו הצלבה עם ערך ויקימילון האנגלי ועם התרגום האנגלי של ההלכה (בדיקה ב, Touger, שימש לבדיקה בלבד ואינו מוצג); בבדיקה הידנית נדחו ${n(r.rejectedByHand)} – רובן מילים פשוטות כמו ״אם״ ו״הרג״ שביאורן מיותר. פורסמו ${n(r.published)} ביאורים.` : '';
+    return `במספרים (תורה ותהילים, ${n(t.verseWordForms)} מילים): ${n(t.wiktionaryVerseCited)} הגדרות בוויקימילון מצטטות את הפסוק; ${n(t.droppedFlagged)} מהן נפסלו בגלל תבנית אזהרה; מתוך ${n(t.checkA)} הנותרות ${n(t.checkB)} עברו את ההצלבה עם TAHOT ו-JPS; בבדיקה הידנית נדחו עוד ${n(h.rejectedByHand)}${h.notReviewedSoNotPublished ? ` (ו-${n(h.notReviewedSoNotPublished)} שטרם נבדקו לא פורסמו)` : ''}. פורסמו ${n(h.published)} ביאורים.${rb}`;
   } catch { return ''; }
 }
 
@@ -347,7 +349,7 @@ function renderAbout() {
   <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">verification/VERIFICATION.md</a>.</li>
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li></ul>
   <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
-  <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> מילים מבוארות בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים) – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. ברש״י, בתניא וברמב״ם אין ביאורים כלל.</li>
+  <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
   <li>בכל מקום אפשר לסמן מילה ולפתוח את ערכה בוויקימילון (קישור חיצוני).</li></ul>
@@ -361,7 +363,7 @@ function renderAbout() {
   <li>כשהמסך כבוי: במחשב ההקראה ממשיכה; באנדרואיד היא לרוב ממשיכה כשהדף פתוח; באייפון היא נעצרת בדרך כלל בנעילת המסך – מומלץ להשאיר את המסך דולק (יש אפשרות כזו בהגדרות).</li></ul>
   <p>האתר בהשראת <a href="https://dvarmalchus.co.il" target="_blank" rel="noopener">דבר מלכות</a>. זהו מיזם עצמאי ואינו קשור אליו.</p>`);
   // the list is generated from sources.json, so About can never disagree with the data
-  data('glossary.json').then(g => { const el = $('#gloss-n'); if (el) el.textContent = g.meta.manualReview.published.toLocaleString('he-IL'); }).catch(() => {});
+  data('glossary.json').then(g => { const el = $('#gloss-n'); if (el) el.textContent = g.meta.manualReview.published.toLocaleString('he-IL'); const r = $('#gloss-rb'); if (r && g.rambam) r.textContent = g.rambam.meta.published.toLocaleString('he-IL'); }).catch(() => {});
   data('sources.json').then(s => { const el = $('#unvoc-list'); if (el) el.textContent = ': ' + unvocalizedList(s).join(', '); }).catch(() => {});
 }
 /** Names (Hebrew) of the Rambam texts that are shown without niqqud, from sources.json. */
@@ -376,7 +378,7 @@ const R = { unit: null, iso: null, doc: null, page: 0, pages: 1, segs: [], speak
 function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 function fmt(html, isTanakh) {
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
-    .replace(/\{([פס])\}/g, '<span class="pe" aria-hidden="true">$1</span>')
+    .replace(/\{([פס])\}/g, (m, k) => `<span class="pe pe-${k === 'פ' ? 'p' : 's'}" aria-hidden="true" title="${k === 'פ' ? 'פרשה פתוחה' : 'פרשה סתומה'}"></span>`) // a gap, as in a Torah scroll (round 5: a bare ס puzzled readers)
     .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">')
     .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
@@ -493,13 +495,24 @@ async function renderDoc() {
     if (nq.length) parts.push(`${nq.length === 1 ? 'תוקנה טעות ניקוד אחת' : `תוקנו ${nq.length} טעויות ניקוד`} של המהדורה (העיצורים זהים לנוסח ויקיטקסט): ${nq.map(f => `<span title="${esc(f.label)}">${esc(f.from)} ← ${esc(f.to)}</span>`).join(' · ')}`);
     html += `<p class="doc-credit" id="doc-fixes">${parts.join('. ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
   }
+  html += `<p class="doc-credit" id="doc-report">מצאת טעות בנוסח, בניקוד, בהקראה או בביאור? <a id="b-report" href="${ISSUES}" target="_blank" rel="noopener">דיווח ב-GitHub</a> (נפתח טופס עם פרטי המקום; דבר אינו נשלח עד שתאשר שם)</p>`;
   html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
   rc.innerHTML = html;
   rc.className = 'r-content gloss-' + prefs.gloss;
-  if (prefs.gloss !== 'off') { await loadGlossary(); applyGlosses(rc, d.book); }
+  if (prefs.gloss !== 'off') { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
+  const rep = $('#b-report'); if (rep) { const upd = () => { rep.href = reportUrl(); }; rep.addEventListener('pointerdown', upd); rep.addEventListener('focus', upd); rep.addEventListener('click', upd); }
   $('#b-nextunit').onclick = () => nextUnit(false);
   layout();
+}
+/** Round 5: the reader states the gloss coverage too (same number as the About page: glossary meta, published). */
+function glossNote(rc, G, kind) {
+  const total = G?.meta?.manualReview?.published, rb = G?.rambam?.meta?.published || 0, here = rc.querySelectorAll('.gl').length, end = $('#doc-report', rc);
+  if (!total || !end) return;
+  const n = x => x.toLocaleString('he-IL');
+  const p = document.createElement('span'); p.id = 'doc-gloss'; // inside the report line: one paragraph, so it doesn't add a page
+  p.innerHTML = `ביאורי מילים בשיעור זה: ${here ? n(here) : 'אין'}. בסך הכול ${n(total)} בתורה ובתהילים ו־${n(rb)} ברמב״ם – מעט בכוונה: כל ביאור עבר שתי בדיקות ובדיקה ידנית${kind === 'tanakh' ? '; ברש״י אין' : kind ? '' : '; בתניא אין'} (<a href="#/about">פירוט</a>). `;
+  end.prepend(p);
 }
 function nextUnitId() { const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
@@ -614,6 +627,19 @@ function anchor() {
   return { pos: s.dataset.id, sub: prefs.layout === 'pages' ? Math.max(0, R.page - segSpan(s)[0]) : 0 };
 }
 function restore(a) { if (a?.pos) goToSeg(a.pos, false, a.sub || 0); }
+// Round 5: a visible "report an error" path. It only builds a link to a new GitHub issue with the context filled in;
+// nothing is sent – the reader sees the form on GitHub and decides whether to submit it.
+const ISSUES = 'https://github.com/dudidd-wq/chitas-reader/issues/new';
+function reportUrl(seg = currentSeg()) {
+  const sel = String(getSelection?.() || '').trim().slice(0, 120);
+  const t = seg ? (seg.querySelector('.t')?.textContent || seg.textContent).replace(/\s+/g, ' ').trim() : '';
+  const where = [R.doc?.title, R.doc?.subtitle].filter(Boolean).join(' – ');
+  const title = `טעות בטקסט: ${where}${seg ? ` (${seg.dataset.ref || seg.dataset.id})` : ''}`.slice(0, 150);
+  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.iso || ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
+    sel ? `**המילים שסומנו:** ${sel}` : '', seg ? `**הנוסח המוצג:**\n> ${t.slice(0, 600)}${t.length > 600 ? '…' : ''}` : '',
+    '', '**מה הטעות?** (ניקוד / מילה חסרה או מיותרת / הקראה / ביאור)', '', '**מה הנוסח הנכון, ולפי איזה מקור?**', ''].filter(x => x !== false).join('\n');
+  return `${ISSUES}?title=${encodeURIComponent(title)}&labels=${encodeURIComponent('text-error')}&body=${encodeURIComponent(body)}`;
+}
 function goToSeg(id, smooth = true, sub = 0) {
   const el = R.segs.find(s => s.dataset.id === id); if (!el) return;
   if (prefs.layout === 'pages') { const [p0, p1] = segSpan(el), p = Math.min(p1, p0 + sub); if (p !== R.page) setPage(p); }

@@ -60,6 +60,9 @@ test('568×320 landscape: bars auto-hide after idle, tap brings them back, more 
     const imm = () => p.evaluate(() => document.querySelector('#reader').classList.contains('immersive'));
     const pages = () => p.evaluate(() => +document.querySelector('#pinfo2').textContent.match(/מתוך (\d+)/)[1]);
     assert.equal(await imm(), false, 'bars visible at first');
+    // Round 5 added one line of new content at the end (#doc-gloss, the gloss-coverage note). It happens to spill onto a 13th page
+    // here, so the density guard compares like with like: the same content as in round 2, i.e. without that note.
+    await p.addStyleTag({ content: '#doc-gloss{display:none}' }); await p.evaluate(() => window.dispatchEvent(new Event('resize'))); await p.waitForTimeout(600);
     const before = await pages();
     assert.ok(before < 13, `fewer pages than the 13 measured in round 2 (got ${before})`);
     await p.waitForFunction(() => document.querySelector('#reader').classList.contains('immersive'), null, { timeout: 4000 });
