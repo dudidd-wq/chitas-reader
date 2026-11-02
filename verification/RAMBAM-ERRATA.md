@@ -90,3 +90,24 @@ This is a systematic search for passages like 11:4. Every chapter of our text, a
 | **short**: our chapter has under 90% of the Wikisource word count | 1 | Kings 12, where only the book's long colophon is missing. |
 
 **Result:** one confirmed gap (11:4), now fixed; 0 open gaps; 0 flags left unreviewed. The read-aloud skips only parentheses that are citations, so the bracketed halacha text above is still read aloud.
+
+## Impossible vowel marks in Rashi, Tanya and Rambam – round 6 (סימני ניקוד בלתי אפשריים – סבב 6)
+
+`site/js/niqqud.js` repairs, at display time and before read-aloud, vowel marks that the source editions encode in a
+way no Hebrew word can have. The source files are not edited. `node tools/niqqud-scan.mjs` counts every repair over all
+shipped text and writes `verification/niqqud-repairs.json` (every word, with its reference).
+
+Repaired on screen and for the voice, because each has exactly one reading:
+
+| Kind | Rule | Example | Rashi | Tanya | Rambam |
+|---|---|---|---|---|---|
+| sin | ש with a vowel and a holam but no shin/sin dot, where the previous letter already has a vowel (or ש starts the word): the holam is a misplaced sin dot | יִשְֹרָאֵל → יִשְׂרָאֵל, עֲשֵֹה → עֲשֵׂה | 118 | 0 | 0 |
+| holam | a letter other than ש with a holam and one other (non-hataf) vowel, whose previous letter has no vowel: the holam is the previous letter's, drawn one letter late (same reading) | הַלּוֶֹה → הַלֹּוֶה, הוֶֹה → הֹוֶה | 1 | 0 | 237 |
+| dup | the same mark twice on one letter | לֹֹֹֹֹא → לֹא, וּּבֵיאוּר → וּבֵיאוּר | 9 | 1 | 1 |
+
+Not repaired on screen (more than one possible repair), 40 words: Rashi 16 (e.g. וְֵישׁ Gen 1:1, וַיִּבְרְָא, אֶלָֹּא, עוֹשִֹׁין),
+Tanya 4 (LA 38 נִתְִהַוּוּ, LA 25 מִצְוַֹת, SY 4 שְׁבְָחוֹ, SY 8 לְאַָהֳבָם) and Rambam 20 (עשֶֹׁה, נשֵֹׁא, בּשֶֹׁם – most likely עֹשֶׂה,
+נֹשֵׂא, בֹּשֶׂם, but the edition writes a shin dot and the same encoding could be a real shin, as in מֹשֶׁה; and בְּרִיפוֱֹת).
+For these the read-aloud passes the one word on **without niqqud**, so the voice reads it as it reads ordinary unvocalised
+Hebrew instead of a broken form. In addition the Masoretic ירושלִַם (patah + hiriq, yod unwritten) is spelled
+ירושלַיִם for the voice. Torah and Tehillim verses have no hits and are not processed. Tested in `tests/round6.test.mjs`.

@@ -141,6 +141,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
 #reader.immersive .thin-progress { opacity: 1; }
 .thin-progress { position: absolute; bottom: 0; inset-inline: 0; height: 2px; z-index: 2; opacity: 0; transition: opacity .3s; }
+.pflash { position: absolute; bottom: max(.6rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 4; font-family: var(--ui); font-size: .8rem; color: var(--paper); background: color-mix(in srgb, var(--ink) 78%, transparent); padding: .2rem .7rem; border-radius: 999px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+.pflash.show { opacity: 1; }
+#reader:not(.immersive) .pflash { display: none; }
 .thin-progress > i { display: block; height: 100%; background: var(--accent); opacity: .6; width: 0; }
 .pageinfo { color: var(--muted); font-size: .85rem; min-width: 5.5em; text-align: center; }
 .tts-ctl { display: flex; align-items: center; gap: .25rem; flex: 1; justify-content: center; flex-wrap: wrap; }
@@ -205,6 +208,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content.gloss-off .gl { text-decoration: none; cursor: auto; }
 .r-content .endmark { text-align: center; margin: 1.5em 0 0; font-family: var(--ui); font-size: .7em; color: var(--muted); break-inside: avoid; }
 .r-content .unvoc { font-family: var(--ui); font-size: .62em; color: var(--muted); border: 1px dashed var(--rule); border-radius: 8px; padding: .3em .6em; margin: 0 0 .8em; }
+.r-content .unvoc-mark { font-family: var(--ui); font-size: .6em; color: var(--muted); border-top: 1px dashed var(--rule); padding-top: .25em; margin: .6em 0 .4em; }
 .gloss-pop { position: fixed; z-index: 20; max-width: min(320px, 90vw); background: var(--card); color: var(--ink); border: 1px solid var(--accent); border-radius: 12px; padding: .6rem .8rem; box-shadow: 0 6px 24px rgba(0, 0, 0, .2); font-size: 1rem; }
 .gloss-pop small { display: block; color: var(--muted); margin-top: .3rem; font-size: .78rem; }
 .sheet { position: absolute; z-index: 5; inset-inline: 0; bottom: 0; max-height: 78vh; overflow: auto; background: var(--card); border-top: 1px solid var(--rule); border-radius: 18px 18px 0 0; padding: 1rem max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); box-shadow: 0 -8px 30px rgba(0, 0, 0, .18); }
@@ -213,6 +217,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .sheet .form { max-width: 640px; margin: 0 auto; }
 #toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--paper); padding: .5rem 1rem; border-radius: 10px; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90vw; text-align: center; }
 #toast.show { opacity: .95; }
+/* round 6: with a sheet open, a toast goes to the top so it never covers the sheet's contents */
+body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-area-inset-top)); }
+.sheet-note { margin: 0 0 .75rem; padding: .6rem .8rem; border-radius: 10px; background: color-mix(in srgb, var(--accent) 14%, var(--card)); border-inline-start: 4px solid var(--accent); font-weight: 600; }
 #toast .btn { pointer-events: auto; margin-inline-start: .5rem; background: var(--paper); color: var(--ink); }
 @media (max-width: 400px) { .btn { padding: .3rem .55rem; } .hero .hd { font-size: 1.6rem; } }
 @media (max-width: 640px) {
@@ -232,13 +239,21 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-bottom.tts-on { flex-wrap: nowrap; gap: .15rem; }
 .r-bottom.tts-on #spacer { display: none; }
 .r-bottom.tts-on .tts-ctl { flex: 1 1 auto; flex-wrap: nowrap; min-width: 0; gap: .15rem; }
-.tts-ctl .btn { min-width: 44px; min-height: 44px; padding: .2rem .4rem; }
-.tts-ctl select { min-height: 44px; padding-inline: .3rem; max-width: 5.2rem; }
+.tts-ctl .btn { min-width: 48px; min-height: 48px; padding: .2rem .4rem; }
+/* round 6: the main controls are bigger targets – play/pause 64 px, skip 56 px – with more room between them */
+.r-bottom.tts-on .tts-ctl { gap: .5rem; }
+.tts-ctl #t-play { min-width: 64px; min-height: 64px; border-radius: 50%; }
+.tts-ctl #t-back, .tts-ctl #t-fwd { min-width: 56px; min-height: 56px; }
+.tts-ctl select { min-height: 48px; padding-inline: .3rem; max-width: 5.2rem; }
 @media (max-width: 560px) {
   .r-bottom.tts-on #b-prev, .r-bottom.tts-on #b-next, .r-bottom.tts-on #pinfo { display: none; }
-  .r-bottom.tts-on .tts-ctl { justify-content: space-between; }
+  .r-bottom.tts-on .tts-ctl { justify-content: space-between; gap: .35rem; }
 }
+/* narrow phones: the speed menu moves to the ⚙ sheet (it has the same speed slider), so the big buttons fit on one row */
+@media (max-width: 400px) { .tts-ctl #t-rate { display: none; } }
 
+.note-more summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 44px; display: flex; align-items: center; width: max-content; }
+.note-more[open] summary { min-height: 32px; }
 .day-note { font-family: var(--ui); font-size: .62em; line-height: 1.55; background: color-mix(in srgb, var(--accent) 9%, var(--card)); border-inline-start: 3px solid var(--accent); border-radius: 8px; padding: .5em .75em; margin: 0 0 .9em; break-inside: avoid; text-align: start; }
 
 /* very short landscape (≤360 px tall, e.g. 568×320): more lines per page – no orphan/widow slack, a slightly tighter
@@ -250,6 +265,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
   .r-content h1 { font-size: .95em; margin: 0; }
   .r-content .doc-sub { margin-bottom: .2em; }
   .r-content h2 { margin: .5em 0 .2em; }
+  /* round 6: title and range on one line, Rashi a little tighter – page 1 has room for a split Rashi block's
+     first 2.5 lines instead of a third of the page left empty */
+  .r-content .doc-head { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: .6em; }
+  .r-content .doc-head .doc-sub { margin: 0; }
+  .r-content h2 { margin: .2em 0 0; font-size: .85em; }
+  .r-content .seg { margin-bottom: .35em; }
+  .r-content .rashi { line-height: 1.55; margin: .1em 0 .4em; }
+  .r-content .doc-head { margin-bottom: .1em; }
 }
 /* tap targets ≥44×44 (WCAG 2.5.5): Sources-table links, glossed words (hit area only – the text layout is unchanged),
    the link inside the gloss pop-up */
@@ -271,3 +294,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 }
 /* the rate chip ("×1") was easy to miss (round 3): outlined like a control */
 .tts-ctl select { border: 1.5px solid var(--accent); border-radius: 10px; font-weight: 600; background: var(--card); color: var(--ink); }
+/* round 6: the gloss popup sits above the word with a caret pointing at it */
+.gloss-pop .caret { position: absolute; width: 12px; height: 12px; background: var(--card); border: 1px solid var(--accent); transform: translateX(-50%) rotate(45deg); }
+.gloss-pop.above .caret { bottom: -7px; border-top: 0; border-left: 0; }
+.gloss-pop.below .caret { top: -7px; border-bottom: 0; border-right: 0; }

@@ -1,3 +1,4 @@
+import { niqqudForTTS } from './niqqud.js';
 // Text preprocessing for browser speech synthesis (Web Speech API, he-IL).
 // Pure functions – unit-tested in tests/tts-prep.test.mjs. Rules are documented in NOTES.md.
 
@@ -258,6 +259,10 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/[\u05F3]/g, "'").replace(/[\u05F4]/g, '"')
     .replace(/([\u0591-\u05C7])\1+/g, '$1'); // duplicated marks in source
   t = t.replace(RE_TAAMIM, '');
+  // round 6: the Masoretic ירושלִַם (patah + hiriq, the yod unwritten) is spelled out for the voice; then the impossible
+  // vowel marks of the editions are repaired or, where no single repair exists, that word is read without niqqud
+  t = t.replace(/([\u05D0-\u05EA][\u05BC]?)(?:\u05B7\u05B4|\u05B4\u05B7)ם/g, '$1\u05B7\u05D9\u05B4ם');
+  t = niqqudForTTS(t);
   const words = t.split(/(\s+)/);
   let k = 0; // index among אלהים-form words (for the chol.js list)
   t = words.map((w, i) => {

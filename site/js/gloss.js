@@ -41,8 +41,8 @@ export function applyGlosses(root, book) {
       const e = occ[i] ? glossRef(ref, p, occ[i]) : null;
       if (e) {
         const s = document.createElement('span');
-        s.className = 'gl'; s.textContent = p; s.dataset.g = e.g; s.dataset.src = e.src || ''; s.dataset.lemma = e.l || ''; if (e.adapted) s.dataset.adapted = '1';
-        s.tabIndex = 0; s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${p} – ביאור: ${e.g}`);
+        s.className = 'gl'; s.textContent = p; s.dataset.g = expandAbbr(e.g); s.dataset.src = e.src || ''; s.dataset.lemma = e.l || ''; if (e.adapted) s.dataset.adapted = '1';
+        s.tabIndex = 0; s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${p} – ביאור: ${expandAbbr(e.g)}`);
         frag.appendChild(s);
       } else frag.appendChild(document.createTextNode(p));
     }
@@ -51,6 +51,9 @@ export function applyGlosses(root, book) {
   }
 }
 
+// round 6: abbreviations inside a sourced definition are spelled out on screen (the stored text stays verbatim)
+const ABBR = [['עפ"ר', 'על פי רוב'], ['ע"פ רוב', 'על פי רוב'], ['בד"כ', 'בדרך כלל']];
+export function expandAbbr(g) { return ABBR.reduce((t, [a, b]) => t.split(a).join(b), String(g)); }
 let pop = null;
 function closePop() { pop?.remove(); pop = null; }
 function showPop(el) {
@@ -59,12 +62,17 @@ function showPop(el) {
   pop = document.createElement('div');
   pop.className = 'gloss-pop'; pop.setAttribute('role', 'tooltip');
   const src = el.dataset.src ? `<small>מקור: <a href="${el.dataset.src}" target="_blank" rel="noopener">ויקימילון${el.dataset.lemma ? ' – ' + el.dataset.lemma : ''}</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>)${el.dataset.adapted ? ' · ניסוח מעודן' : ''}</small>` : '';
-  pop.innerHTML = `<b></b> ${src}`; pop.querySelector('b').textContent = el.dataset.g;
+  pop.innerHTML = `<b></b> ${src}<i class="caret" aria-hidden="true"></i>`; pop.querySelector('b').textContent = el.dataset.g;
   document.body.appendChild(pop);
+  // round 6: above the word, so the lines that follow stay readable; below only when there is no room above.
+  // A caret points at the word.
   const r = el.getBoundingClientRect(), pr = pop.getBoundingClientRect();
-  let top = r.bottom + 8; if (top + pr.height > innerHeight - 10) top = r.top - pr.height - 8;
-  let left = Math.min(Math.max(8, r.left + r.width / 2 - pr.width / 2), innerWidth - pr.width - 8);
+  const above = r.top - pr.height - 10 >= 8;
+  const top = above ? r.top - pr.height - 10 : r.bottom + 10;
+  const left = Math.min(Math.max(8, r.left + r.width / 2 - pr.width / 2), innerWidth - pr.width - 8);
+  pop.classList.add(above ? 'above' : 'below');
   pop.style.top = top + 'px'; pop.style.left = left + 'px';
+  pop.querySelector('.caret').style.left = Math.min(Math.max(10, r.left + r.width / 2 - left), pr.width - 10) + 'px';
 }
 document.addEventListener('click', e => {
   const g = e.target.closest?.('.gl');

@@ -39,7 +39,7 @@ test('reader DOM: every glossary key marks exactly one word, and the right copy 
     verses[ref] = JSON.parse(fs.readFileSync(f)).v[v - 1];
   }
   const bad = await p.evaluate(async verses => {
-    const { applyGlosses, loadGlossary } = await import('/js/gloss.js');
+    const { applyGlosses, loadGlossary, expandAbbr } = await import('/js/gloss.js');
     const { norm } = await import('/js/hnorm.js');
     const G = await loadGlossary(); const bad = [];
     const root = document.createElement('div'); document.body.appendChild(root);
@@ -54,7 +54,7 @@ test('reader DOM: every glossary key marks exactly one word, and the right copy 
       while (w.nextNode()) for (const t of w.currentNode.nodeValue.split(/[\s\u05BE]+/)) if (t) words.push({ t: norm(t), el: w.currentNode.parentElement.closest('.gl') });
       const seen = {};
       for (const x of words) { if (!x.t) continue; seen[x.t] = (seen[x.t] || 0) + 1; const want = G.verses[seg.dataset.ref][x.t] || G.verses[seg.dataset.ref][`${x.t}#${seen[x.t]}`];
-        if (!!want !== !!x.el || (want && x.el.dataset.g !== want.g)) bad.push(`${seg.dataset.ref}: ${x.t} #${seen[x.t]}`); }
+        if (!!want !== !!x.el || (want && x.el.dataset.g !== expandAbbr(want.g))) bad.push(`${seg.dataset.ref}: ${x.t} #${seen[x.t]}`); }
     }
     return bad;
   }, verses);

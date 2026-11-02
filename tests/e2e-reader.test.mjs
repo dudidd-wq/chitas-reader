@@ -67,7 +67,7 @@ test('TTS with no Hebrew voice does not start and never marks the lesson read (r
   const p = await startTts('novoice');
   await p.waitForTimeout(2500);
   assert.equal(await p.evaluate(() => window.__spoken.length), 0, 'nothing may be sent to the engine');
-  assert.match(await p.textContent('#toast'), /לא נמצא במכשיר קול עברי/);
+  assert.match(await p.textContent('#sh-note'), /לא נמצא במכשיר קול עברי/);   // round 6: inside the sheet, not a toast over it
   assert.ok(await p.isVisible('#sheet'), 'the voice-installation help opens');
   assert.equal(new URL(p.url()).hash, `#/r/chumash/${D}`, 'must not advance to the next lesson');
   const pr = await progressOf(p);

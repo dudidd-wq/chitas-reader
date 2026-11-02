@@ -1,0 +1,3162 @@
+{
+ "meta": {
+  "rashi": {
+   "words": 128,
+   "byKind": {
+    "sin": 118,
+    "holam": 1,
+    "dup": 9
+   },
+   "leftImpossible": 16
+  },
+  "tanya": {
+   "words": 1,
+   "byKind": {
+    "dup": 1
+   },
+   "leftImpossible": 4
+  },
+  "rambam": {
+   "words": 238,
+   "byKind": {
+    "holam": 237,
+    "dup": 1
+   },
+   "leftImpossible": 20
+  }
+ },
+ "detail": {
+  "rashi": {
+   "words": 128,
+   "byKind": {
+    "sin": 118,
+    "holam": 1,
+    "dup": 9
+   },
+   "leftImpossible": 16,
+   "examples": [
+    {
+     "ref": "Deuteronomy 2:26",
+     "from": "וְלִשְֹרֹף",
+     "to": "וְלִשְׂרֹף",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Exodus 12:13",
+     "from": "הוֶֹה",
+     "to": "הֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Exodus 12:14",
+     "from": "עָשָֹר",
+     "to": "עָשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Exodus 33:1",
+     "from": "אֶֶרֶץ",
+     "to": "אֶרֶץ",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Exodus 34:24",
+     "from": "שָׁלֹֹשׁ",
+     "to": "שָׁלֹשׁ",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Exodus 34:26",
+     "from": "וְשָׁלֹֹשׁ",
+     "to": "וְשָׁלֹשׁ",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 1:1",
+     "from": "לֹֹֹֹֹא",
+     "to": "לֹא",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 12:9",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 12:9",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 13:1",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 15:10",
+     "from": "וּשְֹעִירִים",
+     "to": "וּשְׂעִירִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 15:10",
+     "from": "וְיִשְֹרָאֵל",
+     "to": "וְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 15:10",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 15:13",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 15:13",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 16:3",
+     "from": "לִשָֹּא",
+     "to": "לִשָּׂא",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 16:3",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Genesis 17:18",
+     "from": "שָׂכָָר",
+     "to": "שָׂכָר",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 2:22",
+     "from": "כְּבִִנְיָן",
+     "to": "כְּבִנְיָן",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 25:1",
+     "from": "שֶֶׁלֹא",
+     "to": "שֶׁלֹא",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 25:26",
+     "from": "וְהִִמְתִּין",
+     "to": "וְהִמְתִּין",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Genesis 6:16",
+     "from": "לְמָדוֹֹר",
+     "to": "לְמָדוֹר",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:1",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:1",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:1",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:4",
+     "from": "עֲשֵֹה",
+     "to": "עֲשֵׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:4",
+     "from": "לַעֲשֵֹה",
+     "to": "לַעֲשֵׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:9",
+     "from": "וְנַעֲשָֹה",
+     "to": "וְנַעֲשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:17",
+     "from": "נִשְֹרָפִים",
+     "to": "נִשְׂרָפִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 1:17",
+     "from": "שָֹבֵעַ",
+     "to": "שָׂבֵעַ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 10:3",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 10:16",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 10:18",
+     "from": "לְשָֹרְפָהּ",
+     "to": "לְשָׂרְפָהּ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 10:19",
+     "from": "הַנְּשִֹיאִים",
+     "to": "הַנְּשִׂיאִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:1",
+     "from": "לְיִשְֹרָאֵל",
+     "to": "לְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:1",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:1",
+     "from": "לְיִשְֹרָאֵל",
+     "to": "לְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:2",
+     "from": "שֶׁיִּשְֹרָאֵל",
+     "to": "שֶׁיִּשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:2",
+     "from": "לְיִשְֹרָאֵל",
+     "to": "לְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 11:45",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 13:14",
+     "from": "וְנַעֲשָֹה",
+     "to": "וְנַעֲשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 13:18",
+     "from": "הַבָּשָֹר",
+     "to": "הַבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 13:23",
+     "from": "בַּבָּשָֹר",
+     "to": "בַּבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 13:39",
+     "from": "הַבָּשָֹר",
+     "to": "הַבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 13:40",
+     "from": "בְּשֵֹעָר",
+     "to": "בְּשֵׂעָר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 14:10",
+     "from": "כְבָשִֹים",
+     "to": "כְבָשִׂים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 14:34",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 14:44",
+     "from": "יַּעֲשֶֹה",
+     "to": "יַּעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 15:6",
+     "from": "עֲשָֹרָה",
+     "to": "עֲשָׂרָה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:13",
+     "from": "עֲשָֹאָהּ",
+     "to": "עֲשָׂאָהּ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:23",
+     "from": "עֲשִֹיַּת",
+     "to": "עֲשִׂיַּת",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:23",
+     "from": "וְשָֹעִיר",
+     "to": "וְשָׂעִיר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:23",
+     "from": "שֶׁנַּעֲשִֹים",
+     "to": "שֶׁנַּעֲשִׂים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:24",
+     "from": "בְּשָֹרוֹ",
+     "to": "בְּשָׂרוֹ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:24",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 16:34",
+     "from": "עָשָֹה",
+     "to": "עָשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 17:7",
+     "from": "וּשְֹעִירִים",
+     "to": "וּשְׂעִירִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 18:3",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 19:13",
+     "from": "בִּשְֹכִיר",
+     "to": "בִּשְׂכִיר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 19:26",
+     "from": "מִבְּשַֹר",
+     "to": "מִבְּשַׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 19:28",
+     "from": "בְּשָֹרָם",
+     "to": "בְּשָׂרָם",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 2:2",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 2:4",
+     "from": "עֶשֶֹר",
+     "to": "עֶשֶׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 2:4",
+     "from": "עֶשֶֹר",
+     "to": "עֶשֶׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 2:5",
+     "from": "לַעֲשִֹיָּתָן",
+     "to": "לַעֲשִׂיָּתָן",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 21:5",
+     "from": "בְּיִשְֹרָאֵל",
+     "to": "בְּיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 21:20",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 22:10",
+     "from": "שָֹכִיר",
+     "to": "שָׂכִיר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 22:14",
+     "from": "נַעֲשִֹין",
+     "to": "נַעֲשִׂין",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 23:2",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 23:14",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 23:20",
+     "from": "כְבָשִֹים",
+     "to": "כְבָשִׂים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 24:11",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 24:12",
+     "from": "יֵּעָשֶֹה",
+     "to": "יֵּעָשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 24:21",
+     "from": "שֶׁיַּעֲשֶֹה",
+     "to": "שֶׁיַּעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 25:4",
+     "from": "שְֹרֻפָה",
+     "to": "שְׂרֻפָה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 25:26",
+     "from": "בְּיִשְֹרָאֵל",
+     "to": "בְּיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 25:33",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 25:36",
+     "from": "לְיִשְֹרָאֵל",
+     "to": "לְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 26:13",
+     "from": "עֲשֵֹה",
+     "to": "עֲשֵׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 26:35",
+     "from": "עָשָֹה",
+     "to": "עָשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 26:35",
+     "from": "עֶשְֹרִים",
+     "to": "עֶשְׂרִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 26:35",
+     "from": "עֶשְֹרֵה",
+     "to": "עֶשְׂרֵה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 27:13",
+     "from": "מַעֲשֵֹר",
+     "to": "מַעֲשֵׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 27:32",
+     "from": "וְהָעֲשִֹירִי",
+     "to": "וְהָעֲשִׂירִי",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 3:4",
+     "from": "הַבָּשָֹר",
+     "to": "הַבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 3:11",
+     "from": "לִשְֹחוֹק",
+     "to": "לִשְׂחוֹק",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 4:3",
+     "from": "מַעֲשֶֹה",
+     "to": "מַעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 4:8",
+     "from": "שְֹעִירֵי",
+     "to": "שְׂעִירֵי",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 5:15",
+     "from": "יִשְֹאוּ",
+     "to": "יִשְׂאוּ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 5:17",
+     "from": "שְֹכָרָן",
+     "to": "שְׂכָרָן",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 5:17",
+     "from": "שָֹכָר",
+     "to": "שָׂכָר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 5:21",
+     "from": "שְֹכַר",
+     "to": "שְׂכַר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 5:21",
+     "from": "שָֹכִיר",
+     "to": "שָׂכִיר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 6:7",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 6:8",
+     "from": "יַעֲשֶֹה",
+     "to": "יַעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 7:19",
+     "from": "וְהַבָּשָֹר",
+     "to": "וְהַבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 7:19",
+     "from": "בָּשָֹר",
+     "to": "בָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 7:30",
+     "from": "וַיָּשִֹימוּ",
+     "to": "וַיָּשִׂימוּ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 8:2",
+     "from": "מַעֲשֶֹה",
+     "to": "מַעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 8:36",
+     "from": "וּשְֹמֹאל",
+     "to": "וּשְׂמֹאל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 9:2",
+     "from": "שֶׁעָשָֹה",
+     "to": "שֶׁעָשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 9:11",
+     "from": "נִשְֹרֶפֶת",
+     "to": "נִשְׂרֶפֶת",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 9:17",
+     "from": "עָשָֹה",
+     "to": "עָשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Leviticus 9:23",
+     "from": "עָשִֹיתָ",
+     "to": "עָשִׂיתָ",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 1:49",
+     "from": "עֶשְֹרִים",
+     "to": "עֶשְׂרִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 10:7",
+     "from": "נְשִֹיאִים",
+     "to": "נְשִׂיאִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 10:35",
+     "from": "עָשָֹה",
+     "to": "עָשָׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 11:7",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 11:17",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 15:41",
+     "from": "שָֹכָר",
+     "to": "שָׂכָר",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 16:10",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 16:14",
+     "from": "שָֹדֶה",
+     "to": "שָׂדֶה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 20:15",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 21:13",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 21:26",
+     "from": "לְיִשְֹרָאֵל",
+     "to": "לְיִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 22:35",
+     "from": "שָֹמַח",
+     "to": "שָׂמַח",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 25:5",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 26:4",
+     "from": "עֶשְֹרִים",
+     "to": "עֶשְׂרִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 28:6",
+     "from": "וַיָּשֶֹם",
+     "to": "וַיָּשֶׂם",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 4:16",
+     "from": "לָשֵֹאת",
+     "to": "לָשֵׂאת",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 6:21",
+     "from": "יַעֲשֶֹה",
+     "to": "יַעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 6:21",
+     "from": "יַעֲשֶֹה",
+     "to": "יַעֲשֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 7:2",
+     "from": "יִשְֹרָאֵל",
+     "to": "יִשְׂרָאֵל",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 7:19",
+     "from": "עֶשְֹרִים",
+     "to": "עֶשְׂרִים",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 8:8",
+     "from": "וַעֲשֵֹה",
+     "to": "וַעֲשֵׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 9:3",
+     "from": "שֶֹה",
+     "to": "שֶׂה",
+     "kinds": [
+      "sin"
+     ]
+    },
+    {
+     "ref": "Numbers 9:7",
+     "from": "הַבָּשָֹר",
+     "to": "הַבָּשָׂר",
+     "kinds": [
+      "sin"
+     ]
+    }
+   ],
+   "left": [
+    {
+     "ref": "Exodus 21:37",
+     "word": "שֶׁנּוֹשְֹׁאוֹ"
+    },
+    {
+     "ref": "Exodus 9:9",
+     "word": "לְֹשִׁיחֲנָא"
+    },
+    {
+     "ref": "Genesis 1:1",
+     "word": "וְֵישׁ"
+    },
+    {
+     "ref": "Genesis 13:14",
+     "word": "מִמֵֶּנּוּ"
+    },
+    {
+     "ref": "Genesis 14:7",
+     "word": "לְהִשְָּׁפֵט"
+    },
+    {
+     "ref": "Genesis 15:13",
+     "word": "כְּשֶׁיֶָּצְאוּ"
+    },
+    {
+     "ref": "Genesis 2:8",
+     "word": "וַיִּבְרְָא"
+    },
+    {
+     "ref": "Genesis 21:7",
+     "word": "אֶלָֹּא"
+    },
+    {
+     "ref": "Genesis 22:2",
+     "word": "בִּירוּשָׁלִַם"
+    },
+    {
+     "ref": "Genesis 24:50",
+     "word": "הַזְֶּה"
+    },
+    {
+     "ref": "Leviticus 11:3",
+     "word": "צִפָּרְנִַין"
+    },
+    {
+     "ref": "Leviticus 11:19",
+     "word": "שֶׁעוֹשָֹׁה"
+    },
+    {
+     "ref": "Leviticus 22:32",
+     "word": "עוֹשִֹׁין"
+    },
+    {
+     "ref": "Leviticus 3:11",
+     "word": "עֹשִֹׁים"
+    },
+    {
+     "ref": "Leviticus 5:21",
+     "word": "וְהַנּוֹשֵֹׁא"
+    },
+    {
+     "ref": "Leviticus 8:5",
+     "word": "עוֹשֶֹׁה"
+    }
+   ]
+  },
+  "tanya": {
+   "words": 1,
+   "byKind": {
+    "dup": 1
+   },
+   "leftImpossible": 4,
+   "examples": [
+    {
+     "ref": "LA 3:5",
+     "from": "וּּבֵיאוּר",
+     "to": "וּבֵיאוּר",
+     "kinds": [
+      "dup"
+     ]
+    }
+   ],
+   "left": [
+    {
+     "ref": "LA 25:13",
+     "word": "מִצְוַֹת"
+    },
+    {
+     "ref": "LA 38:12",
+     "word": "נִתְִהַוּוּ"
+    },
+    {
+     "ref": "SY 4:4",
+     "word": "שְׁבְָחוֹ"
+    },
+    {
+     "ref": "SY 8:3",
+     "word": "לְאַָהֳבָם"
+    }
+   ]
+  },
+  "rambam": {
+   "words": 238,
+   "byKind": {
+    "holam": 237,
+    "dup": 1
+   },
+   "leftImpossible": 20,
+   "examples": [
+    {
+     "ref": "Agents_and_Partners.1.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Agents_and_Partners.1.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Agents_and_Partners.1.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Agents_and_Partners.1.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.3",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.3",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.3",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.4",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.5",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.7",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.1.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.10.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.10.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.10.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.10.6",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.7",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.11.11",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.1",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.1",
+     "from": "לוִֹין",
+     "to": "לֹוִין",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.3",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.3",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "וְלוֶֹה",
+     "to": "וְלֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.5",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.6",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.13.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.3",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.4",
+     "from": "וְלוֶֹה",
+     "to": "וְלֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.7",
+     "from": "וְלוֶֹה",
+     "to": "וְלֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.9",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.9",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.9",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.10",
+     "from": "וְלוֶֹה",
+     "to": "וְלֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.13",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.13",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.14",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.14",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.14.14",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.6",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.15.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.16.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.16.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.16.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.16.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.3",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.4",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.6",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.6",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.7",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.9",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.17.9",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.18.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.19.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.19.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.19.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.19.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.2",
+     "from": "לוִֹין",
+     "to": "לֹוִין",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.2.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.20.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.20.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.20.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.1",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.10",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.10",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.16",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.22.16",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.5",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.5",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.5",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.11",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.16",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.16",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.17",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.17",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.23.18",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.24.1",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.24.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.24.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.24.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.24.10",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.4",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.4",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.5",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.14",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.25.14",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.1",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.7",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.26.8",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.27.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.4",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.6",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.3.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.2",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.2",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.2",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.3",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.3",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.6",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.10",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.4.13",
+     "from": "שֶׁהַלּוֶֹה",
+     "to": "שֶׁהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.5.1",
+     "from": "לוִֹין",
+     "to": "לֹוִין",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.5.14",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.6.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.6.8",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Creditor_and_Debtor.7.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Foundations_of_the_Torah.2.3",
+     "from": "הוִֹים",
+     "to": "הֹוִים",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Foundations_of_the_Torah.6.3",
+     "from": "מִלַּיהוָֹה",
+     "to": "מִלַּיהֹוָה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Foundations_of_the_Torah.6.4",
+     "from": "מֵיְהוָֹה",
+     "to": "מֵיְהֹוָה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Gifts_to_the_Poor.9.16",
+     "from": "בְּשׁוְֹיֵהֶן",
+     "to": "בְּשֹׁוְיֵהֶן",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Hiring.7.5",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Mourning.5.8",
+     "from": "טוָֹה",
+     "to": "טֹוָה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.2.5",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.4.5",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.4.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.4.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.3",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.5",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.6.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Plaintiff_and_Defendant.7.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Robbery_and_Lost_Property.18.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Robbery_and_Lost_Property.18.4",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Robbery_and_Lost_Property.18.5",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Robbery_and_Lost_Property.3.16",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Slaves.2.7",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.10.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.15.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.16.3",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.17.1",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.17.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.17.4",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.17.6",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.18.2",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.21.2",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.21.2",
+     "from": "לַלּוֶֹה",
+     "to": "לַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.3.1",
+     "from": "לוִֹין",
+     "to": "לֹוִין",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "Testimony.3.4",
+     "from": "לוִֹין",
+     "to": "לֹוִין",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.11.2",
+     "from": "לְהָרְגוֹֹ",
+     "to": "לְהָרְגוֹ",
+     "kinds": [
+      "dup"
+     ]
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.6.7",
+     "from": "וְהַלּוֶֹה",
+     "to": "וְהַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.6.7",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.6.7",
+     "from": "לוֶֹה",
+     "to": "לֹוֶה",
+     "kinds": [
+      "holam"
+     ]
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.6.9",
+     "from": "הַלּוֶֹה",
+     "to": "הַלֹּוֶה",
+     "kinds": [
+      "holam"
+     ]
+    }
+   ],
+   "left": [
+    {
+     "ref": "Admission_into_the_Sanctuary.7.13",
+     "word": "בְּבשֶֹׁם"
+    },
+    {
+     "ref": "Defilement_by_a_Corpse.1.2",
+     "word": "וְהַנּשֵֹׁא"
+    },
+    {
+     "ref": "Foundations_of_the_Torah.2.4",
+     "word": "עשֶֹׁה"
+    },
+    {
+     "ref": "Hiring.11.2",
+     "word": "נשֵֹׁא"
+    },
+    {
+     "ref": "Human_Dispositions.5.9",
+     "word": "בּשֶֹׁם"
+    },
+    {
+     "ref": "Human_Dispositions.5.9",
+     "word": "בְּבשֶֹׁם"
+    },
+    {
+     "ref": "Kings_and_Wars.7.15",
+     "word": "עשֶֹׁה"
+    },
+    {
+     "ref": "Oaths.12.12",
+     "word": "עשֵֹׁה"
+    },
+    {
+     "ref": "Offerings_for_Unintentional_Transgressions.1.5",
+     "word": "לָעשֶֹׁה"
+    },
+    {
+     "ref": "Other_Sources_of_Defilement.1.1",
+     "word": "וְהַנּשֵֹׁא"
+    },
+    {
+     "ref": "Prayer_and_the_Priestly_Blessing.13.18",
+     "word": "עשֶֹׁה"
+    },
+    {
+     "ref": "Rest_on_a_Holiday.6.3",
+     "word": "בְּרִיפוֱֹת"
+    },
+    {
+     "ref": "Sabbath.19.8",
+     "word": "בּשֶֹׁם"
+    },
+    {
+     "ref": "Slaves.9.8",
+     "word": "עשֵֹׁנִי"
+    },
+    {
+     "ref": "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.22.4",
+     "word": "עשֶֹׁה"
+    },
+    {
+     "ref": "Theft.7.8",
+     "word": "עשֵֹׁה"
+    },
+    {
+     "ref": "Theft.7.8",
+     "word": "עשֵֹׁה"
+    },
+    {
+     "ref": "Vessels.12.11",
+     "word": "הַבּשֶֹׁם"
+    },
+    {
+     "ref": "Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein.1.2",
+     "word": "הַבּשֶֹׁם"
+    },
+    {
+     "ref": "Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein.1.3",
+     "word": "בּשֶֹׁם"
+    }
+   ]
+  }
+ }
+}

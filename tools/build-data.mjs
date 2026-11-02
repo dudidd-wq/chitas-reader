@@ -126,7 +126,10 @@ async function rambam(only) {
     if (t.meta.versionTitle === VERSIONS.rambam) record('rambam', t.meta, { sefariaUrl: 'https://www.sefaria.org/Mishneh_Torah,_Foundations_of_the_Torah?vhe=' + encodeURIComponent(VERSIONS.rambam) });
     sources.rambamOverrides ||= {};
     const all = JSON.stringify(t.text), L = (all.match(/[\u05D0-\u05EA]/g) || []).length, N = (all.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length;
-    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = { ...fixWikisource(name, t.meta), vocalized: N / Math.max(L, 1) >= 0.3 }; else delete sources.rambamOverrides[name];
+    // round 6: also count vocalised segments, so a partly vocalised book (Positive Mitzvot) is labelled "מנוקד חלקית"
+    const segs = JSON.stringify(t.text.flat ? t.text.flat(2) : t.text).split('","').map(x => { const l = (x.match(/[\u05D0-\u05EA]/g) || []).length; return l < 20 ? null : (x.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length / l >= 0.3; }).filter(v => v !== null);
+    const vSegs = [segs.filter(Boolean).length, segs.length];
+    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = { ...fixWikisource(name, t.meta), vocalized: N / Math.max(L, 1) >= 0.3, ...(vSegs[0] && vSegs[0] < vSegs[1] && N / Math.max(L, 1) < 0.3 ? { partial: vSegs } : {}) }; else delete sources.rambamOverrides[name];
     const he = (t.heRef || '').replace(/^משנה תורה,\s*/, '');
     const depth2 = Array.isArray(t.text[0]);
     const chapters = depth2 ? t.text : [t.text];

@@ -43,13 +43,18 @@ for (const [w, h] of [[320, 568], [360, 740], [390, 844], [844, 390], [568, 320]
       await p.keyboard.press('p');
       await p.waitForSelector('#ttsctl:not([hidden])'); await p.waitForTimeout(500);
       const m = await p.evaluate(() => {
-        const rb = document.querySelector('#rb'), btns = [...rb.querySelectorAll('#ttsctl .btn, #ttsctl select')];
-        const tops = new Set(btns.map(x => Math.round(x.getBoundingClientRect().top / 8)));
+        const rb = document.querySelector('#rb'), btns = [...rb.querySelectorAll('#ttsctl .btn, #ttsctl select')].filter(x => x.getClientRects().length);
+        const tops = new Set(btns.map(x => { const r = x.getBoundingClientRect(); return Math.round((r.top + r.bottom) / 2 / 16); }));   // round 6: controls differ in height – compare centres
         return { h: rb.offsetHeight, rows: tops.size, pad: parseFloat(document.querySelector('#rc').style.paddingBottom),
           small: btns.filter(x => { const r = x.getBoundingClientRect(); return r.width < 43.5 || r.height < 43.5; }).map(x => x.id + ':' + Math.round(x.getBoundingClientRect().width) + 'x' + x.getBoundingClientRect().height),
-          overflow: document.documentElement.scrollWidth > innerWidth };
+          overflow: document.documentElement.scrollWidth > innerWidth,
+          play: Math.min(...['width', 'height'].map(k => document.querySelector('#t-play').getBoundingClientRect()[k])),
+          skip: Math.min(...['#t-back', '#t-fwd'].flatMap(s => ['width', 'height'].map(k => document.querySelector(s).getBoundingClientRect()[k]))),
+          gap: Math.min(...btns.slice(1).map((x, i) => Math.abs(btns[i].getBoundingClientRect().left - x.getBoundingClientRect().right))) };
       });
-      assert.ok(m.h <= 64, `bar height ${m.h}px`);
+      assert.ok(m.h <= 78, `bar height ${m.h}px`);   // round 6: a 64 px play button
+      assert.ok(m.play >= 63.5 && m.skip >= 55.5, `play ${m.play}px, skip ${m.skip}px`);
+      assert.ok(m.gap >= 5, `space between buttons ${m.gap}px`);
       assert.equal(m.rows, 1, 'all player controls on one row');
       assert.deepEqual(m.small, [], 'player controls ≥44px');
       assert.ok(m.pad >= m.h, `text padding (${m.pad}) accounts for the bar (${m.h}); before ${padBefore}`);

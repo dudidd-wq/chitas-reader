@@ -6,6 +6,7 @@ import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetwork
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
+import { fixNiqqud } from './niqqud.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -313,7 +314,7 @@ async function renderSources() {
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים (בהקראה הם נקראים בניקוד הפסוק כשהם מילות הפסוק)')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
-  ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : '<b>לא מנוקד</b> (או מנוקד חלקית) – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
+  ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : m.partial ? `<b>מנוקד חלקית</b> – ${m.partial[0]} מתוך ${m.partial[1]} קטעים מנוקדים; לשאר אין גרסה מנוקדת ברישיון המתיר שימוש כאן` : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
   ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
   </tbody></table>
   <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), ולכל ביאור מצורף קישור לערך המקור. ביאור מתפרסם רק אם עבר <b>שתי בדיקות בלתי תלויות</b>, ואחריהן בדיקה ידנית:</p>
@@ -375,7 +376,14 @@ function renderAbout() {
   <li>לחיצה אחת על כפתור ההקראה מתחילה לקרוא מיד; ההגדרות (קול, מהירות, שם ה׳) – בלחיצה ארוכה על הכפתור או בכפתור ההגדרות שבסרגל ההקראה.</li>
   <li>מה לא מוקרא: סימני פרשה פתוחה/סתומה (פ/ס), והפניות למקורות בסוגריים, כמו ״(שמות כ׳)״ או ״(מכילתא)״ – הן נשארות על המסך. ראשי תיבות מורחבים רק כשהם חד־משמעיים (למשל ת״ל – תַּלְמוּד לוֹמַר); אחרת נקראים ככתבם.</li>
   <li>שם ה׳ במצב ״השם״: שם הוי׳ה, ה׳, יי ו״ה׳״ עם מקף או אות שימוש (לַה׳ – לַהַשֵּׁם) נקראים ״הַשֵּׁם״; אֲדֹנָי כשם קודש נקרא ״אֲדוֹשֵׁם״; אלוקים, קָהּ וקֵל בק׳. במקום שהמילה אינה שם קודש (למשל ״אלהים אחרים״) – אין החלפה. זו רשימה שלנו, לא פסק הלכה.</li>
-  <li id="tts-untested"><b>מה נבדק ומה לא:</b> ההכנה לדיבור (ניקוד, מספרים, ראשי תיבות, שם ה׳) נבדקת בבדיקות אוטומטיות, והנגן נבדק בדפדפן עם קול מדומה. <b>ההקראה בפועל עם קולות עבריים אמיתיים, באייפון ובאנדרואיד, לא נבדקה</b> – לא היה בידינו מכשיר כזה לבדיקה, ולכן גם המשפט הבא מבוסס על התיעוד של הדפדפנים ולא על ניסוי.</li>
+  <li id="tts-untested"><b>מה נבדק ומה לא:</b> ההכנה לדיבור (ניקוד, מספרים, ראשי תיבות, שם ה׳) נבדקת בבדיקות אוטומטיות, והנגן נבדק בדפדפן עם קול מדומה. <b>ההקראה בפועל עם קולות עבריים אמיתיים, באייפון ובאנדרואיד, לא נבדקה</b> – לא היה בידינו מכשיר כזה לבדיקה, ולכן גם המשפט הבא מבוסס על התיעוד של הדפדפנים ולא על ניסוי.
+    <details id="tts-howto"><summary>איך לבדוק במכשיר שלכם</summary><ol>
+    <li>מתקינים קול עברי (אנדרואיד: מנוע Google ← התקנת נתוני קול ← עברית; אייפון: נגישות ← תוכן מוקרא ← קולות ← עברית ← כרמית).</li>
+    <li>פותחים את החומש של היום ולוחצים 🔊.</li>
+    <li>מאזינים לעלייה שלמה: רש״י, שמות קודש (דברים ו,ד; בראשית יח,ג), ראשי תיבות, ו״יִשְׂרָאֵל״ ברש״י ויקרא א,א (צריך להישמע ״יִסְרָאֵל״).</li>
+    <li>נועלים את המסך ובודקים את כפתורי הבא/הקודם במסך הנעילה.</li>
+    <li>באייפון: בודקים אם ההקראה נעצרת בנעילה.</li></ol>
+    מה שמצאתם – בקישור ״מצאת טעות?״ שבחלון התצוגה (Aא) בקורא. פירוט מלא ב-README שבמאגר הקוד.</details></li>
   <li>כשהמסך כבוי: במחשב ההקראה ממשיכה; באנדרואיד היא לרוב ממשיכה כשהדף פתוח; באייפון היא נעצרת בדרך כלל בנעילת המסך – מומלץ להשאיר את המסך דולק (יש אפשרות כזו בהגדרות).</li></ul>
   <h2>שימוש לא מסחרי</h2><p id="noncommercial">האתר כולו, כפי שהוא מוגש כאן, הוא <b>לשימוש לא מסחרי בלבד</b>: טקסט התניא שבו ניתן ברישיון CC BY-NC (Kehot Publication Society), ולכן אין באתר פרסומות, תשלום או מנוי, ואין להעתיק אותו לשימוש מסחרי עם התניא הזה. קוד האתר עצמו (GPL) והטקסטים האחרים כפופים לרישיונות שלהם – ראו <a href="#/sources">מקורות ורישיונות</a>.</p>
   <p>האתר בהשראת <a href="https://dvarmalchus.co.il" target="_blank" rel="noopener">דבר מלכות</a>. זהו מיזם עצמאי ואינו קשור אליו.</p>`);
@@ -386,7 +394,7 @@ function renderAbout() {
 /** Names (Hebrew) of the Rambam texts that are shown without niqqud, from sources.json. */
 function unvocalizedList(s) {
   const n = k => Locale.gettext(k, 'he-x-NoNikud');
-  return [...Object.entries(s.rambamOverrides || {}).filter(([, m]) => m.vocalized === false).map(([k]) => n(k)),
+  return [...Object.entries(s.rambamOverrides || {}).filter(([, m]) => m.vocalized === false).map(([k, m]) => n(k) + (m.partial ? ' (מנוקד חלקית)' : '')),
     ...Object.entries(s.rambamChapterOverrides || {}).filter(([, m]) => m.vocalized === false).map(([k]) => { const [, b, c] = k.match(/^(.*) (\d+)$/); return `${n(b)} פרק ${gem(+c)}`; })];
 }
 
@@ -398,8 +406,16 @@ function fmt(html, isTanakh) {
     .replace(/\{([פס])\}/g, (m, k) => `<span class="pe pe-${k === 'פ' ? 'p' : 's'}" aria-hidden="true" title="${k === 'פ' ? 'פרשה פתוחה' : 'פרשה סתומה'}"></span>`) // a gap, as in a Torah scroll (round 5: a bare ס puzzled readers)
     .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">')
     .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
+  if (!isTanakh) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
   return s;
+}
+// per block: true = vocalised, false = not, null = too short to tell (inherits the previous block's state)
+function vocState(blocks) {
+  let last = null;
+  const raw = blocks.map(b => { const t = b.type === 'h' ? '' : (b.text || '') + ' ' + (b.sub || []).join(' '); const L = (t.match(/[\u05D0-\u05EA]/g) || []).length; return L < 20 ? null : niqqudRatio(t) >= 0.3; });
+  const first = raw.find(v => v !== null) ?? null;
+  return raw.map(v => (v === null ? (last ?? first) : (last = v)));
 }
 function niqqudRatio(text) { const L = (text.match(/[\u05D0-\u05EA]/g) || []).length; const N = (text.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length; return N / Math.max(L, 1); }
 
@@ -443,6 +459,7 @@ async function openReader(unit, iso) {
     <button class="btn ghost" id="b-next" aria-label="עמוד הבא">${ICON.next}</button>
   </footer>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
+  <div class="pflash" id="pflash" aria-hidden="true"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
   bindReaderUi();
   try {
@@ -473,7 +490,11 @@ function simchatTorahNote() {
   const t = c.shabbat
     ? 'שמחת תורה שחל בשבת (בארץ ישראל): לומדים את ״וזאת הברכה״ מ״שביעי״ עד סוף התורה בלבד, ולמחר (אסרו חג, יום ראשון) – ״בראשית״ ״ראשון״. זה הכלל הכתוב בספר המנהגים (שיעורי חת״ת): בשמחת תורה – ״וזאת הברכה״ מעליית היום עד הסוף, ובאסרו חג – ״בראשית״ מתחילתה עד עליית היום. יש הנוהגים להוסיף בשמחת תורה גם ״בראשית״ עד עליית היום (כך אנו נוהגים כשהחג חל ביום חול); בשבת פירוש הדבר כל פרשת בראשית, ולא מצאנו מקור שמורה כך במפורש.'
     : `בשמחת תורה מסיימים את ״וזאת הברכה״ מעליית היום (${c.aliyahHe}) עד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום – ע״פ שיחת הרבי (תורת מנחם תשל״ב ח״א עמ׳ 129) ו״מנהגי חב״ד לשמחת תורה״ (chabad.org.il). בלוחות אחרים, כמו Chabad.org, מופיעה היום רק ״וזאת הברכה״.`;
-  return `<aside class="day-note" role="note"><b>לתשומת לב:</b> ${esc(t)}</aside>`;
+  // round 6: one line first, the reasoning and sources behind "פירוט"
+  const lead = c.shabbat
+    ? 'היום: ״וזאת הברכה״ מ״שביעי״ עד סוף התורה; מחר (אסרו חג): ״בראשית״ ״ראשון״.'
+    : `היום: ״וזאת הברכה״ מ״${c.aliyahHe}״ עד הסוף ו״בראשית״ עד סוף ״${c.aliyahHe}״; ב-Chabad.org: ״וזאת הברכה״ בלבד.`;
+  return `<aside class="day-note" role="note"><b>שמחת תורה:</b> ${esc(lead)}<details class="note-more"><summary>פירוט</summary>${esc(t)}</details></aside>`;
 }
 // A reader opened before the location was chosen (e.g. from a shared link): state which calendar is shown and why.
 function readerLocNote() {
@@ -485,7 +506,6 @@ async function renderDoc() {
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
   let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
-  const allText = d.blocks.filter(b => b.text).map(b => b.text).join(' ');
   html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
@@ -493,9 +513,17 @@ async function renderDoc() {
     tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
-  if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון המתיר שימוש כאן.</p>`;
-  let open = false;
-  for (const b of d.blocks) {
+  // round 6: vocalisation is judged per block, not for the whole lesson (Positive Mitzvot: the first ~47 mitzvot are
+  // vocalised, the rest not). A short block (< 20 letters) inherits its neighbour's state, so a title never flips it.
+  const voc = vocState(d.blocks), nV = voc.filter(v => v === true).length, nU = voc.filter(v => v === false).length;
+  const mixed = nV > 0 && nU > 0;
+  if (nU && !nV) html += `<p class="unvoc" id="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון המתיר שימוש כאן.</p>`;
+  else if (mixed) html += `<p class="unvoc" id="unvoc">טקסט זה מנוקד חלקית: ${nV} מתוך ${nV + nU} קטעים מנוקדים. לשאר לא נמצאה גרסה מנוקדת ברישיון המתיר שימוש כאן; תחילת כל קטע לא מנוקד מסומנת.</p>`;
+  let open = false, prevVoc = true;
+  for (const [bi, b] of d.blocks.entries()) {
+    if (mixed && voc[bi] === false && prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט אינו מנוקד</p>`;
+    if (mixed && voc[bi] === true && !prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט מנוקד</p>`;
+    if (voc[bi] !== null) prevVoc = voc[bi];
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
@@ -676,6 +704,12 @@ function updateProgress(save = true) {
     frac = R.pages <= 1 ? 1 : R.page / (R.pages - 1);
     const a = R.spread ? 2 * R.page + 1 : R.page + 1, b = R.spread ? Math.min(2 * R.page + 2, R.cols) : a;
     $('#pinfo').textContent = $('#pinfo2').textContent = a === b ? `עמוד ${a} מתוך ${R.cols}` : `עמודים ${a}–${b} מתוך ${R.cols}`;
+    // round 6: in full-screen mode the bars are hidden, so the page number shows briefly on each page turn
+    if (R.flashed !== R.page && $('#reader').classList.contains('immersive')) {
+      const f = $('#pflash'); f.textContent = $('#pinfo').textContent; f.classList.add('show');
+      clearTimeout(R.flashT); R.flashT = setTimeout(() => f.classList.remove('show'), 1400);
+    }
+    R.flashed = R.page;
   } else {
     const vp = $('#vp'); const max = vp.scrollHeight - vp.clientHeight;
     frac = max <= 0 ? 1 : vp.scrollTop / max;
@@ -693,6 +727,8 @@ const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 44
 const AUTO_HIDE_MS = 2500;
 function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
+  // a note's "פירוט" changes its height – re-paginate and stay on it
+  $('#rc').addEventListener('toggle', e => { if (e.target.matches?.('.note-more') && prefs.layout === 'pages') { const a = anchor(); layout(); restore(a); } }, true);
   const toggleChrome = force => {
     const before = el.classList.contains('immersive'), after = el.classList.toggle('immersive', force);
     if (!after) armAutoHide();
@@ -804,11 +840,11 @@ document.addEventListener('keydown', e => {
 }, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
 let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } }, 150); });
 
-function openSheet(kind) {
-  const sh = $('#sheet');
+function openSheet(kind, note = '') {
+  const sh = $('#sheet'); clearToast();
   if (sh.hidden) R.sheetOpener = document.activeElement;
   sh.innerHTML = `<h2><span id="sh-title">${kind === 'tts' ? 'הקראה' : 'תצוגה'}</span><button class="btn ghost" id="sh-x" aria-label="סגירה">${ICON.close}</button></h2>
-    <form class="form" onsubmit="return false">${kind === 'tts' ? `<button class="btn primary" id="sh-play" type="button">${R.speaker?.state === 'playing' ? 'השהה הקראה' : 'התחל הקראה מהעמוד הנוכחי'}</button>` + ttsForm() + (R.credit ? `<p class="note" id="sh-credit">הטקסט המוקרא – ${R.credit}</p>` : '') : displayForm()}</form>`;
+    ${note ? `<p class="sheet-note" id="sh-note" role="alert">${esc(note)}</p>` : ''}<form class="form" onsubmit="return false">${kind === 'tts' ? `<button class="btn primary" id="sh-play" type="button">${R.speaker?.state === 'playing' ? 'השהה הקראה' : 'התחל הקראה מהעמוד הנוכחי'}</button>` + ttsForm() + (R.credit ? `<p class="note" id="sh-credit">הטקסט המוקרא – ${R.credit}</p>` : '') : displayForm()}</form>`;
   sh.hidden = false;
   for (const id of ['#rt', '#vp', '#rb']) $(id).inert = true;
   $('#sh-x').onclick = closeSheet;
@@ -852,7 +888,7 @@ function ttsSegments() {
   });
 }
 const TTS_ERR = {
-  'no-voice': 'לא נמצא במכשיר קול עברי, ולכן ההקראה לא הופעלה. הוראות התקנה – בחלון ההקראה.',
+  'no-voice': 'ההקראה לא הופעלה: לא נמצא במכשיר קול עברי. הוראות ההתקנה – כאן למטה.',
   silent: 'מנוע הדיבור לא השמיע את הטקסט (ייתכן שאין קול עברי). ההקראה נעצרה, והשיעור לא סומן כנלמד.',
 };
 // The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
@@ -886,8 +922,9 @@ async function ttsToggle() {
     },
     onError: code => {
       R.speaker = null; R.ttsShown = false; showTtsBar(false);
+      // round 6: the no-voice message is written inside the sheet, above the install steps – a toast covered them
+      if (code === 'no-voice') { openSheet('tts', TTS_ERR[code]); return; }
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
-      if (code === 'no-voice') openSheet('tts');
     },
   });
   R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen },
