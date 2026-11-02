@@ -238,7 +238,15 @@
     "sefariaUrl2": "https://www.sefaria.org/Likkutei_Torah?vhe=Kehot_Publication_Society&lang=he",
     "luach": "לוח המורה שיעור – כינוס השלוחים העולמי (תשפ״ה)",
     "luachUrl": "https://www.torahor.app/he",
-    "fetchedAt": "2026-11-02"
+    "fetchedAt": "2026-11-02",
+    "niqqud": {
+      "versionTitle": "Chassidut Behirah (chassidutbehirah.com)",
+      "versionTitleInHebrew": "נוסח מנוקד: חסידות בהירה, על פי מהדורת קה״ת ה׳תשע״ה",
+      "license": "באישור, לשימוש לא מסחרי בלבד",
+      "versionSource": "https://chassidutbehirah.com/",
+      "permission": "לפי דיווח בעל האתר, אושר ע״י חסידות בהירה וקה״ת, לשימוש לא מסחרי בלבד",
+      "method": "verification/CHASSIDUT-BEHIRAH.md"
+    }
   },
   "ravyomi": {
     "title": "Shulchan Arukh HaRav, Orach Chayim",

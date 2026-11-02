@@ -175,7 +175,8 @@ export async function build() {
   const sp = 'site/data/sources.json', sources = JSON.parse(fs.readFileSync(sp, 'utf8'));
   const meta = JSON.parse(fs.readFileSync(path.join(CACHE, 'Torah_Ohr_Bereshit.json'), 'utf8')).meta;
   sources.tolt = { ...meta, sefariaUrl: 'https://www.sefaria.org/Torah_Ohr?vhe=Kehot_Publication_Society&lang=he', sefariaUrl2: 'https://www.sefaria.org/Likkutei_Torah?vhe=Kehot_Publication_Society&lang=he',
-    luach: 'לוח המורה שיעור – כינוס השלוחים העולמי (תשפ״ה)', luachUrl: 'https://www.torahor.app/he', fetchedAt: new Date().toISOString().slice(0, 10) };
+    luach: 'לוח המורה שיעור – כינוס השלוחים העולמי (תשפ״ה)', luachUrl: 'https://www.torahor.app/he', fetchedAt: new Date().toISOString().slice(0, 10),
+    ...(sources.tolt?.niqqud ? { niqqud: sources.tolt.niqqud } : {}) }; // the Chassidut Behirah record (tools/cb-niqqud) is kept
   fs.writeFileSync(sp, JSON.stringify(sources, null, 1));
   return report;
 }

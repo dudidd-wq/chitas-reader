@@ -193,6 +193,7 @@ async function toltLessons(plan) {
   const S = await data('tolt/schedule.json');
   return plan.tolt.parts.map(([slug, day]) => ({ slug, day, e: S.weeks[slug].days[day - 1], week: S.weeks[slug] }));
 }
+export const CB_ATTR = 'נוסח מנוקד: חסידות בהירה, על פי מהדורת קה״ת ה׳תשע״ה; באישור, לשימוש לא מסחרי בלבד', CB_URL = 'https://chassidutbehirah.com/';
 const LUACH_LINKS = [['לוח המורה שיעור – כינוס השלוחים העולמי', 'https://hisachdus.co.il/'], ['torahor.app – התאחדות החסידים', 'https://www.torahor.app/he']];
 async function toltDoc(plan) {
   const blocks = [];
@@ -205,10 +206,14 @@ async function toltDoc(plan) {
     if (e.approx) blocks.push({ type: 'note', text: 'מיקום משוער: הד״ה בלוח שונה מעט מהכותרת שבמהדורה, ולכן תחילת השיעור נקבעה לפי הכותרת הקרובה בעמוד שבלוח. כדאי לוודא בספר.' });
     if (e.add) blocks.push({ type: 'note', text: `בלוח מצוין גם: ${e.add.replace(/^\+\s*/, '')}. ${/שנדפסה|השמטה/.test(e.add) ? 'קטע זה אינו מוצג כאן.' : 'ההוספות אינן מוצגות כאן; אפשר לפתוח את הספר בספריא.'}`, href: e.sefaria, hrefText: 'פתיחה בספריא' });
     if (!paras) { blocks.push({ type: 'note', text: `לא נמצא במהדורה שבאתר המקום המדויק של שיעור זה (${toltWork(e)}, ${toltPlace(e)}, ${toltDh(e)}). מוצגת ההפניה בלבד.`, href: e.sefaria, hrefText: 'פתיחה בספריא' }); continue; }
-    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, src: 'tolt' }));
+    // vocalised paragraphs (nq) come from Chassidut Behirah, written only on words whose letters equal this Kehot text
+    // (tools/cb-niqqud, verification/CHASSIDUT-BEHIRAH.md); the rest stay the unvocalised Kehot/Sefaria text
+    const nq = paras.filter(p => p.nq).length;
+    if (nq) blocks.push({ type: 'note', text: `${CB_ATTR}. `, links: [['חסידות בהירה – chassidutbehirah.com', CB_URL]], tail: nq < paras.length ? `. ${paras.length - nq} מתוך ${paras.length} הפסקאות מוצגות בלי ניקוד, כי לא אומתה בהן התאמה מלאה לאותיות נוסח קה״ת.` : '.' });
+    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}) }));
     if (e.until) blocks.push({ type: 'note', text: `לפי הלוח השיעור מסתיים ${e.until.daf === 'תום' || e.until === 'תום' ? 'בסוף הדרוש' : e.until === 'סוף הפרשה' ? 'בסוף הפרשה' : `בדף ${gem(e.until.daf)}/${e.until.amud}`}.` });
   }
-  blocks.push({ type: 'note', text: 'חלוקת השיעורים: ', links: LUACH_LINKS, tail: '. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC), בלי ניקוד. בסוגריים המרובעים – מספרי הדפים והעמודים במהדורה (א–ד).' });
+  blocks.push({ type: 'note', text: 'חלוקת השיעורים: ', links: LUACH_LINKS, tail: `. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC). ${CB_ATTR} (chassidutbehirah.com); הניקוד נקלט רק במילים שאותיותיהן זהות לנוסח קה״ת, ופסקה שלא אומתה מוצגת בלי ניקוד. בסוגריים המרובעים – מספרי הדפים והעמודים במהדורה (א–ד).` });
   return { title: UNITS.tolt.full, subtitle: L.map(({ e }) => `${toltWork(e)} ${toltPlace(e)}`).join(' · '), blocks, raw: true };
 }
 // ---------------- Shulchan Aruch HaRav – "Rav Yomi" luach (tools/build-rav-yomi.mjs) ----------------
