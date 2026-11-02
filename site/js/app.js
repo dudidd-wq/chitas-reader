@@ -7,6 +7,8 @@ import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
 import { fixNiqqud } from './niqqud.js';
+import { CITIES, cityById, computeZmanim, fmtTime } from './zmanim.js';
+import { hebDateHe } from './calendar.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -46,6 +48,86 @@ const dayDates = (plan, iso) => `${plan.hebDate} · ${fmtDmy(iso)}`;
 const dayDatesHtml = (plan, iso) => `<bdi>${esc(plan.hebDate)}</bdi><i aria-hidden="true"> · </i><bdi dir="ltr">${esc(fmtDmy(iso))}</bdi>`;
 const shiftIso = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); return isoDate(new HDate(new Date(y, m - 1, d + n))); };
 
+// ---------------- Zmanim ----------------
+// The place for "זמני היום": a built-in city, or the device position (only when the user taps "המיקום שלי"; kept in
+// localStorage, never sent anywhere). Before a choice: a city in the device's time zone, else Jerusalem.
+const deviceTz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jerusalem'; } catch { return 'Asia/Jerusalem'; } };
+function zmanPlace() {
+  if (prefs.zmanPlace === 'geo' && prefs.zmanGeo) return { id: 'geo', he: 'המיקום שלי', ...prefs.zmanGeo, il: guessIsrael(), candles: 18 };
+  return cityById(prefs.zmanPlace) || (guessIsrael() ? cityById('jerusalem') : CITIES.find(c => c.tz === deviceTz()) || cityById('jerusalem'));
+}
+const ZMAN_TEASER = ['alot', 'misheyakir', 'netz', 'shma', 'tefila', 'chatzot', 'minchaGedola', 'plag', 'shkia', 'tzeit'];
+function zmanTeaser() {
+  let line = '';
+  try {
+    const pl = zmanPlace(), z = computeZmanim(currentDate, pl, { candleMins: prefs.candleMins });
+    const now = Date.now(), isToday = currentDate === todayIso();
+    const items = [...z.special.filter(x => x.r).map(x => ({ he: x.he, r: x.r })), ...z.rows.filter(r => ZMAN_TEASER.includes(r.key)).map(r => ({ he: r.he, r: r.opts[0].r }))].filter(x => x.r).sort((a, b) => a.r - b.r);
+    const nxt = isToday ? items.find(x => x.r > now) : z.special[0] || items.find(x => /^סוף זמן קריאת/.test(x.he));
+    line = nxt ? `${isToday ? 'הבא: ' : ''}${esc(nxt.he)} <time dir="ltr">${fmtTime(nxt.r, pl.tz)}</time>` : '';
+    line = `<span class="zt-place">${esc(pl.he)}</span>${line ? `<span class="zt-next">${line}</span>` : ''}`;
+  } catch { /* computed on the device; nothing to show */ }
+  return `<a class="zm-teaser" id="zm-teaser" href="#/zmanim/${currentDate}"><span class="zt-h">זמני היום</span>${line}<span class="go">פתח</span></a>`;
+}
+function renderZmanim() {
+  const iso = currentDate, plan = dayPlan(iso, { il: prefs.il }), pl = zmanPlace();
+  const z = computeZmanim(iso, pl, { candleMins: prefs.candleMins });
+  const tm = d => `<time dir="ltr">${fmtTime(d, pl.tz)}</time>`;
+  document.title = `זמני היום – ${pl.he} – ${plan.hebDate} (${fmtDmy(iso)})`;
+  const opt = c => `<option value="${c.id}" ${c.id === pl.id ? 'selected' : ''}>${esc(c.he)}</option>`;
+  const nearPole = z.rows.some(r => r.opts.some(o => !o.r));
+  shell('זמני היום', `
+  <p class="zm-date"><b>${esc(plan.hebDate)}</b> · ${esc(gregLongHe(iso, { weekday: true }))}</p>
+  <nav class="datebar zm-nav" aria-label="בחירת יום">
+    <a class="btn" href="#/zmanim/${shiftIso(iso, -1)}" aria-label="היום הקודם, ${fmtDmy(shiftIso(iso, -1))}">${ICON.prev}<span>הקודם</span></a>
+    ${iso === todayIso() ? '' : `<a class="btn today" href="#/zmanim/${todayIso()}">היום</a>`}
+    <a class="btn" href="#/zmanim/${shiftIso(iso, 1)}" aria-label="היום הבא, ${fmtDmy(shiftIso(iso, 1))}"><span>הבא</span>${ICON.next}</a>
+  </nav>
+  <div class="zm-place">
+    <label for="zm-city">מקום</label>
+    <select id="zm-city">
+      ${prefs.zmanGeo ? `<option value="geo" ${pl.id === 'geo' ? 'selected' : ''}>המיקום שלי (${prefs.zmanGeo.lat.toFixed(2)}, ${prefs.zmanGeo.lon.toFixed(2)})</option>` : ''}
+      <optgroup label="ארץ ישראל">${CITIES.filter(c => c.il).map(opt).join('')}</optgroup>
+      <optgroup label="חוץ לארץ">${CITIES.filter(c => !c.il).map(opt).join('')}</optgroup>
+    </select>
+    <button class="btn" type="button" id="zm-geo">${PIN}<span>המיקום שלי</span></button>
+  </div>
+  <p class="note" id="zm-geo-st" role="status" aria-live="polite">${pl.id === 'geo' ? `לפי המיקום שנשמר במכשיר; שעון: <bdi dir="ltr">${esc(pl.tz)}</bdi>` : prefs.zmanPlace ? '' : 'לא נבחר מקום – מוצג ' + esc(pl.he) + ' כברירת מחדל.'}</p>
+  ${z.special.length ? `<ul class="zm-special">${z.special.map(x => `<li><span><b>${esc(x.he)}</b><small>${esc(x.op)}</small></span>${tm(x.r)}</li>`).join('')}</ul>` : ''}
+  <ul class="zm-list">${z.rows.map(r => `
+    <li class="zm-row" data-z="${r.key}">
+      <div class="zm-main"><span><b>${esc(r.he)}</b><small>${esc(r.opts[0].op)}</small></span>${tm(r.opts[0].r)}</div>
+      ${r.opts.length > 1 ? `<ul class="zm-alt">${r.opts.slice(1).map(o => `<li><span>${esc(o.op)}</span>${tm(o.r)}</li>`).join('')}</ul>` : ''}
+    </li>`).join('')}
+  </ul>
+  ${z.sunset ? `<p class="note zm-heb">התאריך העברי מתחלף בשקיעה: מהשקיעה (${tm(z.sunset)}) מתחיל ${esc(hebDateHe(z.nextHeb))}.</p>` : ''}
+  <h2>הדלקת נרות</h2>
+  <div class="zm-place"><label for="zm-cand">דקות לפני השקיעה</label>
+    <select id="zm-cand"><option value="0" ${!prefs.candleMins ? 'selected' : ''}>לפי העיר (${pl.candles || 18})</option>${[18, 20, 22, 30, 40].map(m => `<option value="${m}" ${prefs.candleMins === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
+  <h2>על החישוב</h2>
+  <ul class="zm-notes">
+    <li><b>הזמנים מחושבים ואינם תחליף ללוח מקומי:</b> יש לבדוק מול לוח הזמנים של הקהילה או הרב המקומי, ובזמנים צמודים – להחמיר.</li>
+    <li>החישוב נעשה במכשיר, גם בלי רשת, בספריית Hebcal (אלגוריתם NOAA), בגובה פני הים (כמו Hebcal ו-Chabad.org), לפי קואורדינטות מרכז העיר. בשורה הראשונה – שיטת אדמו״ר הזקן כפי שמפרסם Chabad.org; מתחת – שיטות נוספות.</li>
+    <li>עיגול לחומרה: זמן אחרון (סוף זמן ק״ש ותפילה, שקיעה, הדלקת נרות, חצות) מעוגל כלפי מטה; זמן מוקדם ביותר (עלות השחר, משיכיר, הנץ, מנחה, פלג, צאת הכוכבים) – כלפי מעלה.</li>
+    <li>נבדק מול Hebcal ומול Chabad.org: 8 ערים × 7 תאריכים (ועוד 6 ערים בתאריך אחד), כולל ערב שבת, מוצאי שבת, ערב פסח, מעבר לשעון קיץ וקיץ בלונדון ובמוסקבה – הפרש של עד דקה.</li>
+    <li>הדלקת נרות: 18 דקות לפני השקיעה, בירושלים 40 ובחיפה 30 (כך ב-Hebcal וב-Chabad.org). מנהגים מקומיים שונים: Hebcal משתמש ב-20 דקות בשאר הערים בארץ, ו-Chabad.org ב-22 בתל אביב וב-30 באילת – אפשר לבחור למעלה. צאת השבת והחג: 8.5°.</li>
+    ${nearPole ? '<li>״—״: בעונה זו השמש אינה יורדת עד הזווית הזו במקום הזה, ולכן אין זמן לפי שיטה זו (Chabad.org מציג אז את חצות הלילה כעלות השחר).</li>' : ''}
+    <li>״המיקום שלי״: המיקום נקרא רק כשלוחצים על הכפתור, נשמר במכשיר בלבד ואינו נשלח לשום מקום; השעות מוצגות לפי אזור הזמן של המכשיר.</li>
+  </ul>`);
+  $('#zm-city').onchange = e => { setPref('zmanPlace', e.target.value); renderZmanim(); $('#zm-city').focus(); };
+  $('#zm-cand').onchange = e => { setPref('candleMins', Number(e.target.value) || 0); renderZmanim(); $('#zm-cand').focus(); };
+  $('#zm-geo').onclick = () => {
+    const st = $('#zm-geo-st');
+    if (!navigator.geolocation) { st.textContent = 'הדפדפן אינו תומך באיתור מיקום.'; return; }
+    st.textContent = 'מאתר מיקום…';
+    navigator.geolocation.getCurrentPosition(p => {
+      const r3 = x => Math.round(x * 1000) / 1000;
+      setPref('zmanGeo', { lat: r3(p.coords.latitude), lon: r3(p.coords.longitude), tz: deviceTz() }); setPref('zmanPlace', 'geo');
+      renderZmanim(); $('#zm-geo')?.focus();
+    }, () => { st.textContent = 'לא התקבל מיקום (ההרשאה נדחתה או שאינו זמין). אפשר לבחור עיר מהרשימה.'; }, { timeout: 15000, maximumAge: 600000 });
+  };
+}
+
 // ---------------- Router ----------------
 let currentDate = todayIso();
 function route() {
@@ -59,6 +141,7 @@ function route() {
   if (view === 'settings') return renderSettings();
   if (view === 'sources') return renderSources();
   if (view === 'about') return renderAbout();
+  if (view === 'zmanim') { if (/^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a; return renderZmanim(); }
   if (view === 'd' && /^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a;
   renderHome();
 }
@@ -136,12 +219,13 @@ async function renderHome(showLoc = false) {
       </li>`).join('')}
       </ol>
     </section>
+    ${zmanTeaser()}
 `}
     <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -370,6 +454,11 @@ function renderAbout() {
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li>
   <li><b>התאריך העברי מוצג לפי היום האזרחי:</b> לכל תאריך לועזי מוצג התאריך העברי של שעות היום שלו (חישוב של ספריית Hebcal). לפי ההלכה התאריך העברי מתחלף כבר בשקיעה, כך שבערב, אחרי השקיעה, כבר מתחיל התאריך העברי הבא – האתר אינו מחליף אותו בשקיעה.</li>
   <li>תאריכים לועזיים מוצגים בסדר הישראלי: יום/חודש/שנה (למשל <bdi dir="ltr">02/11/2026</bdi>) או ״2 בנובמבר 2026״.</li></ul>
+  <h2>זמני היום</h2><ul>
+  <li>בעמוד <a href="#/zmanim/${currentDate}">זמני היום</a>: עלות השחר, משיכיר, הנץ, סוף זמן ק״ש ותפילה, חצות, מנחה גדולה וקטנה, פלג, שקיעה, צאת הכוכבים וחצות הלילה, ובערב שבת ויום טוב – הדלקת נרות וצאת השבת/החג. לכל זמן מצוינת השיטה; השורה הראשונה היא שיטת אדמו״ר הזקן כפי שמפרסם Chabad.org.</li>
+  <li>החישוב נעשה במכשיר (ספריית Hebcal, אלגוריתם NOAA), בלי רשת, בגובה פני הים, ונבדק מול Hebcal ומול Chabad.org עד דקה. <b>זהו חישוב – יש לבדוק מול לוח מקומי.</b></li>
+  <li>הדלקת נרות: 18 דקות לפני השקיעה, בירושלים 40 ובחיפה 30; יש מנהגים מקומיים אחרים (Chabad.org: תל אביב 22, אילת 30; Hebcal: 20 בשאר הארץ) – אפשר לבחור בעמוד.</li>
+  <li>״המיקום שלי״ נקרא רק בלחיצה, נשמר במכשיר בלבד ואינו נשלח.</li></ul>
   <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>

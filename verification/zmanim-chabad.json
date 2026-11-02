@@ -1,0 +1,2489 @@
+{
+ "meta": {
+  "fetched": "2026-11-02",
+  "note": "reference data for tests only",
+  "source": "https://www.chabad.org/webservices/zmanim/zmanim/Get_Zmanim (locationtype=3, coords)"
+ },
+ "data": {
+  "jerusalem": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "4:41 AM"
+    ],
+    "EarliestTefillin": [
+     "5:14 AM"
+    ],
+    "NetzHachamah": [
+     "5:59 AM"
+    ],
+    "LatestShema": [
+     "8:39 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "11:22 AM"
+    ],
+    "MinchahGedolah": [
+     "11:50 AM"
+    ],
+    "MinchahKetanah": [
+     "2:34 PM"
+    ],
+    "PlagHaminchah": [
+     "3:42 PM"
+    ],
+    "CandleLighting": [
+     "4:06 PM"
+    ],
+    "Shkiah": [
+     "4:46 PM"
+    ],
+    "Tzeis": [
+     "5:12 PM"
+    ],
+    "ChatzosNight": [
+     "11:22 PM"
+    ],
+    "ShaahZmanit": [
+     "54:28 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "4:42 AM"
+    ],
+    "EarliestTefillin": [
+     "5:15 AM"
+    ],
+    "NetzHachamah": [
+     "6:00 AM"
+    ],
+    "LatestShema": [
+     "8:39 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "11:22 AM"
+    ],
+    "MinchahGedolah": [
+     "11:50 AM"
+    ],
+    "MinchahKetanah": [
+     "2:33 PM"
+    ],
+    "PlagHaminchah": [
+     "3:41 PM"
+    ],
+    "Shkiah": [
+     "4:45 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:23 PM"
+    ],
+    "ChatzosNight": [
+     "11:23 PM"
+    ],
+    "ShaahZmanit": [
+     "54:20 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "5:19 AM"
+    ],
+    "EarliestTefillin": [
+     "5:53 AM"
+    ],
+    "NetzHachamah": [
+     "6:40 AM"
+    ],
+    "LatestShema": [
+     "9:12 AM"
+    ],
+    "LatestTefillah": [
+     "10:04 AM"
+    ],
+    "Chatzos": [
+     "11:48 AM"
+    ],
+    "MinchahGedolah": [
+     "12:15 PM"
+    ],
+    "MinchahKetanah": [
+     "2:52 PM"
+    ],
+    "PlagHaminchah": [
+     "3:57 PM"
+    ],
+    "CandleLighting": [
+     "4:18 PM"
+    ],
+    "Shkiah": [
+     "4:58 PM"
+    ],
+    "Tzeis": [
+     "5:24 PM"
+    ],
+    "ChatzosNight": [
+     "11:48 PM"
+    ],
+    "ShaahZmanit": [
+     "52:08 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "5:19 AM"
+    ],
+    "EarliestTefillin": [
+     "5:52 AM"
+    ],
+    "NetzHachamah": [
+     "6:36 AM"
+    ],
+    "LatestShema": [
+     "9:38 AM"
+    ],
+    "LatestTefillah": [
+     "10:40 AM"
+    ],
+    "Chatzos": [
+     "12:45 PM"
+    ],
+    "MinchahGedolah": [
+     "1:17 PM"
+    ],
+    "MinchahKetanah": [
+     "4:23 PM"
+    ],
+    "PlagHaminchah": [
+     "5:41 PM"
+    ],
+    "CandleLighting": [
+     "6:14 PM"
+    ],
+    "Shkiah": [
+     "6:54 PM"
+    ],
+    "Tzeis": [
+     "7:19 PM"
+    ],
+    "ChatzosNight": [
+     "12:44 AM"
+    ],
+    "ShaahZmanit": [
+     "62:08 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "4:43 AM"
+    ],
+    "EarliestTefillin": [
+     "5:19 AM"
+    ],
+    "NetzHachamah": [
+     "6:04 AM"
+    ],
+    "LatestShema": [
+     "9:19 AM"
+    ],
+    "LatestTefillah": [
+     "10:25 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:25 AM"
+    ],
+    "BurnChametzTime": [
+     "11:31 AM"
+    ],
+    "Chatzos": [
+     "12:38 PM"
+    ],
+    "MinchahGedolah": [
+     "1:12 PM"
+    ],
+    "MinchahKetanah": [
+     "4:31 PM"
+    ],
+    "PlagHaminchah": [
+     "5:53 PM"
+    ],
+    "CandleLighting": [
+     "6:32 PM"
+    ],
+    "Shkiah": [
+     "7:12 PM"
+    ],
+    "Tzeis": [
+     "7:38 PM"
+    ],
+    "ChatzosNight": [
+     "12:37 AM"
+    ],
+    "ShaahZmanit": [
+     "66:14 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "4:01 AM"
+    ],
+    "EarliestTefillin": [
+     "4:42 AM"
+    ],
+    "NetzHachamah": [
+     "5:34 AM"
+    ],
+    "LatestShema": [
+     "9:05 AM"
+    ],
+    "LatestTefillah": [
+     "10:17 AM"
+    ],
+    "Chatzos": [
+     "12:40 PM"
+    ],
+    "MinchahGedolah": [
+     "1:17 PM"
+    ],
+    "MinchahKetanah": [
+     "4:53 PM"
+    ],
+    "PlagHaminchah": [
+     "6:22 PM"
+    ],
+    "Shkiah": [
+     "7:48 PM"
+    ],
+    "Tzeis": [
+     "8:16 PM"
+    ],
+    "ChatzosNight": [
+     "12:40 AM"
+    ],
+    "ShaahZmanit": [
+     "71:48 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "4:02 AM"
+    ],
+    "EarliestTefillin": [
+     "4:44 AM"
+    ],
+    "NetzHachamah": [
+     "5:35 AM"
+    ],
+    "LatestShema": [
+     "9:06 AM"
+    ],
+    "LatestTefillah": [
+     "10:18 AM"
+    ],
+    "Chatzos": [
+     "12:41 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:53 PM"
+    ],
+    "PlagHaminchah": [
+     "6:23 PM"
+    ],
+    "CandleLighting": [
+     "7:08 PM"
+    ],
+    "Shkiah": [
+     "7:48 PM"
+    ],
+    "Tzeis": [
+     "8:17 PM"
+    ],
+    "ChatzosNight": [
+     "12:41 AM"
+    ],
+    "ShaahZmanit": [
+     "71:46 min."
+    ]
+   }
+  },
+  "telaviv": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "4:43 AM"
+    ],
+    "EarliestTefillin": [
+     "5:16 AM"
+    ],
+    "NetzHachamah": [
+     "6:02 AM"
+    ],
+    "LatestShema": [
+     "8:41 AM"
+    ],
+    "LatestTefillah": [
+     "9:35 AM"
+    ],
+    "Chatzos": [
+     "11:24 AM"
+    ],
+    "MinchahGedolah": [
+     "11:52 AM"
+    ],
+    "MinchahKetanah": [
+     "2:35 PM"
+    ],
+    "PlagHaminchah": [
+     "3:43 PM"
+    ],
+    "CandleLighting": [
+     "4:25 PM"
+    ],
+    "Shkiah": [
+     "4:47 PM"
+    ],
+    "Tzeis": [
+     "5:13 PM"
+    ],
+    "ChatzosNight": [
+     "11:24 PM"
+    ],
+    "ShaahZmanit": [
+     "54:23 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "4:44 AM"
+    ],
+    "EarliestTefillin": [
+     "5:17 AM"
+    ],
+    "NetzHachamah": [
+     "6:02 AM"
+    ],
+    "LatestShema": [
+     "8:41 AM"
+    ],
+    "LatestTefillah": [
+     "9:35 AM"
+    ],
+    "Chatzos": [
+     "11:24 AM"
+    ],
+    "MinchahGedolah": [
+     "11:52 AM"
+    ],
+    "MinchahKetanah": [
+     "2:35 PM"
+    ],
+    "PlagHaminchah": [
+     "3:43 PM"
+    ],
+    "Shkiah": [
+     "4:46 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:24 PM"
+    ],
+    "ChatzosNight": [
+     "11:24 PM"
+    ],
+    "ShaahZmanit": [
+     "54:15 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "5:21 AM"
+    ],
+    "EarliestTefillin": [
+     "5:55 AM"
+    ],
+    "NetzHachamah": [
+     "6:42 AM"
+    ],
+    "LatestShema": [
+     "9:14 AM"
+    ],
+    "LatestTefillah": [
+     "10:06 AM"
+    ],
+    "Chatzos": [
+     "11:50 AM"
+    ],
+    "MinchahGedolah": [
+     "12:17 PM"
+    ],
+    "MinchahKetanah": [
+     "2:53 PM"
+    ],
+    "PlagHaminchah": [
+     "3:58 PM"
+    ],
+    "CandleLighting": [
+     "4:37 PM"
+    ],
+    "Shkiah": [
+     "4:59 PM"
+    ],
+    "Tzeis": [
+     "5:26 PM"
+    ],
+    "ChatzosNight": [
+     "11:50 PM"
+    ],
+    "ShaahZmanit": [
+     "52:02 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "5:20 AM"
+    ],
+    "EarliestTefillin": [
+     "5:54 AM"
+    ],
+    "NetzHachamah": [
+     "6:38 AM"
+    ],
+    "LatestShema": [
+     "9:40 AM"
+    ],
+    "LatestTefillah": [
+     "10:42 AM"
+    ],
+    "Chatzos": [
+     "12:46 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:25 PM"
+    ],
+    "PlagHaminchah": [
+     "5:43 PM"
+    ],
+    "CandleLighting": [
+     "6:34 PM"
+    ],
+    "Shkiah": [
+     "6:56 PM"
+    ],
+    "Tzeis": [
+     "7:21 PM"
+    ],
+    "ChatzosNight": [
+     "12:46 AM"
+    ],
+    "ShaahZmanit": [
+     "62:09 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "4:44 AM"
+    ],
+    "EarliestTefillin": [
+     "5:20 AM"
+    ],
+    "NetzHachamah": [
+     "6:06 AM"
+    ],
+    "LatestShema": [
+     "9:20 AM"
+    ],
+    "LatestTefillah": [
+     "10:27 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:27 AM"
+    ],
+    "BurnChametzTime": [
+     "11:33 AM"
+    ],
+    "Chatzos": [
+     "12:39 PM"
+    ],
+    "MinchahGedolah": [
+     "1:14 PM"
+    ],
+    "MinchahKetanah": [
+     "4:32 PM"
+    ],
+    "PlagHaminchah": [
+     "5:55 PM"
+    ],
+    "CandleLighting": [
+     "6:52 PM"
+    ],
+    "Shkiah": [
+     "7:14 PM"
+    ],
+    "Tzeis": [
+     "7:40 PM"
+    ],
+    "ChatzosNight": [
+     "12:39 AM"
+    ],
+    "ShaahZmanit": [
+     "66:18 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "4:01 AM"
+    ],
+    "EarliestTefillin": [
+     "4:43 AM"
+    ],
+    "NetzHachamah": [
+     "5:35 AM"
+    ],
+    "LatestShema": [
+     "9:06 AM"
+    ],
+    "LatestTefillah": [
+     "10:18 AM"
+    ],
+    "Chatzos": [
+     "12:42 PM"
+    ],
+    "MinchahGedolah": [
+     "1:19 PM"
+    ],
+    "MinchahKetanah": [
+     "4:55 PM"
+    ],
+    "PlagHaminchah": [
+     "6:25 PM"
+    ],
+    "Shkiah": [
+     "7:50 PM"
+    ],
+    "Tzeis": [
+     "8:19 PM"
+    ],
+    "ChatzosNight": [
+     "12:42 AM"
+    ],
+    "ShaahZmanit": [
+     "71:56 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "4:02 AM"
+    ],
+    "EarliestTefillin": [
+     "4:44 AM"
+    ],
+    "NetzHachamah": [
+     "5:36 AM"
+    ],
+    "LatestShema": [
+     "9:07 AM"
+    ],
+    "LatestTefillah": [
+     "10:19 AM"
+    ],
+    "Chatzos": [
+     "12:43 PM"
+    ],
+    "MinchahGedolah": [
+     "1:20 PM"
+    ],
+    "MinchahKetanah": [
+     "4:56 PM"
+    ],
+    "PlagHaminchah": [
+     "6:26 PM"
+    ],
+    "CandleLighting": [
+     "7:29 PM"
+    ],
+    "Shkiah": [
+     "7:51 PM"
+    ],
+    "Tzeis": [
+     "8:20 PM"
+    ],
+    "ChatzosNight": [
+     "12:43 AM"
+    ],
+    "ShaahZmanit": [
+     "71:54 min."
+    ]
+   }
+  },
+  "haifa": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "4:43 AM"
+    ],
+    "EarliestTefillin": [
+     "5:16 AM"
+    ],
+    "NetzHachamah": [
+     "6:02 AM"
+    ],
+    "LatestShema": [
+     "8:40 AM"
+    ],
+    "LatestTefillah": [
+     "9:35 AM"
+    ],
+    "Chatzos": [
+     "11:23 AM"
+    ],
+    "MinchahGedolah": [
+     "11:51 AM"
+    ],
+    "MinchahKetanah": [
+     "2:34 PM"
+    ],
+    "PlagHaminchah": [
+     "3:41 PM"
+    ],
+    "CandleLighting": [
+     "4:15 PM"
+    ],
+    "Shkiah": [
+     "4:45 PM"
+    ],
+    "Tzeis": [
+     "5:11 PM"
+    ],
+    "ChatzosNight": [
+     "11:23 PM"
+    ],
+    "ShaahZmanit": [
+     "54:12 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "4:43 AM"
+    ],
+    "EarliestTefillin": [
+     "5:17 AM"
+    ],
+    "NetzHachamah": [
+     "6:03 AM"
+    ],
+    "LatestShema": [
+     "8:41 AM"
+    ],
+    "LatestTefillah": [
+     "9:35 AM"
+    ],
+    "Chatzos": [
+     "11:23 AM"
+    ],
+    "MinchahGedolah": [
+     "11:51 AM"
+    ],
+    "MinchahKetanah": [
+     "2:33 PM"
+    ],
+    "PlagHaminchah": [
+     "3:41 PM"
+    ],
+    "Shkiah": [
+     "4:44 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:22 PM"
+    ],
+    "ChatzosNight": [
+     "11:23 PM"
+    ],
+    "ShaahZmanit": [
+     "54:04 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "5:21 AM"
+    ],
+    "EarliestTefillin": [
+     "5:55 AM"
+    ],
+    "NetzHachamah": [
+     "6:43 AM"
+    ],
+    "LatestShema": [
+     "9:14 AM"
+    ],
+    "LatestTefillah": [
+     "10:05 AM"
+    ],
+    "Chatzos": [
+     "11:49 AM"
+    ],
+    "MinchahGedolah": [
+     "12:16 PM"
+    ],
+    "MinchahKetanah": [
+     "2:51 PM"
+    ],
+    "PlagHaminchah": [
+     "3:56 PM"
+    ],
+    "CandleLighting": [
+     "4:26 PM"
+    ],
+    "Shkiah": [
+     "4:56 PM"
+    ],
+    "Tzeis": [
+     "5:23 PM"
+    ],
+    "ChatzosNight": [
+     "11:49 PM"
+    ],
+    "ShaahZmanit": [
+     "51:46 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "5:19 AM"
+    ],
+    "EarliestTefillin": [
+     "5:52 AM"
+    ],
+    "NetzHachamah": [
+     "6:36 AM"
+    ],
+    "LatestShema": [
+     "9:39 AM"
+    ],
+    "LatestTefillah": [
+     "10:41 AM"
+    ],
+    "Chatzos": [
+     "12:46 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:24 PM"
+    ],
+    "PlagHaminchah": [
+     "5:42 PM"
+    ],
+    "CandleLighting": [
+     "6:26 PM"
+    ],
+    "Shkiah": [
+     "6:56 PM"
+    ],
+    "Tzeis": [
+     "7:21 PM"
+    ],
+    "ChatzosNight": [
+     "12:45 AM"
+    ],
+    "ShaahZmanit": [
+     "62:11 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "4:42 AM"
+    ],
+    "EarliestTefillin": [
+     "5:18 AM"
+    ],
+    "NetzHachamah": [
+     "6:04 AM"
+    ],
+    "LatestShema": [
+     "9:19 AM"
+    ],
+    "LatestTefillah": [
+     "10:26 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:26 AM"
+    ],
+    "BurnChametzTime": [
+     "11:32 AM"
+    ],
+    "Chatzos": [
+     "12:39 PM"
+    ],
+    "MinchahGedolah": [
+     "1:13 PM"
+    ],
+    "MinchahKetanah": [
+     "4:32 PM"
+    ],
+    "PlagHaminchah": [
+     "5:55 PM"
+    ],
+    "CandleLighting": [
+     "6:44 PM"
+    ],
+    "Shkiah": [
+     "7:14 PM"
+    ],
+    "Tzeis": [
+     "7:40 PM"
+    ],
+    "ChatzosNight": [
+     "12:38 AM"
+    ],
+    "ShaahZmanit": [
+     "66:28 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "3:57 AM"
+    ],
+    "EarliestTefillin": [
+     "4:40 AM"
+    ],
+    "NetzHachamah": [
+     "5:32 AM"
+    ],
+    "LatestShema": [
+     "9:04 AM"
+    ],
+    "LatestTefillah": [
+     "10:17 AM"
+    ],
+    "Chatzos": [
+     "12:41 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:55 PM"
+    ],
+    "PlagHaminchah": [
+     "6:26 PM"
+    ],
+    "Shkiah": [
+     "7:51 PM"
+    ],
+    "Tzeis": [
+     "8:20 PM"
+    ],
+    "ChatzosNight": [
+     "12:41 AM"
+    ],
+    "ShaahZmanit": [
+     "72:16 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "3:58 AM"
+    ],
+    "EarliestTefillin": [
+     "4:41 AM"
+    ],
+    "NetzHachamah": [
+     "5:33 AM"
+    ],
+    "LatestShema": [
+     "9:05 AM"
+    ],
+    "LatestTefillah": [
+     "10:18 AM"
+    ],
+    "Chatzos": [
+     "12:42 PM"
+    ],
+    "MinchahGedolah": [
+     "1:19 PM"
+    ],
+    "MinchahKetanah": [
+     "4:56 PM"
+    ],
+    "PlagHaminchah": [
+     "6:26 PM"
+    ],
+    "CandleLighting": [
+     "7:22 PM"
+    ],
+    "Shkiah": [
+     "7:52 PM"
+    ],
+    "Tzeis": [
+     "8:21 PM"
+    ],
+    "ChatzosNight": [
+     "12:42 AM"
+    ],
+    "ShaahZmanit": [
+     "72:14 min."
+    ]
+   }
+  },
+  "eilat": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "4:41 AM"
+    ],
+    "EarliestTefillin": [
+     "5:13 AM"
+    ],
+    "NetzHachamah": [
+     "5:57 AM"
+    ],
+    "LatestShema": [
+     "8:38 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "11:23 AM"
+    ],
+    "MinchahGedolah": [
+     "11:52 AM"
+    ],
+    "MinchahKetanah": [
+     "2:37 PM"
+    ],
+    "PlagHaminchah": [
+     "3:45 PM"
+    ],
+    "CandleLighting": [
+     "4:20 PM"
+    ],
+    "Shkiah": [
+     "4:50 PM"
+    ],
+    "Tzeis": [
+     "5:15 PM"
+    ],
+    "ChatzosNight": [
+     "11:24 PM"
+    ],
+    "ShaahZmanit": [
+     "55:01 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "4:41 AM"
+    ],
+    "EarliestTefillin": [
+     "5:14 AM"
+    ],
+    "NetzHachamah": [
+     "5:58 AM"
+    ],
+    "LatestShema": [
+     "8:38 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "11:23 AM"
+    ],
+    "MinchahGedolah": [
+     "11:52 AM"
+    ],
+    "MinchahKetanah": [
+     "2:36 PM"
+    ],
+    "PlagHaminchah": [
+     "3:45 PM"
+    ],
+    "Shkiah": [
+     "4:49 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:26 PM"
+    ],
+    "ChatzosNight": [
+     "11:24 PM"
+    ],
+    "ShaahZmanit": [
+     "54:54 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "5:17 AM"
+    ],
+    "EarliestTefillin": [
+     "5:50 AM"
+    ],
+    "NetzHachamah": [
+     "6:36 AM"
+    ],
+    "LatestShema": [
+     "9:10 AM"
+    ],
+    "LatestTefillah": [
+     "10:03 AM"
+    ],
+    "Chatzos": [
+     "11:49 AM"
+    ],
+    "MinchahGedolah": [
+     "12:17 PM"
+    ],
+    "MinchahKetanah": [
+     "2:55 PM"
+    ],
+    "PlagHaminchah": [
+     "4:01 PM"
+    ],
+    "CandleLighting": [
+     "4:33 PM"
+    ],
+    "Shkiah": [
+     "5:03 PM"
+    ],
+    "Tzeis": [
+     "5:29 PM"
+    ],
+    "ChatzosNight": [
+     "11:49 PM"
+    ],
+    "ShaahZmanit": [
+     "52:54 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "5:22 AM"
+    ],
+    "EarliestTefillin": [
+     "5:55 AM"
+    ],
+    "NetzHachamah": [
+     "6:37 AM"
+    ],
+    "LatestShema": [
+     "9:40 AM"
+    ],
+    "LatestTefillah": [
+     "10:42 AM"
+    ],
+    "Chatzos": [
+     "12:46 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:24 PM"
+    ],
+    "PlagHaminchah": [
+     "5:41 PM"
+    ],
+    "CandleLighting": [
+     "6:25 PM"
+    ],
+    "Shkiah": [
+     "6:55 PM"
+    ],
+    "Tzeis": [
+     "7:19 PM"
+    ],
+    "ChatzosNight": [
+     "12:45 AM"
+    ],
+    "ShaahZmanit": [
+     "62:01 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "4:49 AM"
+    ],
+    "EarliestTefillin": [
+     "5:23 AM"
+    ],
+    "NetzHachamah": [
+     "6:08 AM"
+    ],
+    "LatestShema": [
+     "9:21 AM"
+    ],
+    "LatestTefillah": [
+     "10:27 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:27 AM"
+    ],
+    "BurnChametzTime": [
+     "11:33 AM"
+    ],
+    "Chatzos": [
+     "12:39 PM"
+    ],
+    "MinchahGedolah": [
+     "1:13 PM"
+    ],
+    "MinchahKetanah": [
+     "4:30 PM"
+    ],
+    "PlagHaminchah": [
+     "5:52 PM"
+    ],
+    "CandleLighting": [
+     "6:40 PM"
+    ],
+    "Shkiah": [
+     "7:10 PM"
+    ],
+    "Tzeis": [
+     "7:36 PM"
+    ],
+    "ChatzosNight": [
+     "12:38 AM"
+    ],
+    "ShaahZmanit": [
+     "65:47 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "4:11 AM"
+    ],
+    "EarliestTefillin": [
+     "4:51 AM"
+    ],
+    "NetzHachamah": [
+     "5:41 AM"
+    ],
+    "LatestShema": [
+     "9:09 AM"
+    ],
+    "LatestTefillah": [
+     "10:20 AM"
+    ],
+    "Chatzos": [
+     "12:41 PM"
+    ],
+    "MinchahGedolah": [
+     "1:18 PM"
+    ],
+    "MinchahKetanah": [
+     "4:50 PM"
+    ],
+    "PlagHaminchah": [
+     "6:19 PM"
+    ],
+    "Shkiah": [
+     "7:43 PM"
+    ],
+    "Tzeis": [
+     "8:11 PM"
+    ],
+    "ChatzosNight": [
+     "12:42 AM"
+    ],
+    "ShaahZmanit": [
+     "70:52 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "4:12 AM"
+    ],
+    "EarliestTefillin": [
+     "4:52 AM"
+    ],
+    "NetzHachamah": [
+     "5:42 AM"
+    ],
+    "LatestShema": [
+     "9:10 AM"
+    ],
+    "LatestTefillah": [
+     "10:21 AM"
+    ],
+    "Chatzos": [
+     "12:42 PM"
+    ],
+    "MinchahGedolah": [
+     "1:19 PM"
+    ],
+    "MinchahKetanah": [
+     "4:51 PM"
+    ],
+    "PlagHaminchah": [
+     "6:20 PM"
+    ],
+    "CandleLighting": [
+     "7:14 PM"
+    ],
+    "Shkiah": [
+     "7:44 PM"
+    ],
+    "Tzeis": [
+     "8:12 PM"
+    ],
+    "ChatzosNight": [
+     "12:42 AM"
+    ],
+    "ShaahZmanit": [
+     "70:50 min."
+    ]
+   }
+  },
+  "crownheights": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "5:04 AM"
+    ],
+    "EarliestTefillin": [
+     "5:41 AM"
+    ],
+    "NetzHachamah": [
+     "6:32 AM"
+    ],
+    "LatestShema": [
+     "9:03 AM"
+    ],
+    "LatestTefillah": [
+     "9:55 AM"
+    ],
+    "Chatzos": [
+     "11:39 AM"
+    ],
+    "MinchahGedolah": [
+     "12:06 PM"
+    ],
+    "MinchahKetanah": [
+     "2:41 PM"
+    ],
+    "PlagHaminchah": [
+     "3:46 PM"
+    ],
+    "CandleLighting": [
+     "4:28 PM"
+    ],
+    "Shkiah": [
+     "4:46 PM"
+    ],
+    "Tzeis": [
+     "5:16 PM"
+    ],
+    "ChatzosNight": [
+     "11:39 PM"
+    ],
+    "ShaahZmanit": [
+     "51:54 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "5:05 AM"
+    ],
+    "EarliestTefillin": [
+     "5:42 AM"
+    ],
+    "NetzHachamah": [
+     "6:33 AM"
+    ],
+    "LatestShema": [
+     "9:04 AM"
+    ],
+    "LatestTefillah": [
+     "9:55 AM"
+    ],
+    "Chatzos": [
+     "11:39 AM"
+    ],
+    "MinchahGedolah": [
+     "12:06 PM"
+    ],
+    "MinchahKetanah": [
+     "2:41 PM"
+    ],
+    "PlagHaminchah": [
+     "3:45 PM"
+    ],
+    "Shkiah": [
+     "4:45 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:28 PM"
+    ],
+    "ChatzosNight": [
+     "11:39 PM"
+    ],
+    "ShaahZmanit": [
+     "51:43 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "5:46 AM"
+    ],
+    "EarliestTefillin": [
+     "6:24 AM"
+    ],
+    "NetzHachamah": [
+     "7:18 AM"
+    ],
+    "LatestShema": [
+     "9:39 AM"
+    ],
+    "LatestTefillah": [
+     "10:27 AM"
+    ],
+    "Chatzos": [
+     "12:05 PM"
+    ],
+    "MinchahGedolah": [
+     "12:30 PM"
+    ],
+    "MinchahKetanah": [
+     "2:56 PM"
+    ],
+    "PlagHaminchah": [
+     "3:57 PM"
+    ],
+    "CandleLighting": [
+     "4:35 PM"
+    ],
+    "Shkiah": [
+     "4:53 PM"
+    ],
+    "Tzeis": [
+     "5:24 PM"
+    ],
+    "ChatzosNight": [
+     "12:05 AM"
+    ],
+    "ShaahZmanit": [
+     "48:41 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "5:23 AM"
+    ],
+    "EarliestTefillin": [
+     "6:00 AM"
+    ],
+    "NetzHachamah": [
+     "6:49 AM"
+    ],
+    "LatestShema": [
+     "9:53 AM"
+    ],
+    "LatestTefillah": [
+     "10:56 AM"
+    ],
+    "Chatzos": [
+     "1:01 PM"
+    ],
+    "MinchahGedolah": [
+     "1:34 PM"
+    ],
+    "MinchahKetanah": [
+     "4:42 PM"
+    ],
+    "PlagHaminchah": [
+     "6:00 PM"
+    ],
+    "CandleLighting": [
+     "6:56 PM"
+    ],
+    "Shkiah": [
+     "7:14 PM"
+    ],
+    "Tzeis": [
+     "7:42 PM"
+    ],
+    "ChatzosNight": [
+     "1:00 AM"
+    ],
+    "ShaahZmanit": [
+     "62:42 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "4:35 AM"
+    ],
+    "EarliestTefillin": [
+     "5:16 AM"
+    ],
+    "NetzHachamah": [
+     "6:08 AM"
+    ],
+    "LatestShema": [
+     "9:29 AM"
+    ],
+    "LatestTefillah": [
+     "10:37 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:37 AM"
+    ],
+    "BurnChametzTime": [
+     "11:46 AM"
+    ],
+    "Chatzos": [
+     "12:54 PM"
+    ],
+    "MinchahGedolah": [
+     "1:30 PM"
+    ],
+    "MinchahKetanah": [
+     "4:55 PM"
+    ],
+    "PlagHaminchah": [
+     "6:20 PM"
+    ],
+    "CandleLighting": [
+     "7:23 PM"
+    ],
+    "Shkiah": [
+     "7:41 PM"
+    ],
+    "Tzeis": [
+     "8:11 PM"
+    ],
+    "ChatzosNight": [
+     "12:54 AM"
+    ],
+    "ShaahZmanit": [
+     "68:25 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "3:28 AM"
+    ],
+    "EarliestTefillin": [
+     "4:23 AM"
+    ],
+    "NetzHachamah": [
+     "5:25 AM"
+    ],
+    "LatestShema": [
+     "9:08 AM"
+    ],
+    "LatestTefillah": [
+     "10:25 AM"
+    ],
+    "Chatzos": [
+     "12:57 PM"
+    ],
+    "MinchahGedolah": [
+     "1:36 PM"
+    ],
+    "MinchahKetanah": [
+     "5:25 PM"
+    ],
+    "PlagHaminchah": [
+     "7:00 PM"
+    ],
+    "Shkiah": [
+     "8:30 PM"
+    ],
+    "Tzeis": [
+     "9:04 PM"
+    ],
+    "ChatzosNight": [
+     "12:57 AM"
+    ],
+    "ShaahZmanit": [
+     "76:14 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "3:29 AM"
+    ],
+    "EarliestTefillin": [
+     "4:24 AM"
+    ],
+    "NetzHachamah": [
+     "5:26 AM"
+    ],
+    "LatestShema": [
+     "9:09 AM"
+    ],
+    "LatestTefillah": [
+     "10:26 AM"
+    ],
+    "Chatzos": [
+     "12:58 PM"
+    ],
+    "MinchahGedolah": [
+     "1:37 PM"
+    ],
+    "MinchahKetanah": [
+     "5:26 PM"
+    ],
+    "PlagHaminchah": [
+     "7:01 PM"
+    ],
+    "CandleLighting": [
+     "8:13 PM"
+    ],
+    "Shkiah": [
+     "8:31 PM"
+    ],
+    "Tzeis": [
+     "9:05 PM"
+    ],
+    "ChatzosNight": [
+     "12:58 AM"
+    ],
+    "ShaahZmanit": [
+     "76:11 min."
+    ]
+   }
+  },
+  "london": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "5:15 AM"
+    ],
+    "EarliestTefillin": [
+     "5:59 AM"
+    ],
+    "NetzHachamah": [
+     "7:03 AM"
+    ],
+    "LatestShema": [
+     "9:20 AM"
+    ],
+    "LatestTefillah": [
+     "10:08 AM"
+    ],
+    "Chatzos": [
+     "11:43 AM"
+    ],
+    "MinchahGedolah": [
+     "12:08 PM"
+    ],
+    "MinchahKetanah": [
+     "2:31 PM"
+    ],
+    "PlagHaminchah": [
+     "3:31 PM"
+    ],
+    "CandleLighting": [
+     "4:07 PM"
+    ],
+    "Shkiah": [
+     "4:25 PM"
+    ],
+    "Tzeis": [
+     "5:01 PM"
+    ],
+    "ChatzosNight": [
+     "11:44 PM"
+    ],
+    "ShaahZmanit": [
+     "47:43 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "5:16 AM"
+    ],
+    "EarliestTefillin": [
+     "6:01 AM"
+    ],
+    "NetzHachamah": [
+     "7:04 AM"
+    ],
+    "LatestShema": [
+     "9:21 AM"
+    ],
+    "LatestTefillah": [
+     "10:08 AM"
+    ],
+    "Chatzos": [
+     "11:43 AM"
+    ],
+    "MinchahGedolah": [
+     "12:08 PM"
+    ],
+    "MinchahKetanah": [
+     "2:30 PM"
+    ],
+    "PlagHaminchah": [
+     "3:30 PM"
+    ],
+    "Shkiah": [
+     "4:23 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:16 PM"
+    ],
+    "ChatzosNight": [
+     "11:44 PM"
+    ],
+    "ShaahZmanit": [
+     "47:26 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "6:06 AM"
+    ],
+    "EarliestTefillin": [
+     "6:52 AM"
+    ],
+    "NetzHachamah": [
+     "8:00 AM"
+    ],
+    "LatestShema": [
+     "10:01 AM"
+    ],
+    "LatestTefillah": [
+     "10:44 AM"
+    ],
+    "Chatzos": [
+     "12:10 PM"
+    ],
+    "MinchahGedolah": [
+     "12:32 PM"
+    ],
+    "MinchahKetanah": [
+     "2:40 PM"
+    ],
+    "PlagHaminchah": [
+     "3:33 PM"
+    ],
+    "CandleLighting": [
+     "4:02 PM"
+    ],
+    "Shkiah": [
+     "4:20 PM"
+    ],
+    "Tzeis": [
+     "4:59 PM"
+    ],
+    "ChatzosNight": [
+     "12:09 AM"
+    ],
+    "ShaahZmanit": [
+     "42:41 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "4:02 AM"
+    ],
+    "EarliestTefillin": [
+     "4:49 AM"
+    ],
+    "NetzHachamah": [
+     "5:50 AM"
+    ],
+    "LatestShema": [
+     "8:56 AM"
+    ],
+    "LatestTefillah": [
+     "9:59 AM"
+    ],
+    "Chatzos": [
+     "12:06 PM"
+    ],
+    "MinchahGedolah": [
+     "12:39 PM"
+    ],
+    "MinchahKetanah": [
+     "3:50 PM"
+    ],
+    "PlagHaminchah": [
+     "5:09 PM"
+    ],
+    "CandleLighting": [
+     "6:05 PM"
+    ],
+    "Shkiah": [
+     "6:23 PM"
+    ],
+    "Tzeis": [
+     "6:57 PM"
+    ],
+    "ChatzosNight": [
+     "12:05 AM"
+    ],
+    "ShaahZmanit": [
+     "63:33 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "3:48 AM"
+    ],
+    "EarliestTefillin": [
+     "4:46 AM"
+    ],
+    "NetzHachamah": [
+     "5:53 AM"
+    ],
+    "LatestShema": [
+     "9:23 AM"
+    ],
+    "LatestTefillah": [
+     "10:35 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:35 AM"
+    ],
+    "BurnChametzTime": [
+     "11:47 AM"
+    ],
+    "Chatzos": [
+     "12:59 PM"
+    ],
+    "MinchahGedolah": [
+     "1:36 PM"
+    ],
+    "MinchahKetanah": [
+     "5:12 PM"
+    ],
+    "PlagHaminchah": [
+     "6:42 PM"
+    ],
+    "CandleLighting": [
+     "7:49 PM"
+    ],
+    "Shkiah": [
+     "8:07 PM"
+    ],
+    "Tzeis": [
+     "8:44 PM"
+    ],
+    "ChatzosNight": [
+     "12:58 AM"
+    ],
+    "ShaahZmanit": [
+     "72:01 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "1:02 AM"
+    ],
+    "EarliestTefillin": [
+     "3:08 AM"
+    ],
+    "NetzHachamah": [
+     "4:43 AM"
+    ],
+    "LatestShema": [
+     "8:49 AM"
+    ],
+    "LatestTefillah": [
+     "10:13 AM"
+    ],
+    "Chatzos": [
+     "1:02 PM"
+    ],
+    "MinchahGedolah": [
+     "1:45 PM"
+    ],
+    "MinchahKetanah": [
+     "5:58 PM"
+    ],
+    "PlagHaminchah": [
+     "7:43 PM"
+    ],
+    "Shkiah": [
+     "9:22 PM"
+    ],
+    "Tzeis": [
+     "10:10 PM"
+    ],
+    "ChatzosNight": [
+     "1:02 AM"
+    ],
+    "ShaahZmanit": [
+     "84:17 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "1:03 AM"
+    ],
+    "EarliestTefillin": [
+     "3:09 AM"
+    ],
+    "NetzHachamah": [
+     "4:44 AM"
+    ],
+    "LatestShema": [
+     "8:50 AM"
+    ],
+    "LatestTefillah": [
+     "10:14 AM"
+    ],
+    "Chatzos": [
+     "1:03 PM"
+    ],
+    "MinchahGedolah": [
+     "1:46 PM"
+    ],
+    "MinchahKetanah": [
+     "5:58 PM"
+    ],
+    "PlagHaminchah": [
+     "7:44 PM"
+    ],
+    "CandleLighting": [
+     "9:04 PM"
+    ],
+    "Shkiah": [
+     "9:22 PM"
+    ],
+    "Tzeis": [
+     "10:10 PM"
+    ],
+    "ChatzosNight": [
+     "1:03 AM"
+    ],
+    "ShaahZmanit": [
+     "84:13 min."
+    ]
+   }
+  },
+  "moscow": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "5:46 AM"
+    ],
+    "EarliestTefillin": [
+     "6:35 AM"
+    ],
+    "NetzHachamah": [
+     "7:46 AM"
+    ],
+    "LatestShema": [
+     "9:56 AM"
+    ],
+    "LatestTefillah": [
+     "10:41 AM"
+    ],
+    "Chatzos": [
+     "12:12 PM"
+    ],
+    "MinchahGedolah": [
+     "12:36 PM"
+    ],
+    "MinchahKetanah": [
+     "2:52 PM"
+    ],
+    "PlagHaminchah": [
+     "3:49 PM"
+    ],
+    "CandleLighting": [
+     "4:22 PM"
+    ],
+    "Shkiah": [
+     "4:40 PM"
+    ],
+    "Tzeis": [
+     "5:20 PM"
+    ],
+    "ChatzosNight": [
+     "12:13 AM"
+    ],
+    "ShaahZmanit": [
+     "45:29 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "5:47 AM"
+    ],
+    "EarliestTefillin": [
+     "6:37 AM"
+    ],
+    "NetzHachamah": [
+     "7:48 AM"
+    ],
+    "LatestShema": [
+     "9:57 AM"
+    ],
+    "LatestTefillah": [
+     "10:42 AM"
+    ],
+    "Chatzos": [
+     "12:12 PM"
+    ],
+    "MinchahGedolah": [
+     "12:36 PM"
+    ],
+    "MinchahKetanah": [
+     "2:51 PM"
+    ],
+    "PlagHaminchah": [
+     "3:48 PM"
+    ],
+    "Shkiah": [
+     "4:38 PM"
+    ],
+    "ShabbatEndTime": [
+     "5:37 PM"
+    ],
+    "ChatzosNight": [
+     "12:13 AM"
+    ],
+    "ShaahZmanit": [
+     "45:08 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "6:42 AM"
+    ],
+    "EarliestTefillin": [
+     "7:33 AM"
+    ],
+    "NetzHachamah": [
+     "8:50 AM"
+    ],
+    "LatestShema": [
+     "10:41 AM"
+    ],
+    "LatestTefillah": [
+     "11:20 AM"
+    ],
+    "Chatzos": [
+     "12:39 PM"
+    ],
+    "MinchahGedolah": [
+     "12:59 PM"
+    ],
+    "MinchahKetanah": [
+     "2:57 PM"
+    ],
+    "PlagHaminchah": [
+     "3:46 PM"
+    ],
+    "CandleLighting": [
+     "4:10 PM"
+    ],
+    "Shkiah": [
+     "4:28 PM"
+    ],
+    "Tzeis": [
+     "5:13 PM"
+    ],
+    "ChatzosNight": [
+     "12:38 AM"
+    ],
+    "ShaahZmanit": [
+     "39:20 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "4:16 AM"
+    ],
+    "EarliestTefillin": [
+     "5:10 AM"
+    ],
+    "NetzHachamah": [
+     "6:17 AM"
+    ],
+    "LatestShema": [
+     "9:23 AM"
+    ],
+    "LatestTefillah": [
+     "10:27 AM"
+    ],
+    "Chatzos": [
+     "12:35 PM"
+    ],
+    "MinchahGedolah": [
+     "1:08 PM"
+    ],
+    "MinchahKetanah": [
+     "4:20 PM"
+    ],
+    "PlagHaminchah": [
+     "5:40 PM"
+    ],
+    "CandleLighting": [
+     "6:37 PM"
+    ],
+    "Shkiah": [
+     "6:55 PM"
+    ],
+    "Tzeis": [
+     "7:32 PM"
+    ],
+    "ChatzosNight": [
+     "12:34 AM"
+    ],
+    "ShaahZmanit": [
+     "64:00 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "2:43 AM"
+    ],
+    "EarliestTefillin": [
+     "3:54 AM"
+    ],
+    "NetzHachamah": [
+     "5:11 AM"
+    ],
+    "LatestShema": [
+     "8:47 AM"
+    ],
+    "LatestTefillah": [
+     "10:01 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:01 AM"
+    ],
+    "BurnChametzTime": [
+     "11:15 AM"
+    ],
+    "Chatzos": [
+     "12:28 PM"
+    ],
+    "MinchahGedolah": [
+     "1:06 PM"
+    ],
+    "MinchahKetanah": [
+     "4:48 PM"
+    ],
+    "PlagHaminchah": [
+     "6:21 PM"
+    ],
+    "CandleLighting": [
+     "7:29 PM"
+    ],
+    "Shkiah": [
+     "7:47 PM"
+    ],
+    "Tzeis": [
+     "8:29 PM"
+    ],
+    "ChatzosNight": [
+     "12:27 AM"
+    ],
+    "ShaahZmanit": [
+     "73:58 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "12:31 AM"
+    ],
+    "EarliestTefillin": [
+     "1:18 AM"
+    ],
+    "NetzHachamah": [
+     "3:45 AM"
+    ],
+    "LatestShema": [
+     "8:03 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "12:31 PM"
+    ],
+    "MinchahGedolah": [
+     "1:16 PM"
+    ],
+    "MinchahKetanah": [
+     "5:44 PM"
+    ],
+    "PlagHaminchah": [
+     "7:35 PM"
+    ],
+    "Shkiah": [
+     "9:18 PM"
+    ],
+    "Tzeis": [
+     "10:20 PM"
+    ],
+    "ChatzosNight": [
+     "12:31 AM"
+    ],
+    "ShaahZmanit": [
+     "89:06 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "12:32 AM"
+    ],
+    "EarliestTefillin": [
+     "1:20 AM"
+    ],
+    "NetzHachamah": [
+     "3:46 AM"
+    ],
+    "LatestShema": [
+     "8:04 AM"
+    ],
+    "LatestTefillah": [
+     "9:33 AM"
+    ],
+    "Chatzos": [
+     "12:32 PM"
+    ],
+    "MinchahGedolah": [
+     "1:17 PM"
+    ],
+    "MinchahKetanah": [
+     "5:44 PM"
+    ],
+    "PlagHaminchah": [
+     "7:35 PM"
+    ],
+    "CandleLighting": [
+     "9:00 PM"
+    ],
+    "Shkiah": [
+     "9:18 PM"
+    ],
+    "Tzeis": [
+     "10:20 PM"
+    ],
+    "ChatzosNight": [
+     "12:32 AM"
+    ],
+    "ShaahZmanit": [
+     "89:01 min."
+    ]
+   }
+  },
+  "melbourne": {
+   "2026-11-06": {
+    "AlosHashachar": [
+     "4:35 AM"
+    ],
+    "EarliestTefillin": [
+     "5:16 AM"
+    ],
+    "NetzHachamah": [
+     "6:08 AM"
+    ],
+    "LatestShema": [
+     "9:34 AM"
+    ],
+    "LatestTefillah": [
+     "10:44 AM"
+    ],
+    "Chatzos": [
+     "1:04 PM"
+    ],
+    "MinchahGedolah": [
+     "1:39 PM"
+    ],
+    "MinchahKetanah": [
+     "5:09 PM"
+    ],
+    "PlagHaminchah": [
+     "6:37 PM"
+    ],
+    "CandleLighting": [
+     "7:42 PM"
+    ],
+    "Shkiah": [
+     "8:00 PM"
+    ],
+    "Tzeis": [
+     "8:29 PM"
+    ],
+    "ChatzosNight": [
+     "1:03 AM"
+    ],
+    "ShaahZmanit": [
+     "69:58 min."
+    ]
+   },
+   "2026-11-07": {
+    "AlosHashachar": [
+     "4:34 AM"
+    ],
+    "EarliestTefillin": [
+     "5:15 AM"
+    ],
+    "NetzHachamah": [
+     "6:07 AM"
+    ],
+    "LatestShema": [
+     "9:33 AM"
+    ],
+    "LatestTefillah": [
+     "10:43 AM"
+    ],
+    "Chatzos": [
+     "1:04 PM"
+    ],
+    "MinchahGedolah": [
+     "1:40 PM"
+    ],
+    "MinchahKetanah": [
+     "5:10 PM"
+    ],
+    "PlagHaminchah": [
+     "6:38 PM"
+    ],
+    "Shkiah": [
+     "8:01 PM"
+    ],
+    "ShabbatEndTime": [
+     "8:44 PM"
+    ],
+    "ChatzosNight": [
+     "1:03 AM"
+    ],
+    "ShaahZmanit": [
+     "70:08 min."
+    ]
+   },
+   "2027-01-15": {
+    "AlosHashachar": [
+     "4:32 AM"
+    ],
+    "EarliestTefillin": [
+     "5:18 AM"
+    ],
+    "NetzHachamah": [
+     "6:14 AM"
+    ],
+    "LatestShema": [
+     "9:49 AM"
+    ],
+    "LatestTefillah": [
+     "11:02 AM"
+    ],
+    "Chatzos": [
+     "1:29 PM"
+    ],
+    "MinchahGedolah": [
+     "2:06 PM"
+    ],
+    "MinchahKetanah": [
+     "5:46 PM"
+    ],
+    "PlagHaminchah": [
+     "7:17 PM"
+    ],
+    "CandleLighting": [
+     "8:26 PM"
+    ],
+    "Shkiah": [
+     "8:44 PM"
+    ],
+    "Tzeis": [
+     "9:15 PM"
+    ],
+    "ChatzosNight": [
+     "1:29 AM"
+    ],
+    "ShaahZmanit": [
+     "73:11 min."
+    ]
+   },
+   "2027-03-26": {
+    "AlosHashachar": [
+     "6:06 AM"
+    ],
+    "EarliestTefillin": [
+     "6:41 AM"
+    ],
+    "NetzHachamah": [
+     "7:28 AM"
+    ],
+    "LatestShema": [
+     "10:24 AM"
+    ],
+    "LatestTefillah": [
+     "11:25 AM"
+    ],
+    "Chatzos": [
+     "1:25 PM"
+    ],
+    "MinchahGedolah": [
+     "1:56 PM"
+    ],
+    "MinchahKetanah": [
+     "4:57 PM"
+    ],
+    "PlagHaminchah": [
+     "6:12 PM"
+    ],
+    "CandleLighting": [
+     "7:05 PM"
+    ],
+    "Shkiah": [
+     "7:23 PM"
+    ],
+    "Tzeis": [
+     "7:50 PM"
+    ],
+    "ChatzosNight": [
+     "1:26 AM"
+    ],
+    "ShaahZmanit": [
+     "60:15 min."
+    ]
+   },
+   "2027-04-21": {
+    "AlosHashachar": [
+     "5:29 AM"
+    ],
+    "EarliestTefillin": [
+     "6:04 AM"
+    ],
+    "NetzHachamah": [
+     "6:52 AM"
+    ],
+    "LatestShema": [
+     "9:33 AM"
+    ],
+    "LatestTefillah": [
+     "10:28 AM"
+    ],
+    "LastEatingChametzTime": [
+     "10:28 AM"
+    ],
+    "BurnChametzTime": [
+     "11:23 AM"
+    ],
+    "Chatzos": [
+     "12:18 PM"
+    ],
+    "MinchahGedolah": [
+     "12:47 PM"
+    ],
+    "MinchahKetanah": [
+     "3:32 PM"
+    ],
+    "PlagHaminchah": [
+     "4:41 PM"
+    ],
+    "CandleLighting": [
+     "5:28 PM"
+    ],
+    "Shkiah": [
+     "5:46 PM"
+    ],
+    "Tzeis": [
+     "6:13 PM"
+    ],
+    "ChatzosNight": [
+     "12:19 AM"
+    ],
+    "ShaahZmanit": [
+     "55:10 min."
+    ]
+   },
+   "2027-06-21": {
+    "AlosHashachar": [
+     "6:06 AM"
+    ],
+    "EarliestTefillin": [
+     "6:43 AM"
+    ],
+    "NetzHachamah": [
+     "7:36 AM"
+    ],
+    "LatestShema": [
+     "9:56 AM"
+    ],
+    "LatestTefillah": [
+     "10:44 AM"
+    ],
+    "Chatzos": [
+     "12:21 PM"
+    ],
+    "MinchahGedolah": [
+     "12:47 PM"
+    ],
+    "MinchahKetanah": [
+     "3:12 PM"
+    ],
+    "PlagHaminchah": [
+     "4:12 PM"
+    ],
+    "Shkiah": [
+     "5:08 PM"
+    ],
+    "Tzeis": [
+     "5:38 PM"
+    ],
+    "ChatzosNight": [
+     "12:21 AM"
+    ],
+    "ShaahZmanit": [
+     "48:26 min."
+    ]
+   },
+   "2027-06-25": {
+    "AlosHashachar": [
+     "6:07 AM"
+    ],
+    "EarliestTefillin": [
+     "6:44 AM"
+    ],
+    "NetzHachamah": [
+     "7:36 AM"
+    ],
+    "LatestShema": [
+     "9:57 AM"
+    ],
+    "LatestTefillah": [
+     "10:45 AM"
+    ],
+    "Chatzos": [
+     "12:22 PM"
+    ],
+    "MinchahGedolah": [
+     "12:47 PM"
+    ],
+    "MinchahKetanah": [
+     "3:13 PM"
+    ],
+    "PlagHaminchah": [
+     "4:13 PM"
+    ],
+    "CandleLighting": [
+     "4:51 PM"
+    ],
+    "Shkiah": [
+     "5:09 PM"
+    ],
+    "Tzeis": [
+     "5:39 PM"
+    ],
+    "ChatzosNight": [
+     "12:22 AM"
+    ],
+    "ShaahZmanit": [
+     "48:27 min."
+    ]
+   }
+  }
+ }
+}

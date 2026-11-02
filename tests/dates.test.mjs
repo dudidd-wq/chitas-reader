@@ -38,7 +38,7 @@ test('no ISO or US-order date in any visible text, title or label; Hebrew + Greg
   const srv = await serve(), b = await launch();
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
-    for (const h of ['#/d/2026-11-02', '#/r/chumash/2026-11-02', '#/r/rambam3/2027-03-23', '#/r/tanya/2026-11-02', '#/settings', '#/about', '#/sources']) {
+    for (const h of ['#/d/2026-11-02', '#/r/chumash/2026-11-02', '#/r/rambam3/2027-03-23', '#/r/tanya/2026-11-02', '#/settings', '#/about', '#/sources', '#/zmanim/2026-11-06']) {
       await p.goto(srv.url + h); await p.waitForTimeout(900);
       const bad = await p.evaluate(() => {
         const out = [], iso = /\b\d{4}-\d{2}-\d{2}\b/, us = /\b(1[0-2]|0?[1-9])\/(3[01]|[12]\d|0?[1-9])\/\d{4}\b/;
