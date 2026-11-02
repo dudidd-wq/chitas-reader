@@ -1,0 +1,1136 @@
+{
+ "source": "https://www.sefaria.org/api/calendars?diaspora={0|1}&year=Y&month=M&day=D",
+ "fetchedAt": "2026-11-02T03:07:50.971Z",
+ "shabbatot": {
+  "2025-09-06": {
+   "il": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   },
+   "diaspora": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   }
+  },
+  "2025-09-13": {
+   "il": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   },
+   "diaspora": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   }
+  },
+  "2025-09-20": {
+   "il": {
+    "name": "Nitzavim",
+    "ref": "Deuteronomy 29:9-30:20"
+   },
+   "diaspora": {
+    "name": "Nitzavim",
+    "ref": "Deuteronomy 29:9-30:20"
+   }
+  },
+  "2025-09-27": {
+   "il": {
+    "name": "Vayeilech",
+    "ref": "Deuteronomy 31:1-30"
+   },
+   "diaspora": {
+    "name": "Vayeilech",
+    "ref": "Deuteronomy 31:1-30"
+   }
+  },
+  "2025-10-04": {
+   "il": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   },
+   "diaspora": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   }
+  },
+  "2025-10-11": {
+   "il": {
+    "name": "Sukkot Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   },
+   "diaspora": {
+    "name": "Sukkot Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   }
+  },
+  "2025-10-18": {
+   "il": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   },
+   "diaspora": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   }
+  },
+  "2025-10-25": {
+   "il": {
+    "name": "Noach",
+    "ref": "Genesis 6:9-11:32"
+   },
+   "diaspora": {
+    "name": "Noach",
+    "ref": "Genesis 6:9-11:32"
+   }
+  },
+  "2025-11-01": {
+   "il": {
+    "name": "Lech-Lecha",
+    "ref": "Genesis 12:1-17:27"
+   },
+   "diaspora": {
+    "name": "Lech-Lecha",
+    "ref": "Genesis 12:1-17:27"
+   }
+  },
+  "2025-11-08": {
+   "il": {
+    "name": "Vayera",
+    "ref": "Genesis 18:1-22:24"
+   },
+   "diaspora": {
+    "name": "Vayera",
+    "ref": "Genesis 18:1-22:24"
+   }
+  },
+  "2025-11-15": {
+   "il": {
+    "name": "Chayei Sara",
+    "ref": "Genesis 23:1-25:18"
+   },
+   "diaspora": {
+    "name": "Chayei Sara",
+    "ref": "Genesis 23:1-25:18"
+   }
+  },
+  "2025-11-22": {
+   "il": {
+    "name": "Toldot",
+    "ref": "Genesis 25:19-28:9"
+   },
+   "diaspora": {
+    "name": "Toldot",
+    "ref": "Genesis 25:19-28:9"
+   }
+  },
+  "2025-11-29": {
+   "il": {
+    "name": "Vayetzei",
+    "ref": "Genesis 28:10-32:3"
+   },
+   "diaspora": {
+    "name": "Vayetzei",
+    "ref": "Genesis 28:10-32:3"
+   }
+  },
+  "2025-12-06": {
+   "il": {
+    "name": "Vayishlach",
+    "ref": "Genesis 32:4-36:43"
+   },
+   "diaspora": {
+    "name": "Vayishlach",
+    "ref": "Genesis 32:4-36:43"
+   }
+  },
+  "2025-12-13": {
+   "il": {
+    "name": "Vayeshev",
+    "ref": "Genesis 37:1-40:23"
+   },
+   "diaspora": {
+    "name": "Vayeshev",
+    "ref": "Genesis 37:1-40:23"
+   }
+  },
+  "2025-12-20": {
+   "il": {
+    "name": "Miketz",
+    "ref": "Genesis 41:1-44:17"
+   },
+   "diaspora": {
+    "name": "Miketz",
+    "ref": "Genesis 41:1-44:17"
+   }
+  },
+  "2025-12-27": {
+   "il": {
+    "name": "Vayigash",
+    "ref": "Genesis 44:18-47:27"
+   },
+   "diaspora": {
+    "name": "Vayigash",
+    "ref": "Genesis 44:18-47:27"
+   }
+  },
+  "2026-01-03": {
+   "il": {
+    "name": "Vayechi",
+    "ref": "Genesis 47:28-50:26"
+   },
+   "diaspora": {
+    "name": "Vayechi",
+    "ref": "Genesis 47:28-50:26"
+   }
+  },
+  "2026-01-10": {
+   "il": {
+    "name": "Shemot",
+    "ref": "Exodus 1:1-6:1"
+   },
+   "diaspora": {
+    "name": "Shemot",
+    "ref": "Exodus 1:1-6:1"
+   }
+  },
+  "2026-01-17": {
+   "il": {
+    "name": "Vaera",
+    "ref": "Exodus 6:2-9:35"
+   },
+   "diaspora": {
+    "name": "Vaera",
+    "ref": "Exodus 6:2-9:35"
+   }
+  },
+  "2026-01-24": {
+   "il": {
+    "name": "Bo",
+    "ref": "Exodus 10:1-13:16"
+   },
+   "diaspora": {
+    "name": "Bo",
+    "ref": "Exodus 10:1-13:16"
+   }
+  },
+  "2026-01-31": {
+   "il": {
+    "name": "Beshalach",
+    "ref": "Exodus 13:17-17:16"
+   },
+   "diaspora": {
+    "name": "Beshalach",
+    "ref": "Exodus 13:17-17:16"
+   }
+  },
+  "2026-02-07": {
+   "il": {
+    "name": "Yitro",
+    "ref": "Exodus 18:1-20:23"
+   },
+   "diaspora": {
+    "name": "Yitro",
+    "ref": "Exodus 18:1-20:23"
+   }
+  },
+  "2026-02-14": {
+   "il": {
+    "name": "Mishpatim",
+    "ref": "Exodus 21:1-24:18"
+   },
+   "diaspora": {
+    "name": "Mishpatim",
+    "ref": "Exodus 21:1-24:18"
+   }
+  },
+  "2026-02-21": {
+   "il": {
+    "name": "Terumah",
+    "ref": "Exodus 25:1-27:19"
+   },
+   "diaspora": {
+    "name": "Terumah",
+    "ref": "Exodus 25:1-27:19"
+   }
+  },
+  "2026-02-28": {
+   "il": {
+    "name": "Tetzaveh",
+    "ref": "Exodus 27:20-30:10"
+   },
+   "diaspora": {
+    "name": "Tetzaveh",
+    "ref": "Exodus 27:20-30:10"
+   }
+  },
+  "2026-03-07": {
+   "il": {
+    "name": "Ki Tisa",
+    "ref": "Exodus 30:11-34:35"
+   },
+   "diaspora": {
+    "name": "Ki Tisa",
+    "ref": "Exodus 30:11-34:35"
+   }
+  },
+  "2026-03-14": {
+   "il": {
+    "name": "Vayakhel-Pekudei",
+    "ref": "Exodus 35:1-40:38"
+   },
+   "diaspora": {
+    "name": "Vayakhel-Pekudei",
+    "ref": "Exodus 35:1-40:38"
+   }
+  },
+  "2026-03-21": {
+   "il": {
+    "name": "Vayikra",
+    "ref": "Leviticus 1:1-5:26"
+   },
+   "diaspora": {
+    "name": "Vayikra",
+    "ref": "Leviticus 1:1-5:26"
+   }
+  },
+  "2026-03-28": {
+   "il": {
+    "name": "Tzav",
+    "ref": "Leviticus 6:1-8:36"
+   },
+   "diaspora": {
+    "name": "Tzav",
+    "ref": "Leviticus 6:1-8:36"
+   }
+  },
+  "2026-04-04": {
+   "il": {
+    "name": "Pesach Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   },
+   "diaspora": {
+    "name": "Pesach Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   }
+  },
+  "2026-04-11": {
+   "il": {
+    "name": "Shmini",
+    "ref": "Leviticus 9:1-11:47"
+   },
+   "diaspora": {
+    "name": "Shmini",
+    "ref": "Leviticus 9:1-11:47"
+   }
+  },
+  "2026-04-18": {
+   "il": {
+    "name": "Tazria-Metzora",
+    "ref": "Leviticus 12:1-15:33"
+   },
+   "diaspora": {
+    "name": "Tazria-Metzora",
+    "ref": "Leviticus 12:1-15:33"
+   }
+  },
+  "2026-04-25": {
+   "il": {
+    "name": "Achrei Mot-Kedoshim",
+    "ref": "Leviticus 16:1-20:27"
+   },
+   "diaspora": {
+    "name": "Achrei Mot-Kedoshim",
+    "ref": "Leviticus 16:1-20:27"
+   }
+  },
+  "2026-05-02": {
+   "il": {
+    "name": "Emor",
+    "ref": "Leviticus 21:1-24:23"
+   },
+   "diaspora": {
+    "name": "Emor",
+    "ref": "Leviticus 21:1-24:23"
+   }
+  },
+  "2026-05-09": {
+   "il": {
+    "name": "Behar-Bechukotai",
+    "ref": "Leviticus 25:1-27:34"
+   },
+   "diaspora": {
+    "name": "Behar-Bechukotai",
+    "ref": "Leviticus 25:1-27:34"
+   }
+  },
+  "2026-05-16": {
+   "il": {
+    "name": "Bamidbar",
+    "ref": "Numbers 1:1-4:20"
+   },
+   "diaspora": {
+    "name": "Bamidbar",
+    "ref": "Numbers 1:1-4:20"
+   }
+  },
+  "2026-05-23": {
+   "il": {
+    "name": "Nasso",
+    "ref": "Numbers 4:21-7:89"
+   },
+   "diaspora": {
+    "name": "Shavuot II",
+    "ref": "Deuteronomy 14:22-16:17"
+   }
+  },
+  "2026-05-30": {
+   "il": {
+    "name": "Beha'alotcha",
+    "ref": "Numbers 8:1-12:16"
+   },
+   "diaspora": {
+    "name": "Nasso",
+    "ref": "Numbers 4:21-7:89"
+   }
+  },
+  "2026-06-06": {
+   "il": {
+    "name": "Sh'lach",
+    "ref": "Numbers 13:1-15:41"
+   },
+   "diaspora": {
+    "name": "Beha'alotcha",
+    "ref": "Numbers 8:1-12:16"
+   }
+  },
+  "2026-06-13": {
+   "il": {
+    "name": "Korach",
+    "ref": "Numbers 16:1-18:32"
+   },
+   "diaspora": {
+    "name": "Sh'lach",
+    "ref": "Numbers 13:1-15:41"
+   }
+  },
+  "2026-06-20": {
+   "il": {
+    "name": "Chukat",
+    "ref": "Numbers 19:1-22:1"
+   },
+   "diaspora": {
+    "name": "Korach",
+    "ref": "Numbers 16:1-18:32"
+   }
+  },
+  "2026-06-27": {
+   "il": {
+    "name": "Balak",
+    "ref": "Numbers 22:2-25:9"
+   },
+   "diaspora": {
+    "name": "Chukat-Balak",
+    "ref": "Numbers 19:1-25:9"
+   }
+  },
+  "2026-07-04": {
+   "il": {
+    "name": "Pinchas",
+    "ref": "Numbers 25:10-30:1"
+   },
+   "diaspora": {
+    "name": "Pinchas",
+    "ref": "Numbers 25:10-30:1"
+   }
+  },
+  "2026-07-11": {
+   "il": {
+    "name": "Matot-Masei",
+    "ref": "Numbers 30:2-36:13"
+   },
+   "diaspora": {
+    "name": "Matot-Masei",
+    "ref": "Numbers 30:2-36:13"
+   }
+  },
+  "2026-07-18": {
+   "il": {
+    "name": "Devarim",
+    "ref": "Deuteronomy 1:1-3:22"
+   },
+   "diaspora": {
+    "name": "Devarim",
+    "ref": "Deuteronomy 1:1-3:22"
+   }
+  },
+  "2026-07-25": {
+   "il": {
+    "name": "Vaetchanan",
+    "ref": "Deuteronomy 3:23-7:11"
+   },
+   "diaspora": {
+    "name": "Vaetchanan",
+    "ref": "Deuteronomy 3:23-7:11"
+   }
+  },
+  "2026-08-01": {
+   "il": {
+    "name": "Eikev",
+    "ref": "Deuteronomy 7:12-11:25"
+   },
+   "diaspora": {
+    "name": "Eikev",
+    "ref": "Deuteronomy 7:12-11:25"
+   }
+  },
+  "2026-08-08": {
+   "il": {
+    "name": "Re'eh",
+    "ref": "Deuteronomy 11:26-16:17"
+   },
+   "diaspora": {
+    "name": "Re'eh",
+    "ref": "Deuteronomy 11:26-16:17"
+   }
+  },
+  "2026-08-15": {
+   "il": {
+    "name": "Shoftim",
+    "ref": "Deuteronomy 16:18-21:9"
+   },
+   "diaspora": {
+    "name": "Shoftim",
+    "ref": "Deuteronomy 16:18-21:9"
+   }
+  },
+  "2026-08-22": {
+   "il": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   },
+   "diaspora": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   }
+  },
+  "2026-08-29": {
+   "il": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   },
+   "diaspora": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   }
+  },
+  "2026-09-05": {
+   "il": {
+    "name": "Nitzavim-Vayeilech",
+    "ref": "Deuteronomy 29:9-31:30"
+   },
+   "diaspora": {
+    "name": "Nitzavim-Vayeilech",
+    "ref": "Deuteronomy 29:9-31:30"
+   }
+  },
+  "2026-09-12": {
+   "il": {
+    "name": "Rosh Hashana I",
+    "ref": "Genesis 21:1-34"
+   },
+   "diaspora": {
+    "name": "Rosh Hashana I",
+    "ref": "Genesis 21:1-34"
+   }
+  },
+  "2026-09-19": {
+   "il": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   },
+   "diaspora": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   }
+  },
+  "2026-09-26": {
+   "il": {
+    "name": "Sukkot I",
+    "ref": "Leviticus 22:26-23:44"
+   },
+   "diaspora": {
+    "name": "Sukkot I",
+    "ref": "Leviticus 22:26-23:44"
+   }
+  },
+  "2026-10-03": {
+   "il": {
+    "name": "Shmini Atzeret",
+    "ref": "Deuteronomy 14:22-16:17"
+   },
+   "diaspora": {
+    "name": "Shmini Atzeret",
+    "ref": "Deuteronomy 14:22-16:17"
+   }
+  },
+  "2026-10-10": {
+   "il": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   },
+   "diaspora": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   }
+  },
+  "2026-10-17": {
+   "il": {
+    "name": "Noach",
+    "ref": "Genesis 6:9-11:32"
+   },
+   "diaspora": {
+    "name": "Noach",
+    "ref": "Genesis 6:9-11:32"
+   }
+  },
+  "2026-10-24": {
+   "il": {
+    "name": "Lech-Lecha",
+    "ref": "Genesis 12:1-17:27"
+   },
+   "diaspora": {
+    "name": "Lech-Lecha",
+    "ref": "Genesis 12:1-17:27"
+   }
+  },
+  "2026-10-31": {
+   "il": {
+    "name": "Vayera",
+    "ref": "Genesis 18:1-22:24"
+   },
+   "diaspora": {
+    "name": "Vayera",
+    "ref": "Genesis 18:1-22:24"
+   }
+  },
+  "2026-11-07": {
+   "il": {
+    "name": "Chayei Sara",
+    "ref": "Genesis 23:1-25:18"
+   },
+   "diaspora": {
+    "name": "Chayei Sara",
+    "ref": "Genesis 23:1-25:18"
+   }
+  },
+  "2026-11-14": {
+   "il": {
+    "name": "Toldot",
+    "ref": "Genesis 25:19-28:9"
+   },
+   "diaspora": {
+    "name": "Toldot",
+    "ref": "Genesis 25:19-28:9"
+   }
+  },
+  "2026-11-21": {
+   "il": {
+    "name": "Vayetzei",
+    "ref": "Genesis 28:10-32:3"
+   },
+   "diaspora": {
+    "name": "Vayetzei",
+    "ref": "Genesis 28:10-32:3"
+   }
+  },
+  "2026-11-28": {
+   "il": {
+    "name": "Vayishlach",
+    "ref": "Genesis 32:4-36:43"
+   },
+   "diaspora": {
+    "name": "Vayishlach",
+    "ref": "Genesis 32:4-36:43"
+   }
+  },
+  "2026-12-05": {
+   "il": {
+    "name": "Vayeshev",
+    "ref": "Genesis 37:1-40:23"
+   },
+   "diaspora": {
+    "name": "Vayeshev",
+    "ref": "Genesis 37:1-40:23"
+   }
+  },
+  "2026-12-12": {
+   "il": {
+    "name": "Miketz",
+    "ref": "Genesis 41:1-44:17"
+   },
+   "diaspora": {
+    "name": "Miketz",
+    "ref": "Genesis 41:1-44:17"
+   }
+  },
+  "2026-12-19": {
+   "il": {
+    "name": "Vayigash",
+    "ref": "Genesis 44:18-47:27"
+   },
+   "diaspora": {
+    "name": "Vayigash",
+    "ref": "Genesis 44:18-47:27"
+   }
+  },
+  "2026-12-26": {
+   "il": {
+    "name": "Vayechi",
+    "ref": "Genesis 47:28-50:26"
+   },
+   "diaspora": {
+    "name": "Vayechi",
+    "ref": "Genesis 47:28-50:26"
+   }
+  },
+  "2027-01-02": {
+   "il": {
+    "name": "Shemot",
+    "ref": "Exodus 1:1-6:1"
+   },
+   "diaspora": {
+    "name": "Shemot",
+    "ref": "Exodus 1:1-6:1"
+   }
+  },
+  "2027-01-09": {
+   "il": {
+    "name": "Vaera",
+    "ref": "Exodus 6:2-9:35"
+   },
+   "diaspora": {
+    "name": "Vaera",
+    "ref": "Exodus 6:2-9:35"
+   }
+  },
+  "2027-01-16": {
+   "il": {
+    "name": "Bo",
+    "ref": "Exodus 10:1-13:16"
+   },
+   "diaspora": {
+    "name": "Bo",
+    "ref": "Exodus 10:1-13:16"
+   }
+  },
+  "2027-01-23": {
+   "il": {
+    "name": "Beshalach",
+    "ref": "Exodus 13:17-17:16"
+   },
+   "diaspora": {
+    "name": "Beshalach",
+    "ref": "Exodus 13:17-17:16"
+   }
+  },
+  "2027-01-30": {
+   "il": {
+    "name": "Yitro",
+    "ref": "Exodus 18:1-20:23"
+   },
+   "diaspora": {
+    "name": "Yitro",
+    "ref": "Exodus 18:1-20:23"
+   }
+  },
+  "2027-02-06": {
+   "il": {
+    "name": "Mishpatim",
+    "ref": "Exodus 21:1-24:18"
+   },
+   "diaspora": {
+    "name": "Mishpatim",
+    "ref": "Exodus 21:1-24:18"
+   }
+  },
+  "2027-02-13": {
+   "il": {
+    "name": "Terumah",
+    "ref": "Exodus 25:1-27:19"
+   },
+   "diaspora": {
+    "name": "Terumah",
+    "ref": "Exodus 25:1-27:19"
+   }
+  },
+  "2027-02-20": {
+   "il": {
+    "name": "Tetzaveh",
+    "ref": "Exodus 27:20-30:10"
+   },
+   "diaspora": {
+    "name": "Tetzaveh",
+    "ref": "Exodus 27:20-30:10"
+   }
+  },
+  "2027-02-27": {
+   "il": {
+    "name": "Ki Tisa",
+    "ref": "Exodus 30:11-34:35"
+   },
+   "diaspora": {
+    "name": "Ki Tisa",
+    "ref": "Exodus 30:11-34:35"
+   }
+  },
+  "2027-03-06": {
+   "il": {
+    "name": "Vayakhel",
+    "ref": "Exodus 35:1-38:20"
+   },
+   "diaspora": {
+    "name": "Vayakhel",
+    "ref": "Exodus 35:1-38:20"
+   }
+  },
+  "2027-03-13": {
+   "il": {
+    "name": "Pekudei",
+    "ref": "Exodus 38:21-40:38"
+   },
+   "diaspora": {
+    "name": "Pekudei",
+    "ref": "Exodus 38:21-40:38"
+   }
+  },
+  "2027-03-20": {
+   "il": {
+    "name": "Vayikra",
+    "ref": "Leviticus 1:1-5:26"
+   },
+   "diaspora": {
+    "name": "Vayikra",
+    "ref": "Leviticus 1:1-5:26"
+   }
+  },
+  "2027-03-27": {
+   "il": {
+    "name": "Tzav",
+    "ref": "Leviticus 6:1-8:36"
+   },
+   "diaspora": {
+    "name": "Tzav",
+    "ref": "Leviticus 6:1-8:36"
+   }
+  },
+  "2027-04-03": {
+   "il": {
+    "name": "Shmini",
+    "ref": "Leviticus 9:1-11:47"
+   },
+   "diaspora": {
+    "name": "Shmini",
+    "ref": "Leviticus 9:1-11:47"
+   }
+  },
+  "2027-04-10": {
+   "il": {
+    "name": "Tazria",
+    "ref": "Leviticus 12:1-13:59"
+   },
+   "diaspora": {
+    "name": "Tazria",
+    "ref": "Leviticus 12:1-13:59"
+   }
+  },
+  "2027-04-17": {
+   "il": {
+    "name": "Metzora",
+    "ref": "Leviticus 14:1-15:33"
+   },
+   "diaspora": {
+    "name": "Metzora",
+    "ref": "Leviticus 14:1-15:33"
+   }
+  },
+  "2027-04-24": {
+   "il": {
+    "name": "Pesach Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   },
+   "diaspora": {
+    "name": "Pesach Shabbat Chol haMoed",
+    "ref": "Exodus 33:12-34:26"
+   }
+  },
+  "2027-05-01": {
+   "il": {
+    "name": "Achrei Mot",
+    "ref": "Leviticus 16:1-18:30"
+   },
+   "diaspora": {
+    "name": "Achrei Mot",
+    "ref": "Leviticus 16:1-18:30"
+   }
+  },
+  "2027-05-08": {
+   "il": {
+    "name": "Kedoshim",
+    "ref": "Leviticus 19:1-20:27"
+   },
+   "diaspora": {
+    "name": "Kedoshim",
+    "ref": "Leviticus 19:1-20:27"
+   }
+  },
+  "2027-05-15": {
+   "il": {
+    "name": "Emor",
+    "ref": "Leviticus 21:1-24:23"
+   },
+   "diaspora": {
+    "name": "Emor",
+    "ref": "Leviticus 21:1-24:23"
+   }
+  },
+  "2027-05-22": {
+   "il": {
+    "name": "Behar",
+    "ref": "Leviticus 25:1-26:2"
+   },
+   "diaspora": {
+    "name": "Behar",
+    "ref": "Leviticus 25:1-26:2"
+   }
+  },
+  "2027-05-29": {
+   "il": {
+    "name": "Bechukotai",
+    "ref": "Leviticus 26:3-27:34"
+   },
+   "diaspora": {
+    "name": "Bechukotai",
+    "ref": "Leviticus 26:3-27:34"
+   }
+  },
+  "2027-06-05": {
+   "il": {
+    "name": "Bamidbar",
+    "ref": "Numbers 1:1-4:20"
+   },
+   "diaspora": {
+    "name": "Bamidbar",
+    "ref": "Numbers 1:1-4:20"
+   }
+  },
+  "2027-06-12": {
+   "il": {
+    "name": "Nasso",
+    "ref": "Numbers 4:21-7:89"
+   },
+   "diaspora": {
+    "name": "Shavuot II",
+    "ref": "Deuteronomy 14:22-16:17"
+   }
+  },
+  "2027-06-19": {
+   "il": {
+    "name": "Beha'alotcha",
+    "ref": "Numbers 8:1-12:16"
+   },
+   "diaspora": {
+    "name": "Nasso",
+    "ref": "Numbers 4:21-7:89"
+   }
+  },
+  "2027-06-26": {
+   "il": {
+    "name": "Sh'lach",
+    "ref": "Numbers 13:1-15:41"
+   },
+   "diaspora": {
+    "name": "Beha'alotcha",
+    "ref": "Numbers 8:1-12:16"
+   }
+  },
+  "2027-07-03": {
+   "il": {
+    "name": "Korach",
+    "ref": "Numbers 16:1-18:32"
+   },
+   "diaspora": {
+    "name": "Sh'lach",
+    "ref": "Numbers 13:1-15:41"
+   }
+  },
+  "2027-07-10": {
+   "il": {
+    "name": "Chukat",
+    "ref": "Numbers 19:1-22:1"
+   },
+   "diaspora": {
+    "name": "Korach",
+    "ref": "Numbers 16:1-18:32"
+   }
+  },
+  "2027-07-17": {
+   "il": {
+    "name": "Balak",
+    "ref": "Numbers 22:2-25:9"
+   },
+   "diaspora": {
+    "name": "Chukat-Balak",
+    "ref": "Numbers 19:1-25:9"
+   }
+  },
+  "2027-07-24": {
+   "il": {
+    "name": "Pinchas",
+    "ref": "Numbers 25:10-30:1"
+   },
+   "diaspora": {
+    "name": "Pinchas",
+    "ref": "Numbers 25:10-30:1"
+   }
+  },
+  "2027-07-31": {
+   "il": {
+    "name": "Matot-Masei",
+    "ref": "Numbers 30:2-36:13"
+   },
+   "diaspora": {
+    "name": "Matot-Masei",
+    "ref": "Numbers 30:2-36:13"
+   }
+  },
+  "2027-08-07": {
+   "il": {
+    "name": "Devarim",
+    "ref": "Deuteronomy 1:1-3:22"
+   },
+   "diaspora": {
+    "name": "Devarim",
+    "ref": "Deuteronomy 1:1-3:22"
+   }
+  },
+  "2027-08-14": {
+   "il": {
+    "name": "Vaetchanan",
+    "ref": "Deuteronomy 3:23-7:11"
+   },
+   "diaspora": {
+    "name": "Vaetchanan",
+    "ref": "Deuteronomy 3:23-7:11"
+   }
+  },
+  "2027-08-21": {
+   "il": {
+    "name": "Eikev",
+    "ref": "Deuteronomy 7:12-11:25"
+   },
+   "diaspora": {
+    "name": "Eikev",
+    "ref": "Deuteronomy 7:12-11:25"
+   }
+  },
+  "2027-08-28": {
+   "il": {
+    "name": "Re'eh",
+    "ref": "Deuteronomy 11:26-16:17"
+   },
+   "diaspora": {
+    "name": "Re'eh",
+    "ref": "Deuteronomy 11:26-16:17"
+   }
+  },
+  "2027-09-04": {
+   "il": {
+    "name": "Shoftim",
+    "ref": "Deuteronomy 16:18-21:9"
+   },
+   "diaspora": {
+    "name": "Shoftim",
+    "ref": "Deuteronomy 16:18-21:9"
+   }
+  },
+  "2027-09-11": {
+   "il": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   },
+   "diaspora": {
+    "name": "Ki Teitzei",
+    "ref": "Deuteronomy 21:10-25:19"
+   }
+  },
+  "2027-09-18": {
+   "il": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   },
+   "diaspora": {
+    "name": "Ki Tavo",
+    "ref": "Deuteronomy 26:1-29:8"
+   }
+  },
+  "2027-09-25": {
+   "il": {
+    "name": "Nitzavim-Vayeilech",
+    "ref": "Deuteronomy 29:9-31:30"
+   },
+   "diaspora": {
+    "name": "Nitzavim-Vayeilech",
+    "ref": "Deuteronomy 29:9-31:30"
+   }
+  },
+  "2027-10-02": {
+   "il": {
+    "name": "Rosh Hashana I",
+    "ref": "Genesis 21:1-34"
+   },
+   "diaspora": {
+    "name": "Rosh Hashana I",
+    "ref": "Genesis 21:1-34"
+   }
+  },
+  "2027-10-09": {
+   "il": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   },
+   "diaspora": {
+    "name": "Ha'Azinu",
+    "ref": "Deuteronomy 32:1-52"
+   }
+  },
+  "2027-10-16": {
+   "il": {
+    "name": "Sukkot I",
+    "ref": "Leviticus 22:26-23:44"
+   },
+   "diaspora": {
+    "name": "Sukkot I",
+    "ref": "Leviticus 22:26-23:44"
+   }
+  },
+  "2027-10-23": {
+   "il": {
+    "name": "Shmini Atzeret",
+    "ref": "Deuteronomy 14:22-16:17"
+   },
+   "diaspora": {
+    "name": "Shmini Atzeret",
+    "ref": "Deuteronomy 14:22-16:17"
+   }
+  },
+  "2027-10-30": {
+   "il": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   },
+   "diaspora": {
+    "name": "Bereshit",
+    "ref": "Genesis 1:1-6:8"
+   }
+  }
+ }
+}
