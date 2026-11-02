@@ -31,7 +31,7 @@ body::before { /* paper grain, generated – no image files */
 #app, #reader { position: relative; z-index: 1; }
 a { color: var(--accent); }
 button, select, input { font: inherit; color: inherit; }
-.skip { position: absolute; inset-inline-start: .5rem; top: 0; transform: translateY(-150%); background: var(--card); padding: .5rem 1rem; z-index: 99; }
+.skip { min-height: 44px; display: inline-flex; align-items: center; position: absolute; inset-inline-start: .5rem; top: 0; transform: translateY(-150%); background: var(--card); padding: .5rem 1rem; z-index: 99; }
 .skip:focus { transform: none; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -157,7 +157,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 /* short landscape (phones on their side): one compact bar on top, page controls move into it */
 @media (max-height: 500px) and (orientation: landscape) {
   .r-top { padding-block: max(.1rem, env(safe-area-inset-top)) .1rem; }
-  .r-top .btn { min-height: 40px; min-width: 40px; padding: .2rem .45rem; }
+  .r-top .btn { min-height: 44px; min-width: 44px; padding: .2rem .4rem; }
   .r-title { text-align: start; padding-inline: .25rem; }
   .r-title b { font-size: .95rem; } .r-title small { font-size: .74rem; }
   .lsc { display: inline-flex !important; }
@@ -223,3 +223,20 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 }
 
 .day-note { font-family: var(--ui); font-size: .62em; line-height: 1.55; background: color-mix(in srgb, var(--accent) 9%, var(--card)); border-inline-start: 3px solid var(--accent); border-radius: 8px; padding: .5em .75em; margin: 0 0 .9em; break-inside: avoid; text-align: start; }
+
+/* very short landscape (≤360 px tall, e.g. 568×320): more lines per page – no orphan/widow slack, a slightly tighter
+   leading cap and a compact title block; the bars also auto-hide (app.js) */
+@media (orientation: landscape) and (max-height: 360px) {
+  .r-content { line-height: min(var(--lh), 1.7); }
+  .r-content p, .r-content div, .r-content li { orphans: 1; widows: 1; }
+  .r-content .doc-head { margin-bottom: .3em; }
+  .r-content h1 { font-size: .95em; margin: 0; }
+  .r-content .doc-sub { margin-bottom: .2em; }
+  .r-content h2 { margin: .5em 0 .2em; }
+}
+/* tap targets ≥44×44 (WCAG 2.5.5): Sources-table links, glossed words (hit area only – the text layout is unchanged),
+   the link inside the gloss pop-up */
+.page table.src td a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; padding-inline: .35rem; }
+.r-content.gloss-tap .gl { position: relative; }
+.r-content.gloss-tap .gl::before { content: ''; position: absolute; top: -9px; bottom: -9px; left: 50%; width: max(100% + 6px, 44px); transform: translateX(-50%); }
+.gloss-pop small a { display: inline-flex; align-items: center; min-height: 44px; }

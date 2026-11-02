@@ -472,14 +472,32 @@ function updateProgress(save = true) {
     setProgress(R.iso, R.unit, { pos: s?.dataset.id, frac, done: frac >= 0.995 });
   }, 400);
 }
+const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 360px)');
+const AUTO_HIDE_MS = 2500;
 function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
   const toggleChrome = force => {
     const before = el.classList.contains('immersive'), after = el.classList.toggle('immersive', force);
+    if (!after) armAutoHide();
     if (before === after || !R.doc) return;
     const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false);
   };
   R.toggleChrome = toggleChrome;
+  // Very short landscape screens (phone on its side, ≤360 px tall): the bars hide themselves after a few seconds
+  // without interaction so the text gets the whole height; a tap in the middle (or Esc) brings them back.
+  const armAutoHide = () => {
+    clearTimeout(R.hideT);
+    if (!SHORT_LANDSCAPE.matches) return;
+    R.hideT = setTimeout(() => {
+      if (el.hidden || !el.isConnected || !$('#sheet') || !$('#sheet').hidden) return;
+      if (el.querySelector('.r-top, .r-bottom')?.contains(document.activeElement) && document.activeElement.matches(':focus-visible')) return; // keyboard user in the bar
+      toggleChrome(true);
+    }, AUTO_HIDE_MS);
+  };
+  R.armAutoHide = armAutoHide;
+  $('#rt').addEventListener('pointerdown', armAutoHide); $('#rb').addEventListener('pointerdown', armAutoHide);
+  $('#rt').addEventListener('focusout', armAutoHide);
+  armAutoHide();
   // Re-paginate whenever a bar changes height (player bar shown/hidden, wrapping, rotation) and keep the position.
   let lastH = '';
   R.ro?.disconnect();
@@ -525,6 +543,7 @@ function bindReaderUi() {
   $('#t-rate').onchange = e => { setPref('ttsRate', snapRate(Number(e.target.value))); R.speaker?.setRate(prefs.ttsRate); };
 }
 function turn(d) {
+  R.armAutoHide?.();
   if (prefs.layout === 'pages') {
     if (d > 0 && R.page >= R.pages - 1) { setProgress(R.iso, R.unit, { done: true, frac: 1 }); toast('סוף השיעור'); return; }
     setPage(R.page + d);
@@ -664,7 +683,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
-  R.ttsShown = false;
+  R.ttsShown = false; clearTimeout(R.hideT);
   if (R.doc && R.unit) { const s = currentSeg(); if (s) setProgress(R.iso, R.unit, { pos: s.dataset.id }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;

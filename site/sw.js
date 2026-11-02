@@ -1,7 +1,7 @@
 // Service worker: app shell precache + cache-first for static text data.
 // VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs);
 // when texts are rebuilt the data cache name changes, the old cache is deleted on activate, and texts are re-fetched.
-const VERSION = '1.0.17';
+const VERSION = '1.0.18';
 const DATA_VERSION = 'd02e9101f9a2';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
