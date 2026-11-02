@@ -22,6 +22,7 @@ export const UNITS = {
   rambam1: { he: 'רמב״ם – פרק אחד', full: 'רמב״ם – פרק אחד ליום' },
   mitzvot: { he: 'ספר המצוות', full: 'ספר המצוות היומי' },
   tolt: { he: 'תורה אור ולקוטי תורה', full: 'תורה אור ולקוטי תורה – שיעור יומי' },
+  ravyomi: { he: 'שולחן ערוך אדמו״ר הזקן', full: 'שולחן ערוך אדמו״ר הזקן – רב יומי' },
   siddur: { he: 'סידור', full: 'סידור – נוסח חב״ד' }, // not a daily lesson: opened from #/siddur, never listed in the day's cards
 };
 const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
@@ -38,6 +39,7 @@ export async function filesFor(plan, unit) {
   }
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
   if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`)); }
+  if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   return [...new Set(f)];
 }
 async function mitzvotDoc(plan) {
@@ -208,12 +210,53 @@ async function toltDoc(plan) {
   blocks.push({ type: 'note', text: 'חלוקת השיעורים: ', links: LUACH_LINKS, tail: '. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC), בלי ניקוד. בסוגריים המרובעים – מספרי הדפים והעמודים במהדורה (א–ד).' });
   return { title: UNITS.tolt.full, subtitle: L.map(({ e }) => `${toltWork(e)} ${toltPlace(e)}`).join(' · '), blocks, raw: true };
 }
+// ---------------- Shulchan Aruch HaRav – "Rav Yomi" luach (tools/build-rav-yomi.mjs) ----------------
+const RAV_LUACH = ['לוח ״רב יומי״ – שולחן ערוך אדמו״ר הזקן', 'https://chabad.info/service/1287411/'];
+const pos = ([si, se]) => `סימן ${gem(si)} סעיף ${gem(se)}`;
+export function ravLabel(d) {
+  if (!d) return '';
+  if (d.ref) return d.ref;
+  const [a, b] = [d.f, d.t];
+  if (a[0] === b[0] && a[1] === b[1]) return pos(a);
+  return a[0] === b[0] ? `סימן ${gem(a[0])} סעיפים ${gem(a[1])}–${gem(b[1])}` : `${pos(a)} – ${pos(b)}`;
+}
+async function ravLesson(plan) {
+  const S = await data('ravyomi/schedule.json'), d = S.days[plan.iso];
+  return { S, d, simanim: d && d.f ? S.simanim.filter(n => n >= d.f[0] && n <= d.t[0]) : [] };
+}
+async function ravDoc(plan) {
+  const { S, d, simanim } = await ravLesson(plan), blocks = [];
+  const credit = { type: 'note', text: 'חלוקת השיעורים: ', links: [RAV_LUACH], tail: '. הטקסט: שולחן ערוך הרב, אורח חיים, המהדורה המנוקדת של הוצאת קה״ת, דרך ספריא (CC BY-NC). הערות השוליים וקונטרס אחרון אינם מוצגים.' };
+  if (!d) {
+    blocks.push({ type: 'note', text: `באתר יש את לוח ״רב יומי״ רק לשנה שמ־כ״ד טבת תשפ״ו עד כ״ג טבת תשפ״ז (${S.first} – ${S.last}). לתאריך זה אין כאן שיעור.`, href: RAV_LUACH[1], hrefText: 'הלוח המלא' });
+    return { title: UNITS.ravyomi.full, subtitle: '', blocks: [...blocks, credit], raw: true };
+  }
+  if (d.ref) {
+    blocks.push({ type: 'h', text: d.ref });
+    blocks.push({ type: 'note', text: `השיעור של היום לפי הלוח הוא ״${d.ref}״, ש״שולחן ערוך הרב״ שבספריא אינו כולל, ולכן מוצגת ההפניה בלבד.`, href: RAV_LUACH[1], hrefText: 'הלוח' });
+    return { title: UNITS.ravyomi.full, subtitle: d.ref, blocks: [...blocks, credit], raw: true };
+  }
+  if (d.gap) blocks.push({ type: 'note', text: d.gap });
+  if (d.fix) blocks.push({ type: 'note', text: 'תיקון בלוח: ' + d.fix });
+  const word = x => typeof x[2] === 'string' && x[2];
+  if (word(d.f)) blocks.push({ type: 'note', text: `לפי הלוח, השיעור מתחיל באמצע סעיף ${gem(d.f[1])}, במילים ״${d.f[2]}״. הסעיף מוצג כאן במלואו.` });
+  for (const n of simanim) {
+    const sm = await data(`ravyomi/s/${n}.json`);
+    const a = n === d.f[0] ? d.f[1] : 1, b = n === d.t[0] ? d.t[1] : sm.s.length;
+    blocks.push({ type: 'h', text: `סימן ${gem(n)}${sm.title ? ' – ' + sm.title.replace(/[,:]?\s*וּ?בוֹ\s.*$/, '') : ''}` });
+    for (let se = a; se <= b; se++) sm.s[se - 1].forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${se}.${k + 1}`, text: k ? t : `<b>${gem(se)}</b> ${t}`, src: 'ravyomi' }));
+  }
+  if (word(d.t) && d.t[3] !== 1) blocks.push({ type: 'note', text: `לפי הלוח, השיעור מסתיים באמצע סעיף ${gem(d.t[1])}, במילים ״${d.t[2]}״. ההמשך נלמד מחר.` });
+  blocks.push(credit);
+  return { title: UNITS.ravyomi.full, subtitle: ravLabel(d), blocks, raw: true };
+}
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);
   if (unit === 'tehillim') return tehillimDoc(plan);
   if (unit === 'tanya') return tanyaDoc(plan);
   if (unit === 'mitzvot') return mitzvotDoc(plan);
   if (unit === 'tolt') return toltDoc(plan);
+  if (unit === 'ravyomi') return ravDoc(plan);
   return rambamDoc(plan, unit);
 }
 /** Short description of a unit's portion for the home cards. */
@@ -223,6 +266,7 @@ export async function describe(plan, unit) {
   if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)
   if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');
   if (unit === 'tolt') return (await toltLessons(plan)).map(({ e }) => toltLabel(e)).join(' · ');
+  if (unit === 'ravyomi') { const { d } = await ravLesson(plan); return d ? ravLabel(d) : 'אין שיעור בלוח לתאריך זה'; }
   return rambamTitle(plan[unit]);
 }
 
