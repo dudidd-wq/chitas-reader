@@ -33,6 +33,9 @@ function applyPrefs() {
   if (meta) meta.content = getComputedStyle(r).getPropertyValue('--paper').trim() || '#f6f1e3';
 }
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
+let toastAfterNav = ''; // a message meant for the screen being navigated to
+/** a status message belongs to the screen it was shown on: drop it when the user navigates (review 3) */
+function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
 const todayIso = () => isoDate(new HDate(new Date()));
 const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1'])];
 const gregHe = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' }); };
@@ -43,6 +46,8 @@ let currentDate = todayIso();
 function route() {
   const h = location.hash.replace(/^#\/?/, '');
   const [view, a, b] = h.split('/');
+  clearToast();
+  if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
   if (view !== 'r') closeReader();
   autoPrefetch();
   if (view === 'r' && UNITS[a]) { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
@@ -125,6 +130,7 @@ async function renderHome(showLoc = false) {
     </section>
     <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
+      <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
         <a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
@@ -161,17 +167,32 @@ function autoPrefetch() {
   }, 2500);
 }
 async function downloadAhead() {
-  const btn = $('#dl30'); btn.disabled = true;
+  const btn = $('#dl30'), st = $('#dl-st'); btn.disabled = true;
   try {
     const files = new Set(['tanya/index.json', 'rambam/index.json', 'glossary.json', 'sources.json']);
     for (let i = 0; i < 30; i++) {
       const plan = dayPlan(shiftIso(currentDate, i), { il: prefs.il });
       for (const u of unitsFor()) (await filesFor(plan, u)).forEach(f => files.add(f));
     }
-    let n = 0;
-    for (const f of files) { await fetch('data/' + f).catch(() => {}); n++; if (n % 10 === 0) btn.textContent = `מוריד… ${Math.round(100 * n / files.size)}%`; }
-    btn.textContent = '✓ נשמר ל-30 יום'; toast('הטקסטים ל-30 הימים הקרובים נשמרו במכשיר');
-  } catch { btn.textContent = 'שגיאה בהורדה'; btn.disabled = false; }
+    let n = 0, ok = 0;
+    for (const f of files) { if (await fetch('data/' + f).then(r => r.ok).catch(() => false)) ok++; n++; if (n % 10 === 0) btn.textContent = `מוריד… ${Math.round(100 * n / files.size)}%`; }
+    // ask the browser not to evict the saved texts (review 3); report the real answer, not a hope
+    const persist = await persistStorage();
+    const pmsg = persist === true ? 'הדפדפן אישר אחסון קבוע.'
+      : persist === false ? 'הדפדפן לא אישר אחסון קבוע, ולכן ייתכן שימחק את השמירה אם יחסר מקום או לאחר זמן רב ללא שימוש (בעיקר ב-iPhone).'
+      : 'הדפדפן אינו תומך בבקשת אחסון קבוע; ייתכן שימחק את השמירה אם יחסר מקום.';
+    if (ok === files.size) { btn.textContent = '✓ נשמר ל-30 יום'; st.textContent = `הטקסטים ל-30 הימים הקרובים נשמרו במכשיר. ${pmsg}`; }
+    else { btn.textContent = 'שמירה חלקית – נסו שוב'; btn.disabled = false; st.textContent = `נשמרו ${ok} מתוך ${files.size} קבצים; חלק לא הורדו (בדקו חיבור). ${pmsg}`; }
+    st.dataset.persisted = String(persist);
+  } catch { btn.textContent = 'שגיאה בהורדה'; btn.disabled = false; st.textContent = 'ההורדה נכשלה – בדקו חיבור ונסו שוב.'; }
+}
+/** navigator.storage.persist(): true/false = the browser's answer, null = not supported */
+async function persistStorage() {
+  try {
+    if (!navigator.storage?.persist) return null;
+    if (await navigator.storage.persisted?.()) return true;
+    return await navigator.storage.persist();
+  } catch { return null; }
 }
 
 // ---------------- Generic pages ----------------
@@ -437,7 +458,7 @@ function nextUnitId() { const us = unitsFor(); const i = us.indexOf(R.unit); ret
 function nextUnit(autoplay) {
   setProgress(R.iso, R.unit, { done: true, frac: 1 });
   const n = nextUnitId();
-  if (!n) { toast('סיימת את כל שיעורי היום. יישר כח!'); location.hash = '#/d/' + R.iso; return; }
+  if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
   R.autoplay = autoplay;
   location.hash = `#/r/${n}/${R.iso}`;
 }
