@@ -23,3 +23,27 @@ test('glossary: licence + every entry sourced, ≤ 4 words, anchored to a real w
   assert.ok(n > 500, 'coverage collapsed: ' + n);
   console.log('glossed verse-words:', n, 'verses:', Object.keys(G.verses).length);
 });
+
+test('glossary: curated allow-list — every published entry was reviewed by hand; known-bad entries removed', async () => {
+  const R = JSON.parse(fs.readFileSync(new URL('../tools/gloss-review.json', import.meta.url)));
+  const idx = new Map(R.entries.map(e => [`${e.ref}|${e.form}`, e]));
+  assert.equal(R.entries.length, 1046);
+  for (const e of R.entries) assert.ok(['keep', 'reject', 'adapt'].includes(e.decision) && (e.decision !== 'reject' || R.meta.codes[e.why]), JSON.stringify(e));
+  let n = 0;
+  for (const [ref, ws] of Object.entries(G.verses)) for (const [form, e] of Object.entries(ws)) {
+    n++; const r = idx.get(`${ref}|${form}`);
+    assert.ok(r && r.decision !== 'reject', `${ref} ${form} published but not approved`);
+    assert.equal(e.g, r.decision === 'adapt' ? r.g2 : r.g);
+    assert.equal(!!e.adapted, r.decision === 'adapt');
+  }
+  assert.equal(n, G.meta.curated.published);
+  const has = (ref, w) => Object.keys(G.verses[ref] || {}).some(f => f === norm(w));
+  for (const [ref, w] of [['Genesis 18:7', 'רַךְ'], ['Genesis 27:41', 'הַבְּרָכָה'], ['Genesis 31:27', 'וַתִּגְנֹב'], ['Genesis 42:7', 'וַיִּתְנַכֵּר'],
+    ['Psalms 11:2', 'כּוֹנְנוּ'], ['Genesis 37:3', 'יוֹסֵף'], ['Psalms 78:67', 'יוֹסֵף'], ['Genesis 1:6', 'בֵּין']])
+    assert.ok(!has(ref, w), `${ref} ${w} should be removed`);
+  for (const ws of Object.values(G.verses)) for (const e of Object.values(ws)) {
+    assert.ok(!/יחסי.?מין|איבר מין|דמות מקראית|ביאה|פליטת זרע/.test(e.g), e.g);
+    assert.ok(!/[<>(]$|\(\d\)|^בנסמך$|^בפרט$/.test(e.g), 'garbled: ' + e.g);
+  }
+  assert.equal(G.verses['Genesis 4:1'][norm('יָדַע')]?.adapted, 1);
+});

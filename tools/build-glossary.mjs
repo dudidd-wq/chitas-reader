@@ -13,6 +13,7 @@ const realFetch = globalThis.fetch;
 globalThis.fetch = async p => { if (/^https?:/.test(p)) return realFetch(p, { headers: { 'User-Agent': 'chitas-reader-build/1.0 (https://github.com/dudidd-wq/chitas-reader)' } }); const f = new URL(p, root); return { ok: fs.existsSync(f), json: async () => JSON.parse(fs.readFileSync(f)) }; };
 
 import { norm, cons } from '../site/js/hnorm.js';
+import { buildGlossary } from './gloss-review.mjs';
 const PREF = 'והבלמכש';
 function variants(n) {
   const out = [n]; let w = n;
@@ -104,10 +105,8 @@ for (const [ref, set] of verses) {
     if (hit) { (outV[ref] ??= {})[n] = hit; matchedV++; }
   }
 }
-const res = {
-  meta: { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
-    stats: { tanakh: { verses: verses.size, verseWordForms: tokV, glossed: matchedV, versesWithGloss: Object.keys(outV).length } } },
-  verses: outV,
-};
+// Publish only hand-reviewed entries (tools/gloss-review.json); new/changed candidates are skipped until reviewed.
+const res = buildGlossary(outV, { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
+    stats: { tanakh: { verses: verses.size, verseWordForms: tokV, glossed: matchedV, versesWithGloss: Object.keys(outV).length } } });
 fs.writeFileSync(new URL('data/glossary.json', root), JSON.stringify(res));
-console.log(JSON.stringify(res.meta.stats));
+console.log(JSON.stringify(res.meta.stats), JSON.stringify(res.meta.curated));

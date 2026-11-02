@@ -32,7 +32,7 @@ export function applyGlosses(root, book) {
       const e = glossFor(book, seg.dataset.id, p);
       if (e) {
         const s = document.createElement('span');
-        s.className = 'gl'; s.textContent = p; s.dataset.g = e.g; s.dataset.src = e.src || ''; s.dataset.lemma = e.l || '';
+        s.className = 'gl'; s.textContent = p; s.dataset.g = e.g; s.dataset.src = e.src || ''; s.dataset.lemma = e.l || ''; if (e.adapted) s.dataset.adapted = '1';
         s.tabIndex = 0; s.setAttribute('role', 'button'); s.setAttribute('aria-label', `${p} – ביאור: ${e.g}`);
         frag.appendChild(s);
       } else frag.appendChild(document.createTextNode(p));
@@ -49,7 +49,7 @@ function showPop(el) {
   if (el.closest('.gloss-off')) return;
   pop = document.createElement('div');
   pop.className = 'gloss-pop'; pop.setAttribute('role', 'tooltip');
-  const src = el.dataset.src ? `<small>מקור: <a href="${el.dataset.src}" target="_blank" rel="noopener">ויקימילון${el.dataset.lemma ? ' – ' + el.dataset.lemma : ''}</a> (CC BY-SA)</small>` : '';
+  const src = el.dataset.src ? `<small>מקור: <a href="${el.dataset.src}" target="_blank" rel="noopener">ויקימילון${el.dataset.lemma ? ' – ' + el.dataset.lemma : ''}</a> (CC BY-SA)${el.dataset.adapted ? ' · ניסוח מעודן' : ''}</small>` : '';
   pop.innerHTML = `<b></b> ${src}`; pop.querySelector('b').textContent = el.dataset.g;
   document.body.appendChild(pop);
   const r = el.getBoundingClientRect(), pr = pop.getBoundingClientRect();
