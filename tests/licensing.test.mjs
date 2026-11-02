@@ -76,6 +76,10 @@ test('reader credits the Wikisource chapter (Chametz uMatzah ch. 9) with a link 
     assert.match(ch, /רש״י: מהדורת רוזנבאום–זילברמן.*נחלת הכלל/);
     await p.goto(srv.url + '#/r/tanya/2026-11-02'); await p.waitForSelector('.seg');
     assert.match(await p.textContent('.doc-credit'), /תניא: הוצאת קה״ת \(Kehot\) \(CC BY-NC\)$/);
+    // …and the read-aloud sheet names the source of what it reads
+    await p.click('#b-tts'); await p.waitForSelector('#sh-credit');
+    assert.match(await p.textContent('#sh-credit'), /^הטקסט המוקרא – תניא: הוצאת קה״ת \(Kehot\) \(CC BY-NC\)$/);
+    await p.click('#sh-x');
     await p.goto(srv.url + '#/r/tehillim/2026-11-02'); await p.waitForSelector('.seg');
     assert.match(await p.textContent('.doc-credit'), /תהילים: מקרא על פי המסורה/);
     assert.deepEqual(p.errors, []);

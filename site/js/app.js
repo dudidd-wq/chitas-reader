@@ -399,7 +399,7 @@ async function openReader(unit, iso) {
       <button class="btn ghost" id="t-fwd" aria-label="קטע הבא">${ICON.rew}</button>
       <button class="btn ghost" id="t-stop" aria-label="עצור">${ICON.stop}</button>
       <label class="sr" for="t-rate">מהירות</label>
-      <select id="t-rate">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
+      <select id="t-rate" title="מהירות ההקראה">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
     </div>
     <span style="flex:1" id="spacer"></span>
     <button class="btn ghost" id="b-next" aria-label="עמוד הבא">${ICON.next}</button>
@@ -459,6 +459,7 @@ async function renderDoc() {
     }
   }
   if (open) html += '</p>';
+  R.credit = credit;
   if (credit) html += `<p class="doc-credit">מקור הנוסח – ${credit}</p>`;
   if (d.fixes?.length) html += `<p class="doc-credit" id="doc-fixes">תוקנו כאן ${d.fixes.length === 1 ? 'טעות ניקוד אחת' : `${d.fixes.length} טעויות ניקוד`} של המהדורה (העיצורים זהים לנוסח ויקיטקסט): ${d.fixes.map(f => `<span title="${esc(f.label)}">${esc(f.from)} ← ${esc(f.to)}</span>`).join(' · ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
   html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
@@ -691,7 +692,7 @@ function openSheet(kind) {
   const sh = $('#sheet');
   if (sh.hidden) R.sheetOpener = document.activeElement;
   sh.innerHTML = `<h2><span id="sh-title">${kind === 'tts' ? 'הקראה' : 'תצוגה'}</span><button class="btn ghost" id="sh-x" aria-label="סגירה">${ICON.close}</button></h2>
-    <form class="form" onsubmit="return false">${kind === 'tts' ? `<button class="btn primary" id="sh-play" type="button">${R.speaker?.state === 'playing' ? 'השהה הקראה' : 'התחל הקראה מהעמוד הנוכחי'}</button>` + ttsForm() : displayForm()}</form>`;
+    <form class="form" onsubmit="return false">${kind === 'tts' ? `<button class="btn primary" id="sh-play" type="button">${R.speaker?.state === 'playing' ? 'השהה הקראה' : 'התחל הקראה מהעמוד הנוכחי'}</button>` + ttsForm() + (R.credit ? `<p class="note" id="sh-credit">הטקסט המוקרא – ${R.credit}</p>` : '') : displayForm()}</form>`;
   sh.hidden = false;
   for (const id of ['#rt', '#vp', '#rb']) $(id).inert = true;
   $('#sh-x').onclick = closeSheet;
