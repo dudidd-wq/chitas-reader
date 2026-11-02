@@ -11,10 +11,13 @@ test('glossary: licence + every entry sourced, ≤ 4 words, anchored to a real w
   for (const [ref, words] of Object.entries(G.verses)) {
     const [, book, c, v] = ref.match(/^(\w+) (\d+):(\d+)$/);
     const text = JSON.parse(fs.readFileSync(new URL(`${c}.json`, torah(book)))).v[v - 1];
-    const forms = new Set(text.replace(/<i class="fn">[^<]*<\/i>/g, '').replace(/<\/?(big|small)>/g, '').replace(/<[^>]+>/g, ' ').split(/[\s\u05BE]+/).map(norm));
-    for (const [form, e] of Object.entries(words)) {
+    // same token split as the reader's DOM walk (an element such as <big> splits a word into separate text nodes)
+    const toks = text.replace(/<i class="fn">[^<]*<\/i>/g, '').replace(/<[^>]+>/g, ' ').replace(/\([^)]*\)/g, ' ').split(/[\s\u05BE]+/).map(norm);
+    for (const [key, e] of Object.entries(words)) {
       n++;
-      assert.ok(forms.has(form), `${ref}: ${form} not in verse`);
+      const [form, k] = key.split('#'), count = toks.filter(t => t === form).length;
+      if (k) assert.ok(count > 1 && +k >= 1 && +k <= count, `${ref}: ${key} – occurrence key on a form that occurs ${count}×`);
+      else assert.equal(count, 1, `${ref}: ${form} occurs ${count}× in the verse but is not occurrence-specific`);
       assert.match(e.src, /^https:\/\/he\.wiktionary\.org\/wiki\//);
       assert.ok(e.g && e.g.split(' ').length <= 4, `${ref} ${form}: ${e.g}`);
       assert.ok(e.l);
@@ -31,15 +34,15 @@ test('glossary: curated allow-list — every published entry was reviewed by han
   for (const e of R.entries) assert.ok(['keep', 'reject', 'adapt'].includes(e.decision) && (e.decision !== 'reject' || R.meta.codes[e.why]), JSON.stringify(e));
   let n = 0;
   for (const [ref, ws] of Object.entries(G.verses)) for (const [form, e] of Object.entries(ws)) {
-    n++; const r = idx.get(`${ref}|${form}`);
+    n++; const r = idx.get(`${ref}|${form}`) || idx.get(`${ref}|${form.split('#')[0]}`);
     assert.ok(r && r.decision !== 'reject', `${ref} ${form} published but not approved`);
     assert.equal(e.g, r.decision === 'adapt' ? r.g2 : r.g);
     assert.equal(!!e.adapted, r.decision === 'adapt');
   }
   assert.equal(n, G.meta.curated.published);
-  const has = (ref, w) => Object.keys(G.verses[ref] || {}).some(f => f === norm(w));
+  const has = (ref, w) => Object.keys(G.verses[ref] || {}).some(f => f.split('#')[0] === norm(w));
   for (const [ref, w] of [['Genesis 18:7', 'רַךְ'], ['Genesis 27:41', 'הַבְּרָכָה'], ['Genesis 31:27', 'וַתִּגְנֹב'], ['Genesis 42:7', 'וַיִּתְנַכֵּר'],
-    ['Psalms 11:2', 'כּוֹנְנוּ'], ['Genesis 37:3', 'יוֹסֵף'], ['Psalms 78:67', 'יוֹסֵף'], ['Genesis 1:6', 'בֵּין']])
+    ['Psalms 11:2', 'כּוֹנְנוּ'], ['Leviticus 11:18', 'הָרָחָם'], ['Exodus 30:25', 'רֹקַח'], ['Psalms 19:5', 'קַוָּם'], ['Genesis 37:3', 'יוֹסֵף'], ['Psalms 78:67', 'יוֹסֵף'], ['Genesis 1:6', 'בֵּין']])
     assert.ok(!has(ref, w), `${ref} ${w} should be removed`);
   for (const ws of Object.values(G.verses)) for (const e of Object.values(ws)) {
     assert.ok(!/יחסי.?מין|איבר מין|דמות מקראית|ביאה|פליטת זרע/.test(e.g), e.g);

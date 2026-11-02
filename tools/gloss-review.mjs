@@ -10,7 +10,9 @@ export function applyReview(raw, review = REVIEW) {
   const idx = new Map(review.entries.map(e => [`${e.ref}|${e.form}`, e]));
   const out = {}; let unreviewed = 0;
   for (const [ref, ws] of Object.entries(raw)) for (const [form, e] of Object.entries(ws)) {
-    const r = idx.get(`${ref}|${form}`);
+    // "form#k" = the k-th occurrence of a form repeated in the verse; an older review of "form" with the same
+    // definition carries over (it was reviewed for that sense), a new sense for another occurrence needs its own review.
+    const r = idx.get(`${ref}|${form}`) || (form.includes('#') ? idx.get(`${ref}|${form.split('#')[0]}`) : null);
     if (!r || r.g !== e.g) { unreviewed++; continue; }
     if (r.decision === 'keep') (out[ref] ??= {})[form] = { g: e.g, l: r.l, src: e.src };
     else if (r.decision === 'adapt') (out[ref] ??= {})[form] = { g: r.g2, l: r.l, src: e.src, adapted: 1 };

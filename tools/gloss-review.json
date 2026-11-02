@@ -9,7 +9,8 @@
    "garbled": "טקסט הגדרה פגום/קטוע",
    "explicit": "ניסוח בוטה – הוסר",
    "speculative": "זיהוי משוער/אנכרוניסטי"
-  }
+  },
+  "reviewed2": "2026-11-02: occurrence-exact glosses (form#k) + 3 weak entries rejected after external review round 2"
  },
  "entries": [
   {
@@ -3337,7 +3338,9 @@
    "l": "רָקַח",
    "g": "עירב בשמים וסממנים שונים",
    "src": "https://he.wiktionary.org/wiki/%D7%A8%D7%A7%D7%97#%D7%A8%D6%B8%D7%A7%D6%B7%D7%97",
-   "decision": "keep"
+   "decision": "reject",
+   "note": "round-2 review: verb sense (רָקַח \"mixed spices\") given for the noun רֹקַח (a compounded perfume)",
+   "why": "wrong-sense"
   },
   {
    "ref": "Exodus 30:30",
@@ -3719,7 +3722,9 @@
    "l": "רָחָם",
    "g": "עוף דורס ממשפחת הנציים",
    "src": "https://he.wiktionary.org/wiki/%D7%A8%D7%97%D7%9D#%D7%A8%D6%B8%D7%97%D6%B8%D7%9D",
-   "decision": "keep"
+   "decision": "reject",
+   "note": "round-2 review: modern zoological identification of a biblical bird",
+   "why": "speculative"
   },
   {
    "ref": "Leviticus 11:22",
@@ -6591,7 +6596,9 @@
    "l": "קַו",
    "g": "אִמרה, דיבור",
    "src": "https://he.wiktionary.org/wiki/%D7%A7%D7%95#%D7%A7%D6%B7%D7%95",
-   "decision": "keep"
+   "decision": "reject",
+   "note": "round-2 review: \"אמרה\" for קַוָּם is one interpretation only (cf. \"line/measure\")",
+   "why": "speculative"
   },
   {
    "ref": "Psalms 19:6",

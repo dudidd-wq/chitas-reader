@@ -15,9 +15,11 @@ export function glossFor(book, id, word) {
   const m = G?.verses?.[`${book} ${id}`]; if (!m) return null;
   const n = norm(word); return cons(n).length > 1 ? m[n] || null : null;
 }
-export function glossRef(ref, word) {
+// `occ` = 1-based occurrence of this form in the verse: a form repeated in a verse is keyed "form#k" and only the
+// occurrence the Wiktionary citation points at is glossed (tools/gloss-occ.mjs).
+export function glossRef(ref, word, occ = 1) {
   const m = G?.verses?.[ref]; if (!m) return null;
-  const n = norm(word); return cons(n).length > 1 ? m[n] || null : null;
+  const n = norm(word); return cons(n).length > 1 ? m[n] || m[`${n}#${occ}`] || null : null;
 }
 export function applyGlosses(root, book) {
   if (!G?.verses || !book) return;
@@ -29,12 +31,14 @@ export function applyGlosses(root, book) {
       acceptNode: n => (n.parentElement.closest('.vn, .hn, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+    const seen = {}; // norm → occurrences so far in this verse (same token split as the glossary builder)
     for (const n of nodes) {
     const parts = n.nodeValue.split(/([\s\u05BE]+)/);
-    if (!parts.some(p => glossRef(ref, p))) continue;
+    const occ = parts.map(p => { const k = norm(p); return cons(k).length > 1 ? (seen[k] = (seen[k] || 0) + 1) : 0; });
+    if (!parts.some((p, i) => occ[i] && glossRef(ref, p, occ[i]))) continue;
     const frag = document.createDocumentFragment();
-    for (const p of parts) {
-      const e = glossRef(ref, p);
+    for (const [i, p] of parts.entries()) {
+      const e = occ[i] ? glossRef(ref, p, occ[i]) : null;
       if (e) {
         const s = document.createElement('span');
         s.className = 'gl'; s.textContent = p; s.dataset.g = e.g; s.dataset.src = e.src || ''; s.dataset.lemma = e.l || ''; if (e.adapted) s.dataset.adapted = '1';

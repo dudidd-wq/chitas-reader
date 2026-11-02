@@ -14,6 +14,7 @@ globalThis.fetch = async p => { if (/^https?:/.test(p)) return realFetch(p, { he
 
 import { norm, cons } from '../site/js/hnorm.js';
 import { buildGlossary } from './gloss-review.mjs';
+import { occurrencesOf } from './gloss-occ.mjs';
 const PREF = 'והבלמכש';
 function variants(n) {
   const out = [n]; let w = n;
@@ -29,7 +30,8 @@ const fin = t => t.replace(/כ$/, 'ך').replace(/מ$/, 'ם').replace(/נ$/, 'ן'
 
 // 1. collect the words of every verse of the Torah and Tehillim (glosses are verse-anchored, so no date window is needed)
 const verses = new Map(); // 'Book c:v' → Set(norm)
-const add = (book, c, v, t) => { for (const w of strip(t).split(/[\s\u05BE]+/)) { const n = norm(w); if (cons(n).length < 2 || !/[\u05B0-\u05BB]/.test(n)) continue; const k = `${book} ${c}:${v}`; if (!verses.has(k)) verses.set(k, new Set()); verses.get(k).add(n); } };
+const verseToks = new Map(); // 'Book c:v' → [norm] in order (all words, for occurrence counting — same split as the reader)
+const add = (book, c, v, t) => { verseToks.set(`${book} ${c}:${v}`, strip(t).split(/[\s\u05BE]+/).map(norm).filter(n => cons(n).length > 1)); for (const w of strip(t).split(/[\s\u05BE]+/)) { const n = norm(w); if (cons(n).length < 2 || !/[\u05B0-\u05BB]/.test(n)) continue; const k = `${book} ${c}:${v}`; if (!verses.has(k)) verses.set(k, new Set()); verses.get(k).add(n); } };
 for (const book of ['Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy'])
   for (let c = 1; fs.existsSync(new URL(`data/torah/${book}/${c}.json`, root)); c++) JSON.parse(fs.readFileSync(new URL(`data/torah/${book}/${c}.json`, root))).v.forEach((t, i) => add(book, c, i + 1, t));
 for (let c = 1; c <= 150; c++) JSON.parse(fs.readFileSync(new URL(`data/tehillim/${c}.json`, root))).v.forEach((t, i) => add('Psalms', c, i + 1, t));
@@ -90,21 +92,40 @@ for (const page of Object.values(cache)) {
         const f = m[1].split('|'); if (f.length < 4) continue;
         const book = BOOKS[f[1].trim()]; if (!book) continue;
         const ref = `${book} ${gnum(f[2])}:${gnum(f[3])}`;
-        for (const b of f[0].matchAll(/'''([^']+)'''/g)) { const nf = norm(b[1]); if (cons(nf).length >= 2) (byVerse[ref] ??= {})[nf] = rec; }
+        for (const b of f[0].matchAll(/'''([^']+)'''/g)) { const nf = norm(b[1]); if (cons(nf).length >= 2) ((byVerse[ref] ??= {})[nf] ??= []).push({ ...rec, q: f[0] }); }
       }
     });
   }
 }
-// 4. match
-const outV = {}; let matchedV = 0, tokV = 0;
+// 4. match — occurrence-exact. A Wiktionary citation quotes the verse with ONE word in bold; when the same form occurs
+// more than once in the verse, the quoted context decides which occurrence is meant (key "form#k", k 1-based).
+// If the context does not pin down a single occurrence, the gloss is dropped (round-2 review: never gloss every copy).
+const outV = {}; let matchedV = 0, tokV = 0, droppedAmbiguous = 0, splitOcc = 0;
 for (const [ref, set] of verses) {
   tokV += set.size;
   const cand = byVerse[ref]; if (!cand) continue;
+  const toks = verseToks.get(ref);
   for (const n of set) {
-    const hit = cand[n] || variants(n).slice(1).filter(v => cons(v).length >= 3).map(v => cand[v]).find(Boolean);
-    if (hit) { (outV[ref] ??= {})[n] = hit; matchedV++; }
+    const recs = cand[n] || variants(n).slice(1).filter(v => cons(v).length >= 3).map(v => cand[v]).find(Boolean);
+    if (!recs) continue;
+    const repeated = toks.filter(t => t === n).length > 1;
+    const byKey = {};
+    for (const r of recs) {
+      const { q, ...rec } = r;
+      const ks = occurrencesOf(toks, n, q);
+      if (!ks) { droppedAmbiguous++; continue; }
+      for (const k of ks) {
+        const key = repeated ? `${n}#${k + 1}` : n;
+        if (key in byKey && byKey[key]?.g !== rec.g) byKey[key] = null; else if (byKey[key] !== null) byKey[key] = rec;
+      }
+    }
+    for (const [key, rec] of Object.entries(byKey)) {
+      if (!rec) { droppedAmbiguous++; continue; }
+      (outV[ref] ??= {})[key] = rec; matchedV++; if (repeated) splitOcc++;
+    }
   }
 }
+console.log('occurrence-specific', splitOcc, 'dropped (ambiguous occurrence/conflicting senses)', droppedAmbiguous);
 // Publish only hand-reviewed entries (tools/gloss-review.json); new/changed candidates are skipped until reviewed.
 const res = buildGlossary(outV, { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
     stats: { tanakh: { verses: verses.size, verseWordForms: tokV, glossed: matchedV, versesWithGloss: Object.keys(outV).length } } });
