@@ -628,7 +628,8 @@ function updateProgress(save = true) {
     setProgress(R.iso, R.unit, { ...anchor(), frac, done: frac >= 0.995 });
   }, 400);
 }
-const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 360px)');
+// round 4: up to 440 px tall, so large phones on their side (390–430 px tall) also get the whole height
+const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 440px)');
 const AUTO_HIDE_MS = 2500;
 function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
@@ -639,7 +640,7 @@ function bindReaderUi() {
     const a = anchor(); layout(); restore(a);
   };
   R.toggleChrome = toggleChrome;
-  // Very short landscape screens (phone on its side, ≤360 px tall): the bars hide themselves after a few seconds
+  // Short landscape screens (phone on its side, ≤440 px tall): the bars hide themselves after a few seconds
   // without interaction so the text gets the whole height; a tap in the middle (or Esc) brings them back.
   const armAutoHide = () => {
     clearTimeout(R.hideT);

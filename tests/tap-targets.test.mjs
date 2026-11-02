@@ -71,6 +71,10 @@ test('568×320 landscape: bars auto-hide after idle, tap brings them back, more 
     await p.click('#b-aa'); await p.waitForTimeout(3000);
     assert.equal(await imm(), false, 'no auto-hide while a sheet is open');
     assert.deepEqual(p.errors, []);
+    // round 4: a large phone on its side (844×390) also auto-hides
+    const l = await pageWith(b, srv.url, { viewport: { width: 844, height: 390 } });
+    await l.goto(srv.url + `#/r/chumash/${D}`); await l.waitForSelector('.seg');
+    await l.waitForFunction(() => document.querySelector('#reader').classList.contains('immersive'), null, { timeout: 4000 });
     // taller screens never auto-hide
     const q = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
     await q.goto(srv.url + `#/r/chumash/${D}`); await q.waitForSelector('.seg'); await q.waitForTimeout(3200);
