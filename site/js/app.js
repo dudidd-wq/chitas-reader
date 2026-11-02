@@ -254,7 +254,7 @@ function renderAbout() {
   shell('אודות ומגבלות', `
   <p>אתר לקריאת שיעורי חת״ת (חומש עם רש״י, תהילים, תניא) ורמב״ם יומי, בטקסט מנוקד ובתצוגה דמוית נייר, עם אפשרות שהדפדפן יקריא את הטקסט. עובד גם ללא רשת לאחר טעינה, ואינו אוסף מידע: אין חשבון, אין מעקב ואין שליחת נתונים.</p>
   <h2>לוח השיעורים</h2><ul>
-  <li>החומש לפי המנהג: בכל יום עולה אחת מפרשת השבוע (ראשון – ראשון … שבת – שביעי). בשבוע שבו השבת היא יום טוב – לומדים את הפרשה של השבת הבאה. מאחרי השבת האחרונה של השנה ועד שמחת תורה – ״וזאת הברכה״. בשמחת תורה עצמה מסיימים את ״וזאת הברכה״ מעליית היום ועד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום (ע״פ שיחת הרבי, תורת מנחם תשל״ב ח״א עמ׳ 129, ו״מנהגי חב״ד לשמחת תורה״ באתר chabad.org.il).</li>
+  <li>החומש לפי המנהג: בכל יום עולה אחת מפרשת השבוע (ראשון – ראשון … שבת – שביעי). בשבוע שבו השבת היא יום טוב – לומדים את הפרשה של השבת הבאה. מאחרי השבת האחרונה של השנה ועד שמחת תורה – ״וזאת הברכה״. בשמחת תורה עצמה מסיימים את ״וזאת הברכה״ מעליית היום ועד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום (ע״פ שיחת הרבי, תורת מנחם תשל״ב ח״א עמ׳ 129, ו״מנהגי חב״ד לשמחת תורה״ באתר chabad.org.il). כששמחת תורה חלה בשבת (בארץ ישראל בלבד) לומדים מ״בראשית״ רק ״ראשון״ (א,א–ב,ג), כי שבוע פרשת בראשית מתחיל למחרת; לכך לא מצאנו מקור מפורש, ויש לוחות שבהם לומדים בשמחת תורה רק ״וזאת הברכה״. ביום זה מוצגת הערה בקורא.</li>
   <li>תהילים לפי ימי החודש; בחודש חסר לומדים ביום כ״ט גם את של יום ל׳.</li>
   <li>תניא יומי לפי הלוח המקובל (מחזור שנתי החל מי״ט כסלו).</li>
   <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו קובץ verification במאגר.</li>
@@ -335,12 +335,24 @@ async function openReader(unit, iso) {
   requestWake();
   if (auto) ttsToggle();
 }
+// Simchat Torah: the Chumash shiur differs between calendars – say what we do and why, so the reader is not
+// surprised when another calendar (e.g. Chabad.org) shows something else.
+function simchatTorahNote() {
+  if (R.unit !== 'chumash') return '';
+  const c = dayPlan(R.iso, { il: prefs.il }).chumash;
+  if (!c?.simchatTorah) return '';
+  const t = c.shabbat
+    ? 'שמחת תורה שחל בשבת (בארץ ישראל): לומדים את ״וזאת הברכה״ מ״שביעי״ עד סוף התורה, ומ״בראשית״ רק את ״ראשון״ (א,א–ב,ג – קריאת חתן בראשית), כי שבוע פרשת בראשית מתחיל למחרת ביום ראשון. לא מצאנו מקור מפורש למקרה זה; יש לוחות שבהם לומדים היום את ״וזאת הברכה״ בלבד.'
+    : `בשמחת תורה מסיימים את ״וזאת הברכה״ מעליית היום (${c.aliyahHe}) עד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום – ע״פ שיחת הרבי (תורת מנחם תשל״ב ח״א עמ׳ 129) ו״מנהגי חב״ד לשמחת תורה״ (chabad.org.il). בלוחות אחרים, כמו Chabad.org, מופיעה היום רק ״וזאת הברכה״.`;
+  return `<aside class="day-note" role="note"><b>לתשומת לב:</b> ${esc(t)}</aside>`;
+}
 async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
   let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   const allText = d.blocks.filter(b => b.text).map(b => b.text).join(' ');
+  html += simchatTorahNote();
   if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון פתוח.</p>`;
   let open = false;
   for (const b of d.blocks) {

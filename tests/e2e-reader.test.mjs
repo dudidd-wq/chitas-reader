@@ -103,6 +103,26 @@ test('TTS that really speaks every chunk marks the lesson read and continues to 
   await p.context().close();
 });
 
+test('Simchat Torah: Israel on Shabbat reads Bereshit Rishon only and explains it; Diaspora shows a note about other calendars', { skip }, async () => {
+  const p = await pageWith(browser, srv.url, { prefs: { il: true } });
+  await p.goto(srv.url + '#/r/chumash/2026-10-03'); await p.waitForSelector('#rc .seg');
+  const r = await p.evaluate(() => { const ids = [...document.querySelectorAll('#rc .seg')].map(s => s.dataset.ref); return { first: ids[0], last: ids.at(-1), note: document.querySelector('#rc .day-note')?.textContent || '', title: document.querySelector('#r-t').textContent }; });
+  assert.equal(r.first, 'Deuteronomy 34:1'); assert.equal(r.last, 'Genesis 2:3');
+  assert.match(r.note, /חל בשבת/); assert.match(r.note, /לא מצאנו מקור מפורש/);
+  await p.goto(srv.url + '#/d/2026-10-03'); await p.waitForSelector('.card');
+  assert.match(await p.textContent('body'), /ובראשית ראשון/);
+  await p.context().close();
+  const q = await pageWith(browser, srv.url, { prefs: { il: false } });
+  await q.goto(srv.url + '#/r/chumash/2026-10-04'); await q.waitForSelector('#rc .seg');
+  assert.match(await q.textContent('#rc .day-note'), /Chabad\.org/);
+  // the note is not a text segment (not read aloud, not counted)
+  assert.equal(await q.$$eval('#rc .day-note.seg, #rc .day-note .seg', x => x.length), 0);
+  await q.goto(srv.url + '#/r/chumash/2026-10-05'); await q.waitForSelector('#rc .seg');
+  assert.equal(await q.$('#rc .day-note'), null);
+  assert.deepEqual(q.errors, []);
+  await q.context().close();
+});
+
 test('Simchat Torah reader shows Vezot to the end and Bereshit up to the day\'s aliyah', { skip }, async () => {
   const p = await pageWith(browser, srv.url, { prefs: { il: false } });
   await p.goto(srv.url + '#/r/chumash/2026-10-04');

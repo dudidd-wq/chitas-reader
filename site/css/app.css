@@ -221,3 +221,5 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
   .r-bottom.tts-on #b-prev, .r-bottom.tts-on #b-next, .r-bottom.tts-on #pinfo { display: none; }
   .r-bottom.tts-on .tts-ctl { justify-content: space-between; }
 }
+
+.day-note { font-family: var(--ui); font-size: .62em; line-height: 1.55; background: color-mix(in srgb, var(--accent) 9%, var(--card)); border-inline-start: 3px solid var(--accent); border-radius: 8px; padding: .5em .75em; margin: 0 0 .9em; break-inside: avoid; text-align: start; }

@@ -70,13 +70,20 @@ export function chumash(hd, il) {
     // its start up to and including the day's aliyah (the Rebbe, Torat Menachem 5732 vol. 1 p. 129, Sichat Yom
     // Simchat Torah; Chabad.org.il "מנהגי חב״ד לשמחת תורה", e.g. Monday: ברכה מ'שני' עד הסוף ובראשית עד 'שני').
     // The next day continues Bereshit with its own aliyah as usual.
-    const b = getLeyningForParsha(['Bereshit']).fullkriyah[n];
+    // Israel only (22 Tishrei can fall on Shabbat; 23 Tishrei never does): on Shabbat the rule "up to the day's
+    // aliyah" would mean all of Bereshit, although the Bereshit week starts anew the next day. We learn Bereshit
+    // 'ראשון' only (1:1–2:3, the חתן בראשית reading), as chabad.org.il words it for a Simchat Torah on a Sunday:
+    // "כל פרשת ברכה וראשון דפרשת בראשית" (Daily/Item.asp?ArticleID=701). No source we found states the Israeli
+    // Shabbat case explicitly – see NOTES.md / About.
+    const onShabbat = n === 7;
+    const b = getLeyningForParsha(['Bereshit']).fullkriyah[onShabbat ? 1 : n];
     res.parts = [
       { book: 'Deuteronomy', bookHe: BOOK_HE.Deuteronomy, from: res.from, to: { c: 34, v: 12 } },
       { book: 'Genesis', bookHe: BOOK_HE.Genesis, from: { c: 1, v: 1 }, to: parseRef(b.e) },
     ];
     res.simchatTorah = true;
-    res.title = `שמחת תורה – וזאת הברכה מ${ALIYAH_HE[n - 1]} עד סוף התורה, ובראשית עד סוף ${ALIYAH_HE[n - 1]}`;
+    res.shabbat = onShabbat;
+    res.title = `שמחת תורה – וזאת הברכה מ${ALIYAH_HE[n - 1]} עד סוף התורה, ובראשית ${onShabbat ? 'ראשון (א,א–ב,ג)' : 'עד סוף ' + ALIYAH_HE[n - 1]}`;
   }
   return res;
 }
