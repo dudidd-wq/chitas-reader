@@ -53,5 +53,7 @@ test('no text is taken from Mechon Mamre (its site forbids reuse on other websit
   assert.equal(src.rambam.versionTitle, 'Torat Emet 363');
   for (const n of ['Transmission of the Oral Law', 'Positive Mitzvot']) assert.equal(src.rambamOverrides[n].versionTitle, 'Wikisource Mishneh Torah', n);
   const t = JSON.parse(fs.readFileSync(new URL('../site/data/rambam/Transmission_of_the_Oral_Law/1.json', import.meta.url), 'utf8')).s;
-  assert.match(t[0], /כָּל הַמִּצְווֹת שֶׁנִּתְּנוּ/);
+  const bare = t[0].replace(/[\u0591-\u05C7\u200D]/g, '');
+  assert.match(bare, /^<b>אז לא אבוש.*כל המצוות שניתנו|כל המצוות שנתנו/);
+  assert.ok(/[\u05B0-\u05BC]/.test(t[0]), 'introduction is vocalised');
 });
