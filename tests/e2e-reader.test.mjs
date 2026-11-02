@@ -102,3 +102,19 @@ test('TTS that really speaks every chunk marks the lesson read and continues to 
   assert.ok(await p.evaluate(() => window.__spoken.length) > 20);
   await p.context().close();
 });
+
+test('Simchat Torah reader shows Vezot to the end and Bereshit up to the day\'s aliyah', { skip }, async () => {
+  const p = await pageWith(browser, srv.url, { prefs: { il: false } });
+  await p.goto(srv.url + '#/r/chumash/2026-10-04');
+  await p.waitForSelector('#rc .seg');
+  const r = await p.evaluate(() => {
+    const ids = [...document.querySelectorAll('#rc .seg')].map(s => s.dataset.ref);
+    return { first: ids[0], last: ids.at(-1), n: ids.length, hasEnd: ids.includes('Deuteronomy 34:12'), heads: [...document.querySelectorAll('#rc h2, #rc h3, #rc .h')].map(h => h.textContent).join('|') };
+  });
+  assert.equal(r.first, 'Deuteronomy 33:1');
+  assert.ok(r.hasEnd);
+  assert.equal(r.last, 'Genesis 2:3');
+  assert.equal(r.n, 29 + 12 + 31 + 3);
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});

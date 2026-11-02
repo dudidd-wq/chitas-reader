@@ -59,12 +59,28 @@ export function chumash(hd, il) {
   const a = ley.fullkriyah[n];
   const ov = CHABAD_ALIYOT[String(parsha)]?.[n];
   const range = ov ? { b: ov[0], e: ov[1] } : a;
-  return {
+  const res = {
     parsha, parshaHe: parshaHe(parsha), aliyah: n, aliyahHe: ALIYAH_HE[n - 1],
     book: a.k, bookHe: BOOK_HE[a.k], from: parseRef(range.b), to: parseRef(range.e),
     title: `פרשת ${parshaHe(parsha)} – ${ALIYAH_HE[n - 1]}`,
   };
+  res.parts = [{ book: res.book, bookHe: res.bookHe, from: res.from, to: res.to }];
+  if (isSimchatTorah(hd, il)) {
+    // Simchat Torah: finish Vezot Haberakhah from the day's aliyah to the end of the Torah, and begin Bereshit from
+    // its start up to and including the day's aliyah (the Rebbe, Torat Menachem 5732 vol. 1 p. 129, Sichat Yom
+    // Simchat Torah; Chabad.org.il "מנהגי חב״ד לשמחת תורה", e.g. Monday: ברכה מ'שני' עד הסוף ובראשית עד 'שני').
+    // The next day continues Bereshit with its own aliyah as usual.
+    const b = getLeyningForParsha(['Bereshit']).fullkriyah[n];
+    res.parts = [
+      { book: 'Deuteronomy', bookHe: BOOK_HE.Deuteronomy, from: res.from, to: { c: 34, v: 12 } },
+      { book: 'Genesis', bookHe: BOOK_HE.Genesis, from: { c: 1, v: 1 }, to: parseRef(b.e) },
+    ];
+    res.simchatTorah = true;
+    res.title = `שמחת תורה – וזאת הברכה מ${ALIYAH_HE[n - 1]} עד סוף התורה, ובראשית עד סוף ${ALIYAH_HE[n - 1]}`;
+  }
+  return res;
 }
+export function isSimchatTorah(hd, il) { return hd.getMonth() === months.TISHREI && hd.getDate() === (il ? 22 : 23); }
 
 export function tehillim(hd) {
   const [a, b] = dailyPsalms(hd);

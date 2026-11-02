@@ -18,7 +18,7 @@ export const UNITS = {
 /** Files a unit needs (used for offline pre-download). */
 export async function filesFor(plan, unit) {
   const f = [];
-  if (unit === 'chumash') { const c = plan.chumash; for (let i = c.from.c; i <= c.to.c; i++) f.push(`torah/${c.book}/${i}.json`); }
+  if (unit === 'chumash') for (const c of plan.chumash.parts) for (let i = c.from.c; i <= c.to.c; i++) f.push(`torah/${c.book}/${i}.json`);
   if (unit === 'tehillim') plan.tehillim.parts.forEach(p => f.push(`tehillim/${p.c}.json`));
   if (unit === 'tanya') { const doc = await tanyaPositions(plan); doc.forEach(([k, c]) => f.push(`tanya/${k}/${c}.json`)); }
   if (unit === 'rambam1' || unit === 'rambam3') {
@@ -29,14 +29,19 @@ export async function filesFor(plan, unit) {
 }
 
 async function chumashDoc(plan) {
-  const c = plan.chumash, blocks = [];
-  for (let ch = c.from.c; ch <= c.to.c; ch++) {
-    const d = await data(`torah/${c.book}/${ch}.json`);
-    const a = ch === c.from.c ? c.from.v : 1, b = ch === c.to.c ? c.to.v : d.v.length;
-    blocks.push({ type: 'h', text: `${c.bookHe} פרק ${gem(ch)}` });
-    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${ch}:${v}`, ref: `${c.book} ${ch}:${v}`, num: gem(v), text: d.v[v - 1], sub: (d.r && d.r[v - 1]) || [], src: 'tanakh' });
+  const blocks = [], multi = plan.chumash.parts.length > 1;
+  for (const c of plan.chumash.parts) {
+    if (multi) blocks.push({ type: 'h', text: c.book === 'Genesis' ? 'פרשת בראשית' : 'פרשת וזאת הברכה' });
+    for (let ch = c.from.c; ch <= c.to.c; ch++) {
+      const d = await data(`torah/${c.book}/${ch}.json`);
+      const a = ch === c.from.c ? c.from.v : 1, b = ch === c.to.c ? c.to.v : d.v.length;
+      blocks.push({ type: 'h', text: `${c.bookHe} פרק ${gem(ch)}` });
+      for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${ch}:${v}`, ref: `${c.book} ${ch}:${v}`, num: gem(v), text: d.v[v - 1], sub: (d.r && d.r[v - 1]) || [], src: 'tanakh' });
+    }
   }
-  return { book: c.book, title: c.title, subtitle: `${c.bookHe} ${gem(c.from.c)}, ${gem(c.from.v)} – ${gem(c.to.c)}, ${gem(c.to.v)}`, blocks, tanakh: true };
+  const sub = c => `${c.bookHe} ${gem(c.from.c)}, ${gem(c.from.v)} – ${gem(c.to.c)}, ${gem(c.to.v)}`;
+  const c0 = plan.chumash;
+  return { book: c0.book, title: c0.title, subtitle: c0.parts.map(sub).join(' · '), blocks, tanakh: true };
 }
 async function tehillimDoc(plan) {
   const blocks = [];

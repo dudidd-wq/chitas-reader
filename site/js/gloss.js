@@ -15,10 +15,15 @@ export function glossFor(book, id, word) {
   const m = G?.verses?.[`${book} ${id}`]; if (!m) return null;
   const n = norm(word); return cons(n).length > 1 ? m[n] || null : null;
 }
+export function glossRef(ref, word) {
+  const m = G?.verses?.[ref]; if (!m) return null;
+  const n = norm(word); return cons(n).length > 1 ? m[n] || null : null;
+}
 export function applyGlosses(root, book) {
   if (!G?.verses || !book) return;
   for (const seg of root.querySelectorAll('.seg[data-id]')) {
-    if (!G.verses[`${book} ${seg.dataset.id}`]) continue;
+    const ref = seg.dataset.ref || `${book} ${seg.dataset.id}`;
+    if (!G.verses[ref]) continue;
     const t = seg.querySelector('.t') || seg;
     const walker = document.createTreeWalker(t, NodeFilter.SHOW_TEXT, {
       acceptNode: n => (n.parentElement.closest('.vn, .hn, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
@@ -26,10 +31,10 @@ export function applyGlosses(root, book) {
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const n of nodes) {
     const parts = n.nodeValue.split(/([\s\u05BE]+)/);
-    if (!parts.some(p => glossFor(book, seg.dataset.id, p))) continue;
+    if (!parts.some(p => glossRef(ref, p))) continue;
     const frag = document.createDocumentFragment();
     for (const p of parts) {
-      const e = glossFor(book, seg.dataset.id, p);
+      const e = glossRef(ref, p);
       if (e) {
         const s = document.createElement('span');
         s.className = 'gl'; s.textContent = p; s.dataset.g = e.g; s.dataset.src = e.src || ''; s.dataset.lemma = e.l || ''; if (e.adapted) s.dataset.adapted = '1';
