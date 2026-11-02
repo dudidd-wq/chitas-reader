@@ -14,7 +14,6 @@ export const VERSIONS = {
   rambam: 'Torat Emet 363',
   tanya: 'Kehot Publication Society',
   mitzvot: 'Sefer HaMitzvot, Warsaw 1883',
-  chassidus: 'Kehot Publication Society',
 };
 export const RAMBAM_FALLBACK = ['Torat Emet 370', 'Wikisource Mishneh Torah'];
 // Sefaria labels some versions "Public Domain", but their origin site forbids reuse on other websites
@@ -183,30 +182,6 @@ async function mitzvot() {
   write(`${OUT}/mitzvot/index.json`, index);
 }
 
-// Torah Or / Likkutei Torah (the Alter Rebbe's maamarim on the weekly parsha), Kehot edition (CC-BY-NC, like the Tanya).
-// Only the parsha sections; the festival sections, Megillat Esther, Shir HaShirim and the supplements are not used
-// (they belong to no weekly parsha). Parsha names are mapped to Hebcal's spelling.
-const CH_NAME = { 'Lech Lecha': 'Lech-Lecha', "Ha'Azinu": "Ha'azinu", "V'Zot HaBerachah": 'Vezot Haberakhah' };
-async function chassidus() {
-  const { parshiot } = await import('@hebcal/core');
-  const index = {};
-  for (const [book, title, he] of [['TO', 'Torah_Ohr', 'תורה אור'], ['LT', 'Likkutei_Torah', 'לקוטי תורה']]) {
-    const raw = await (await fetch('https://www.sefaria.org/api/v2/raw/index/' + title, { headers: { 'User-Agent': 'chitas-reader-build/1.0 (static open-source study app)' } })).json();
-    for (const n of raw.schema.nodes) {
-      const name = n.sharedTitle || n.titles?.find(t => t.lang === 'en' && t.primary)?.text;
-      const parsha = CH_NAME[name] || name;
-      if (!parshiot.includes(parsha)) { console.log('skip', book, name); continue; }
-      const t = await fetchText(title.replace(/_/g, ' ') + ', ' + name, VERSIONS.chassidus);
-      record('chassidus', t.meta, { sefariaUrl: 'https://www.sefaria.org/Torah_Ohr?vhe=' + encodeURIComponent(VERSIONS.chassidus) });
-      const slug = parsha.replace(/[^A-Za-z]/g, '');
-      const maamarim = (Array.isArray(t.text[0]) ? t.text : [t.text]).map(m => m.map(clean).filter(Boolean)).filter(m => m.length);
-      write(`${OUT}/chassidus/${book}/${slug}.json`, { m: maamarim });
-      (index[parsha] ||= []).push({ book, he, file: `${book}/${slug}`, maamarim: maamarim.length });
-      console.log('chassidus', book, parsha, maamarim.length);
-    }
-  }
-  write(`${OUT}/chassidus/index.json`, index);
-}
 
 import { pathToFileURL } from 'node:url';
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
@@ -216,6 +191,5 @@ if (what === 'torah' || what === 'all') { await torah(); saveSources(); }
 if (what === 'tehillim' || what === 'all') { await tehillim(); saveSources(); }
 if (what === 'tanya' || what === 'all') { await tanya(); saveSources(); }
 if (what === 'mitzvot' || what === 'all') { await mitzvot(); saveSources(); }
-if (what === 'chassidus' || what === 'all') { await chassidus(); saveSources(); }
 if (what === 'rambam' || what === 'all') { await rambam(process.argv[3] ? process.argv[3].split(',') : null); saveSources(); }
 console.log('ok');

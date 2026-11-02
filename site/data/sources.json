@@ -142,14 +142,6 @@
   "sefariaUrl": "https://www.sefaria.org/Sefer_HaMitzvot?vhe=Sefer%20HaMitzvot%2C%20Warsaw%201883",
   "fetchedAt": "2026-11-02"
  },
- "chassidus": {
-  "versionTitle": "Kehot Publication Society",
-  "license": "CC-BY-NC",
-  "versionSource": "http://kehot.com",
-  "versionTitleInHebrew": null,
-  "sefariaUrl": "https://www.sefaria.org/Torah_Ohr?vhe=Kehot%20Publication%20Society",
-  "fetchedAt": "2026-11-02"
- },
  "siddur": {
   "versionTitle": "Siddur Nusach Ha-Ari (Chabad), transcribed by Shmuel Gonzales – Open Siddur Project",
   "versionTitleInHebrew": "סידור נוסח האר״י (חב״ד), תעתיק שמואל גונזלס – Open Siddur Project",

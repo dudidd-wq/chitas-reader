@@ -228,8 +228,6 @@ export function dayPlan(date, { il = true } = {}) {
     weekParsha: parshaHe(chumashParsha(hd, il)),
     chumash: chumash(hd, il), tehillim: tehillim(hd), tanyaStart: tanyaStart(hd),
     rambam1: rambam1(hd), rambam3: rambam3(hd), mitzvot: mitzvot(hd),
-    // Torah Or / Likkutei Torah: the maamarim of the week's parsha (the parsha learnt in Chumash this week)
-    chassidus: { parsha: chumashParsha(hd, il) },
   };
 }
 export { HDate, Locale };

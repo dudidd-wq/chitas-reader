@@ -1,5 +1,6 @@
 // Phase 2 lessons (opt-in): the Rebbe's daily Sefer HaMitzvot (schedule checked against Chabad.org) and the week's
-// Torah Or / Likkutei Torah maamarim. Off by default, so the chitas + Rambam home stays as it was.
+// Off by default, so the chitas + Rambam home stays as it was. The weekly Torah Or / Likkutei Torah lesson was removed in 1.0.50
+// (no verified daily division) – the last test checks it is gone everywhere.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -48,37 +49,21 @@ test('every Sefer HaMitzvot item in a full cycle has its text file (or is an hon
   assert.equal(seen.P.size, 248); assert.equal(seen.N.size, 365);
 });
 
-test('chassidus of the week: parsha -> Torah Or / Likkutei Torah (14 dates, both calendars)', () => {
-  const idx = json('chassidus/index.json');
-  const books = (iso, il = true) => dayPlan(iso, { il }).chassidus.parsha.map(p => `${p}:${(idx[p] || []).map(e => e.book).join('+') || '-'}`).join(' ');
-  const want = {
-    '2026-10-04': 'Bereshit:TO', '2026-10-18': 'Lech-Lecha:TO', '2026-11-02': 'Chayei Sara:TO', '2027-01-17': 'Beshalach:TO+LT', '2027-01-25': 'Yitro:TO',
-    '2027-02-28': 'Vayakhel:TO', '2027-03-08': 'Pekudei:LT', '2027-03-15': 'Vayikra:LT', '2027-04-04': 'Tazria:LT', '2027-07-25': 'Matot:LT Masei:LT',
-    '2027-08-29': 'Shoftim:-', '2027-09-20': 'Nitzavim:LT Vayeilech:-', '2027-09-27': "Ha'azinu:LT", '2026-10-01': 'Vezot Haberakhah:LT',
-  };
-  for (const [iso, w] of Object.entries(want)) assert.equal(books(iso), w, iso);
-  assert.equal(books('2027-06-14', false), 'Nasso:LT'); assert.equal(books('2027-06-14', true), "Beha'alotcha:LT");
-  assert.equal(books('2026-03-09'), 'Vayakhel:TO Pekudei:LT');
-  // all 54 parshiot are covered except Shoftim and Vayeilech, which have no section in either book
-  for (let t = Date.parse('2026-10-04'); t < Date.parse('2027-10-01'); t += 7 * 864e5)
-    for (const p of dayPlan(new Date(t).toISOString().slice(0, 10)).chassidus.parsha) assert.ok(idx[p] || ['Shoftim', 'Vayeilech'].includes(p), p);
-});
-
 test('lessons are opt-in; reader: Hebrew labels, honest notes, credits, axe in 4 themes, 320px, same-origin', { skip }, async () => {
-  assert.equal(DEFAULT_PREFS.lessonMitzvot, false); assert.equal(DEFAULT_PREFS.lessonChassidus, false);
+  assert.equal(DEFAULT_PREFS.lessonMitzvot, false); assert.ok(!('lessonChassidus' in DEFAULT_PREFS));
   const srv = await serve(), b = await launch();
   try {
     const p0 = await pageWith(b, srv.url);
     await p0.goto(srv.url + '#/settings'); await p0.waitForSelector('[name="lessonMitzvot"]');
-    await p0.check('[name="lessonMitzvot"]'); await p0.check('[name="lessonChassidus"]');
+    await p0.check('[name="lessonMitzvot"]');
     await p0.goto(srv.url + '#/d/2026-11-02'); await p0.waitForSelector('.card');
-    assert.equal(await p0.$$eval('.card', x => x.length), 7);
-    await p0.waitForFunction(() => /מצות עשה רמה/.test(document.body.textContent) && /תורה אור – פרשת חיי שרה/.test(document.body.textContent));
+    assert.equal(await p0.$$eval('.card', x => x.length), 6);
+    await p0.waitForFunction(() => /מצות עשה רמה/.test(document.body.textContent));
     assert.deepEqual(p0.errors, []);
     for (const theme of ['paper', 'sepia', 'dark', 'night']) for (const [unit, iso, re] of [
       ['mitzvot', '2026-02-02', /מצות עשה קצא.*סיום ספר המצוות.*אין לסיום קטע נפרד/s], ['mitzvot', '2026-03-09', /נוסח התפילה.*ההפניה בלבד/s],
-      ['mitzvot', '2026-02-04', /שורשים א–ג.*השורש הראשון.*השורש השלישי/s], ['chassidus', '2027-09-20', /לקוטי תורה – נצבים – מאמר א.*אין בספרי תורה אור ולקוטי תורה מאמרים לפרשת וילך/s]]) {
-      const p = await pageWith(b, srv.url, { prefs: { theme, lessonMitzvot: true, lessonChassidus: true }, viewport: { width: 320, height: 700 } });
+      ['mitzvot', '2026-02-04', /שורשים א–ג.*השורש הראשון.*השורש השלישי/s]]) {
+      const p = await pageWith(b, srv.url, { prefs: { theme, lessonMitzvot: true }, viewport: { width: 320, height: 700 } });
       const foreign = []; p.on('request', r => { if (!r.url().startsWith(srv.url)) foreign.push(r.url()); });
       await p.goto(srv.url + `#/r/${unit}/${iso}`); await p.waitForSelector('#rc .doc-credit');
       assert.match(await p.textContent('#rc'), re, `${unit} ${iso}`);
@@ -89,5 +74,24 @@ test('lessons are opt-in; reader: Hebrew labels, honest notes, credits, axe in 4
       assert.deepEqual(foreign, []); assert.deepEqual(p.errors, []);
       await p.context().close();
     }
+  } finally { await b.close(); srv.close(); }
+});
+
+test('Torah Or / Likkutei Torah weekly lesson is removed (not a daily division) and the reason is stated', { skip }, async () => {
+  assert.ok(!fs.existsSync(site + 'data/chassidus'));
+  assert.ok(!('chassidus' in json('sources.json')));
+  assert.ok(!('chassidus' in dayPlan('2026-11-02')));
+  for (const f of ['js/app.js', 'js/texts.js', 'js/store.js', 'js/calendar.js', 'sw.js']) assert.doesNotMatch(fs.readFileSync(site + f, 'utf8'), /lessonChassidus|'chassidus'|chassidus\//, f);
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { prefs: { lessonMitzvot: true, lessonChassidus: true } }); // an old stored pref is ignored
+    await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
+    assert.equal(await p.$$eval('.card', x => x.length), 6);
+    assert.doesNotMatch(await p.textContent('main'), /תורה אור/);
+    await p.goto(srv.url + '#/settings'); await p.waitForSelector('[name="lessonMitzvot"]');
+    assert.equal(await p.$$eval('[name="lessonChassidus"]', x => x.length), 0);
+    await p.goto(srv.url + '#/about'); await p.waitForSelector('#more-lessons');
+    assert.match(await p.textContent('main'), /תורה אור ולקוטי תורה – הוסר.*אינה.*חלוקת השיעור היומי.*Chabad\.org/s);
+    assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

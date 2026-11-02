@@ -43,7 +43,7 @@ let toastAfterNav = ''; // a message meant for the screen being navigated to
 /** a status message belongs to the screen it was shown on: drop it when the user navigates (review 3) */
 function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
 const todayIso = () => isoDate(new HDate(new Date()));
-const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : []), ...(prefs.lessonChassidus ? ['chassidus'] : [])];
+const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : [])];
 // Dates shown to the reader: Israeli order only (2 בנובמבר 2026 / 02/11/2026); ISO stays in URLs and storage keys.
 const gregHe = iso => gregLongHe(iso);
 const dayDates = (plan, iso) => `${plan.hebDate} · ${fmtDmy(iso)}`;
@@ -152,7 +152,7 @@ function route() {
 window.addEventListener('hashchange', route);
 
 // ---------------- Home ----------------
-const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ', chassidus: 'ל' };
+const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ' };
 const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const guessIsrael = () => { try { return /^Asia\/(Jerusalem|Tel_Aviv)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { return true; } };
@@ -458,7 +458,7 @@ function renderSettings() {
   shell('הגדרות', `<form class="form" id="sf" onsubmit="return false">
     <fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
-    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonChassidus', prefs.lessonChassidus, 'חסידות הפרשה – תורה אור / לקוטי תורה (מאמרי הפרשה של השבוע)')}
+    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}
     <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>
     <h2>תצוגה</h2>${displayForm()}
     <h2>הקראה</h2>${ttsForm()}
@@ -492,7 +492,6 @@ async function renderSources() {
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
   ${row('ספר המצוות לרמב״ם', s.mitzvot, 'אינו מנוקד. סריקת המהדורה בספרייה הלאומית')}
-  ${row('תורה אור ולקוטי תורה', s.chassidus, 'אינו מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${s.siddur ? `<tr><td data-h="חלק">סידור (נוסח חב״ד)</td><td data-h="גרסה">${esc(s.siddur.versionTitleInHebrew)}</td><td data-h="רישיון">${licenseLink(s.siddur.license, s.siddur)}; ההוראות באנגלית: ${licenseLink(s.siddur.instructionsLicense)}</td><td data-h="קישור"><a href="${esc(s.siddur.versionSource)}" rel="noopener" target="_blank">מקור</a></td><td data-h="הערות">מנוקד. אינו סידור תהלת ה׳ עצמו. אומת מול סידור מצודה נוסח ספרד (ספריא, CC BY), שאינו מוגש באתר</td></tr>` : ''}
   ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : m.partial ? `<b>מנוקד חלקית</b> – ${m.partial[0]} מתוך ${m.partial[1]} קטעים מנוקדים; לשאר אין גרסה מנוקדת ברישיון המתיר שימוש כאן` : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
   ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
@@ -554,7 +553,7 @@ function renderAbout() {
   <h2 id="more-lessons">שיעורים נוספים (לבחירה בהגדרות)</h2><ul>
   <li><b>ספר המצוות היומי:</b> לוח הרבי לספר המצוות של הרמב״ם, שנלמד במקביל לשיעור הרמב״ם (ספריית Hebcal). הלוח נבדק מול לוח השיעורים של Chabad.org ב־23 תאריכים בשנים 2026–2027, ונמצאה התאמה בכולם. הטקסט: ספר המצוות, ורשה תרמ״ג (נחלת הכלל, דרך ספריא), <b>בלי ניקוד</b>.</li>
   <li>בימים שבהם השיעור הוא טקסט מתוך משנה תורה (נוסח התפילה, נוסח ההגדה, הלכות מגילה וחנוכה), מוצגת הפניה בלבד. ביום סיום המחזור Chabad.org מציין גם ״סיום״; במהדורה הפתוחה אין לו קטע נפרד, ולכן גם הוא מוצג כהפניה.</li>
-  <li><b>חסידות הפרשה – תורה אור ולקוטי תורה:</b> מאמרי האדמו״ר הזקן על פרשת השבוע, כנהוג ללמוד חסידות בפרשת השבוע. <b>אין לספרים אלה חלוקה יומית רשמית</b>, ולכן מוצגים כל מאמרי הפרשה של השבוע (לפי פרשת החומש של אותו שבוע). בשבוע עם פרשיות מחוברות מוצגות שתיהן. בספרים אין מאמרים לפרשות שופטים ווילך, וזה מצוין שם. מאמרי המועדים (ראש השנה, יום כיפור, סוכות, פורים ועוד) ושיר השירים אינם כלולים, כי אינם קשורים לפרשה. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC, כמו התניא), <b>בלי ניקוד</b>.</li>
+  <li><b>תורה אור ולקוטי תורה – הוסר (גרסה 1.0.50):</b> בגרסה 1.0.47 נוסף כאן ״חסידות הפרשה״ – כל מאמרי הפרשה של השבוע. זו <b>אינה</b> חלוקת השיעור היומי, ולכן השיעור הוסר מהרשימה ומההגדרות. בדקנו: בלוח הלימוד היומי של Chabad.org אין שיעור יומי בתורה אור ולקוטי תורה, ולא נמצאה חלוקה רשמית של קה״ת או של ״היום יום״. יש כמה לוחות פרטיים שונים זה מזה: מורה שיעור שנתי של ״התאחדות החסידים״, ״דף ליום״ של Project Likkutei Torah, מסלול של שלוש שנים ועוד. לא מצאנו לוח אחד שאפשר לאמת מול מקור שני ב־10 תאריכים לפחות. בנוסף, הטקסט ברישיון שבידינו (קה״ת דרך ספריא) מחולק למאמרים ולא לדפים, ולכן אי אפשר להציג בדיוק ״דף ליום״. אם יימצא לוח מאומת, השיעור יוחזר לפיו.</li>
   <li><b>שולחן ערוך הרב (״רב יומי״) לא נוסף:</b> יש לו טקסט ברישיון פתוח, אבל לא מצאנו ללוח היומי שלו מקור שני שאפשר לבדוק מולו באופן אוטומטי. כדי לא להציג לוח שלא נבדק, השיעור הזה לא נכלל.</li></ul>
   <h2 id="siddur-about">סידור</h2><ul>
   <li><b>נוסח:</b> נוסח האריז״ל כמנהג חב״ד, מתעתיק Open Siddur (שמואל גונזלס, CC0; ההוראות באנגלית – CC BY). התעתיק נערך ״בהתאם לתהלת ה׳״ אך <b>אינו</b> סידור תהלת ה׳ עצמו (שמוגן בזכויות יוצרים, וכך גם הנוסח של Chabad.org – ולכן לא נלקח משם דבר). ייתכנו הבדלים קטנים מהסידור המודפס.</li>
@@ -724,7 +723,6 @@ async function renderDoc() {
   const main = { chumash: [['חומש', srcs.tanakh], showRashi && ['רש״י', srcs.rashi && { ...srcs.rashi, versionTitleInHebrew: 'מהדורת רוזנבאום–זילברמן (1929–1934)' }]], tehillim: [['תהילים', srcs.tanakh]],
     tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
     mitzvot: [['ספר המצוות', srcs.mitzvot && { ...srcs.mitzvot, versionTitleInHebrew: 'ספר המצוות, ורשה תרמ״ג' }]],
-    chassidus: [['תורה אור / לקוטי תורה', srcs.chassidus && { ...srcs.chassidus, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
     siddur: [['סידור', srcs.siddur], ['הוראות באנגלית', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
