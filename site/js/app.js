@@ -1,3 +1,4 @@
+import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data } from './texts.js';
 import { prefs, setPref, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
@@ -311,10 +312,10 @@ async function renderDoc() {
     const num = b.num ? `<span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
     if (inline) {
       if (!open) { html += '<p>'; open = true; }
-      html += `<span class="seg inline" data-id="${b.id}">${num}<span class="t">${fmt(b.text, true)}</span></span> `;
+      html += `<span class="seg inline" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${num}<span class="t">${fmt(b.text, true)}</span></span> `;
     } else {
       const rashi = showRashi && b.sub?.length ? `<div class="rashi">${b.sub.map((r, i) => `<p>${i ? '' : '<span class="lbl">רש״י </span>'}${fmt(r, false)}</p>`).join('')}</div>` : '';
-      html += `<div class="seg" data-id="${b.id}"><div class="t">${num}${fmt(b.text, !!d.tanakh)}</div>${rashi}</div>`;
+      html += `<div class="seg" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}><div class="t">${num}${fmt(b.text, !!d.tanakh)}</div>${rashi}</div>`;
     }
   }
   if (open) html += '</p>';
@@ -474,7 +475,7 @@ function ttsSegments() {
   return R.segs.map(s => {
     const parts = [s.querySelector('.t').innerHTML.replace(/<span class="(vn|hn|ketiv)[^>]*>.*?<\/span>/g, '')];
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(p.innerHTML));
-    return { el: s, parts };
+    return { el: s, parts, chol: CHOL[s.dataset.ref] };
   });
 }
 const TTS_ERR = {

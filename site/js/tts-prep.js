@@ -29,9 +29,27 @@ export const ABBREVIATIONS = {
 const ABBR = new Map(Object.entries(ABBREVIATIONS).map(([k, v]) => [k.replace(/[״]/g, '"').replace(/[׳]/g, "'"), v]));
 const PREFIXES = ['', 'ו', 'ה', 'ב', 'ל', 'מ', 'כ', 'ש', 'וב', 'ול', 'ומ', 'וכ', 'וש', 'וה', 'שב', 'של', 'שה', 'מה', 'כש', 'לה', 'בה', 'וכש', 'ושב', 'ומה'];
 
-// Divine names. Rule (documented): the Tetragrammaton is read "השם" (default) or "אֲדֹנָי" (setting);
-// forms of אלהים are read with ק ("אלוקים") in "השם" mode, unchanged in "אֲדֹנָי" mode.
+// Divine names. Rules (documented in NOTES.md):
+//  * the Tetragrammaton is read "השם" (default) or "אֲדֹנָי" (setting);
+//  * in "השם" mode the other holy names are read in the customary substituted form, keeping all vowels:
+//    אלהים-forms and אֱלוֹהַּ: ה→ק (אֱלֹקִים, אֱלוֹקַּ); יָהּ → קָהּ; the noun אֵל (vocalised with tsere) → קֵל.
+//    In "אֲדֹנָי" mode they are read as written.
+//  * no substitution where the word does not refer to God: before אחרים/אחר/נכר/מסכה/כסף/זהב/העמים/הגוים/מצרים…
+//    (CHOL_NEXT), and in the verse-specific list of chol.js (idols, judges – per Soferim 4, Rambam Yesodei HaTorah 6:9).
 const RE_ELOKIM = /^(ו|ה|ב|ל|מ|כ|ש|וב|ול|ומ|וכ|וש|וה|לא|כא|בא|מא|וא)?(אלהים|אלהי|אלהיך|אלהינו|אלהיכם|אלהיהם|אלהיו|אלהיה|אלהיהן|אלהיכן|אלהיהו|אלוה|אלוהים|אלוהי)$/;
+export const CHOL_NEXT = new Set(['אחרים', 'אחר', 'נכר', 'הנכר', 'מסכה', 'כסף', 'זהב', 'העמים', 'הגוים', 'הגויים', 'מצרים', 'זר', 'עמים', 'האמרי']);
+const RE_EL = /^(ו|ה|ב|ל|כ|מ|וה|וב|ול|כה|לה|בה)?אל$/;
+const RE_YAH = /^(ו|ב|כ|ל|וב)?יה$/;
+const isElokimWord = w => { const sk = skeleton(w); return !/["']/.test(sk) && RE_ELOKIM.test(sk.replace(/["']/g, '')); };
+const nextLetters = w => skeleton(w || '').replace(/["']/g, '').replace(/^ו/, '');
+
+function swapLetter(word, n, from, to) {
+  let seen = 0, out = '';
+  for (const ch of word) {
+    if (/[\u05D0-\u05EA]/.test(ch)) { out += (seen === n && ch === from) ? to : ch; seen++; } else out += ch;
+  }
+  return out;
+}
 
 function prefixWithMarks(word, n) {
   // return the first n letters of `word` with their marks
@@ -67,15 +85,19 @@ export function replaceWord(w, opt) {
     const p = sk.length - 2;
     return lead + prefixWithMarks(core, p) + (opt.divineName === 'adonai' ? 'אֲדֹנָי' : 'השם') + trail;
   }
-  if (opt.divineName !== 'adonai' && RE_ELOKIM.test(letters) && !/["']/.test(sk)) {
-    // replace the ה of אלה with ק, keeping all vowels
-    const idx = letters.indexOf('אלה');
-    if (idx >= 0) {
-      let seen = 0, out = '';
-      for (const ch of core) {
-        if (/[\u05D0-\u05EA]/.test(ch)) { out += (seen === idx + 2 && ch === 'ה') ? 'ק' : ch; seen++; } else out += ch;
-      }
-      return lead + out + trail;
+  if (opt.divineName !== 'adonai' && !opt.chol) {
+    if (RE_ELOKIM.test(letters) && !/["']/.test(sk)) {
+      // replace the ה of אלה / אלוה with ק, keeping all vowels
+      const idx = letters.search(/אלו?ה/);
+      const hpos = idx + (letters[idx + 2] === 'ו' ? 3 : 2);
+      return lead + swapLetter(core, hpos, 'ה', 'ק') + trail;
+    }
+    // יָהּ (with mappiq) → קָהּ
+    if (RE_YAH.test(letters) && /\u05BC/.test(core.slice(-3)) && !/["']/.test(sk)) return lead + swapLetter(core, letters.length - 2, 'י', 'ק') + trail;
+    // the noun אֵל: vocalised, tsere under the א (the preposition אֶל has segol)
+    if (RE_EL.test(letters) && !/["']/.test(sk)) {
+      const a = core.lastIndexOf('א');
+      if (/^[\u0591-\u05AF]*\u05B5/.test(core.slice(a + 1)) && !/\u05B4|\u05B8/.test(core.slice(core.lastIndexOf('ל')))) return lead + swapLetter(core, letters.length - 2, 'א', 'ק') + trail;
     }
   }
   return w;
@@ -84,7 +106,7 @@ export function replaceWord(w, opt) {
 /**
  * Prepare one text unit for speech.
  * @param {string} html  source text (may contain <b>…</b>)
- * @param {{stress?:boolean, divineName?:'hashem'|'adonai'}} opt
+ * @param {{stress?:boolean, divineName?:'hashem'|'adonai', chol?:number[]}} opt  chol: indices of אלהים-form words that are not holy (chol.js)
  *   stress=true  ("הקראה בהטעמה"): keep niqqud, remove cantillation only.
  *   stress=false: remove niqqud too (plain spelling; engine guesses vowels).
  */
@@ -101,7 +123,32 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/[\u05F3]/g, "'").replace(/[\u05F4]/g, '"')
     .replace(/([\u0591-\u05C7])\1+/g, '$1'); // duplicated marks in source
   t = t.replace(RE_TAAMIM, '');
-  t = t.split(/(\s+)/).map(w => (/\s/.test(w) ? w : replaceWord(w, o))).join('');
+  const words = t.split(/(\s+)/);
+  let k = 0; // index among אלהים-form words (for the chol.js list)
+  t = words.map((w, i) => {
+    if (/\s/.test(w) || !w) return w;
+    let chol = false;
+    if (isElokimWord(w) || RE_EL.test(skeleton(w).replace(/["']/g, ''))) {
+      const nx = words.slice(i + 1).find(x => x && !/^\s+$/.test(x));
+      if (CHOL_NEXT.has(nextLetters(nx))) chol = true;
+      if (!isElokimWord(w)) {
+        // יֵשׁ לְאֵל יָדִי / אֵין לְאֵל יָדְךָ = "power"; הָאֵל after a definite plural noun = archaic "these" (הָאֲנָשִׁים הָאֵל)
+        if (/^(ידי|ידך|ידם|ידכם)$/.test(nextLetters(nx))) chol = true;
+        const pv = words.slice(0, i).reverse().find(x => x && !/^\s+$/.test(x));
+        const pl = skeleton(pv || '').replace(/["']/g, '');
+        if (/^ה/.test(skeleton(w)) && /(ים|ות|ת)$/.test(pl) && !isElokimWord(pv) && pl !== 'האדנים') chol = true;
+        // בֵּית־אֵל is a place name
+        if (/^(ו|ב|ל|מ|וב|ומ)?בית$/.test(pl)) chol = true;
+      }
+      if (isElokimWord(w)) { if (o.chol && o.chol.includes(k)) chol = true; k++; }
+    }
+    // ע"ה after a name/title = עָלָיו הַשָּׁלוֹם (elsewhere ע"ה is usually the number 75 or a folio, left as is)
+    if (/^ע["״]ה[.,:;]?$/.test(skeleton(w) + (w.match(/[.,:;]$/)?.[0] || ''))) {
+      const pv = words.slice(0, i).reverse().find(x => x && !/^\s+$/.test(x));
+      if (/^(רבינו|רבנו|המלך|אבינו|הכהן|הנביא|אמנו)$/.test(skeleton(pv || ''))) return 'עָלָיו הַשָּׁלוֹם' + (w.match(/[.,:;]$/)?.[0] || '');
+    }
+    return replaceWord(w, chol ? { ...o, chol: true } : { ...o, chol: undefined });
+  }).join('');
   if (!o.stress) t = t.replace(RE_NIQQUD, '');
   t = t.replace(/[[\]{}]/g, '').replace(/[–—]/g, ', ').replace(/\s+([.,:;?!])/g, '$1').replace(/\s+/g, ' ').trim();
   return t;

@@ -34,7 +34,7 @@ async function chumashDoc(plan) {
     const d = await data(`torah/${c.book}/${ch}.json`);
     const a = ch === c.from.c ? c.from.v : 1, b = ch === c.to.c ? c.to.v : d.v.length;
     blocks.push({ type: 'h', text: `${c.bookHe} פרק ${gem(ch)}` });
-    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${ch}:${v}`, num: gem(v), text: d.v[v - 1], sub: (d.r && d.r[v - 1]) || [], src: 'tanakh' });
+    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${ch}:${v}`, ref: `${c.book} ${ch}:${v}`, num: gem(v), text: d.v[v - 1], sub: (d.r && d.r[v - 1]) || [], src: 'tanakh' });
   }
   return { book: c.book, title: c.title, subtitle: `${c.bookHe} ${gem(c.from.c)}, ${gem(c.from.v)} – ${gem(c.to.c)}, ${gem(c.to.v)}`, blocks, tanakh: true };
 }
@@ -44,7 +44,7 @@ async function tehillimDoc(plan) {
     const d = await data(`tehillim/${p.c}.json`);
     blocks.push({ type: 'h', text: `מזמור ${gem(p.c)}` });
     const a = p.from || 1, b = p.to || d.v.length;
-    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${p.c}:${v}`, num: gem(v), text: d.v[v - 1], src: 'tanakh' });
+    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${p.c}:${v}`, ref: `Psalms ${p.c}:${v}`, num: gem(v), text: d.v[v - 1], src: 'tanakh' });
   }
   return { book: 'Psalms', title: plan.tehillim.title, subtitle: 'לפי חלוקת החודש', blocks, tanakh: true };
 }

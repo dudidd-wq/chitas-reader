@@ -55,8 +55,8 @@ export class Speaker {
     this.stop(true);
     this.opts = opts; this.meta = meta;
     this.queue = [];
-    segments.forEach((s, si) => s.parts.forEach(html => {
-      for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName }))) this.queue.push({ si, text: c });
+    segments.forEach((s, si) => s.parts.forEach((html, pi) => {
+      for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined }))) this.queue.push({ si, text: c });
     }));
     this.segCount = segments.length; this.bad = 0;
   }
