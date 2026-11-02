@@ -49,6 +49,16 @@ export const MISSING = [
 
 // spelling slips in some section titles of the transcription (titles only; the prayer text is never changed)
 const TITLE_FIX = [[/אמידה/g, 'עמידה'], [/התור$/g, 'התורה'], [/התור /g, 'התורה '], [/סעורת/g, 'סעודת'], [/בירכת/g, 'ברכת'], [/קרבנ /g, 'קרבן '], [/מיל$/g, 'מילה'], [/ברכת אחרונות/g, 'ברכות אחרונות']];
+// Transcription slips in the source text, found by the cross-check in tools/verify-siddur.mjs (second source: Siddur
+// Sefard / Metsudah) and confirmed by the same transcriber's own text elsewhere. [wrong, right, times expected, why]
+export const USED = new Map();
+export const TEXT_FIX = [
+  ['וּמֵאַהֲרֵינוּ', 'וּמֵאַחֲרֵינוּ', 1, 'השכיבנו במעריב: ה׳ במקום ח׳ (כך בקריאת שמע שעל המיטה של אותו מתעתיק)'],
+  ['אוֹיֵב דֶּבֶר, וְרָעָב', 'אוֹיֵב דֶּבֶר, וְחֶרֶב, וְרָעָב', 1, 'השכיבנו במעריב: חסרה המילה „וחרב” (קיימת בקריאת שמע שעל המיטה ובמקור השני)'],
+  ['עֲקֵדַת יָהִד', 'עֲקֵדַת יָחִיד', 1, 'והוא רחום של שני וחמישי: ה׳ במקום ח׳'],
+  ['וְנִפְלָוֹת עַד אֵין מִסְפָר', 'וְנִפְלָאוֹת עַד אֵין מִסְפָּר', 2, 'אמת ואמונה (חול ושבת): חסרה א׳'],
+];
+const fixText = (t, file, used) => TEXT_FIX.reduce((a, f) => { const n = a.split(f[0]).length - 1; if (n) used.set(f, (used.get(f) || 0) + n); return a.split(f[0]).join(f[1]); }, t);
 const fixTitle = s => TITLE_FIX.reduce((a, [re, to]) => a.replace(re, to), s);
 const sha = b => crypto.createHash('sha256').update(b).digest('hex');
 async function getFile(src, name) {
@@ -104,7 +114,9 @@ function tables(lines) {
 }
 /** One source file → sections [{he, en, b:[[type, html]]}] */
 export function parse(raw) {
-  let t = cleanUnicode(raw).replace(/\r/g, '');
+  let t = fixText(cleanUnicode(raw).replace(/\r/g, ''), null, USED);
+  // an English instruction run straight into the next Hebrew verse ("…when saying the second'''''עֵ'''ינֵי כֹל") – split them
+  t = t.replace(/([a-z])'''''(?=[\u05D0-\u05EA][\u0591-\u05C7]*''')/g, "$1.''\n'''");
   t = t.replace(/<ref[^>]*\/>/g, '').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, '').replace(/<references\s*\/>/g, '').replace(/\[\[Image:[^\]]*\]\]/g, '')
     .replace(/<\/?(nowiki|center|u)>/g, '').replace(/<div[^>]*>|<\/div>/g, '').replace(/<sup>[\s\S]*?<\/sup>/g, '');
   const lines = tables(t.split('\n'));
@@ -123,8 +135,10 @@ export function parse(raw) {
     html = fullName(html).replace(/ \| /g, ' ׀ ');
     if (/✶/.test(l)) { cur = { he: fixTitle(l.replace(/[✶'*]/g, '').replace(/\s+/g, ' ').trim()), en: '', b: [] }; secs.push(cur); continue; }
     if (/★/.test(l)) { push('h', fixTitle(html.replace(/★/g, '').replace(/<\/?[bi]>/g, '').trim())); continue; }
-    const H = cnt(l, HEB), L = cnt(l, LAT);
-    if (L > H) {
+    const H = cnt(l, HEB), L = cnt(l, LAT), out = l.replace(/\([^)]*\)/g, '');
+    // prayer text with an English aside in brackets ("עֹשֶׂה שָׁלוֹם (During the Ten Days … הַשָּׁלוֹם) בִּמְרוֹמָיו …") is text
+    const textWithAside = cnt(out, HEB) > 3 * cnt(out, LAT) && cnt(out, HEB) >= 12;
+    if (L > H && !textWithAside) {
       // the English line right under a section title is its subtitle
       if (cur && !cur.en && !cur.b.length && l.length < 90) { cur.en = l.replace(/'/g, '').trim(); continue; }
       push('n', html); continue;
@@ -149,6 +163,8 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     index.books.push({ id, he, group, secs: secs.map(s => ({ he: s.he || he, en: s.en, h: s.b.filter(b => b[0] === 'h').map(b => b[1]), n: s.b.length })) });
     console.log(id, secs.length, secs.map(s => s.he).join(' | '));
   }
+  for (const f of TEXT_FIX) if (USED.get(f) !== f[2]) throw new Error(`TEXT_FIX ${f[0]}: applied ${USED.get(f) || 0}×, expected ${f[2]}×`);
+  index.fixes = TEXT_FIX.map(([from, to, , why]) => ({ from, to, why }));
   fs.writeFileSync(`${OUT}/index.json`, JSON.stringify(index));
   const sp = 'site/data/sources.json', sources = JSON.parse(fs.readFileSync(sp, 'utf8'));
   sources.siddur = {
