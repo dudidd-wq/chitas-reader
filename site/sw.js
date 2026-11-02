@@ -1,24 +1,67 @@
 // Service worker: app shell precache + cache-first for static text data.
-// VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs);
-// when texts are rebuilt the data cache name changes, the old cache is deleted on activate, and texts are re-fetched.
-const VERSION = '1.0.30';
+// VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs).
+// When texts are rebuilt the data cache name changes. On activate the texts the user had saved are carried over
+// (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
+// re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
+// remains an offline fallback, so an update while the network is poor never loses the 30-day save.
+const VERSION = '1.0.31';
 const DATA_VERSION = 'd02e9101f9a2';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
+const MANIFEST = new URL('data/manifest.json', self.registration.scope).href;
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/layout.js', 'js/vendor/hebcal.js',
   'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json', 'data/rambam-errata.json'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())); });
+self.addEventListener('install', e => {
+  e.waitUntil(Promise.all([
+    caches.open(SHELL).then(c => c.addAll(ASSETS)),
+    // the manifest that describes this data version is kept inside its cache (it is what the next update compares to)
+    fetch(MANIFEST, { cache: 'no-store' }).then(async r => {
+      if (!r.ok) return; const m = await r.clone().json();
+      if (m.version === DATA_VERSION) await (await caches.open(DATA)).put(MANIFEST, r);
+    }).catch(() => {}),
+  ]).then(() => self.skipWaiting()));
+});
+const readManifest = async c => { try { return await (await c.match(MANIFEST))?.json() || null; } catch { return null; } };
+const relOf = url => { const i = url.indexOf('/data/'); return i < 0 ? null : decodeURIComponent(url.slice(i + 6).split('?')[0]); };
+async function sha16(buf) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16); }
+async function migrateData() {
+  const olds = (await caches.keys()).filter(k => k.startsWith('data-') && k !== DATA);
+  if (!olds.length) return;
+  const cur = await caches.open(DATA), man = await readManifest(cur);
+  if (!man) return;  // cannot tell what changed: keep the old caches as an offline fallback
+  for (const k of olds) {
+    const old = await caches.open(k), oldMan = await readManifest(old);
+    const reqs = (await old.keys()).filter(r => r.url !== MANIFEST);
+    let ok = true;
+    for (let i = 0; i < reqs.length; i += 6) await Promise.all(reqs.slice(i, i + 6).map(async req => {
+      const rel = relOf(req.url);
+      if (!rel || !man.files[rel] || await cur.match(req)) return;   // dropped from the data, or already there
+      if (oldMan?.files?.[rel] === man.files[rel]) { const r = await old.match(req); if (r) await cur.put(req, r); return; }
+      try {
+        const r = await fetch(req.url, { cache: 'no-store' }), body = r.ok && await r.clone().arrayBuffer();
+        if (body && await sha16(body) === man.files[rel]) await cur.put(req, r); else ok = false;
+      } catch { ok = false; }
+    }));
+    if (ok) await caches.delete(k);
+  }
+}
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => (k.startsWith('shell-') && k !== SHELL) || (k.startsWith('data-') && k !== DATA)).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys()
+    .then(keys => Promise.all(keys.filter(k => k.startsWith('shell-') && k !== SHELL).map(k => caches.delete(k))))
+    .then(() => migrateData().catch(() => {}))
+    .then(() => self.clients.claim()));
 });
 self.addEventListener('message', e => { if (e.data === 'version') e.source?.postMessage({ version: VERSION, data: DATA_VERSION }); });
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  if (url.href.split('?')[0] === MANIFEST) return;
   const isData = url.pathname.includes('/data/') && !/index\.json$|sources\.json$|glossary\.json$|rambam-errata\.json$/.test(url.pathname);
   if (isData) {
-    e.respondWith(caches.open(DATA).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })));
+    // cache-first; offline, a text that only an older (not yet migrated) data cache holds is still served
+    e.respondWith(caches.open(DATA).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })
+      .catch(async err => (await caches.match(e.request)) || Promise.reject(err))));
     return;
   }
   // shell: network-first for navigation (fresh after deploy), cache-first for the rest

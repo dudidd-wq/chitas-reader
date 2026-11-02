@@ -186,7 +186,7 @@ async function downloadAhead() {
     const pmsg = persist === true ? 'הדפדפן אישר אחסון קבוע.'
       : persist === false ? 'הדפדפן לא אישר אחסון קבוע, ולכן ייתכן שימחק את השמירה אם יחסר מקום או לאחר זמן רב ללא שימוש (בעיקר ב-iPhone).'
       : 'הדפדפן אינו תומך בבקשת אחסון קבוע; ייתכן שימחק את השמירה אם יחסר מקום.';
-    if (ok === files.size) { btn.textContent = '✓ נשמר ל-30 יום'; st.textContent = `הטקסטים ל-30 הימים הקרובים נשמרו במכשיר. ${pmsg}`; }
+    if (ok === files.size) { btn.textContent = '✓ נשמר ל-30 יום'; st.textContent = `הטקסטים ל-30 הימים הקרובים נשמרו במכשיר, והשמירה נשארת גם אחרי עדכוני האתר (מורדים מחדש רק קבצים שהשתנו). ${pmsg}`; }
     else { btn.textContent = 'שמירה חלקית – נסו שוב'; btn.disabled = false; st.textContent = `נשמרו ${ok} מתוך ${files.size} קבצים; חלק לא הורדו (בדקו חיבור). ${pmsg}`; }
     st.dataset.persisted = String(persist);
   } catch { btn.textContent = 'שגיאה בהורדה'; btn.disabled = false; st.textContent = 'ההורדה נכשלה – בדקו חיבור ונסו שוב.'; }

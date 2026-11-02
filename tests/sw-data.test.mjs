@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { dataHash } from '../tools/data-version.mjs';
+import { dataHash, dataManifest } from '../tools/data-version.mjs';
 import { cleanMiqra } from '../tools/build-data.mjs';
 import { prepareForTTS } from '../site/js/tts-prep.js';
 const sw = fs.readFileSync(new URL('../site/sw.js', import.meta.url), 'utf8');
@@ -12,7 +12,8 @@ const J = p => JSON.parse(fs.readFileSync(new URL('../site/data/' + p, import.me
 test('SW DATA_VERSION matches the current text data (run `npm run data-version` after rebuilding)', () => {
   assert.equal(sw.match(/const DATA_VERSION = '([^']*)'/)[1], dataHash());
   assert.match(sw, /const DATA = `data-\$\{DATA_VERSION\}`/);
-  assert.match(sw, /k\.startsWith\('data-'\) && k !== DATA/, 'old data caches are deleted on activate');
+  assert.match(sw, /k\.startsWith\('data-'\) && k !== DATA/, 'old data caches are migrated, then deleted, on activate');
+  assert.deepEqual(J('manifest.json'), dataManifest(), 'site/data/manifest.json is stale (npm run data-version)');
 });
 test('every JS module the app imports is precached by the SW', () => {
   const mods = new Set();
