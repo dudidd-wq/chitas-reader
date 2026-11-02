@@ -146,17 +146,19 @@ export function numeralReading(words, i) {
   if (!m) return null;
   const sk = skeleton(m[2]).replace(/״/g, '"').replace(/׳/g, "'");
   const n = gematria(sk);
-  // only tokens that would otherwise be expanded as a word (ה׳ → השם, ר׳ → רבי, ס״א → סטרא אחרא …);
-  // other numerals are left to the speech engine as before
-  if (!n || !ABBR.has(sk)) return null;
+  if (!n) return null;
   const near = dir => { for (let j = i + dir; j >= 0 && j < words.length; j += dir) if (words[j] && !/^\s+$/.test(words[j])) return words[j]; return ''; };
   const pv = near(-1), nx = near(1);
-  const pvs = skeleton(pv).replace(/״/g, '"').replace(/׳/g, "'"), nxs = skeleton(nx).replace(/["']/g, '');
+  const pvs = skeleton(pv).replace(/״/g, '"').replace(/׳/g, "'").replace(/^[([]+/, ''), nxs = skeleton(nx).replace(/["']/g, '');
   const names = () => [...sk.replace(/["']/g, '')].map(l => LETTER_NAME[l]).join(' ');
+  // round 3: ANY numeral right after a unit word is a citation – "דף רכ״ט" → "דף מאתיים עשרים ותשע", "עמוד ב׳" → "עמוד בית"
+  // (one letter: its name; several letters: the number, so the engine does not read "רכט" as a word)
+  if (CITE_UNIT.test(pvs) && !/[.,;:)]$/.test(pv)) return m[1] + (sk.replace(/["']/g, '').length === 1 ? names() : numberWords(n)) + m[3];
+  // otherwise only tokens that would be expanded as a word (ה׳ → השם, ר׳ → רבי, ס״א → סטרא אחרא …) are handled here;
+  // other numerals are left to the speech engine as before
+  if (!ABBR.has(sk)) return null;
   // a count: "ס״א תעניות", "ר׳ מעלות", "מנת ר׳", "המסלול ר׳"
   if (COUNT_NEXT.test(nxs) || (COUNT_PREV.test(pvs) && !/[.,;:]$/.test(pv))) return m[1] + numberWords(n) + m[3];
-  // a citation after a unit word: "סימן ה׳", "פרק ה׳", "דף ה׳", "אות ה׳" (the letter itself)
-  if (CITE_UNIT.test(pvs) && !/[.,;:)]$/.test(pv)) return m[1] + names() + m[3];
   // a short parenthesised reference ending in the numeral: "(דברים ה׳)", "(מכות ה׳):", "(שמואל ב ה׳:כ״ד)"
   if (/^\)|^:[\u05D0-\u05EA]/.test(m[3]) || (m[3] === '' && /^\)/.test(nx))) {
     let j = i - 1, cnt = 0, open = false;
@@ -181,6 +183,7 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&[a-z]+;/g, ' ')
     .replace(/\{[פס]\}/g, ' ')
     .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '$2') // ketiv (…) followed by qere […]: read the qere
+    .replace(/\u05C6/g, ' ')            // inverted nun (Ps 107, Num 10) – a scribal mark, not read
     .replace(/\u05C0/g, ' ')            // paseq
     .replace(/\u05C3/g, '.')            // sof pasuq
     .replace(/\u05BE/g, ' ')            // maqaf -> word break

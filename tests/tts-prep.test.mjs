@@ -71,3 +71,19 @@ test('gematria and number words', async () => {
   assert.equal(numberWords(165).replace(/[\u05B0-\u05C7]/g, ''), 'מאה ששים וחמש');
   assert.equal(numberWords(15).replace(/[\u05B0-\u05C7]/g, ''), 'חמש עשרה');
 });
+
+// round 3 SHOULD 1–2: inverted nun is not sent to the engine; any numeral after דף/פרק/סימן/עמוד… is expanded
+test('inverted nun (U+05C6) is stripped; citation numerals after a unit word are read as numbers/letter names', async () => {
+  const T = { stress: false };
+  const fs = await import('node:fs');
+  const ps107 = JSON.parse(fs.readFileSync(new URL('../site/data/tehillim/107.json', import.meta.url))).v;
+  for (const v of [23, 24, 25, 26, 27, 28, 40]) { const out = P(ps107[v - 1], T); assert.ok(!out.includes('\u05C6'), `Ps 107:${v}`); assert.ok(!/^\s/.test(out)); }
+  assert.ok(ps107.some(v => v.includes('\u05C6')), 'fixture still has the mark');
+  assert.equal(P('(דַּף רכ"ט עַמּוּד ב\')', T), '(דף מאתים עשרים ותשע עמוד בית)');
+  assert.equal(P('בְּפֶרֶק כ"ג', T), 'בפרק עשרים ושלוש');
+  assert.equal(P('סִימָן קס"ה וְעוֹד', T), 'סימן מאה ששים וחמש ועוד');
+  assert.equal(P('הֲלָכָה י"ב', T), 'הלכה שתים עשרה');
+  assert.equal(P('פֶּרֶק א\'', T), 'פרק אלף');
+  assert.equal(P('בְּעָמוֹס סוֹף סִימָן ה׳. פֵּירוּשׁ', T), 'בעמוס סוף סימן הא. פירוש');
+  assert.equal(P('וְהָיָה כ"ג', T), 'והיה כ"ג', 'a numeral in running text without a unit word is left alone');
+});
