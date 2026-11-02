@@ -26,7 +26,9 @@ const slowSynth = () => {
 // that are on the current page.
 const visibleCheck = p => p.evaluate(() => {
   const el = document.querySelector('#rc .speaking'); if (!el) return { ok: false, why: 'no highlight' };
-  const top = document.querySelector('#rt').getBoundingClientRect().bottom, bot = document.querySelector('#rb').getBoundingClientRect().top;
+  // a top bar that is sliding away (full-screen mode just switched on) no longer counts as covering the text
+  const imm = document.querySelector('#reader').classList.contains('immersive');
+  const top = imm ? 0 : document.querySelector('#rt').getBoundingClientRect().bottom, bot = document.querySelector('#rb').getBoundingClientRect().top;
   const rects = [...el.getClientRects()].filter(r => r.width > 2 && r.right > 0 && r.left < innerWidth);
   if (!rects.length) return { ok: false, why: 'highlight off screen' };
   const bad = rects.filter(r => r.top < top - 1 || r.bottom > bot + 1);

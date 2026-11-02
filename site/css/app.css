@@ -185,7 +185,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
   .r-content h1 { font-size: 1em; }
   .r-content .doc-sub { margin-bottom: .4em; }
 }
-@media (prefers-reduced-motion: reduce) { .r-viewport.pages .r-content { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .r-viewport.pages .r-content, .r-top, .r-bottom { transition: none; } }
 .r-content h1 { font-size: 1.15em; text-align: center; margin: 0 0 .1em; line-height: 1.35; }
 .r-content .doc-sub { text-align: center; color: var(--muted); font-size: .62em; font-family: var(--ui); margin: 0; }
 .r-content h2 { font-size: .9em; text-align: center; color: var(--accent); margin: 1em 0 .4em; break-after: avoid; line-height: 1.4; }
