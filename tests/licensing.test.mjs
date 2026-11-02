@@ -85,3 +85,30 @@ test('reader credits the Wikisource chapter (Chametz uMatzah ch. 9) with a link 
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
+
+test('round 4: data licence note in the repo states the Tanya NC restriction', () => {
+  const d = R('site/data/LICENSE-DATA.md'), r = R('README.md');
+  assert.match(d, /tanya\/.*CC BY-NC – non-commercial use only/);
+  assert.match(r, /id="data-licence"/);
+  assert.match(r, /תניא.*CC BY-NC: שימוש לא מסחרי בלבד/);
+  assert.match(r, /\]\(site\/data\/LICENSE-DATA\.md\)/);
+  assert.ok(src.tanya && /NC/.test(src.tanya.license), 'sources.json still says NC for Tanya');
+});
+
+test('round 4: Sources page does not call NC "open", and links every verification document', { skip }, async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url);
+    await p.goto(srv.url + '#/sources'); await p.waitForSelector('table.src');
+    const t = await p.textContent('.page');
+    assert.doesNotMatch(t, /ברישיון פתוח/);
+    assert.match(t, /CC BY-NC \(שימוש לא מסחרי בלבד/);
+    const links = await p.$$eval('.page a', a => a.map(x => x.href));
+    for (const f of ['VERIFICATION.md', 'GLOSSARY-VERIFICATION.md', 'RAMBAM-ERRATA.md'])
+      assert.ok(links.some(h => h.endsWith('/verification/' + f)), f);
+    for (const f of ['VERIFICATION.md', 'GLOSSARY-VERIFICATION.md', 'RAMBAM-ERRATA.md']) assert.ok(R('verification/' + f).length > 100);
+    await p.goto(srv.url + '#/about'); await p.waitForSelector('main h2');
+    assert.ok((await p.$$eval('main a', a => a.map(x => x.href))).some(h => h.endsWith('/verification/VERIFICATION.md')));
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});

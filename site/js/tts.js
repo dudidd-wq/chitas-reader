@@ -1,5 +1,7 @@
 // Browser speech (Web Speech API) reader with per-segment highlighting, Media Session and
-// optional silent-audio keep-alive for lock-screen controls. No audio files, no network.
+// optional silent-audio keep-alive for lock-screen controls. The app itself sends nothing; note that some browser
+// voices are network voices (localService === false) whose engine sends the text to the browser vendor – those are
+// labelled in the UI and never chosen by default when a local Hebrew voice exists.
 import { prepareForTTS, chunkText } from './tts-prep.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -7,8 +9,12 @@ export const ttsSupported = () => !!synth && typeof SpeechSynthesisUtterance !==
 
 export function hebrewVoices() {
   if (!ttsSupported()) return [];
-  return synth.getVoices().filter(v => /^(he|iw)([-_]|$)/i.test(v.lang));
+  // local (on-device) voices first, so the default voice never sends text to a vendor if a local one exists
+  return synth.getVoices().filter(v => /^(he|iw)([-_]|$)/i.test(v.lang))
+    .map((v, i) => [v, i]).sort((a, b) => isNetworkVoice(a[0]) - isNetworkVoice(b[0]) || a[1] - b[1]).map(([v]) => v);
 }
+/** A voice whose speech is synthesised by the vendor's server (the text is sent there). */
+export const isNetworkVoice = v => v?.localService === false;
 export function onVoices(cb) {
   if (!ttsSupported()) return cb([]);
   cb(hebrewVoices());

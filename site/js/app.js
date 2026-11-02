@@ -2,7 +2,7 @@ import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel } from './texts.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
-import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
+import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
@@ -227,6 +227,7 @@ function ttsForm() {
   return `
   <div id="voice-warn"></div>
   <label class="field"><span>קול</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
+  <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). ברירת המחדל היא תמיד קול מקומי, כשיש כזה.</small>
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
@@ -248,8 +249,9 @@ function bindForm(root, onChange) {
   });
   const sel = root.querySelector('#voice-sel'), warn = root.querySelector('#voice-warn');
   if (sel) onVoices(vs => {
-    sel.innerHTML = '<option value="">ברירת מחדל (עברית)</option>' + vs.map(v => `<option ${v.name === prefs.ttsVoice ? 'selected' : ''}>${esc(v.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">ברירת מחדל (עברית)</option>' + vs.map(v => `<option value="${esc(v.name)}" ${v.name === prefs.ttsVoice ? 'selected' : ''}>${esc(v.name)}${isNetworkVoice(v) ? ' – מקוון (הטקסט נשלח לספק)' : ''}</option>`).join('');
     warn.innerHTML = vs.length ? '' : voiceHelp();
+    const net = root.querySelector('#voice-net'); if (net) net.hidden = !vs.some(isNetworkVoice);
   });
 }
 function voiceHelp() {
@@ -257,7 +259,7 @@ function voiceHelp() {
   return `<div class="warn"><b>לא נמצא במכשיר קול עברי.</b> ההקראה עלולה להישמע לא נכון או לא לפעול. להתקנה:
   <ul><li><b>אנדרואיד:</b> הגדרות ← מערכת ← שפות וקלט ← פלט טקסט לדיבור ← מנוע Google ← התקנת נתוני קול ← עברית.</li>
   <li><b>אייפון/אייפד:</b> הגדרות ← נגישות ← תוכן מוקרא ← קולות ← עברית (כרמית).</li>
-  <li><b>Windows:</b> הגדרות ← זמן ושפה ← דיבור ← הוספת קולות ← עברית. בדפדפן Edge זמינים גם קולות עבריים ״טבעיים״ (אבי/הילה) מהרשת.</li>
+  <li><b>Windows:</b> הגדרות ← זמן ושפה ← דיבור ← הוספת קולות ← עברית. (Edge מציע גם קולות ״טבעיים״ מקוונים; קולות כאלה שולחים את הטקסט ל-Microsoft, ולכן עדיף קול מותקן.)</li>
   <li><b>macOS:</b> הגדרות מערכת ← נגישות ← תוכן מוקרא ← קול מערכת ← ניהול קולות ← עברית.</li></ul>
   לאחר ההתקנה יש לרענן את הדף.</div>`;
 }
@@ -287,14 +289,16 @@ async function renderSources() {
   const row = (what, m, note = '') => m ? `<tr><td data-h="חלק">${what}</td><td data-h="גרסה">${esc(m.versionTitleInHebrew || m.versionTitle)}</td><td data-h="רישיון">${licenseLink(m.license, m)}</td><td data-h="קישור"><a href="${esc(m.versionSource)}" rel="noopener" target="_blank">מקור</a> · <a href="${esc(m.sefariaUrl || 'https://www.sefaria.org')}" rel="noopener" target="_blank">ספריא</a></td><td data-h="הערות">${note}</td></tr>` : '';
   const ov = Object.entries(s.rambamOverrides || {});
   $('.page').innerHTML = `<h1>מקורות ורישיונות</h1>
-  <p>כל הטקסטים נלקחו מגרסאות ברישיון פתוח דרך ה-API של <a href="https://www.sefaria.org" rel="noopener" target="_blank">ספריא</a>, נשמרו מראש כקבצים סטטיים ומוגשים מהאתר עצמו. לא נוסף ניקוד ידני ולא שונה נוסח.</p>
+  <p>כל הטקסטים נלקחו דרך ה-API של <a href="https://www.sefaria.org" rel="noopener" target="_blank">ספריא</a> מגרסאות שהרישיון שלהן מתיר הצגה באתר חינמי זה: נחלת הכלל, CC BY-SA, ובתניא – <b>CC BY-NC (שימוש לא מסחרי בלבד</b>; זה אינו רישיון ״פתוח״ במובן המקובל, ולכן גם מי שמעתיק את האתר או את המאגר כפוף להגבלה זו לגבי התניא). הטקסטים נשמרו מראש כקבצים סטטיים ומוגשים מהאתר עצמו. לא נוסף ניקוד ידני ולא שונה נוסח.</p>
+  <p>מעמד ״נחלת הכלל״ של גרסאות תורת אמת ורוזנבאום–זילברמן מבוסס על הסימון בספריא; לא בדקנו אותו באופן עצמאי.</p>
+  <p>מסמכי הבדיקה (במאגר הקוד): <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">VERIFICATION.md</a> (לוח השיעורים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/GLOSSARY-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">GLOSSARY-VERIFICATION.md</a> (ביאור מילים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/RAMBAM-ERRATA.md" target="_blank" rel="noopener" dir="ltr">RAMBAM-ERRATA.md</a> (נוסח הרמב״ם), ו<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/README.md#data-licence" target="_blank" rel="noopener">הערת רישיון הנתונים</a>.</p>
   <p>גרסאות שמקורן באתר <a href="https://mechon-mamre.org/copy.htm" rel="noopener" target="_blank">מכון ממרא</a> אינן בשימוש: אף שבספריא הן מסומנות ״נחלת הכלל״, האתר עצמו מתיר שימוש פרטי לשם לימוד והוראה בלבד ואוסר להעתיק את החומר לאתר אחר. לכן ההקדמה למשנה תורה ומניין המצוות נלקחו מוויקיטקסט (CC BY-SA).</p>
   <table class="src"><thead><tr><th>חלק</th><th>גרסה</th><th>רישיון</th><th>קישור</th><th>הערות</th></tr></thead><tbody>
   ${row('חומש ותהילים', s.tanakh, 'מנוקד ומוטעם')}
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים (בהקראה הם נקראים בניקוד הפסוק כשהם מילות הפסוק)')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
-  ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : '<b>לא מנוקד</b> (או מנוקד חלקית) – אין גרסה מנוקדת ברישיון פתוח')).join('')}
+  ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : '<b>לא מנוקד</b> (או מנוקד חלקית) – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
   ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
   </tbody></table>
   <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), ולכל ביאור מצורף קישור לערך המקור. ביאור מתפרסם רק אם עבר <b>שתי בדיקות בלתי תלויות</b>, ואחריהן בדיקה ידנית:</p>
@@ -332,19 +336,20 @@ async function glossCounts() {
 
 function renderAbout() {
   shell('אודות ומגבלות', `
-  <p>אתר לקריאת שיעורי חת״ת (חומש עם רש״י, תהילים, תניא) ורמב״ם יומי, בטקסט מנוקד ובתצוגה דמוית נייר, עם אפשרות שהדפדפן יקריא את הטקסט. עובד גם ללא רשת לאחר טעינה, ואינו אוסף מידע: אין חשבון, אין מעקב ואין שליחת נתונים.</p>
+  <p>אתר לקריאת שיעורי חת״ת (חומש עם רש״י, תהילים, תניא) ורמב״ם יומי, בטקסט מנוקד ובתצוגה דמוית נייר, עם אפשרות שהדפדפן יקריא את הטקסט. עובד גם ללא רשת לאחר טעינה, ואינו אוסף מידע: אין חשבון, אין מעקב, והאתר עצמו אינו שולח נתונים (לחריג היחיד – קולות הקראה מקוונים – ראו ״הקראה״ להלן).</p>
   <h2>לוח השיעורים</h2><ul>
   <li>החומש לפי המנהג: בכל יום עולה אחת מפרשת השבוע (ראשון – ראשון … שבת – שביעי). בשבוע שבו השבת היא יום טוב – לומדים את הפרשה של השבת הבאה. מאחרי השבת האחרונה של השנה ועד שמחת תורה – ״וזאת הברכה״. בשמחת תורה עצמה מסיימים את ״וזאת הברכה״ מעליית היום ועד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום (ע״פ שיחת הרבי, תורת מנחם תשל״ב ח״א עמ׳ 129, ו״מנהגי חב״ד לשמחת תורה״ באתר chabad.org.il). כששמחת תורה חלה בשבת (בארץ ישראל בלבד) לומדים מ״בראשית״ רק ״ראשון״ (א,א–ב,ג), כי שבוע פרשת בראשית מתחיל למחרת; לכך לא מצאנו מקור מפורש, ויש לוחות שבהם לומדים בשמחת תורה רק ״וזאת הברכה״. ביום זה מוצגת הערה בקורא.</li>
   <li>תהילים לפי ימי החודש; בחודש חסר לומדים ביום כ״ט גם את של יום ל׳.</li>
   <li>תניא יומי לפי הלוח המקובל (מחזור שנתי החל מי״ט כסלו).</li>
-  <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו קובץ verification במאגר.</li>
+  <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">verification/VERIFICATION.md</a>.</li>
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li></ul>
-  <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון פתוח<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
+  <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> מילים מבוארות בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים) – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. ברש״י, בתניא וברמב״ם אין ביאורים כלל.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
   <li>בכל מקום אפשר לסמן מילה ולפתוח את ערכה בוויקימילון (קישור חיצוני).</li></ul>
   <h2>הקראה</h2><ul>
+  <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו בוחר קול מקוון כברירת מחדל כשיש קול מקומי, ואינו ממליץ עליהם.</li>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
   <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
   <li>כשהמסך כבוי: במחשב ההקראה ממשיכה; באנדרואיד היא לרוב ממשיכה כשהדף פתוח; באייפון היא נעצרת בדרך כלל בנעילת המסך – מומלץ להשאיר את המסך דולק (יש אפשרות כזו בהגדרות).</li></ul>
@@ -458,7 +463,7 @@ async function renderDoc() {
     tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
-  if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון פתוח.</p>`;
+  if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון המתיר שימוש כאן.</p>`;
   let open = false;
   for (const b of d.blocks) {
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
