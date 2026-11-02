@@ -21,7 +21,7 @@ export function applyGlosses(root, book) {
     if (!G.verses[`${book} ${seg.dataset.id}`]) continue;
     const t = seg.querySelector('.t') || seg;
     const walker = document.createTreeWalker(t, NodeFilter.SHOW_TEXT, {
-      acceptNode: n => (n.parentElement.closest('.vn, .hn, .ketiv, .pe, .endmark, .gl, .lbl, .rashi') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+      acceptNode: n => (n.parentElement.closest('.vn, .hn, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
     for (const n of nodes) {

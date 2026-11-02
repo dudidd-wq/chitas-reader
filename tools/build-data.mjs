@@ -52,6 +52,21 @@ export function clean(s) {
     .replace(/[ \t\u00a0]+/g, ' ')
     .trim();
 }
+/**
+ * Clean a Miqra (Tanakh) verse: like clean(), but keeps the Masoretic large/small letters (<big>/<small>)
+ * and turns the edition's footnotes (e.g. Num 25:12 "וי״ו קטיעא") into <i class="fn">…</i>.
+ * A <small> around a paseq (׀) or other non-letters is unwrapped.
+ */
+export function cleanMiqra(s) {
+  if (typeof s !== 'string') return '';
+  const keep = [];
+  const stash = h => { keep.push(h); return `\u0001${keep.length - 1}\u0002`; };
+  let t = s
+    .replace(/<sup class="footnote-marker">[\s\S]*?<\/sup>\s*<i class="footnote">\s*\(?([\s\S]*?)\)?\s*<\/i>/g, (_, n) => stash(`<i class="fn">${n.replace(/<[^>]+>/g, '').trim()}</i>`))
+    .replace(/<(big|small)>([\s\S]*?)<\/\1>/g, (m, tag, inner) => /[\u05D0-\u05EA]/.test(inner) ? stash(`<${tag}>${inner.replace(/<[^>]+>/g, '')}</${tag}>`) : inner);
+  t = clean(t);
+  return t.replace(/\u0001(\d+)\u0002/g, (_, i) => keep[+i]);
+}
 const write = (p, obj) => { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, JSON.stringify(obj)); };
 const record = (key, meta, extra = {}) => { sources[key] = { ...(sources[key] || {}), ...meta, ...extra, fetchedAt: new Date().toISOString().slice(0, 10) }; };
 
@@ -74,7 +89,7 @@ async function torah() {
     t.text.forEach((verses, ci) => {
       const rc = r.text[ci] || [];
       write(`${OUT}/torah/${book}/${ci + 1}.json`, {
-        v: verses.map(clean),
+        v: verses.map(cleanMiqra),
         r: verses.map((_, vi) => (rc[vi] || []).map(clean).filter(Boolean)),
       });
     });
@@ -86,7 +101,7 @@ async function torah() {
 async function tehillim() {
   const t = await fetchText('Psalms', VERSIONS.tanakh);
   record('tanakh', t.meta);
-  t.text.forEach((verses, ci) => write(`${OUT}/tehillim/${ci + 1}.json`, { v: verses.map(clean) }));
+  t.text.forEach((verses, ci) => write(`${OUT}/tehillim/${ci + 1}.json`, { v: verses.map(cleanMiqra) }));
   write(`${OUT}/tehillim/index.json`, t.text.map(c => c.length));
   console.log('tehillim', t.text.length);
 }
@@ -139,7 +154,9 @@ async function tanya() {
   write(`${OUT}/tanya/index.json`, index);
 }
 
-const what = process.argv[2] || 'all';
+import { pathToFileURL } from 'node:url';
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+const what = isMain ? (process.argv[2] || 'all') : 'none';
 const saveSources = () => { fs.mkdirSync(OUT, { recursive: true }); fs.writeFileSync(`${OUT}/sources.json`, JSON.stringify(sources, null, 1)); };
 if (what === 'torah' || what === 'all') { await torah(); saveSources(); }
 if (what === 'tehillim' || what === 'all') { await tehillim(); saveSources(); }

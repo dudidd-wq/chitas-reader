@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "קורא חת\"ת ורמב\"ם יומי – PWA סטטי",
   "scripts": {
+    "data-version": "node tools/data-version.mjs",
     "vendor": "esbuild tools/vendor-entry.mjs --bundle --format=esm --minify --legal-comments=eof --outfile=site/js/vendor/hebcal.js",
-    "data": "node tools/build-data.mjs all && node tools/patch-missing-chapters.mjs",
+    "data": "node tools/build-data.mjs all && node tools/patch-missing-chapters.mjs && node tools/data-version.mjs",
     "glossary": "node tools/build-glossary.mjs",
     "rss": "node tools/fetch-chabad-rss.mjs",
     "test": "node --test tests/*.test.mjs",

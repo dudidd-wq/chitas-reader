@@ -137,6 +137,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .sheet .form { max-width: 640px; margin: 0 auto; }
 #toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%); z-index: 30; background: var(--ink); color: var(--paper); padding: .5rem 1rem; border-radius: 10px; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90vw; text-align: center; }
 #toast.show { opacity: .95; }
+#toast .btn { pointer-events: auto; margin-inline-start: .5rem; background: var(--paper); color: var(--ink); }
 @media (max-width: 400px) { .btn { padding: .3rem .55rem; } .hero .hd { font-size: 1.6rem; } }
 @media (max-width: 640px) {
   .page table.src thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
@@ -145,3 +146,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
   .page table.src td { border: 0; padding: .15rem 0; text-align: start; }
   .page table.src td::before { content: attr(data-h) ": "; font-weight: 600; color: var(--muted); }
 }
+
+/* Masoretic large/small letters (אותיות גדולות/זעירות) and edition notes (e.g. וי״ו קטיעא) */
+.t big { font-size: 1.32em; line-height: 0; font-weight: 600; }
+.t small { font-size: .68em; line-height: 0; vertical-align: .12em; }
+.t .fn { font-style: normal; font-family: var(--ui); font-size: .6em; color: var(--muted); margin-inline: .3em; white-space: normal; letter-spacing: 0; }
+.t .fn::before { content: '('; } .t .fn::after { content: ')'; }

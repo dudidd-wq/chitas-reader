@@ -11,7 +11,7 @@ test('glossary: licence + every entry sourced, ≤ 4 words, anchored to a real w
   for (const [ref, words] of Object.entries(G.verses)) {
     const [, book, c, v] = ref.match(/^(\w+) (\d+):(\d+)$/);
     const text = JSON.parse(fs.readFileSync(new URL(`${c}.json`, torah(book)))).v[v - 1];
-    const forms = new Set(text.replace(/<[^>]+>/g, ' ').split(/[\s\u05BE]+/).map(norm));
+    const forms = new Set(text.replace(/<i class="fn">[^<]*<\/i>/g, '').replace(/<\/?(big|small)>/g, '').replace(/<[^>]+>/g, ' ').split(/[\s\u05BE]+/).map(norm));
     for (const [form, e] of Object.entries(words)) {
       n++;
       assert.ok(forms.has(form), `${ref}: ${form} not in verse`);

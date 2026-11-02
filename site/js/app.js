@@ -241,7 +241,8 @@ const R = { unit: null, iso: null, doc: null, page: 0, pages: 1, segs: [], speak
 function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 function fmt(html, isTanakh) {
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
-    .replace(/\{([פס])\}/g, '<span class="pe" aria-hidden="true">$1</span>');
+    .replace(/\{([פס])\}/g, '<span class="pe" aria-hidden="true">$1</span>')
+    .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">');
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
   return s;
 }
@@ -544,4 +545,17 @@ function closeReader() {
 
 applyPrefs();
 route();
-if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  // Update flow: the new worker activates immediately (skipWaiting); the running page still has the old code,
+  // so reload at once on the home page, or offer a reload in the reader (never interrupt reading/TTS).
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return; // first install, nothing to refresh
+    if ($('#reader').hidden) { location.reload(); return; }
+    const t = $('#toast'); clearTimeout(toast.t);
+    t.innerHTML = 'גרסה חדשה של היישומון מוכנה. <button type="button" class="btn small" id="swReload">רענון</button>';
+    t.classList.add('show');
+    $('#swReload').onclick = () => location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(r => { r.update?.().catch(() => {}); }).catch(() => {});
+}
