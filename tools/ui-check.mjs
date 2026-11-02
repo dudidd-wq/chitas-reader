@@ -35,7 +35,7 @@ for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   }
   // sheets
   if (name === 'chumash' && w === 390) for (const id of ['#b-aa', '#b-tts']) {
-    await p.click(id); await p.waitForTimeout(300);
+    await p.click(id, id === '#b-tts' ? { button: 'right' } : {}); await p.waitForTimeout(300);
     const r = await new AxeBuilder({ page: p }).withTags(['wcag2a', 'wcag2aa']).analyze();
     for (const v of r.violations) fails.push(`${w} ${name}${id}: axe ${v.id} ×${v.nodes.length}: ${v.nodes[0].target}`);
     log.push(`${w} ${name} sheet ${id}: axe ${r.violations.length} violations`);

@@ -78,7 +78,8 @@ test('speed: the footer menu and the settings slider use one scale; old values s
     const opts = await p.$$eval('#t-rate option', o => o.map(x => Number(x.value)));
     assert.deepEqual(opts, TTS_RATES);
     assert.equal(await p.$eval('#t-rate', s => s.value), '1.3');
-    await p.click('#b-tts'); await p.waitForSelector('#sheet input[name="ttsRate"]');
+    await p.click('#b-tts'); await p.waitForSelector('#ttsctl:not([hidden])');  // round 4: one tap starts reading
+    await p.click('#t-set'); await p.waitForSelector('#sheet input[name="ttsRate"]');
     const r = await p.$eval('#sheet input[name="ttsRate"]', i => [i.min, i.max, i.step, i.value]);
     assert.deepEqual(r, ['0.6', '1.6', '0.1', '1.3']);
     await p.$eval('#sheet input[name="ttsRate"]', i => { i.value = '1.6'; i.dispatchEvent(new Event('input', { bubbles: true })); i.dispatchEvent(new Event('change', { bubbles: true })); });

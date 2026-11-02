@@ -57,7 +57,7 @@ export class Speaker {
     this.queue = [];
     segments.forEach((s, si) => {
       const chunks = [];
-      s.parts.forEach((html, pi) => { for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined }))) chunks.push(c); });
+      s.parts.forEach((html, pi) => { for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi] }))) chunks.push(c); });
       // frac: share of the segment already spoken when this chunk starts (lets the view follow long segments)
       const total = chunks.reduce((a, c) => a + c.length, 0) || 1; let done = 0;
       for (const c of chunks) { this.queue.push({ si, text: c, frac: done / total }); done += c.length; }

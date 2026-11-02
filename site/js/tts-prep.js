@@ -24,7 +24,10 @@ export const ABBREVIATIONS = {
   'ת"ת': 'תַּלְמוּד תּוֹרָה', 'עוה"ז': 'עוֹלָם הַזֶּה', 'עוה"ב': 'עוֹלָם הַבָּא', 'ק"ש': 'קְרִיאַת שְׁמַע', 'בעה"ז': 'בָּעוֹלָם הַזֶּה',
   'וק"ל': 'וְקַל לְהָבִין', 'כנודע': 'כַּנּוֹדָע', 'אדה"ר': 'אָדָם הָרִאשׁוֹן', 'ב"ה': 'בָּרוּךְ הוּא', 'ע"כ': 'עַל כֵּן',
   'פי\'': 'פֵּירוּשׁ', 'פירש"י': 'פֵּירֵשׁ רַשִׁ"י', 'רש"י': 'רַשִׁ"י', 'ר\'': 'רַבִּי', 'ת"ר': 'תָּנוּ רַבָּנָן', 'א"ר': 'אָמַר רַבִּי',
-  'ה\'': 'השם', 'הוי\'': 'הֲוָיָ"ה', 'הוי"ה': 'הֲוָיָ"ה', 'אד\'': 'אדנות', 'הש"י': 'השם יִתְבָּרֵךְ', 'השי"ת': 'השם יִתְבָּרֵךְ',
+  'ה\'': 'הַשֵּׁם', 'הוי\'': 'הֲוָיָ"ה', 'הוי"ה': 'הֲוָיָ"ה', 'אד\'': 'אדנות', 'הש"י': 'הַשֵּׁם יִתְבָּרֵךְ', 'השי"ת': 'הַשֵּׁם יִתְבָּרֵךְ',
+  // round 4: common in Rashi / Rambam, one reading only
+  'ת"ל': 'תַּלְמוּד לוֹמַר', 'ד"א': 'דָּבָר אַחֵר', 'ק"ו': 'קַל וָחוֹמֶר', 'מק"ו': 'מִקַּל וָחוֹמֶר', 'י"ל': 'יֵשׁ לוֹמַר', 'וי"ל': 'וְיֵשׁ לוֹמַר', 'ז"ש': 'זֶהוּ שֶׁכָּתוּב',
+  'מנ"ל': 'מְנָא לַן', 'אא"א': 'אִי אֶפְשָׁר', 'וגומר': 'וְגוֹמֵר', 'גו\'': 'גוֹמֵר','כמש"נ': 'כְּמוֹ שֶׁנֶּאֱמַר', 'ת"ש': 'תָּא שְׁמַע', 'דא"א': 'דְּאִי אֶפְשָׁר', 'א"נ': 'אִי נַמִּי', 'בע"כ': 'בְּעַל כָּרְחוֹ', 'עכ"פ': 'עַל כָּל פָּנִים', 'אפ"ה': 'אַפִּילּוּ הָכִי', 'ממ"נ': 'מִמָּה נַפְשָׁךְ', 'וכה"ג': 'וְכַהַאי גַּוְונָא', 'כה"ג': 'כַּהַאי גַּוְונָא',
 };
 const ABBR = new Map(Object.entries(ABBREVIATIONS).map(([k, v]) => [k.replace(/[״]/g, '"').replace(/[׳]/g, "'"), v]));
 const PREFIXES = ['', 'ו', 'ה', 'ב', 'ל', 'מ', 'כ', 'ש', 'וב', 'ול', 'ומ', 'וכ', 'וש', 'וה', 'שב', 'של', 'שה', 'מה', 'כש', 'לה', 'בה', 'וכש', 'ושב', 'ומה'];
@@ -60,8 +63,15 @@ function prefixWithMarks(word, n) {
   return word.slice(0, i);
 }
 
+// round 4: the substitute is vocalised, so a prefix reads naturally (לַה' → לַהַשֵּׁם, not "לַהשם")
+export const HASHEM = 'הַשֵּׁם';
+// אֲדֹנָי as a holy name (qamats under the nun; אֲדֹנַי "my lords" has patah) is read אֲדוֹשֵׁם in "השם" mode
+export const ADOSHEM = 'אֲדוֹשֵׁם';
+const RE_ADONAI = /^(ו|ב|ל|מ|כ|וב|ול|ומ|וכ)?אדני$/;
+const RE_YY = /^(ו|ב|ל|מ|כ|ש|וב|ול|ומ|וכ|וש|לפני|ולפני)?יי$/;
 export function replaceWord(w, opt) {
-  const core = w.replace(/^[^\u05D0-\u05EA]+|[^\u05D0-\u05EA\u0591-\u05C7"'״׳]+$/g, '');
+  // a closing quotation mark (״ / ") after a whole word is punctuation, not gershayim; a geresh (ה׳, ר׳) is kept
+  const core = w.replace(/^[^\u05D0-\u05EA]+|[^\u05D0-\u05EA\u0591-\u05C7'׳]+$/g, '');
   if (!core) return w;
   const lead = w.slice(0, w.indexOf(core)), trail = w.slice(w.indexOf(core) + core.length);
   const sk = skeleton(core).replace(/״/g, '"').replace(/׳/g, "'");
@@ -71,19 +81,28 @@ export function replaceWord(w, opt) {
     if (letters === p + 'יהוה' && !/["']/.test(sk)) {
       // vocalized with hiriq (יֱהֹוִה, after אֲדֹנָי) it is read as Elohim
       const elohim = /\u05B4/.test(core.slice(core.lastIndexOf('ו')));
-      const name = elohim ? (opt.divineName === 'adonai' ? 'אֱלֹהִים' : 'אֱלֹקִים') : (opt.divineName === 'adonai' ? 'אֲדֹנָי' : 'השם');
+      const name = elohim ? (opt.divineName === 'adonai' ? 'אֱלֹהִים' : 'אֱלֹקִים') : (opt.divineName === 'adonai' ? 'אֲדֹנָי' : HASHEM);
       return lead + prefixWithMarks(core, p.length) + name + trail;
     }
   }
   if (ABBR.has(sk)) {
     let v = ABBR.get(sk);
-    if (v === 'השם' && opt.divineName === 'adonai') v = 'אֲדֹנָי';
+    if (v === HASHEM && opt.divineName === 'adonai') v = 'אֲדֹנָי';
     return lead + v + trail;
   }
   // prefixed ה' (e.g. וַה', לַה')
   if (/^[ובלמכש]{1,2}ה'$/.test(sk)) {
     const p = sk.length - 2;
-    return lead + prefixWithMarks(core, p) + (opt.divineName === 'adonai' ? 'אֲדֹנָי' : 'השם') + trail;
+    return lead + prefixWithMarks(core, p) + (opt.divineName === 'adonai' ? 'אֲדֹנָי' : HASHEM) + trail;
+  }
+  // יי / יְיָ (how many editions print the Name, e.g. the Rambam), with or without a geresh
+  if (RE_YY.test(letters) && /^[\u05D0-\u05EA]+'?$/.test(sk)) {
+    const p = letters.length - 2;
+    return lead + prefixWithMarks(core, p) + (opt.divineName === 'adonai' ? 'אֲדֹנָי' : HASHEM) + trail;
+  }
+  if (opt.divineName !== 'adonai' && RE_ADONAI.test(letters) && !/["']/.test(sk) && !opt.chol) {
+    const n = core.lastIndexOf('נ');
+    if (/\u05B8/.test(core.slice(n))) return lead + prefixWithMarks(core, letters.length - 4) + ADOSHEM + trail;
   }
   if (opt.divineName !== 'adonai' && !opt.chol) {
     if (RE_ELOKIM.test(letters) && !/["']/.test(sk)) {
@@ -174,19 +193,45 @@ export function numeralReading(words, i) {
   return null;
 }
 
+// ---- round 4: source citations in parentheses – "(שמות כ׳)", "(מכילתא)", "(דברים ו ה)", "(זבחים קט״ו)" – are not read
+// aloud in Rashi and Rambam (setting, on by default). A parenthesis counts as a citation only when its first word
+// (after an optional עי׳ / ראה) is a book of Tanakh, a tractate, a midrash or a reference word, and it is short.
+const BOOKS = 'בראשית שמות ויקרא במדבר דברים יהושע שופטים שמואל מלכים ישעיה ישעיהו ירמיה ירמיהו יחזקאל הושע יואל עמוס עובדיה יונה מיכה נחום חבקוק צפניה חגי זכריה מלאכי תהילים תהלים משלי איוב שיר רות איכה קהלת אסתר דניאל עזרא נחמיה דברי דהי"א דהי"ב דה"א דה"ב דבהי"א שה"ש '
+  + 'ברכות פאה דמאי כלאים שביעית תרומות מעשרות חלה ערלה בכורים שבת עירובין פסחים שקלים יומא סוכה סכה ביצה ראש תענית מגילה מועד חגיגה יבמות כתובות נדרים נזיר סוטה גיטין קידושין בבא ב"ק ב"מ ב"ב סנהדרין מכות שבועות עדיות עבודה אבות הוריות זבחים מנחות חולין בכורות ערכין תמורה כריתות מעילה תמיד מדות קנים כלים אהלות נגעים פרה טהרות מקואות נדה מכשירין זבים טבול ידים עוקצין '
+  + 'ספרי ספרא מכילתא תנחומא ב"ר ויק"ר שמו"ר במ"ר דב"ר רבה ילקוט פסיקתא פסיק\' פרקי ברייתא תוספתא תלמוד ירושלמי בבלי משנה גמרא תו"כ ת"כ סדר שם לעיל לקמן דף פסוק בר\' ברא\' תה\' תהל\' סנה\' פסח\' גיט\' זבח\' יחז\' קה\' בכ\' בכו\' מ"א מ"ב ר"ה';
+const CITE_FIRST = new Set(BOOKS.split(/\s+/).filter(Boolean));
+const CITE_INTRO = /^(ו?עי['׳]?|ע['׳]|ראה|וראה|ועיין|עיין)$/;
+export function isCitation(inner) {
+  const ws = inner.replace(/[\u0591-\u05C7]/g, '').replace(/[״]/g, '"').replace(/[׳]/g, "'").replace(/<[^>]+>/g, ' ').trim().split(/\s+/).map(w => w.replace(/[,;:.]+$/, ''));
+  if (!ws[0] || inner.length > 90 || ws.length > 12) return false;
+  const first = CITE_INTRO.test(ws[0]) ? ws[1] : ws[0];
+  if (!first || !CITE_FIRST.has(first)) return false;
+  // "(שם)" / "(שם י״ג)" is a reference; "(שם הוא …)" would be prose
+  const after = ws[ws.indexOf(first) + 1];
+  return first !== 'שם' || CITE_FIRST.has(after) || ws.slice(ws.indexOf(first) + 1).every(w => /["']/.test(w) || w.length <= 2);
+}
+export function stripCitations(t) {
+  return t.replace(/\s*\(([^()]{1,90})\)/g, (m, inner) => (isCitation(inner) ? ' ' : m));
+}
+
 export function prepareForTTS(html, opt = {}) {
   const o = { stress: true, divineName: 'hashem', ...opt };
   let t = String(html)
     .replace(/<i class="fn"[^>]*>[\s\S]*?<\/i>/g, '') // edition footnotes (e.g. וי"ו קטיעא) are not read
+    // round 4: anything hidden from screen readers is not spoken either – the petucha/setuma markers פ / ס in particular
+    .replace(/<(span|i|b)\b[^>]*aria-hidden="true"[^>]*>[^<]*<\/\1>/g, ' ')
     .replace(/<\/?(big|small)>/g, '')               // large/small letters: same word
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&[a-z]+;/g, ' ')
     .replace(/\{[פס]\}/g, ' ')
     .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '$2') // ketiv (…) followed by qere […]: read the qere
+    .replace(/[^]*/, x => (o.cites ? stripCitations(x) : x))
     .replace(/\u05C6/g, ' ')            // inverted nun (Ps 107, Num 10) – a scribal mark, not read
     .replace(/\u05C0/g, ' ')            // paseq
     .replace(/\u05C3/g, '.')            // sof pasuq
     .replace(/\u05BE/g, ' ')            // maqaf -> word break
+    .replace(/([\u05D0-\u05EA\u0591-\u05C7'"׳״])-(?=[\u05D0-\u05EA])/g, '$1 ') // a hyphen used as maqaf (אֶת-ה׳)
+    .replace(/[\u200E\u200F\u202A-\u202E]/g, '')  // direction marks (e.g. after יְיָ׳ in the Rambam)
     .replace(/[\u05F3]/g, "'").replace(/[\u05F4]/g, '"')
     .replace(/([\u0591-\u05C7])\1+/g, '$1'); // duplicated marks in source
   t = t.replace(RE_TAAMIM, '');

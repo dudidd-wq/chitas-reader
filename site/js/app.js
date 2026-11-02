@@ -22,6 +22,7 @@ const ICON = {
   stop: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h12v12H6z"/></svg>',
   rew: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',
   fwd: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
@@ -226,6 +227,7 @@ function ttsForm() {
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
+  ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}`;
 }
@@ -384,7 +386,7 @@ async function openReader(unit, iso) {
     <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
     <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
-    <button class="btn ghost" id="b-tts" aria-label="הקראה" aria-haspopup="dialog">${ICON.speak}</button>
+    <button class="btn ghost" id="b-tts" aria-label="הקראה – התחלה או השהיה (לחיצה ארוכה: הגדרות הקראה)" title="הקראה (לחיצה ארוכה: הגדרות)">${ICON.speak}</button>
     <button class="btn ghost" id="b-aa" aria-label="הגדרות תצוגה" aria-haspopup="dialog">${ICON.aa}</button>
     <button class="btn ghost" id="b-full" aria-label="מסך מלא – הסתרת הסרגלים">${ICON.full}</button>
   </header>
@@ -398,6 +400,7 @@ async function openReader(unit, iso) {
       <button class="btn" id="t-play" aria-label="הפעל">${ICON.play}</button>
       <button class="btn ghost" id="t-fwd" aria-label="קטע הבא">${ICON.rew}</button>
       <button class="btn ghost" id="t-stop" aria-label="עצור">${ICON.stop}</button>
+      <button class="btn ghost" id="t-set" aria-label="הגדרות הקראה" aria-haspopup="dialog">${ICON.gear}</button>
       <label class="sr" for="t-rate">מהירות</label>
       <select id="t-rate" title="מהירות ההקראה">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
     </div>
@@ -626,7 +629,12 @@ function bindReaderUi() {
   };
   syncFullBtn();
   $('#b-aa').onclick = () => openSheet('display');
-  $('#b-tts').onclick = () => openSheet('tts');
+  // round 4: one tap starts (or pauses) the reading; a long press – or the ⚙ in the player – opens the settings
+  { const bt = $('#b-tts'); let timer = 0, long = false;
+    bt.addEventListener('pointerdown', () => { long = false; clearTimeout(timer); timer = setTimeout(() => { long = true; openSheet('tts'); }, 550); });
+    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) bt.addEventListener(ev, () => clearTimeout(timer));
+    bt.addEventListener('contextmenu', e => { e.preventDefault(); if (!long) { clearTimeout(timer); long = true; openSheet('tts'); } });
+    bt.onclick = () => { if (long) { long = false; return; } ttsToggle(); }; }
   vp.addEventListener('scroll', () => { if (prefs.layout === 'scroll') updateProgress(); }, { passive: true });
   // tap zones & swipe (page mode); tap center toggles chrome
   let sx = 0, sy = 0, st = 0;
@@ -645,6 +653,7 @@ function bindReaderUi() {
   });
   $('#t-play').onclick = () => ttsToggle();
   $('#t-stop').onclick = () => { R.speaker?.stop(); };
+  $('#t-set').onclick = () => openSheet('tts');
   $('#t-back').onclick = () => R.speaker?.skip(-1);
   $('#t-fwd').onclick = () => R.speaker?.skip(1);
   $('#t-rate').onchange = e => { setPref('ttsRate', snapRate(Number(e.target.value))); R.speaker?.setRate(prefs.ttsRate); };
@@ -730,7 +739,9 @@ function ttsSegments() {
     const parts = [s.querySelector('.t').innerHTML.replace(/<span class="(vn|hn|ketiv)[^>]*>.*?<\/span>/g, '')];
     // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
-    return { el: s, parts, chol: CHOL[s.dataset.ref] };
+    // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
+    const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites };
   });
 }
 const TTS_ERR = {
@@ -772,7 +783,7 @@ async function ttsToggle() {
       if (code === 'no-voice') openSheet('tts');
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, lockscreen: prefs.ttsLockscreen },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);

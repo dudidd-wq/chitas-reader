@@ -4,7 +4,7 @@ const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both',
-  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsContinuous: true,
+  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
 };
 // One speed scale for the footer menu and the settings slider.
@@ -20,7 +20,7 @@ function load() {
 }
 const state = load();
 function save() {
-  // keep at most ~400 days of progress
+  // keep at most 2,500 progress entries (one per lesson and day: about 500 days of all five lessons), dropping the oldest
   const keys = Object.keys(state.progress);
   if (keys.length > 2500) keys.sort((a, b) => (state.progress[a].t || 0) - (state.progress[b].t || 0)).slice(0, keys.length - 2500).forEach(k => delete state.progress[k]);
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* storage full or disabled */ }

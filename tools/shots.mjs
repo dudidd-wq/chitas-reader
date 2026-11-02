@@ -26,7 +26,7 @@ await shot('rambam3-paper-desktop', { w: 1280, h: 800, hash: `r/rambam3/${D}` })
 await shot('rambam1-scroll', { hash: `r/rambam1/${D}`, prefs: { layout: 'scroll', size: 22 } });
 await shot('chumash-immersive-landscape', { w: 844, h: 390, hash: `r/chumash/${D}`, action: async p => { await p.mouse.click(422, 200); await p.waitForTimeout(400); } });
 await shot('reader-display-sheet', { hash: `r/tanya/${D}`, action: async p => { await p.click('#b-aa'); await p.waitForTimeout(300); } });
-await shot('reader-tts-sheet', { hash: `r/tanya/${D}`, action: async p => { await p.click('#b-tts'); await p.waitForTimeout(300); } });
+await shot('reader-tts-sheet', { hash: `r/tanya/${D}`, action: async p => { await p.click('#b-tts', { button: 'right' }); await p.waitForTimeout(300); } });
 await shot('tehillim-gloss-inline', { hash: `r/tehillim/${D}`, prefs: { gloss: 'inline', layout: 'scroll' }, action: async p => { await p.evaluate(() => document.querySelector('.gl')?.scrollIntoView({ block: 'center' })); await p.waitForTimeout(300); } });
 await shot('chumash-gloss-popover', { hash: `r/chumash/${D}`, prefs: { layout: 'scroll' }, action: async p => { const g = p.locator('.gl').first(); if (await g.count()) { await g.scrollIntoViewIfNeeded(); await g.click(); await p.waitForTimeout(300); } else errors.push('no gloss in chumash'); } });
 await shot('settings', { hash: 'settings', h: 1600 });

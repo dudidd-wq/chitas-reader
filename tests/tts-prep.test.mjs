@@ -4,7 +4,7 @@ import { prepareForTTS as P, chunkText } from '../site/js/tts-prep.js';
 const H = { stress: true, divineName: 'hashem' }, A = { stress: true, divineName: 'adonai' };
 
 test('cantillation removed, niqqud kept, sof pasuq → period, maqaf → space', () => {
-  assert.equal(P('וַיְדַבֵּ֥ר יְהוָ֖ה אֶל־מֹשֶׁ֥ה לֵּאמֹֽר׃', H), 'וַיְדַבֵּר השם אֶל מֹשֶׁה לֵּאמֹר.');
+  assert.equal(P('וַיְדַבֵּ֥ר יְהוָ֖ה אֶל־מֹשֶׁ֥ה לֵּאמֹֽר׃', H), 'וַיְדַבֵּר הַשֵּׁם אֶל מֹשֶׁה לֵּאמֹר.');
   assert.doesNotMatch(P('בְּרֵאשִׁ֖ית בָּרָ֣א', H), /[\u0591-\u05AF]/);
 });
 test('plain mode strips niqqud as well', () => {
@@ -13,10 +13,10 @@ test('plain mode strips niqqud as well', () => {
 test('Tetragrammaton per chosen rule, with prefixes', () => {
   assert.equal(P('יְהוָה', A), 'אֲדֹנָי');
   assert.equal(P('לַיהוָה', A), 'לַאֲדֹנָי');
-  assert.equal(P('לַיהוָה', H), 'לַהשם');
+  assert.equal(P('לַיהוָה', H), 'לַהַשֵּׁם');
   assert.equal(P('אֲדֹנָ֥י יֱהֹוִ֖ה', A), 'אֲדֹנָי אֱלֹהִים');
-  assert.equal(P('אֲדֹנָ֥י יֱהֹוִ֖ה', H), 'אֲדֹנָי אֱלֹקִים');
-  assert.equal(P("ה' אֱלֹקֵינוּ", H), 'השם אֱלֹקֵינוּ');
+  assert.equal(P('אֲדֹנָ֥י יֱהֹוִ֖ה', H), 'אֲדוֹשֵׁם אֱלֹקִים');
+  assert.equal(P("ה' אֱלֹקֵינוּ", H), 'הַשֵּׁם אֱלֹקֵינוּ');
 });
 test('Elohim → Elokim only in "השם" mode', () => {
   assert.equal(P('אֱלֹהִ֑ים', H), 'אֱלֹקִים');
@@ -113,4 +113,42 @@ test('round 3: Rashi headwords are read with the verse\'s vowels when they are t
     d.r.forEach((rs, i) => rs.forEach(x => { tot++; if (vowelHeadword(x, d.v[i]) !== x) ch++; }));
   }
   assert.ok(ch / tot > 0.9, `${ch}/${tot}`);
+});
+
+test('round 4: petucha/setuma markers and other aria-hidden content are never spoken', async () => {
+  const { chunkText: C } = await import('../site/js/tts-prep.js');
+  const html = 'וַיֵּרֶד מֹשֶׁה אֶל־הָעָם וַיֹּאמֶר אֲלֵהֶם׃ <span class="pe" aria-hidden="true">ס</span>';
+  const out = P(html, H);
+  assert.equal(out, 'וַיֵּרֶד מֹשֶׁה אֶל הָעָם וַיֹּאמֶר אֲלֵהֶם.');
+  assert.ok(C(out).every(c => !/^[ספ]$/.test(c)));
+  assert.equal(P('<span class="pe" aria-hidden="true">פ</span>', H), '');
+});
+test('round 4: Rashi abbreviations ת״ל, ד״א, ק״ו …', () => {
+  assert.equal(P('תַּ"לֹ כִּי מִן הַשָּׁמַיִם', H), 'תַּלְמוּד לוֹמַר כִּי מִן הַשָּׁמַיִם');
+  assert.equal(P('ד״א מִכָּאן ק״ו', H), 'דָּבָר אַחֵר מִכָּאן קַל וָחוֹמֶר');
+  assert.equal(P('שנא׳ כו׳', H), 'שֶׁנֶּאֱמַר כּוּלֵּי');
+  // ambiguous ones are still left alone
+  assert.equal(P('ע״ב', H), 'ע"ב');
+});
+test('round 4: source citations in parentheses are skipped when asked (Rashi/Rambam), kept otherwise', async () => {
+  const { isCitation } = await import('../site/js/tts-prep.js');
+  const t = 'כִּי מִן הַשָּׁמַיִם (שמות כ׳) (מכילתא) וְכֵן (זבחים קט״ו) (דברים ו ה, יא א) (שם; זבחים ק"א) (שם) סוֹף';
+  assert.equal(P(t, { ...H, cites: true }), 'כִּי מִן הַשָּׁמַיִם וְכֵן סוֹף');
+  assert.match(P(t, H), /\(שמות כ'\)/);
+  // not citations: list numbers, ketiv-like words, prose
+  for (const x of ['א', 'יא', 'ולא כשהוא בינו לבין עצמו', 'שם הוא אדם גדול מאד', 'לא']) assert.equal(isCitation(x), false, x);
+  assert.equal(P('(א) לְהַאֲמִין', { ...H, cites: true }), '(א) לְהַאֲמִין');
+});
+test('round 4: divine names in "השם" mode – hyphen, יי, quotation marks, אֲדֹנָי, prefixes', () => {
+  assert.equal(P("אֶת-ה' אֱלֹהֶיךָ", H), 'אֶת הַשֵּׁם אֱלֹקֶיךָ');
+  assert.equal(P('"וְשַׁבְתָּ עַד ה\' אֱלֹהֶיךָ"', H), '"וְשַׁבְתָּ עַד הַשֵּׁם אֱלֹקֶיךָ"');
+  assert.equal(P('״וְאָהַבְתָּ אֵת יְיָ׳\u200e אֱלֹהֶיךָ״', H), '"וְאָהַבְתָּ אֵת הַשֵּׁם אֱלֹקֶיךָ"');
+  assert.equal(P('זולתי יי', H), 'זולתי הַשֵּׁם');
+  assert.equal(P('זולתי יי', A), 'זולתי אֲדֹנָי');
+  assert.equal(P('אֲדֹנָ֗י מָע֣וֹן אַ֭תָּה', H), 'אֲדוֹשֵׁם מָעוֹן אַתָּה');   // Ps 90:1
+  assert.equal(P('וַאדֹנָי', H), 'וַאֲדוֹשֵׁם');
+  assert.equal(P('אֲדֹנָ֗י מָע֣וֹן', A), 'אֲדֹנָי מָעוֹן');
+  assert.equal(P('הִנֶּה נָּא אֲדֹנַי', H), 'הִנֶּה נָּא אֲדֹנַי');            // "my lords" (patah) – not a holy name
+  assert.equal(P("לַה' וַה' מֵה'", H), 'לַהַשֵּׁם וַהַשֵּׁם מֵהַשֵּׁם');
+  assert.doesNotMatch(P("לַה' וַיהוָה בַּה'", H), /[\u05B0-\u05BC]השם/);
 });
