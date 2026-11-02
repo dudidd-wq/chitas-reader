@@ -1,5 +1,5 @@
 // Loads prebuilt static JSON (site/data) and assembles a day's portion into a document of blocks.
-import { gem, tanya as tanyaRange } from './calendar.js';
+import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe } from './calendar.js';
 
 const cache = new Map();
 /** Licence labels exactly as the source (Sefaria version record) states them — no version is added (round-3 review).
@@ -20,7 +20,10 @@ export const UNITS = {
   tanya: { he: 'תניא', full: 'תניא יומי' },
   rambam3: { he: 'רמב״ם – ג׳ פרקים', full: 'רמב״ם – שלושה פרקים ליום' },
   rambam1: { he: 'רמב״ם – פרק אחד', full: 'רמב״ם – פרק אחד ליום' },
+  mitzvot: { he: 'ספר המצוות', full: 'ספר המצוות היומי' },
+  chassidus: { he: 'תורה אור / לקוטי תורה', full: 'חסידות הפרשה – תורה אור / לקוטי תורה' },
 };
+const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
 
 /** Files a unit needs (used for offline pre-download). */
 export async function filesFor(plan, unit) {
@@ -32,7 +35,51 @@ export async function filesFor(plan, unit) {
     const idx = await data('rambam/index.json');
     for (const it of plan[unit]) for (const [c] of rambamChaptersFull(it, idx[it.name])) f.push(`rambam/${idx[it.name].slug}/${c}.json`);
   }
+  if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
+  if (unit === 'chassidus') { f.push('chassidus/index.json'); const idx = await data('chassidus/index.json'); for (const p of plan.chassidus.parsha) for (const e of idx[p] || []) f.push(`chassidus/${e.file}.json`); }
   return [...new Set(f)];
+}
+async function mitzvotDoc(plan) {
+  const blocks = [];
+  for (const it of plan.mitzvot.items) {
+    blocks.push({ type: 'h', text: mitzvotLabel(it) });
+    if (it.k === 'P' || it.k === 'N' || it.k === 'intro') {
+      const d = await data(shmFile(it)[0]);
+      d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot' }));
+    } else if (it.k === 'S') {
+      for (let n = it.from; n <= it.to; n++) {
+        const d = await data(`mitzvot/S/${n}.json`);
+        if (it.to > it.from) blocks.push({ type: 'h', text: `השורש ה${['', 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שביעי', 'שמיני', 'תשיעי', 'עשירי', 'אחד עשר', 'שנים עשר', 'שלושה עשר', 'ארבעה עשר'][n]}` });
+        d.s.forEach((t, i) => blocks.push({ type: 'p', id: `S${n}.${i + 1}`, text: t, src: 'mitzvot' }));
+      }
+    } else if (it.k === 'conclusion') {
+      blocks.push({ type: 'note', text: 'לפי לוח Chabad.org נלמד היום גם סיום ספר המצוות. במהדורה הפתוחה שבאתר (ורשה תרמ״ג, נחלת הכלל) אין לסיום קטע נפרד, ולכן הוא אינו מוצג כאן.' });
+    } else {
+      blocks.push({ type: 'note', text: `שיעור היום בספר המצוות הוא ${it.he}. הטקסט הזה אינו חלק מספר המצוות, ולכן מוצגת כאן ההפניה בלבד. הוא נמצא בספר משנה תורה, וכלול בדרך כלל גם בשיעור הרמב״ם של אותם ימים.` });
+    }
+  }
+  return { title: UNITS.mitzvot.full, subtitle: plan.mitzvot.items.map(mitzvotLabel).join(' · '), blocks };
+}
+async function chassidusDoc(plan) {
+  const idx = await data('chassidus/index.json');
+  const blocks = [];
+  for (const p of plan.chassidus.parsha) {
+    const list = idx[p] || [];
+    if (plan.chassidus.parsha.length > 1 || !list.length) blocks.push({ type: 'h', text: `פרשת ${parshaHe([p])}` });
+    if (!list.length) blocks.push({ type: 'note', text: `אין בספרי תורה אור ולקוטי תורה מאמרים לפרשת ${parshaHe([p])}.` });
+    for (const e of list) {
+      const d = await data(`chassidus/${e.file}.json`);
+      d.m.forEach((m, mi) => {
+        blocks.push({ type: 'h', text: `${e.he} – ${parshaHe([p])}${d.m.length > 1 ? ` – מאמר ${gem(mi + 1)}` : ''}` });
+        m.forEach((t, i) => blocks.push({ type: 'p', id: `${e.book}.${p}.${mi + 1}.${i + 1}`, text: t, src: 'chassidus' }));
+      });
+    }
+  }
+  return { title: UNITS.chassidus.full, subtitle: await chassidusTitle(plan), blocks };
+}
+async function chassidusTitle(plan) {
+  const idx = await data('chassidus/index.json');
+  return plan.chassidus.parsha.map(p => { const l = idx[p] || []; return l.length ? `${[...new Set(l.map(e => e.he))].join(' ו')} – פרשת ${parshaHe([p])}` : `פרשת ${parshaHe([p])} – אין מאמרים`; }).join(' · ');
 }
 
 async function chumashDoc(plan) {
@@ -155,6 +202,8 @@ export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);
   if (unit === 'tehillim') return tehillimDoc(plan);
   if (unit === 'tanya') return tanyaDoc(plan);
+  if (unit === 'mitzvot') return mitzvotDoc(plan);
+  if (unit === 'chassidus') return chassidusDoc(plan);
   return rambamDoc(plan, unit);
 }
 /** Short description of a unit's portion for the home cards. */
@@ -162,5 +211,7 @@ export async function describe(plan, unit) {
   if (unit === 'chumash') return plan.chumash.title;
   if (unit === 'tehillim') return plan.tehillim.title;
   if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)
+  if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');
+  if (unit === 'chassidus') return chassidusTitle(plan);
   return rambamTitle(plan[unit]);
 }

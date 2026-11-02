@@ -41,7 +41,7 @@ let toastAfterNav = ''; // a message meant for the screen being navigated to
 /** a status message belongs to the screen it was shown on: drop it when the user navigates (review 3) */
 function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
 const todayIso = () => isoDate(new HDate(new Date()));
-const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1'])];
+const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : []), ...(prefs.lessonChassidus ? ['chassidus'] : [])];
 // Dates shown to the reader: Israeli order only (2 בנובמבר 2026 / 02/11/2026); ISO stays in URLs and storage keys.
 const gregHe = iso => gregLongHe(iso);
 const dayDates = (plan, iso) => `${plan.hebDate} · ${fmtDmy(iso)}`;
@@ -148,7 +148,7 @@ function route() {
 window.addEventListener('hashchange', route);
 
 // ---------------- Home ----------------
-const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר' };
+const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ', chassidus: 'ל' };
 const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const guessIsrael = () => { try { return /^Asia\/(Jerusalem|Tel_Aviv)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { return true; } };
@@ -371,6 +371,8 @@ function renderSettings() {
   shell('הגדרות', `<form class="form" id="sf" onsubmit="return false">
     <fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
+    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonChassidus', prefs.lessonChassidus, 'חסידות הפרשה – תורה אור / לקוטי תורה (מאמרי הפרשה של השבוע)')}
+    <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>
     <h2>תצוגה</h2>${displayForm()}
     <h2>הקראה</h2>${ttsForm()}
     <h2>גיבוי ושחזור</h2>
@@ -402,6 +404,8 @@ async function renderSources() {
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים (בהקראה הם נקראים בניקוד הפסוק כשהם מילות הפסוק)')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
+  ${row('ספר המצוות לרמב״ם', s.mitzvot, 'אינו מנוקד. סריקת המהדורה בספרייה הלאומית')}
+  ${row('תורה אור ולקוטי תורה', s.chassidus, 'אינו מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : m.partial ? `<b>מנוקד חלקית</b> – ${m.partial[0]} מתוך ${m.partial[1]} קטעים מנוקדים; לשאר אין גרסה מנוקדת ברישיון המתיר שימוש כאן` : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
   ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
   </tbody></table>
@@ -459,7 +463,12 @@ function renderAbout() {
   <li>החישוב נעשה במכשיר (ספריית Hebcal, אלגוריתם NOAA), בלי רשת, בגובה פני הים, ונבדק מול Hebcal ומול Chabad.org עד דקה. <b>זהו חישוב – יש לבדוק מול לוח מקומי.</b></li>
   <li>הדלקת נרות: 18 דקות לפני השקיעה, בירושלים 40 ובחיפה 30; יש מנהגים מקומיים אחרים (Chabad.org: תל אביב 22, אילת 30; Hebcal: 20 בשאר הארץ) – אפשר לבחור בעמוד.</li>
   <li>״המיקום שלי״ נקרא רק בלחיצה, נשמר במכשיר בלבד ואינו נשלח.</li></ul>
-  <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
+  <h2 id="more-lessons">שיעורים נוספים (לבחירה בהגדרות)</h2><ul>
+  <li><b>ספר המצוות היומי:</b> לוח הרבי לספר המצוות של הרמב״ם, שנלמד במקביל לשיעור הרמב״ם (ספריית Hebcal). הלוח נבדק מול לוח השיעורים של Chabad.org ב־23 תאריכים בשנים 2026–2027, ונמצאה התאמה בכולם. הטקסט: ספר המצוות, ורשה תרמ״ג (נחלת הכלל, דרך ספריא), <b>בלי ניקוד</b>.</li>
+  <li>בימים שבהם השיעור הוא טקסט מתוך משנה תורה (נוסח התפילה, נוסח ההגדה, הלכות מגילה וחנוכה), מוצגת הפניה בלבד. ביום סיום המחזור Chabad.org מציין גם ״סיום״; במהדורה הפתוחה אין לו קטע נפרד, ולכן גם הוא מוצג כהפניה.</li>
+  <li><b>חסידות הפרשה – תורה אור ולקוטי תורה:</b> מאמרי האדמו״ר הזקן על פרשת השבוע, כנהוג ללמוד חסידות בפרשת השבוע. <b>אין לספרים אלה חלוקה יומית רשמית</b>, ולכן מוצגים כל מאמרי הפרשה של השבוע (לפי פרשת החומש של אותו שבוע). בשבוע עם פרשיות מחוברות מוצגות שתיהן. בספרים אין מאמרים לפרשות שופטים ווילך, וזה מצוין שם. מאמרי המועדים (ראש השנה, יום כיפור, סוכות, פורים ועוד) ושיר השירים אינם כלולים, כי אינם קשורים לפרשה. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC, כמו התניא), <b>בלי ניקוד</b>.</li>
+  <li><b>שולחן ערוך הרב (״רב יומי״) לא נוסף:</b> יש לו טקסט ברישיון פתוח, אבל לא מצאנו ללוח היומי שלו מקור שני שאפשר לבדוק מולו באופן אוטומטי. כדי לא להציג לוח שלא נבדק, השיעור הזה לא נכלל.</li></ul>
+  <h2>ניקוד</h2><ul><li>כל טקסטי חת״ת והרמב״ם מנוקדים (ספר המצוות ומאמרי החסידות שבשיעורים הנוספים אינם מנוקדים), חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
@@ -508,7 +517,7 @@ function fmt(html, isTanakh) {
 // per block: true = vocalised, false = not, null = too short to tell (inherits the previous block's state)
 function vocState(blocks) {
   let last = null;
-  const raw = blocks.map(b => { const t = b.type === 'h' ? '' : (b.text || '') + ' ' + (b.sub || []).join(' '); const L = (t.match(/[\u05D0-\u05EA]/g) || []).length; return L < 20 ? null : niqqudRatio(t) >= 0.3; });
+  const raw = blocks.map(b => { const t = b.type === 'h' || b.type === 'note' ? '' : (b.text || '') + ' ' + (b.sub || []).join(' '); const L = (t.match(/[\u05D0-\u05EA]/g) || []).length; return L < 20 ? null : niqqudRatio(t) >= 0.3; });
   const first = raw.find(v => v !== null) ?? null;
   return raw.map(v => (v === null ? (last ?? first) : (last = v)));
 }
@@ -605,7 +614,9 @@ async function renderDoc() {
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
   const main = { chumash: [['חומש', srcs.tanakh], showRashi && ['רש״י', srcs.rashi && { ...srcs.rashi, versionTitleInHebrew: 'מהדורת רוזנבאום–זילברמן (1929–1934)' }]], tehillim: [['תהילים', srcs.tanakh]],
-    tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
+    tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
+    mitzvot: [['ספר המצוות', srcs.mitzvot && { ...srcs.mitzvot, versionTitleInHebrew: 'ספר המצוות, ורשה תרמ״ג' }]],
+    chassidus: [['תורה אור / לקוטי תורה', srcs.chassidus && { ...srcs.chassidus, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
   // round 6: vocalisation is judged per block, not for the whole lesson (Positive Mitzvot: the first ~47 mitzvot are
@@ -620,6 +631,7 @@ async function renderDoc() {
     if (mixed && voc[bi] === true && !prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט מנוקד</p>`;
     if (voc[bi] !== null) prevVoc = voc[bi];
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
+    if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += `<aside class="day-note" role="note">${esc(b.text)}</aside>`; continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
     if (inline) {

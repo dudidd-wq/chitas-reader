@@ -328,3 +328,4 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .zm-heb, #zm-geo-st { text-align: start; } #zm-geo-st:empty { display: none; }
 .zm-special small { color: var(--ink); }
 .zm-nav .today { flex-basis: auto !important; }
+.form .hint { color: var(--muted); font-size: .9rem; margin: .25rem 0 0; }

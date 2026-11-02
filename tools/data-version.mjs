@@ -12,7 +12,7 @@ export function dataHash() {
     const p = path.join(d, e.name);
     if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) { h.update(path.relative(root, p)); h.update(fs.readFileSync(p)); }
   });
-  for (const d of ['torah', 'tehillim', 'tanya', 'rambam']) walk(path.join(root, 'data', d));
+  for (const d of ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'chassidus']) walk(path.join(root, 'data', d));
   return h.digest('hex').slice(0, 12);
 }
 /** { version, files: { "torah/Genesis/1.json": "<sha256, 16 hex>" } } – the hash the SW checks a re-fetched file against */
@@ -22,7 +22,7 @@ export function dataManifest() {
     const p = path.join(d, e.name);
     if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) files[path.relative(path.join(root, 'data'), p)] = crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex').slice(0, 16);
   });
-  for (const d of ['torah', 'tehillim', 'tanya', 'rambam']) walk(path.join(root, 'data', d));
+  for (const d of ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'chassidus']) walk(path.join(root, 'data', d));
   return { version: dataHash(), files };
 }
 if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) {

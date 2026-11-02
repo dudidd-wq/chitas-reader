@@ -1,6 +1,6 @@
 // Daily Chitas + Rambam schedule, computed fully offline.
 // Works in the browser and in Node (tests) – depends only on the bundled hebcal libraries.
-import { HDate, Sedra, Locale, months, dailyRambam1, dailyRambam3, tanyaYomi, dailyPsalms, getLeyningForParsha } from './vendor/hebcal.js';
+import { HDate, Sedra, Locale, months, dailyRambam1, dailyRambam3, tanyaYomi, dailyPsalms, seferHaMitzvot, getLeyningForParsha } from './vendor/hebcal.js';
 
 export const ALIYAH_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שביעי'];
 export const DAY_HE = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'שבת קודש'];
@@ -162,6 +162,37 @@ function rambamItems(list) {
 export const rambam1 = hd => rambamItems([dailyRambam1(hd)]);
 export const rambam3 = hd => rambamItems(dailyRambam3(hd));
 
+// ---- Sefer HaMitzvot (the Rebbe's daily track, instituted 5744) ----
+// Hebcal's schedule (@hebcal/learning) checked against Chabad.org's Daily Study (verification/VERIFICATION.md).
+// Items: {k:'P'|'N', n} mitzvah; {k:'S', from, to} principles (shorashim); {k:'intro'}; {k:'conclusion'} (Chabad.org
+// lists a "Conclusion" on the last day of the cycle, Hebcal omits it); {k:'ref', he} a day whose lesson is a
+// Mishneh Torah text (Order of Prayer, the Haggadah, Megillah and Chanukah) – shown as a reference.
+const SHM_REF = { 'Nusach HaTefila': 'נוסח התפילה (משנה תורה, סוף ספר אהבה)', 'Order of Prayer': 'סדר התפילה (משנה תורה, סוף ספר אהבה)', 'Text of the Haggadah': 'נוסח ההגדה (משנה תורה, סוף הלכות חמץ ומצה)' };
+export function mitzvot(hd) {
+  const r = seferHaMitzvot(hd); if (!r) return { items: [] };
+  const items = [];
+  let m;
+  if (/Introduction/.test(r.reading)) items.push({ k: 'intro' });
+  else if ((m = r.reading.match(/^Principle (\d+)(?:-(\d+))?$/))) items.push({ k: 'S', from: +m[1], to: +(m[2] || m[1]) });
+  else for (const part of r.reading.split(/,\s*(?![^()]*\))/)) {
+    const p = part.trim();
+    if ((m = p.match(/^([PN])(\d+)$/))) items.push({ k: m[1], n: +m[2] });
+    else if ((m = p.match(/^Laws of Megillah and Chanukah Chapters (\d+)-(\d+)$/))) items.push({ k: 'ref', he: `הלכות מגילה וחנוכה פרקים ${gem(+m[1])}–${gem(+m[2])} (משנה תורה)` });
+    else items.push({ k: 'ref', he: SHM_REF[p] || p });
+  }
+  const nx = seferHaMitzvot(hd.next());
+  if (nx && /Introduction/.test(nx.reading) && !/Introduction/.test(r.reading)) items.push({ k: 'conclusion' });
+  return { items, day: r.day };
+}
+export function mitzvotLabel(it) {
+  if (it.k === 'P') return `מצות עשה ${gem(it.n)}`;
+  if (it.k === 'N') return `מצות לא תעשה ${gem(it.n)}`;
+  if (it.k === 'S') return it.from === it.to ? `שורש ${gem(it.from)}` : `שורשים ${gem(it.from)}–${gem(it.to)}`;
+  if (it.k === 'intro') return 'הקדמת הרמב״ם לספר המצוות';
+  if (it.k === 'conclusion') return 'סיום ספר המצוות';
+  return it.he;
+}
+
 // ---- Hebrew numerals / dates ----
 export function gem(n) {
   const ones = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'];
@@ -196,7 +227,9 @@ export function dayPlan(date, { il = true } = {}) {
     iso: isoDate(hd), hd, dayHe: DAY_HE[hd.getDay()], hebDate: hebDateHe(hd),
     weekParsha: parshaHe(chumashParsha(hd, il)),
     chumash: chumash(hd, il), tehillim: tehillim(hd), tanyaStart: tanyaStart(hd),
-    rambam1: rambam1(hd), rambam3: rambam3(hd),
+    rambam1: rambam1(hd), rambam3: rambam3(hd), mitzvot: mitzvot(hd),
+    // Torah Or / Likkutei Torah: the maamarim of the week's parsha (the parsha learnt in Chumash this week)
+    chassidus: { parsha: chumashParsha(hd, il) },
   };
 }
 export { HDate, Locale };
