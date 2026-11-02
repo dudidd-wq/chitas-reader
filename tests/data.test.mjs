@@ -45,3 +45,13 @@ test('every portion resolves to non-empty text (both Israel and diaspora)', asyn
   console.log(`  ${n} portions checked`);
   console.log('  unvocalized portions:', JSON.stringify(Object.fromEntries(Object.entries(unvoc).map(([k, v]) => [k, v.length + ' days, e.g. ' + v[0]])), null, 1));
 });
+
+test('no text is taken from Mechon Mamre (its site forbids reuse on other websites)', () => {
+  const src = JSON.parse(fs.readFileSync(new URL('../site/data/sources.json', import.meta.url), 'utf8'));
+  const all = JSON.stringify(src);
+  assert.ok(!/mechon-mamre/i.test(all), 'sources.json must not reference mechon-mamre');
+  assert.equal(src.rambam.versionTitle, 'Torat Emet 363');
+  for (const n of ['Transmission of the Oral Law', 'Positive Mitzvot']) assert.equal(src.rambamOverrides[n].versionTitle, 'Wikisource Mishneh Torah', n);
+  const t = JSON.parse(fs.readFileSync(new URL('../site/data/rambam/Transmission_of_the_Oral_Law/1.json', import.meta.url), 'utf8')).s;
+  assert.match(t[0], /כָּל הַמִּצְווֹת שֶׁנִּתְּנוּ/);
+});

@@ -13,7 +13,11 @@ export const VERSIONS = {
   rambam: 'Torat Emet 363',
   tanya: 'Kehot Publication Society',
 };
-export const RAMBAM_FALLBACK = ['Torat Emet 370', 'Mechon Mamre Mishneh Torah', 'Mechon-mamre Mishneh Torah', 'Mishneh Torah', 'Wikisource Mishneh Torah'];
+export const RAMBAM_FALLBACK = ['Torat Emet 370', 'Wikisource Mishneh Torah'];
+// Sefaria labels some versions "Public Domain", but their origin site forbids reuse on other websites
+// (Mechon Mamre, https://mechon-mamre.org/copy.htm: "חל איסור מוחלט להעתיק ולהשתמש בחומר שבאתר שלנו באתר אחר").
+// Such versions are never used, whatever their Sefaria licence field says.
+export const EXCLUDED_SOURCES = [/mechon-mamre\.org/i];
 // Only clearly open licences are accepted (CC-BY-NC only for the Tanya, flagged in the docs).
 export const ALLOWED_LICENSES = ['Public Domain', 'CC0', 'CC-BY', 'CC-BY-SA', 'CC-BY-NC'];
 const sources = fs.existsSync(`${OUT}/sources.json`) ? JSON.parse(fs.readFileSync(`${OUT}/sources.json`, 'utf8')) : {};
@@ -29,6 +33,7 @@ async function fetchText(ref, version) {
         const v = d.versions?.[0];
         if (!v || v.versionTitle !== version) { const e = new Error('version missing for ' + ref); e.fatal = true; throw e; }
         await sleep(250);
+        if (EXCLUDED_SOURCES.some(re => re.test(v.versionSource || ''))) { const e = new Error('source excluded: ' + v.versionSource); e.fatal = true; throw e; }
         if (!ALLOWED_LICENSES.includes(v.license)) { const e = new Error('licence not allowed: ' + v.license); e.fatal = true; throw e; }
         return { text: v.text, heRef: d.heRef, ref: d.ref, meta: { versionTitle: v.versionTitle, license: v.license, versionSource: v.versionSource, versionTitleInHebrew: v.versionTitleInHebrew || null } };
       }
@@ -107,18 +112,20 @@ async function tehillim() {
 }
 
 export const slug = name => name.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
-async function rambam() {
-  const index = {};
+async function rambam(only) {
+  const index = only ? JSON.parse(fs.readFileSync(`${OUT}/rambam/index.json`, 'utf8')) : {};
   for (const name of Object.keys(mt)) {
+    if (only && !only.includes(name)) continue;
     const ref = 'Mishneh Torah, ' + name;
     let t = null;
     for (const ver of [VERSIONS.rambam, ...RAMBAM_FALLBACK]) {
       try { t = await fetchText(ref, ver); break; } catch (e) { console.warn('fallback', name, ver); }
     }
     if (!t) throw new Error('no version for ' + name);
-    record('rambam', t.meta, { sefariaUrl: 'https://www.sefaria.org/Mishneh_Torah,_Foundations_of_the_Torah?vhe=' + encodeURIComponent(VERSIONS.rambam) });
+    if (t.meta.versionTitle === VERSIONS.rambam) record('rambam', t.meta, { sefariaUrl: 'https://www.sefaria.org/Mishneh_Torah,_Foundations_of_the_Torah?vhe=' + encodeURIComponent(VERSIONS.rambam) });
     sources.rambamOverrides ||= {};
-    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = t.meta; else delete sources.rambamOverrides[name];
+    const all = JSON.stringify(t.text), L = (all.match(/[\u05D0-\u05EA]/g) || []).length, N = (all.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length;
+    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = { ...t.meta, vocalized: N / Math.max(L, 1) >= 0.3 }; else delete sources.rambamOverrides[name];
     const he = (t.heRef || '').replace(/^משנה תורה,\s*/, '');
     const depth2 = Array.isArray(t.text[0]);
     const chapters = depth2 ? t.text : [t.text];
@@ -161,5 +168,5 @@ const saveSources = () => { fs.mkdirSync(OUT, { recursive: true }); fs.writeFile
 if (what === 'torah' || what === 'all') { await torah(); saveSources(); }
 if (what === 'tehillim' || what === 'all') { await tehillim(); saveSources(); }
 if (what === 'tanya' || what === 'all') { await tanya(); saveSources(); }
-if (what === 'rambam' || what === 'all') { await rambam(); saveSources(); }
+if (what === 'rambam' || what === 'all') { await rambam(process.argv[3] ? process.argv[3].split(',') : null); saveSources(); }
 console.log('ok');

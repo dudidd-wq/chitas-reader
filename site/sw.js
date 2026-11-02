@@ -1,8 +1,8 @@
 // Service worker: app shell precache + cache-first for static text data.
 // VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs);
 // when texts are rebuilt the data cache name changes, the old cache is deleted on activate, and texts are re-fetched.
-const VERSION = '1.0.9';
-const DATA_VERSION = 'b89c7d8432b9';
+const VERSION = '1.0.10';
+const DATA_VERSION = 'd02e9101f9a2';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/vendor/hebcal.js',
