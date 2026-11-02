@@ -71,3 +71,35 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closePop();
 });
 document.addEventListener('scroll', closePop, true);
+
+// Any word, in any unit (incl. Rashi, Tanya, Rambam): selecting it (long-press / double-click) offers a lookup link to
+// he.wiktionary. Nothing is sent anywhere unless the user taps the link (a normal navigation in a new tab).
+export function lookupWord(s) {
+  const w = String(s).replace(/[\u0591-\u05AF\u05BD\u05BF\u05C0\u05C3-\u05C7]/g, '').replace(/[\u05B0-\u05BC\u05C1\u05C2]/g, '')
+    .replace(/[\u05BE]/g, ' ').replace(/[^\u05D0-\u05EA\u05F3\u05F4"'׳״ ]/g, ' ').replace(/\s+/g, ' ').trim()
+    .replace(/^["'׳״]+|["'׳״]+$/g, '');
+  return w && w.split(' ').length <= 3 && w.length <= 30 ? w : '';
+}
+let lk = null, lkT = 0;
+function closeLookup() { lk?.remove(); lk = null; }
+document.addEventListener('selectionchange', () => {
+  clearTimeout(lkT);
+  lkT = setTimeout(() => {
+    const sel = getSelection();
+    const node = sel.rangeCount && sel.getRangeAt(0).commonAncestorContainer;
+    const el = node && (node.nodeType === 1 ? node : node.parentElement);
+    const w = !sel.isCollapsed && el?.closest('.r-content') ? lookupWord(sel.toString()) : '';
+    if (!w) { closeLookup(); return; }
+    closeLookup();
+    lk = document.createElement('div'); lk.className = 'gloss-pop lookup-pop';
+    lk.innerHTML = `<a target="_blank" rel="noopener"></a><small>קישור חיצוני לוויקימילון (נפתח בלשונית חדשה)</small>`;
+    const a = lk.querySelector('a'); a.textContent = `חיפוש ״${w}״ בוויקימילון`;
+    a.href = 'https://he.wiktionary.org/w/index.php?search=' + encodeURIComponent(w);
+    document.body.appendChild(lk);
+    const r = sel.getRangeAt(0).getBoundingClientRect(), pr = lk.getBoundingClientRect();
+    let top = r.bottom + 10; if (top + pr.height > innerHeight - 10) top = Math.max(8, r.top - pr.height - 10);
+    lk.style.top = top + 'px'; lk.style.left = Math.min(Math.max(8, r.left + r.width / 2 - pr.width / 2), innerWidth - pr.width - 8) + 'px';
+  }, 350);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLookup(); });
+addEventListener('hashchange', closeLookup);

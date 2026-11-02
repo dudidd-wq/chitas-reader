@@ -123,3 +123,24 @@ test('sheets are modal dialogs: aria-modal, focus trapped, background inert, foc
     assert.deepEqual(await axe(), [], 'home: no axe violations');
   } finally { await b.close(); srv.close(); }
 });
+
+test('any word (here in Tanya, which has no glossary) can be selected and looked up in Wiktionary; niqqud stripped', { skip }, async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url);
+    await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('.seg'); await p.waitForTimeout(300);
+    await p.evaluate(() => {
+      const t = [...document.querySelectorAll('.seg .t, .seg')].map(e => e.firstChild).find(n => n?.nodeType === 3 && /\S{3,}/.test(n.nodeValue));
+      const m = t.nodeValue.match(/[\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05C7]{2,}/);
+      const r = document.createRange(); r.setStart(t, m.index); r.setEnd(t, m.index + m[0].length);
+      getSelection().removeAllRanges(); getSelection().addRange(r);
+    });
+    await p.waitForSelector('.lookup-pop a');
+    const href = await p.getAttribute('.lookup-pop a', 'href');
+    assert.match(href, /^https:\/\/he\.wiktionary\.org\/w\/index\.php\?search=/);
+    assert.doesNotMatch(decodeURIComponent(href), /[\u0591-\u05C7]/, 'no niqqud in the query');
+    await p.evaluate(() => getSelection().removeAllRanges()); await p.waitForTimeout(500);
+    assert.equal(await p.$('.lookup-pop'), null);
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
