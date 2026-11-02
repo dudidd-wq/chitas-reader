@@ -499,7 +499,7 @@ function bindReaderUi() {
     else if (document.fullscreenElement) document.exitFullscreen();
     toggleChrome(true);
   };
-  $('#b-full').setAttribute('aria-pressed', 'false');
+  syncFullBtn();
   $('#b-aa').onclick = () => openSheet('display');
   $('#b-tts').onclick = () => openSheet('tts');
   vp.addEventListener('scroll', () => { if (prefs.layout === 'scroll') updateProgress(); }, { passive: true });
@@ -530,10 +530,28 @@ function turn(d) {
     setPage(R.page + d);
   } else { const vp = $('#vp'); vp.scrollBy({ top: d * (vp.clientHeight - 80), behavior: 'smooth' }); }
 }
+// The ⤢ button reflects the real full-screen state (also when the browser leaves full screen by itself, e.g. Esc).
+function syncFullBtn() { const b = $('#b-full'); if (b) b.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false'); }
+let fsExitT = 0;
+document.addEventListener('fullscreenchange', () => {
+  syncFullBtn();
+  if (!document.fullscreenElement) { fsExitT = Date.now(); if (!$('#reader').hidden) R.toggleChrome?.(false); }
+});
+// Escape never leaves the text: it closes the innermost layer only (word pop-up → sheet → full screen / hidden bars).
+// Going back to the day is the explicit ‹ button (or the browser's Back).
+function readerEscape() {
+  if (document.querySelector('.gloss-pop')) return 'popup';          // gloss.js closes it
+  if (!$('#sheet').hidden) { closeSheet(); return 'sheet'; }
+  if (Date.now() - fsExitT < 400) return 'fullscreen';                // this Esc already left full screen
+  if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return 'fullscreen'; }
+  if ($('#reader').classList.contains('immersive')) { R.toggleChrome?.(false); return 'chrome'; }
+  return 'none';
+}
 document.addEventListener('keydown', e => {
-  if ($('#reader').hidden || e.target.closest('input, select, textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
+  if ($('#reader').hidden || e.altKey || e.ctrlKey || e.metaKey) return;
   const k = e.key;
-  if (k === 'Escape') { if (!$('#sheet').hidden) closeSheet(); else location.hash = '#/d/' + R.iso; return; }
+  if (k !== 'Escape' && e.target.closest('input, select, textarea')) return;
+  if (k === 'Escape') { R.lastEsc = readerEscape(); return; }
   if (!$('#sheet').hidden) return;
   if (k === 'ArrowLeft' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); turn(1); }
   else if (k === 'ArrowRight' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); turn(-1); }
@@ -541,7 +559,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'End') { e.preventDefault(); prefs.layout === 'pages' ? setPage(R.pages - 1) : $('#vp').scrollTo({ top: 1e9 }); }
   else if (k === 'p' || k === 'P' || k === 'פ') ttsToggle();
   else if (k === 'f' || k === 'F' || k === 'כ') $('#b-full').click();
-});
+}, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
 let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); } }, 150); });
 
 function openSheet(kind) {
