@@ -80,20 +80,22 @@ export function chumash(hd, il) {
     // its start up to and including the day's aliyah (the Rebbe, Torat Menachem 5732 vol. 1 p. 129, Sichat Yom
     // Simchat Torah; Chabad.org.il "מנהגי חב״ד לשמחת תורה", e.g. Monday: ברכה מ'שני' עד הסוף ובראשית עד 'שני').
     // The next day continues Bereshit with its own aliyah as usual.
-    // Israel only (22 Tishrei can fall on Shabbat; 23 Tishrei never does): on Shabbat the rule "up to the day's
-    // aliyah" would mean all of Bereshit, although the Bereshit week starts anew the next day. We learn Bereshit
-    // 'ראשון' only (1:1–2:3, the חתן בראשית reading), as chabad.org.il words it for a Simchat Torah on a Sunday:
-    // "כל פרשת ברכה וראשון דפרשת בראשית" (Daily/Item.asp?ArticleID=701). No source we found states the Israeli
-    // Shabbat case explicitly – see NOTES.md / About.
+    // Israel only (22 Tishrei can fall on Shabbat; 23 Tishrei never does): there is no explicit instruction for
+    // the Israeli Shabbat case, and "Bereshit up to the day's aliyah" would mean all of Bereshit although its week
+    // begins the next day. So on Shabbat we follow the basic written rule that both opinions share – Sefer HaMinhagim
+    // (Chabad), Chitas: "on Simchat Torah one studies Vezot from the passage of that weekday to the end; on Isru Chag,
+    // Bereshit from its start up to the passage of that weekday" (= HaYom Yom 5703; also 'Otzar Minhagei Chabad'
+    // p. 392 as quoted in Hitkashrut 1368: "כל פרשת ברכה (בלבד – זו כנראה ההוראה הקבועה)"). I.e. Shabbat: Vezot
+    // Shevi'i only; Sunday (Isru Chag): Bereshit Rishon, as on every Sunday – no repetition.
     const onShabbat = n === 7;
-    const b = getLeyningForParsha(['Bereshit']).fullkriyah[onShabbat ? 1 : n];
-    res.parts = [
-      { book: 'Deuteronomy', bookHe: BOOK_HE.Deuteronomy, from: res.from, to: { c: 34, v: 12 } },
-      { book: 'Genesis', bookHe: BOOK_HE.Genesis, from: { c: 1, v: 1 }, to: parseRef(b.e) },
-    ];
+    res.parts = [{ book: 'Deuteronomy', bookHe: BOOK_HE.Deuteronomy, from: res.from, to: { c: 34, v: 12 } }];
+    if (!onShabbat) {
+      const b = getLeyningForParsha(['Bereshit']).fullkriyah[n];
+      res.parts.push({ book: 'Genesis', bookHe: BOOK_HE.Genesis, from: { c: 1, v: 1 }, to: parseRef(b.e) });
+    }
     res.simchatTorah = true;
     res.shabbat = onShabbat;
-    res.title = `שמחת תורה – וזאת הברכה מ${ALIYAH_HE[n - 1]} עד סוף התורה, ובראשית ${onShabbat ? 'ראשון (א,א–ב,ג)' : 'עד סוף ' + ALIYAH_HE[n - 1]}`;
+    res.title = `שמחת תורה – וזאת הברכה מ${ALIYAH_HE[n - 1]} עד סוף התורה${onShabbat ? '' : ', ובראשית עד סוף ' + ALIYAH_HE[n - 1]}`;
   }
   return res;
 }

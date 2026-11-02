@@ -20,11 +20,11 @@ test('Simchat Torah: two-part Chumash shiur', () => {
   assert.deepEqual(R(dayPlan('2025-10-15', { il: true }).chumash.parts), [['Genesis', '3:22', '4:18']]);
   assert.match(dayPlan('2025-10-15', { il: false }).chumash.title, /שמחת תורה/);
 });
-test('Israel, Simchat Torah on Shabbat (22 Tishrei 5787 = 2026-10-03): Vezot Shevi\'i + Bereshit Rishon only (round-2 MUST-FIX)', () => {
+test('Israel, Simchat Torah on Shabbat (22 Tishrei 5787 = 2026-10-03): Vezot Shevi\'i only, Bereshit Rishon on Isru Chag (Sefer HaMinhagim; round 4)', () => {
   const c = dayPlan('2026-10-03', { il: true }).chumash;
   assert.equal(c.simchatTorah, true); assert.equal(c.shabbat, true);
-  assert.deepEqual(R(c.parts), [['Deuteronomy', '34:1', '34:12'], ['Genesis', '1:1', '2:3']]);
-  assert.match(c.title, /ובראשית ראשון/); assert.doesNotMatch(c.title, /עד סוף שביעי/);
+  assert.deepEqual(R(c.parts), [['Deuteronomy', '34:1', '34:12']]);
+  assert.match(c.title, /וזאת הברכה משביעי עד סוף התורה$/); assert.doesNotMatch(c.title, /בראשית/);
   // the Bereshit week begins the next day with Rishon as usual (Shabbat Bereshit is 2026-10-10 in Israel)
   assert.deepEqual(R(dayPlan('2026-10-04', { il: true }).chumash.parts), [['Genesis', '1:1', '2:3']]);
   // the Diaspora on that Shabbat is Shemini Atzeret: one Vezot aliyah
@@ -32,7 +32,9 @@ test('Israel, Simchat Torah on Shabbat (22 Tishrei 5787 = 2026-10-03): Vezot She
   // every other Israeli Simchat Torah on Shabbat in 5780–5800 follows the same rule
   for (const iso of ['2020-10-10', '2023-10-07']) {
     const x = dayPlan(iso, { il: true }).chumash;
-    assert.deepEqual(R(x.parts).at(-1), ['Genesis', '1:1', '2:3'], iso);
+    assert.deepEqual(R(x.parts), [['Deuteronomy', '34:1', '34:12']], iso);
+    const next = new Date(new Date(iso + 'T12:00:00Z').getTime() + 864e5).toISOString().slice(0, 10);
+    assert.deepEqual(R(dayPlan(next, { il: true }).chumash.parts), [['Genesis', '1:1', '2:3']], next);
   }
 });
 test('Simchat Torah: offline files include both books', async () => {
