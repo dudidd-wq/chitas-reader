@@ -18,6 +18,16 @@ export function toHDate(date) {
   if (typeof date === 'string') { const [y, m, d] = date.split('-').map(Number); return new HDate(new Date(y, m - 1, d)); }
   return new HDate(date);
 }
+// Day/month/year as used in Israel, independent of the browser locale (the native date field follows the OS locale,
+// e.g. mm/dd/yyyy on an English system).
+export function fmtDmy(iso) { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; }
+// Accepts d/m/yyyy with '/', '.' or '-' separators; returns an ISO date or null for an impossible date.
+export function parseDmy(str) {
+  const m = String(str).trim().match(/^(\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{4})$/); if (!m) return null;
+  const [d, mo, y] = [+m[1], +m[2], +m[3]], g = new Date(Date.UTC(y, mo - 1, d));
+  if (g.getUTCFullYear() !== y || g.getUTCMonth() !== mo - 1 || g.getUTCDate() !== d) return null;
+  return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
 export function isoDate(hd) {
   const g = hd.greg();
   return `${g.getFullYear()}-${String(g.getMonth() + 1).padStart(2, '0')}-${String(g.getDate()).padStart(2, '0')}`;

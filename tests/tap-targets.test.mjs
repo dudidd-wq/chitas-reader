@@ -8,6 +8,8 @@ const D = '2026-11-02';
 const scan = p => p.evaluate(() => [...document.querySelectorAll('a, button, select, input, label, [role=button], [tabindex]')].filter(e => {
   if (e.closest('[hidden], [inert]') || e.closest('.r-content') || e.matches('.sr, .skip')) return false;
   const r = e.getBoundingClientRect(); if (!r.width || !r.height) return false;
+  // not a target at all: hidden from AT, out of the tab order and not clickable (the native picker behind the calendar button)
+  if (e.getAttribute('aria-hidden') === 'true' && e.tabIndex < 0 && getComputedStyle(e).pointerEvents === 'none') return false;
   if (e.tagName === 'INPUT' && /radio|checkbox/.test(e.type) && (e.closest('label') || document.querySelector(`label[for="${e.id}"]`))) return false;
   // WCAG 2.5.8 inline exception: a link inside a sentence of running text
   if (e.tagName === 'A' && e.parentElement.matches('p, li') && e.parentElement.textContent.trim().length > e.textContent.trim().length + 10) return false;

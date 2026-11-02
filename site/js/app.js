@@ -1,5 +1,5 @@
 import { CHOL } from './chol.js';
-import { dayPlan, isoDate, toHDate, HDate, Locale, gem } from './calendar.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL } from './texts.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
@@ -15,6 +15,7 @@ const ICON = {
   next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
   aa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 19l5-14 5 14M5 14h6M15 19l3.5-9 3.5 9M16 16h5"/></svg>',
   speak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg>',
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
   full: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg>',
   pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
@@ -69,6 +70,21 @@ function locationPanel(first) {
       <button class="btn ${guess ? '' : 'primary'}" data-il="false">${PIN}חוץ לארץ</button>
     </div></section>`;
 }
+// Date field: typed as dd/mm/yyyy whatever the browser locale; the calendar button opens the native picker
+// (hidden input) and its choice is shown back in dd/mm/yyyy.
+function bindDateField() {
+  const t = $('#datepick'), n = $('#datenative'), err = $('#dateerr');
+  const go = () => {
+    const iso = parseDmy(t.value);
+    if (!iso) { t.setAttribute('aria-invalid', 'true'); err.innerHTML = 'תאריך בתבנית יום/חודש/שנה, למשל <bdi dir="ltr">24/05/2026</bdi>'; return; }
+    t.removeAttribute('aria-invalid'); err.textContent = '';
+    if (iso !== currentDate) location.hash = '#/d/' + iso; else t.value = fmtDmy(iso);
+  };
+  t.addEventListener('change', go);
+  t.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+  $('#calbtn').addEventListener('click', () => { try { n.showPicker(); } catch { t.focus(); t.select(); } });
+  n.addEventListener('change', () => { if (n.value) { t.value = fmtDmy(n.value); go(); } });
+}
 async function renderHome(showLoc = false) {
   const plan = dayPlan(currentDate, { il: prefs.il });
   const isToday = currentDate === todayIso();
@@ -85,10 +101,15 @@ async function renderHome(showLoc = false) {
     ${first || showLoc ? locationPanel(first) : ''}
     <nav class="datebar" aria-label="בחירת תאריך">
       <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם">${ICON.prev}<span>הקודם</span></a>
-      <label class="sr" for="datepick">תאריך</label>
-      <input type="date" id="datepick" value="${currentDate}">
+      <span class="datefield">
+        <label class="sr" for="datepick">תאריך (יום/חודש/שנה)</label>
+        <input type="text" id="datepick" dir="ltr" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" placeholder="יי/חח/שששש" value="${fmtDmy(currentDate)}" aria-describedby="dateerr">
+        <button type="button" class="btn icon" id="calbtn" aria-label="פתיחת לוח שנה">${ICON.cal}</button>
+        <input type="date" id="datenative" value="${currentDate}" tabindex="-1" aria-hidden="true">
+      </span>
       <a class="btn" href="#/d/${shiftIso(currentDate, 1)}" aria-label="היום הבא"><span>הבא</span>${ICON.next}</a>
       ${isToday ? '' : `<a class="btn today" href="#/d/${todayIso()}">חזרה להיום</a>`}
+      <p id="dateerr" class="dateerr" role="alert"></p>
     </nav>
     <section aria-labelledby="day-h">
       <div class="dayhead"><h2 id="day-h">שיעורי היום</h2><span id="daysum" class="daysum"></span></div>
@@ -110,7 +131,7 @@ async function renderHome(showLoc = false) {
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
   </div>`;
-  $('#datepick').addEventListener('change', e => { if (e.target.value) location.hash = '#/d/' + e.target.value; });
+  bindDateField();
   $('#dl30').addEventListener('click', downloadAhead);
   $('#loc').addEventListener('click', () => { renderHome(!showLoc && !first); if (!showLoc && !first) $('#locq [data-il]')?.focus(); });
   v.querySelectorAll('#locq [data-il]').forEach(b => b.addEventListener('click', () => {
