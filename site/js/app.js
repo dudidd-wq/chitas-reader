@@ -307,7 +307,8 @@ async function renderSources() {
   <li><b>בדיקה ידנית</b> של כל ביאור שעבר את שתי הבדיקות, מול הפסוק ומול שני המקורות. ספק – נדחה.</li></ol>
   <p id="gloss-counts"></p>
   <p>תיאור השיטה המלא, הפקודות והמספרים: <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/GLOSSARY-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">verification/GLOSSARY-VERIFICATION.md</a>. לכל מילה אחרת, בכל השיעורים (גם רש״י, תניא ורמב״ם), אפשר לסמן את המילה (לחיצה ארוכה או לחיצה כפולה) ולבחור ״חיפוש בוויקימילון״ – קישור חיצוני שנפתח בלשונית חדשה; האפליקציה עצמה אינה שולחת דבר.</p>
-  <h2>תיקוני ניקוד ברמב״ם</h2><p id="rambam-errata">מהדורת תורת אמת של משנה תורה היא המהדורה המנוקדת החופשית היחידה שמצאנו, ויש בה מעט טעויות ניקוד. תיקנו רק טעויות שנבדקו ידנית: העיצורים זהים בנוסח השני שבספריא (ויקיטקסט), והניקוד המתוקן הוא הניקוד שהמהדורה עצמה נותנת לאותה מילה במקומות אחרים. התיקון מוצג בשיעור עצמו (״תוקנו כאן…״), וקובצי המקור אינם משתנים.</p>
+  <h2>תיקוני נוסח וניקוד ברמב״ם</h2><p id="rambam-errata">מהדורת תורת אמת של משנה תורה היא המהדורה המנוקדת החופשית היחידה שמצאנו, ויש בה מעט טעויות ניקוד. תיקנו רק טעויות שנבדקו ידנית: העיצורים זהים בנוסח השני שבספריא (ויקיטקסט), והניקוד המתוקן הוא הניקוד שהמהדורה עצמה נותנת לאותה מילה במקומות אחרים. התיקון מוצג בשיעור עצמו (״תוקנו כאן…״), וקובצי המקור אינם משתנים.</p>
+  <p id="rambam-text-fixes">תיקון נוסח: בהלכות מלכים יא, ד הופיע במהדורה המשפט מהדפוס המצונזר בסוגריים, בלי המילים ״וניצח כל האומות שסביביו״. הוא הוחלף בנוסח השלם, שבו מסכימים שני מקורות: ויקיטקסט (נוסח מוגה לפי כתבי יד) והנוסח השני שבספריא. ניקוד המילים שנוספו לקוח ממקומות אחרים במהדורה עצמה.</p>
   <p id="rambam-errata-counts"></p>
   <p>השיטה, הסריקות והרשימות המלאות: <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/RAMBAM-ERRATA.md" target="_blank" rel="noopener" dir="ltr">verification/RAMBAM-ERRATA.md</a>.</p>
   <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> מאת Michael J. Radwin, Danny Sadinoff ושותפים, ארוזות ללא שינוי בקובץ js/vendor/hebcal.js: ‎@hebcal/core ו-‎@hebcal/hdate (GPL-2.0-or-later), ‎@hebcal/learning ו-‎@hebcal/leyning (BSD-2-Clause, ‏Copyright (c) 2020–2026 hebcal), ‎@hebcal/noaa (LGPL-2.1). נוסח הרישיונות המלא והודעות זכויות היוצרים: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>. החישוב נעשה במכשיר, ללא רשת.</p>
@@ -320,7 +321,9 @@ async function renderSources() {
 async function errataCounts() {
   try {
     const m = (await data('rambam-errata.json')).meta, n = x => x.toLocaleString('he-IL'), q = m.scans?.niqqud, w = m.scans?.wikisource;
-    let t = `תוקנו ${n(m.fixes)} טעויות ניקוד ב־${n(m.halachot)} הלכות.`;
+    let t = `תוקנו ${n(m.fixes)} טעויות ניקוד ב־${n(m.halachot)} הלכות${m.textFixes ? (m.textFixes === 1 ? ', ותיקון נוסח אחד (מלכים יא, ד)' : `, ו־${n(m.textFixes)} תיקוני נוסח`) : ''}.`;
+    const g = m.scans?.gaps;
+    if (g) t += ` סריקת השמטות (השוואה לנוסח ויקיטקסט, פרק מול פרק): ${n(g.missing)} מקומות שבהם בוויקיטקסט יש 3 מילים או יותר שאין אצלנו, ו־${n(g.paren)} קטעים בסוגריים שאינם מראי מקום; כולם נבדקו ידנית – פירוט בקובץ השיטה.`;
     if (q) t += ` סריקה אוטומטית סימנה עוד ${n(q.wordsFlagged)} מילים בעלות ניקוד חריג ב־${n(q.halachotFlagged)} הלכות; רובן צורות תקינות (למשל בניין או זמן אחר), ולכן לא שונו – הן ברשימה לבדיקה ידנית.`;
     if (w) t += ` השוואת עיצורים מול נוסח ויקיטקסט: ${n(w.identical)} מתוך ${n(w.halachot)} הלכות זהות; בשאר יש הבדלי נוסח בין המהדורות (מתוכם ${n(w.nearIdenticalSubstitutions)} החלפות של מילה בודדת במילה כמעט זהה), שגם הם רק מסומנים ולא שונו.`;
     return t;
@@ -483,7 +486,13 @@ async function renderDoc() {
   if (open) html += '</p>';
   R.credit = credit;
   if (credit) html += `<p class="doc-credit">מקור הנוסח – ${credit}</p>`;
-  if (d.fixes?.length) html += `<p class="doc-credit" id="doc-fixes">תוקנו כאן ${d.fixes.length === 1 ? 'טעות ניקוד אחת' : `${d.fixes.length} טעויות ניקוד`} של המהדורה (העיצורים זהים לנוסח ויקיטקסט): ${d.fixes.map(f => `<span title="${esc(f.label)}">${esc(f.from)} ← ${esc(f.to)}</span>`).join(' · ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
+  if (d.fixes?.length) {
+    const nq = d.fixes.filter(f => f.kind !== 'text'), tx = d.fixes.filter(f => f.kind === 'text');
+    const parts = [];
+    if (tx.length) parts.push(`תיקון נוסח: ${tx.map(f => `ב${esc(f.label)} הוחלף משפט מהדפוס המצונזר (שהופיע בסוגריים) בנוסח השלם, על פי ויקיטקסט (נוסח מוגה לפי כתבי יד) והנוסח השני שבספריא`).join('; ')}`);
+    if (nq.length) parts.push(`${nq.length === 1 ? 'תוקנה טעות ניקוד אחת' : `תוקנו ${nq.length} טעויות ניקוד`} של המהדורה (העיצורים זהים לנוסח ויקיטקסט): ${nq.map(f => `<span title="${esc(f.label)}">${esc(f.from)} ← ${esc(f.to)}</span>`).join(' · ')}`);
+    html += `<p class="doc-credit" id="doc-fixes">${parts.join('. ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
+  }
   html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
   rc.innerHTML = html;
   rc.className = 'r-content gloss-' + prefs.gloss;

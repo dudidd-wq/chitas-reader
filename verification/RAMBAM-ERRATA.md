@@ -22,7 +22,7 @@ A fix is included only if **all** of the following hold. The generator asserts t
    and לְהִתְגַּיֵּר 5 times.
 4. **Checked by hand.** The source form is not a valid vocalisation in context.
 
-Current count: see `meta` in `site/data/rambam-errata.json`. It holds 31 fixes in 24 halachot, and 14 of them (all
+Current count: see `meta` in `site/data/rambam-errata.json`. It holds 31 fixes in 24 halachot (plus 1 text fix, Kings 11:4 – see "Text fixes" below), and 14 of them (all
 outside the Introduction) are confirmed against the Wikisource consonants. The reviewer's examples are among them:
 לִהִתְגַּיֵּר → לְהִתְגַּיֵּר (Forbidden Intercourse 14:1) and שִׁאוֹסֵר → שֶׁאוֹסֵר (Forbidden Foods 12:1). Three
 halachot have a damaged stretch in which the vowels have shifted (Forbidden Intercourse 1:11, Foundations of the
@@ -46,3 +46,25 @@ Rejected candidates include וְשֶׁמִּן (Forbidden Foods 12:21, correct: 
 
 Reproduce: `python3 tools/rambam-ws-compare.py && python3 tools/rambam-niqqud-scan.py && python3 tools/rambam-errata-src.py`.
 The Wikisource text excerpts in the mismatch list are © Wikisource contributors, CC BY-SA, via Sefaria.
+
+## Text fixes (round 5)
+
+A text fix changes wording, not only niqqud, so the bar is higher. Two independent sources must agree on the wording, and every added word must be vocalised the way this edition vocalises it elsewhere. Text fixes are stored in the same overlay as `kind: "text"`, with `sources` and `note`. The reader shows them as "תיקון נוסח", separately from the niqqud fixes.
+
+| Ref | Before (Torat Emet) | After | Sources |
+|---|---|---|---|
+| Kings 11:4 | "…בְּחֶזְקַת שֶׁהוּא מָשִׁיחַ. (אִם עָשָׂה וְהִצְלִיחַ וּבָנָה מִקְדָּשׁ … וִיתַקֵּן אֶת הָעוֹלָם כֻּלּוֹ … שְׁכֶם אֶחָד):". This is the censored Warsaw–Vilna sentence, in parentheses. It lacks "וניצח כל האומות שסביביו". | "…אִם עָשָׂה וְהִצְלִיחַ וְנִצֵּחַ כָּל הָאֻמּוֹת שֶׁסְּבִיבָיו וּבָנָה מִקְדָּשׁ בִּמְקוֹמוֹ וְקִבֵּץ נִדְחֵי יִשְׂרָאֵל הֲרֵי זֶה מָשִׁיחַ בְּוַדַּאי:" | (1) Sefaria "Wikisource Mishneh Torah" 11:4. (2) The manuscript-corrected הגהה section of he.wikisource "רמב"ם הלכות מלכים ומלחמות יא". The idea in "ויתקן את העולם…" appears in the full text in halacha 7, which is already shown. Vocalisation: וְנִצֵּחַ (Kings 7:15), הָאֻמּוֹת (18 times), שֶׁסְּבִיבָיו (from סְבִיבָיו 11 times and שֶׁסְּבִיבוֹתָיו 3 times). |
+
+## Gap scan (round 5): `tools/rambam-gap-scan.py` → `rambam-gap-scan.json`
+
+This is a systematic search for passages like 11:4. Every chapter of our text, after the overlay, is compared word by word with Sefaria's "Wikisource Mishneh Torah" chapter. The comparison runs per chapter because the two editions split halachot differently; a per-halacha diff produced about 90 false alarms from alignment alone. The diff uses a consonant key with matres lectionis dropped. Citations are ignored.
+
+| Kind | Count | Review result |
+|---|---|---|
+| Our halachot / compared with Wikisource | 14,367 / 14,284 | The rest are the Introduction and the chapters taken from other versions. |
+| **missing**: 3 or more Wikisource words absent from our text in one place | 12 before the fix, **11** after | Kings 11:4 was a real gap and is **fixed**. The other 11 were read in both texts. None of them is a gap in our text: 4 are verse references, 1 is an editorial note in Wikisource, 1 is a closing formula, 3 are duplications or word-order errors in Wikisource, and 2 are Wikisource artefacts (a duplicated halacha, and a lemma glued onto the start of a sentence). The verdict for each is in the JSON (`review`). |
+| **colophon**: "סליקו להו… / בריך רחמנא…" absent from our text | 21 | These are closing formulas, not halacha text. Not a gap. |
+| **paren**: non-citation parentheses of 4 or more words | 32 (64 before excluding "(גמרא …)" and "(משנה …)" source references) | In 30 of them the same words are also in Wikisource; in our edition they are only bracketed editorially. One is a broken citation parenthesis. One ("אף על פי שאינו סימן מבהק", Robbery 15:10) is an editorial addition in our edition. Nothing is missing. |
+| **short**: our chapter has under 90% of the Wikisource word count | 1 | Kings 12, where only the book's long colophon is missing. |
+
+**Result:** one confirmed gap (11:4), now fixed; 0 open gaps; 0 flags left unreviewed. The read-aloud skips only parentheses that are citations, so the bracketed halacha text above is still read aloud.

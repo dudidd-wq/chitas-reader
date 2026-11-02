@@ -58,9 +58,33 @@ for ref, a, b in E:
     assert ws is not False, ('consonants not in Wikisource', ref, a)
     wsChecked += ws is True
   out.setdefault(ref, []).append({'from': N(a), 'to': N(b), 'elsewhere': ev, 'wikisourceConsonants': ws})
-total = sum(len(v) for v in out.values())
-json.dump({'meta': {'edition': 'Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource', 'fixes': total, 'halachot': len(out),
+# TEXT corrections (round 5): not niqqud – a wording fix where our edition is incomplete or mixes in the censored
+# print. Each one needs two independent sources that agree on the wording (recorded in 'sources'); the vocalisation of
+# every added word is the one this edition uses elsewhere (counts in 'elsewhere').
+TEXT = [
+ ('Kings_and_Wars.11.4',
+  "(אִם עָשָׂה וְהִצְלִיחַ וּבָנָה מִקְדָּשׁ בִּמְקוֹמוֹ וְקִבֵּץ נִדְחֵי יִשְׂרָאֵל הֲרֵי זֶה מָשִׁיחַ בְּוַדַּאי. וִיתַקֵּן אֶת הָעוֹלָם כֻּלּוֹ לַעֲבֹד אֶת ה' בְּיַחַד שֶׁנֶּאֱמַר כִּי אָז אֶהְפֹּךְ אֶל עַמִּים שָׂפָה בְרוּרָה לִקְרֹא כֻלָּם בְּשֵׁם ה' וּלְעָבְדוֹ שְׁכֶם אֶחָד)",
+  "אִם עָשָׂה וְהִצְלִיחַ וְנִצֵּחַ כָּל הָאֻמּוֹת שֶׁסְּבִיבָיו וּבָנָה מִקְדָּשׁ בִּמְקוֹמוֹ וְקִבֵּץ נִדְחֵי יִשְׂרָאֵל הֲרֵי זֶה מָשִׁיחַ בְּוַדַּאי",
+  ['Sefaria "Wikisource Mishneh Torah" 11:4 (ends "…וניצח כל האומות שסביביו ובנה מקדש במקומו וקבץ נדחי ישראל הרי זה משיח בודאי")',
+   'he.wikisource.org "רמב\"ם הלכות מלכים ומלחמות יא", section הגהה (manuscript-corrected): "אם עשה והצליח, ונצח כל האומות שסביביו, ובנה מקדש במקומו וקבץ נדחי ישראל – הרי זה משיח בוודאי."'],
+  'The parenthesised sentence is the censored Warsaw–Vilna print (he.wikisource section דפוס), which lacks "וניצח כל האומות שסביביו" and ends with "ויתקן את העולם…"; in the full text that idea appears in halacha 7 (already shown). Vocalisation: וְנִצֵּחַ as in Kings 7:15 (וְאִם לֹא נִצֵּחַ); הָאֻמּוֹת 18×; שֶׁסְּבִיבָיו = שֶׁ + סְבִיבָיו (11×), dagesh as in שֶׁסְּבִיבוֹתָיו (3×).'),
+]
+textFixes = 0
+for ref, a, b, sources, note in TEXT:
+  slug, c, s = ref.rsplit('.', 2)
+  h = N(json.load(open(f'{ROOT}/site/data/rambam/{slug}/{c}.json'))['s'][int(s) - 1])
+  assert N(a) in h, ('not found', ref)
+  assert len(sources) >= 2, ('two sources needed', ref)
+  added = [w for w in re.findall(r'[\u05D0-\u05EA\u0591-\u05C7]+', N(b)) if w not in N(a).split()]
+  t = json.load(open(f'/tmp/rs/ws/{slug}.{c}.json'))[int(s) - 1] if os.path.exists(f'/tmp/rs/ws/{slug}.{c}.json') else None
+  if t is not None:
+    have = set(wsk(t).split()); assert all(k in have for k in wsk(' '.join(added)).split()), ('added words not in Wikisource', ref)
+  out.setdefault(ref, []).append({'from': N(a), 'to': N(b), 'kind': 'text', 'sources': sources, 'note': note, 'elsewhere': {w: cnt[w] for w in added}})
+  textFixes += 1
+total = sum(len(v) for v in out.values()) - textFixes
+niqqudHalachot = sum(1 for v in out.values() if any(f.get('kind') != 'text' for f in v))
+json.dump({'meta': {'edition': 'Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource', 'fixes': total, 'textFixes': textFixes, 'halachot': niqqudHalachot,
   'method': 'niqqud-only corrections; consonants identical to Sefaria "Wikisource Mishneh Torah"; corrected form = the form this edition uses elsewhere ("elsewhere" = occurrences); checked by hand',
   'doc': 'verification/RAMBAM-ERRATA.md', 'wikisourceConsonantsChecked': wsChecked,
-  'scans': {k: json.load(open(f'{ROOT}/verification/{f}'))['meta'] for k, f in (('niqqud', 'rambam-niqqud-flags.json'), ('wikisource', 'rambam-ws-mismatches.json')) if os.path.exists(f'{ROOT}/verification/{f}')}}, 'fixes': out}, open(f'{ROOT}/site/data/rambam-errata.json', 'w'), ensure_ascii=False, indent=1)
-print(total, 'fixes in', len(out), 'halachot;', wsChecked, 'checked against Wikisource consonants')
+  'scans': {k: json.load(open(f'{ROOT}/verification/{f}'))['meta'] for k, f in (('niqqud', 'rambam-niqqud-flags.json'), ('wikisource', 'rambam-ws-mismatches.json'), ('gaps', 'rambam-gap-scan.json')) if os.path.exists(f'{ROOT}/verification/{f}')}}, 'fixes': out}, open(f'{ROOT}/site/data/rambam-errata.json', 'w'), ensure_ascii=False, indent=1)
+print(total, 'fixes in', niqqudHalachot, 'halachot;', textFixes, 'text fix(es);', wsChecked, 'checked against Wikisource consonants')

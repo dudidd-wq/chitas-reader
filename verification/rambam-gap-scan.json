@@ -1,0 +1,708 @@
+{
+"meta": {
+"halachot": 14367,
+"compared": 14284,
+"paren": 32,
+"missing": 11,
+"colophon": 21,
+"short": 1,
+"flaggedHalachot": 43,
+"unreviewed": 0,
+"confirmedGapsOpen": 0,
+"confirmedGapsFixed": [
+"Kings_and_Wars.11.4"
+],
+"method": "paren: non-citation parenthesised passage (>=4 words); missing: >=3 more Wikisource words than ours in one diff hunk of the chapter (consonant key, matres dropped); colophon: a missing closing formula (סליקו/בריך רחמנא/נשלמו), not a gap; short: chapter <90% of the Wikisource word count. Applied errata included. For human review only."
+},
+"flags": [
+{
+"ref": "Human_Dispositions.5.13",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "מ ג ישעיהו מט ג",
+"ours": "",
+"review": "citation: Wikisource writes the verse reference outside parentheses (we drop citations)"
+}
+]
+},
+{
+"ref": "Human_Dispositions.6.1",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "משלי יג כ",
+"ours": "",
+"review": "citation (verse reference)"
+}
+]
+},
+{
+"ref": "Repentance.3.2",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "ירמיהו ל יד ירמיהו ל טו הושע ט ז",
+"ours": "",
+"review": "citation (verse references)"
+}
+]
+},
+{
+"ref": "Repentance.3.14",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "ירמיהו ג יד ירמיהו ג כב אע",
+"ours": "אף על",
+"review": "citation (verse references) + abbreviation אע\"פ"
+}
+]
+},
+{
+"ref": "Repentance.10.6",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "נגמר ספר ראשון והוא ספר המדע",
+"ours": ""
+}
+]
+},
+{
+"ref": "Sabbath.11.6",
+"flags": [
+{
+"kind": "paren",
+"text": "המפרק מן העור כדי לעשות קמע חיב",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Rest_on_a_Holiday.7.12",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "מי שרצה ללוות וכו",
+"ours": "",
+"review": "Wikisource artefact: an editor's \"מי שרצה ללוות וכו'\" lemma glued before the sentence that both texts have"
+}
+]
+},
+{
+"ref": "Shofar_Sukkah_and_Lulav.6.14",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "גמר מלאכול ביום השמיני מוריד כליו ומפנה אותה אין לו מקום להוריד את כליו אם היתה קטנה מכניס בה מנורה ואם היתה גדולה מכניס בה קדרות וקערות וכיוצא בהן כדי להזכיר שהיא פסולה ושכבר נגמרה מצותה ומפני שהוא יום טוב אינו יכול לפחות בה ולפסלה",
+"ours": "",
+"review": "Wikisource artefact: halacha 14 is duplicated in place of 13; our 13 (\"בזמן הזה…\") and 14 are both complete"
+}
+]
+},
+{
+"ref": "Shofar_Sukkah_and_Lulav.8.15",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "שבח לבוחן כליות ולב",
+"ours": "",
+"review": "closing formula \"שבח לבוחן כליות ולב\" (not part of the halacha)"
+}
+]
+},
+{
+"ref": "Fasts.1.6",
+"flags": [
+{
+"kind": "paren",
+"text": "מתענין עליהם בשבת ו",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Marriage.3.5",
+"flags": [
+{
+"kind": "paren",
+"text": "ובין שבא עליה כדרכה ובין שבא עליה שלא כדרכה הרי זו מקדשת",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Marriage.3.20",
+"flags": [
+{
+"kind": "paren",
+"text": "וכן דין הכסף דין תורה ופרושו מדברי סופרים",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Marriage.19.15",
+"flags": [
+{
+"kind": "paren",
+"text": "אלא עד שתתארס או עד שתבגר וזו",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Divorce.3.8",
+"flags": [
+{
+"kind": "paren",
+"text": "אלא שהוא פסול. ולמה אינו בטל",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Levirate_Marriage_and_Release.1.7",
+"flags": [
+{
+"kind": "paren",
+"text": "אלא לאבלות ולעדות אבל",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Levirate_Marriage_and_Release.2.3",
+"flags": [
+{
+"kind": "paren",
+"text": "בין שבא עליה כדרכה בין שלא כדרכה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Levirate_Marriage_and_Release.2.4",
+"flags": [
+{
+"kind": "paren",
+"text": "אם נפל מן הגג ונתקע בה או",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.1.10",
+"flags": [
+{
+"kind": "paren",
+"text": "ואחד הבא על הערוה כדרכה ואחד הבא עליה שלא כדרכה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.1.16",
+"flags": [
+{
+"kind": "paren",
+"text": "הבא עליה בין כדרכה בין שלא כדרכה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.1.17",
+"flags": [
+{
+"kind": "paren",
+"text": "בין כדרכה בין שלא כדרכה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.3.6",
+"flags": [
+{
+"kind": "paren",
+"text": "במה דברים אמורים שבאו עליה כדרכה אבל אם באו עליה שלא כדרכה עדין היא בתולה וכלן בסקילה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.11.11",
+"flags": [
+{
+"kind": "paren",
+"text": "אם אין בכתם שעור כדי לחוש לזיבות",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.19.15",
+"flags": [
+{
+"kind": "paren",
+"text": "לויים וישראלים וחללים מתרים לבוא זה בזה והולד הולך אחר הזכר",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Intercourse.22.21",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות איסורי ביאה בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Forbidden_Foods.8.3",
+"flags": [
+{
+"kind": "paren",
+"text": "וכן הוא לוקה על כל גיד וגיד",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Forbidden_Foods.17.32",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "בריך רחמנא דסייען מריש ועד כען",
+"ours": ""
+}
+]
+},
+{
+"ref": "Appraisals_and_Devoted_Property.8.13",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "בריך רחמנא דסייען",
+"ours": ""
+}
+]
+},
+{
+"ref": "Gifts_to_the_Poor.4.16",
+"flags": [
+{
+"kind": "paren",
+"text": "וכן אשכול שלם שנפרט שם הרי הוא פרט",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Heave_Offerings.4.8",
+"flags": [
+{
+"kind": "paren",
+"text": "אין תרומת השני תרומה לא תרם הראשון כשעור",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Heave_Offerings.5.21",
+"flags": [
+{
+"kind": "paren",
+"text": "היה בלבו לתרם מן היין על היין ונמצא בידו חמץ אינה תרומה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Sabbatical_Year_and_the_Jubilee.3.8",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "היו עשויות שורה אחת מוקפות א א נ ל מן הגמרא דאו מוקפות עטרה קתני במתניתין",
+"ours": "",
+"review": "Wikisource editorial note (\"א\"א נ\"ל מן הגמרא…\"), not Rambam text"
+}
+]
+},
+{
+"ref": "Sabbatical_Year_and_the_Jubilee.10.10",
+"flags": [
+{
+"kind": "paren",
+"text": "שנאמר (ויקרא כה ט",
+"inWikisource": false,
+"review": "reviewed: an editorial addition of this edition, or a citation with a broken parenthesis – nothing missing"
+}
+]
+},
+{
+"ref": "Sabbatical_Year_and_the_Jubilee.13.13",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "בריך רחמנא דסייען",
+"ours": ""
+}
+]
+},
+{
+"ref": "The_Chosen_Temple.8.12",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות בית הבחירה",
+"ours": ""
+}
+]
+},
+{
+"ref": "Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein.10.13",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות כלי המקדש",
+"ours": ""
+}
+]
+},
+{
+"ref": "Admission_into_the_Sanctuary.9.15",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות ביאת המקדש",
+"ours": ""
+}
+]
+},
+{
+"ref": "Things_Forbidden_on_the_Altar.7.11",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "ליי וגו סליקו",
+"ours": ""
+}
+]
+},
+{
+"ref": "Sacrificial_Procedure.8.9",
+"flags": [
+{
+"kind": "paren",
+"text": "או אפלו דם עולה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Sacrificial_Procedure.19.16",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות מעשה הקרבנות בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Daily_Offerings_and_Additional_Offerings.10.20",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות תמידין ומוספין בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Sacrifices_Rendered_Unfit.4.8",
+"flags": [
+{
+"kind": "paren",
+"text": "אף על פי שנמצאת בעלת מום או שנמצאת אחר שעברה שנתה",
+"inWikisource": false,
+"review": "reviewed: an editorial addition of this edition, or a citation with a broken parenthesis – nothing missing"
+}
+]
+},
+{
+"ref": "Sacrifices_Rendered_Unfit.10.3",
+"flags": [
+{
+"kind": "paren",
+"text": "שכבר עשה שנים למטה שהם חטאת",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Sacrifices_Rendered_Unfit.19.15",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות פסולי המוקדשין בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Service_on_the_Day_of_Atonement.5.11",
+"flags": [
+{
+"kind": "paren",
+"text": "וחוזר ונותן מן הראשון אחת למעלה ושבע למטה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Service_on_the_Day_of_Atonement.5.28",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות עבודת יוה כ בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Paschal_Offering.10.15",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות קרבן פסח בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Festival_Offering.3.7",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות חגיגה בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Firstlings.8.15",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות בכורות בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Offerings_for_Unintentional_Transgressions.15.10",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות שגגות בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Offerings_for_Those_with_Incomplete_Atonement.5.11",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות מחוסרי כפרה בס ד",
+"ours": ""
+}
+]
+},
+{
+"ref": "Immersion_Pools.2.2",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "והחלב והדם ושרף התות והתאנה והשקמה",
+"ours": "",
+"review": "Wikisource word-order error (a phrase displaced into \"ושאר כל … השרפין\"); both have the same words"
+}
+]
+},
+{
+"ref": "Immersion_Pools.11.12",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות מקואות בס ד נגמר ספר עשירי והוא ספר טהרה הלכותיו שמונה ופרקיו מאה וארבעים וארבעה",
+"ours": ""
+}
+]
+},
+{
+"ref": "Theft.3.2",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "גניבה קודם שיתחייב באיסור",
+"ours": "",
+"review": "Wikisource dittography (\"קודם שיתחייב באיסור גניבה\" twice)"
+}
+]
+},
+{
+"ref": "Robbery_and_Lost_Property.5.10",
+"flags": [
+{
+"kind": "paren",
+"text": "נטלו חמורו והחזירו לו חמור אחר",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Robbery_and_Lost_Property.15.10",
+"flags": [
+{
+"kind": "paren",
+"text": "אף על פי שאינו סימן מבהק",
+"inWikisource": false,
+"review": "reviewed: an editorial addition of this edition, or a citation with a broken parenthesis – nothing missing"
+}
+]
+},
+{
+"ref": "Murderer_and_the_Preservation_of_Life.5.3",
+"flags": [
+{
+"kind": "paren",
+"text": "או את גר תושב",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Sales.21.18",
+"flags": [
+{
+"kind": "missing",
+"wikisource": "אפילו עבדים ובתים וכל המטלטלין הידועים לו",
+"ours": "",
+"review": "Wikisource dittography (\"ואפילו עבדים ובתים…\" twice)"
+}
+]
+},
+{
+"ref": "Neighbors.12.1",
+"flags": [
+{
+"kind": "paren",
+"text": "בשומא שלי מצד זה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Agents_and_Partners.5.7",
+"flags": [
+{
+"kind": "paren",
+"text": "אפלו אין יכולים חבריו להציל דלא פלג כיון דלא אמר כלום",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+},
+{
+"kind": "paren",
+"text": "אם יכולים להציל הציל עד כדי חלקו לעצמו והיותר שלהם ואם אין יכולין להציל",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Creditor_and_Debtor.15.4",
+"flags": [
+{
+"kind": "paren",
+"text": "שפרעו הרי גובה ממנו בלא שבועה ואפלו הביא מאה עדים",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Inheritances.5.5",
+"flags": [
+{
+"kind": "paren",
+"text": "מת היבם הספק אומר בנו אני ואירשנו ואבי היבם אומר שמא בן בני האחר אתה וזה אחי אביך הוא ואני אירשנו חולקין בשוה",
+"inWikisource": true,
+"review": "the words are in the Wikisource text as well (an editorial bracket, not an omission)"
+}
+]
+},
+{
+"ref": "Inheritances.11.12",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "סליקו להו הלכות נחלות בס ד נגמר ספר שלשה עשר והוא ספר משפטים הלכותיו חמשה ופרקיו חמשה ושבעים הלכות שכירות שלשה עשר פרקים הלכות שאלה ופקדון שמונה פרקים הלכות מלוה ולוה עשרים ושבעה פרקים הלכות טוען ונטען ששה עשר פרקים הלכות נחלות אחד עשר פרקים",
+"ours": ""
+}
+]
+},
+{
+"ref": "Kings_and_Wars.12.1",
+"flags": [
+{
+"kind": "short",
+"ours": 454,
+"wikisource": 516,
+"review": "only the closing colophon of the book is missing (see the colophon flag)"
+}
+]
+},
+{
+"ref": "Kings_and_Wars.12.5",
+"flags": [
+{
+"kind": "colophon",
+"wikisource": "נשלמו הלכות מלכים והחבור כולו ברוך שאמר והיה העולם בפרטו ובכללו נגמר ספר ארבעה עשר והוא ספר שופטים הלכותיו חמש ופרקיו אחד ושמונים הלכות סנהדרין ששה ועשרים פרקים הלכות עדות שנים ועשרים פרקים הלכות ממרים שבעה פרקים הלכות אבל ארבעה עשר פרקים הלכות מלכים שנים עשר פרקים כל הלכות הספר בכללו שלשה ושמונים והפרקים תתקפ ב תם ונשלם שבח לאל בורא עולם",
+"ours": ""
+}
+]
+}
+]
+}

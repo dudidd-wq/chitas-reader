@@ -107,7 +107,7 @@ export async function rambamTitle(items) {
   for (const it of items) { const m = idx[it.name]; if (!books.has(m.he)) books.set(m.he, { m, chs: [] }); if (m.depth === 2) books.get(m.he).chs.push(...rambamChaptersFull(it, m).map(x => x[0])); }
   return [...books.entries()].map(([he, { chs }]) => chs.length ? `${he} ${chs.length > 1 ? 'פרקים' : 'פרק'} ${chapList(chs)}` : he).join(' · ');
 }
-/** Apply niqqud-only corrections [{from,to}] to one halacha. Matching is done on NFC (the data mixes mark orders). */
+/** Apply source-checked corrections [{from,to,kind?}] to one halacha (niqqud fixes, and kind:'text' wording fixes backed by two sources). Matching is done on NFC (the data mixes mark orders). */
 export function applyErrata(text, list) {
   if (!list?.length) return { text, applied: [] };
   let t = text.normalize('NFC');
@@ -115,7 +115,7 @@ export function applyErrata(text, list) {
   for (const f of list) {
     // whole words only (a Hebrew letter or mark on either side means a different word); every occurrence
     const re = new RegExp(`(?<![\u05D0-\u05EA\u0591-\u05C7])${f.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\u05D0-\u05EA\u0591-\u05C7])`, 'g');
-    if (re.test(t)) { t = t.replace(re, f.to); applied.push({ from: f.from, to: f.to }); }
+    if (re.test(t)) { t = t.replace(re, f.to); applied.push({ from: f.from, to: f.to, ...(f.kind === 'text' ? { kind: 'text' } : {}) }); }
   }
   return applied.length ? { text: t, applied } : { text, applied };
 }

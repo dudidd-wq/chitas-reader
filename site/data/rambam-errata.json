@@ -2,6 +2,7 @@
  "meta": {
   "edition": "Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource",
   "fixes": 31,
+  "textFixes": 1,
   "halachot": 24,
   "method": "niqqud-only corrections; consonants identical to Sefaria \"Wikisource Mishneh Torah\"; corrected form = the form this edition uses elsewhere (\"elsewhere\" = occurrences); checked by hand",
   "doc": "verification/RAMBAM-ERRATA.md",
@@ -23,6 +24,21 @@
     "singleWordSubstitutions": 890,
     "nearIdenticalSubstitutions": 642,
     "method": "word-level consonant comparison against Sefaria \"Wikisource Mishneh Torah\" after removing niqqud, punctuation, parenthesised verse citations and the matres ו/י; every difference is listed for human review, none is applied automatically"
+   },
+   "gaps": {
+    "halachot": 14367,
+    "compared": 14284,
+    "paren": 32,
+    "missing": 11,
+    "colophon": 21,
+    "short": 1,
+    "flaggedHalachot": 43,
+    "unreviewed": 0,
+    "confirmedGapsOpen": 0,
+    "confirmedGapsFixed": [
+     "Kings_and_Wars.11.4"
+    ],
+    "method": "paren: non-citation parenthesised passage (>=4 words); missing: >=3 more Wikisource words than ours in one diff hunk of the chapter (consonant key, matres dropped); colophon: a missing closing formula (סליקו/בריך רחמנא/נשלמו), not a gap; short: chapter <90% of the Wikisource word count. Applied errata included. For human review only."
    }
   }
  },
@@ -337,6 +353,26 @@
      "שֶׁהֵן": 889
     },
     "wikisourceConsonants": null
+   }
+  ],
+  "Kings_and_Wars.11.4": [
+   {
+    "from": "(אִם עָשָׂה וְהִצְלִיחַ וּבָנָה מִקְדָּשׁ בִּמְקוֹמוֹ וְקִבֵּץ נִדְחֵי יִשְׂרָאֵל הֲרֵי זֶה מָשִׁיחַ בְּוַדַּאי. וִיתַקֵּן אֶת הָעוֹלָם כֻּלּוֹ לַעֲבֹד אֶת ה' בְּיַחַד שֶׁנֶּאֱמַר כִּי אָז אֶהְפֹּךְ אֶל עַמִּים שָׂפָה בְרוּרָה לִקְרֹא כֻלָּם בְּשֵׁם ה' וּלְעָבְדוֹ שְׁכֶם אֶחָד)",
+    "to": "אִם עָשָׂה וְהִצְלִיחַ וְנִצֵּחַ כָּל הָאֻמּוֹת שֶׁסְּבִיבָיו וּבָנָה מִקְדָּשׁ בִּמְקוֹמוֹ וְקִבֵּץ נִדְחֵי יִשְׂרָאֵל הֲרֵי זֶה מָשִׁיחַ בְּוַדַּאי",
+    "kind": "text",
+    "sources": [
+     "Sefaria \"Wikisource Mishneh Torah\" 11:4 (ends \"…וניצח כל האומות שסביביו ובנה מקדש במקומו וקבץ נדחי ישראל הרי זה משיח בודאי\")",
+     "he.wikisource.org \"רמב\"ם הלכות מלכים ומלחמות יא\", section הגהה (manuscript-corrected): \"אם עשה והצליח, ונצח כל האומות שסביביו, ובנה מקדש במקומו וקבץ נדחי ישראל – הרי זה משיח בוודאי.\""
+    ],
+    "note": "The parenthesised sentence is the censored Warsaw–Vilna print (he.wikisource section דפוס), which lacks \"וניצח כל האומות שסביביו\" and ends with \"ויתקן את העולם…\"; in the full text that idea appears in halacha 7 (already shown). Vocalisation: וְנִצֵּחַ as in Kings 7:15 (וְאִם לֹא נִצֵּחַ); הָאֻמּוֹת 18×; שֶׁסְּבִיבָיו = שֶׁ + סְבִיבָיו (11×), dagesh as in שֶׁסְּבִיבוֹתָיו (3×).",
+    "elsewhere": {
+     "אִם": 6376,
+     "וְנִצֵּחַ": 0,
+     "כָּל": 5310,
+     "הָאֻמּוֹת": 18,
+     "שֶׁסְּבִיבָיו": 0,
+     "בְּוַדַּאי": 95
+    }
    }
   ]
  }
