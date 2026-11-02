@@ -21,6 +21,7 @@ export const UNITS = {
   rambam3: { he: 'רמב״ם – ג׳ פרקים', full: 'רמב״ם – שלושה פרקים ליום' },
   rambam1: { he: 'רמב״ם – פרק אחד', full: 'רמב״ם – פרק אחד ליום' },
   mitzvot: { he: 'ספר המצוות', full: 'ספר המצוות היומי' },
+  tolt: { he: 'תורה אור ולקוטי תורה', full: 'תורה אור ולקוטי תורה – שיעור יומי' },
   siddur: { he: 'סידור', full: 'סידור – נוסח חב״ד' }, // not a daily lesson: opened from #/siddur, never listed in the day's cards
 };
 const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
@@ -36,6 +37,7 @@ export async function filesFor(plan, unit) {
     for (const it of plan[unit]) for (const [c] of rambamChaptersFull(it, idx[it.name])) f.push(`rambam/${idx[it.name].slug}/${c}.json`);
   }
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
+  if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`)); }
   return [...new Set(f)];
 }
 async function mitzvotDoc(plan) {
@@ -176,11 +178,42 @@ async function rambamDoc(plan, unit) {
   }
   return { book: 'Rambam', title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits, fixes }; // book: the gloss key prefix ('Rambam <slug>.<c>.<s>')
 }
+// ---------------- Torah Or / Likkutei Torah (daily luach "מורה שיעור", by parasha week; tools/build-tolt.mjs) ----------------
+/** "דף טו עמוד ב" in the edition's 4-column Vilna numbering (א–ד), as the luach writes "טו/ב" */
+export const toltPlace = e => typeof e.daf === 'number' ? `${gem(e.daf)}/${e.amud}` : '';
+export const toltWork = e => e.w === 'to' ? 'תורה אור' : 'לקוטי תורה';
+/** the luach's section heading, e.g. "לקוטי תורה, מצורע" (Sefaria's Hebrew node title) */
+/** the luach's ד״ה; a leading single letter is the edition's section number in the maamar ("ד ובזה יובן" = section ד) */
+export const toltDh = e => { const m = e.dh.match(/^([\u05D0-\u05EA]) (.+)$/); return m ? `אות ${m[1]}, ד״ה ${m[2]}` : `ד״ה ${e.dh}`; };
+export function toltLabel(e) { return `${e.he || toltWork(e)} ${toltPlace(e)} · ${toltDh(e)}`; }
+async function toltLessons(plan) {
+  const S = await data('tolt/schedule.json');
+  return plan.tolt.parts.map(([slug, day]) => ({ slug, day, e: S.weeks[slug].days[day - 1], week: S.weeks[slug] }));
+}
+const LUACH_LINKS = [['לוח המורה שיעור – כינוס השלוחים העולמי', 'https://hisachdus.co.il/'], ['torahor.app – התאחדות החסידים', 'https://www.torahor.app/he']];
+async function toltDoc(plan) {
+  const blocks = [];
+  const L = await toltLessons(plan);
+  if (plan.tolt.repeat) blocks.push({ type: 'note', text: 'השנה יש לפני שמחת תורה שני שבועות שהשבת שלהם היא שבת של חג (סוכות ושמיני עצרת), והלוח קובע רק שבוע אחד (וזאת הברכה ודרושים לשמיני עצרת). לכן מוצג השבוע שיעור היום מאותו שבוע, והוא חוזר בשבוע הבא.' });
+  if (L.length === 2) blocks.push({ type: 'note', text: `השבוע הפרשיות מחוברות (${parshaHe(plan.tolt.parsha)}), ולכן לפי הלוח לומדים היום שני שיעורים.` });
+  for (const { slug, day, e } of L) {
+    blocks.push({ type: 'h', text: toltLabel(e) });
+    const w = await data(`tolt/w/${slug}.json`), paras = w.days[day - 1];
+    if (e.approx) blocks.push({ type: 'note', text: 'מיקום משוער: הד״ה בלוח שונה מעט מהכותרת שבמהדורה, ולכן תחילת השיעור נקבעה לפי הכותרת הקרובה בעמוד שבלוח. כדאי לוודא בספר.' });
+    if (e.add) blocks.push({ type: 'note', text: `בלוח מצוין גם: ${e.add.replace(/^\+\s*/, '')}. ${/שנדפסה|השמטה/.test(e.add) ? 'קטע זה אינו מוצג כאן.' : 'ההוספות אינן מוצגות כאן; אפשר לפתוח את הספר בספריא.'}`, href: e.sefaria, hrefText: 'פתיחה בספריא' });
+    if (!paras) { blocks.push({ type: 'note', text: `לא נמצא במהדורה שבאתר המקום המדויק של שיעור זה (${toltWork(e)}, ${toltPlace(e)}, ${toltDh(e)}). מוצגת ההפניה בלבד.`, href: e.sefaria, hrefText: 'פתיחה בספריא' }); continue; }
+    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, src: 'tolt' }));
+    if (e.until) blocks.push({ type: 'note', text: `לפי הלוח השיעור מסתיים ${e.until.daf === 'תום' || e.until === 'תום' ? 'בסוף הדרוש' : e.until === 'סוף הפרשה' ? 'בסוף הפרשה' : `בדף ${gem(e.until.daf)}/${e.until.amud}`}.` });
+  }
+  blocks.push({ type: 'note', text: 'חלוקת השיעורים: ', links: LUACH_LINKS, tail: '. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC), בלי ניקוד. בסוגריים המרובעים – מספרי הדפים והעמודים במהדורה (א–ד).' });
+  return { title: UNITS.tolt.full, subtitle: L.map(({ e }) => `${toltWork(e)} ${toltPlace(e)}`).join(' · '), blocks, raw: true };
+}
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);
   if (unit === 'tehillim') return tehillimDoc(plan);
   if (unit === 'tanya') return tanyaDoc(plan);
   if (unit === 'mitzvot') return mitzvotDoc(plan);
+  if (unit === 'tolt') return toltDoc(plan);
   return rambamDoc(plan, unit);
 }
 /** Short description of a unit's portion for the home cards. */
@@ -189,6 +222,7 @@ export async function describe(plan, unit) {
   if (unit === 'tehillim') return plan.tehillim.title;
   if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)
   if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');
+  if (unit === 'tolt') return (await toltLessons(plan)).map(({ e }) => toltLabel(e)).join(' · ');
   return rambamTitle(plan[unit]);
 }
 

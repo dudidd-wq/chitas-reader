@@ -3,7 +3,7 @@ import { dayPlan } from './calendar.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
-  taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false,
+  taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, candleMins: 0,

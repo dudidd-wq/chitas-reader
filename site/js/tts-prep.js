@@ -242,6 +242,7 @@ export function prepareForTTS(html, opt = {}) {
   const o = { stress: true, divineName: 'hashem', ...opt };
   let t = String(html)
     .replace(/<i class="fn"[^>]*>[\s\S]*?<\/i>/g, '') // edition footnotes (e.g. וי"ו קטיעא) are not read
+    .replace(/<span class="daf"[^>]*>[^<]*<\/span>/g, ' ') // Torah Or / Likkutei Torah page markers are not read
     // round 4: anything hidden from screen readers is not spoken either – the petucha/setuma markers פ / ס in particular
     .replace(/<(span|i|b)\b[^>]*aria-hidden="true"[^>]*>[^<]*<\/\1>/g, ' ')
     .replace(/<\/?(big|small)>/g, '')               // large/small letters: same word

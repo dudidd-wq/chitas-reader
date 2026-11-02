@@ -221,13 +221,33 @@ export function gregLongHe(iso, { weekday = false } = {}) {
   return `${weekday ? (wd === 6 ? 'שבת' : DAY_HE[wd]) + ', ' : ''}${d} ב${GREG_MONTH[m - 1]} ${y}`;
 }
 
+/** Daily Torah Or / Likkutei Torah ("מורה שיעור" luach of Kinus HaShluchim 5785, by parasha week; data/tolt).
+ *  Day 1 = Sunday … 7 = Shabbat of the week whose parsha is learnt in Chumash. A joined week takes two luach days a day
+ *  (the luach's own rule): Sun = 1+2 of the first, Mon = 3+4, Tue = 5+6, Wed = 7 + 1 of the second, Thu = 2+3, Fri = 4+5, Shabbat = 6+7. */
+export const TOLT_SLUGS = ['bereshit', 'noach', 'lech-lecha', 'vayera', 'chayei-sara', 'toldot', 'vayetze', 'vayishlach', 'vayeshev', 'miketz', 'vayigash', 'vayechi', 'shemot', 'vaera', 'bo', 'beshalach', 'yitro', 'mishpatim', 'terumah', 'tetzaveh', 'ki-tisa', 'vayakhel', 'pekudei', 'vayikra', 'tzav', 'shemini', 'tazria', 'metzora', 'acharei', 'kedoshim', 'emor', 'behar', 'bechukotai', 'bamidbar', 'naso', 'behaalotcha', 'shelach', 'korach', 'chukat', 'balak', 'pinchas', 'matot', 'masei', 'devarim', 'vaetchanan', 'eikev', 'reeh', 'shoftim', 'ki-teitzei', 'ki-tavo', 'nitzavim', 'vayelech', 'haazinu', 'vezot-haberacha'];
+export const TOLT_JOINED = [[[0, 1], [0, 2]], [[0, 3], [0, 4]], [[0, 5], [0, 6]], [[0, 7], [1, 1]], [[1, 2], [1, 3]], [[1, 4], [1, 5]], [[1, 6], [1, 7]]];
+const PARSHIOT = ['Bereshit', 'Noach', 'Lech-Lecha', 'Vayera', 'Chayei Sara', 'Toldot', 'Vayetzei', 'Vayishlach', 'Vayeshev', 'Miketz', 'Vayigash', 'Vayechi', 'Shemot', 'Vaera', 'Bo', 'Beshalach', 'Yitro', 'Mishpatim', 'Terumah', 'Tetzaveh', 'Ki Tisa', 'Vayakhel', 'Pekudei', 'Vayikra', 'Tzav', 'Shmini', 'Tazria', 'Metzora', 'Achrei Mot', 'Kedoshim', 'Emor', 'Behar', 'Bechukotai', 'Bamidbar', 'Nasso', "Beha'alotcha", "Sh'lach", 'Korach', 'Chukat', 'Balak', 'Pinchas', 'Matot', 'Masei', 'Devarim', 'Vaetchanan', 'Eikev', "Re'eh", 'Shoftim', 'Ki Teitzei', 'Ki Tavo', 'Nitzavim', 'Vayeilech', "Ha'azinu", 'Vezot Haberakhah']; // hebcal's names
+const SLUG_OF = Object.fromEntries(PARSHIOT.map((n, i) => [n, TOLT_SLUGS[i]]));
+// A luach week runs Sunday–Shabbat and is named for the parsha of the Shabbat that ends it (day 7 = Shabbat). This differs
+// from chumashParsha only in Tishrei: the week that ends on Shabbat Bereshit is the Bereshit week from its Sunday, even when
+// Simchat Torah falls mid-week (so no Bereshit day is skipped); a week ending on a Shabbat of Sukkot / Shemini Atzeret
+// is the Vezot Haberakhah week (drushim for Shemini Atzeret + Vezot). When there are two such weeks (e.g. 5787), the luach
+// gives nothing more, so the first of them repeats the Vezot week and is marked `repeat`.
+export function tolt(hd, il) {
+  const sh = hd.onOrAfter(6), parsha = chumashParsha(sh, il), slugs = parsha.map(n => SLUG_OF[n]);
+  const dow = hd.getDay() + 1;
+  const parts = slugs.length === 2 ? TOLT_JOINED[dow - 1].map(([i, d]) => [slugs[i], d]) : [[slugs[0], dow]];
+  const repeat = slugs[0] === 'vezot-haberacha' && chumashParsha(sh.add(7, 'd'), il)[0] === 'Vezot Haberakhah';
+  return { parsha, slugs, dow, parts, ...(repeat ? { repeat } : {}) };
+}
+
 export function dayPlan(date, { il = true } = {}) {
   const hd = toHDate(date);
   return {
     iso: isoDate(hd), hd, dayHe: DAY_HE[hd.getDay()], hebDate: hebDateHe(hd),
     weekParsha: parshaHe(chumashParsha(hd, il)),
     chumash: chumash(hd, il), tehillim: tehillim(hd), tanyaStart: tanyaStart(hd),
-    rambam1: rambam1(hd), rambam3: rambam3(hd), mitzvot: mitzvot(hd),
+    rambam1: rambam1(hd), rambam3: rambam3(hd), mitzvot: mitzvot(hd), tolt: tolt(hd, il),
   };
 }
 export { HDate, Locale };

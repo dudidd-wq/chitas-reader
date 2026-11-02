@@ -11,6 +11,7 @@ version number; Wikisource itself states CC BY-SA 4.0). Per-file metadata: `sour
 | `tanya/` | Tanya, Kehot Publication Society | Sefaria | **CC BY-NC – non-commercial use only** |
 | `rambam/` | Mishneh Torah, Torat Emet 363/370 | Sefaria | Public domain (per Sefaria's label) |
 | `rambam/` (overrides listed in `sources.json`) | Mishneh Torah | Wikisource via Sefaria | CC BY-SA |
+| `tolt/` | Torah Or / Likkutei Torah, Kehot Publication Society; daily division (references only) from "לוח המורה שיעור" – Kinus HaShluchim / Hisachdus HaChassidim (torahor.app); the luach PDF is not included | Sefaria | **CC BY-NC – non-commercial use only** |
 | `mitzvot/` | Sefer HaMitzvot, Warsaw 1883 (NLI scan) | Sefaria | Public domain (per Sefaria's label) |
 | `siddur/` (prayer text) | Siddur Nusach Ha-Ari (Chabad), transcribed by Shmuel Gonzales | Open Siddur Project (Internet Archive copy) | CC0 |
 | `siddur/` (English instructions, `n` blocks) | same | Open Siddur Project | CC BY (attribution: Contributors to the Open Siddur Project, including Shmueli Gonzales) |

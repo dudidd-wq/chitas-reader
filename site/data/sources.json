@@ -228,5 +228,16 @@
     "sha256": "3cf40f4e0c91823bc3a3499baf6c85af7e374a1b40f46cfc4987c387a96c71f1"
    }
   }
+ },
+ "tolt": {
+  "versionTitle": "Kehot Publication Society",
+  "license": "CC-BY-NC",
+  "versionSource": "http://kehot.com",
+  "versionTitleInHebrew": null,
+  "sefariaUrl": "https://www.sefaria.org/Torah_Ohr?vhe=Kehot_Publication_Society&lang=he",
+  "sefariaUrl2": "https://www.sefaria.org/Likkutei_Torah?vhe=Kehot_Publication_Society&lang=he",
+  "luach": "לוח המורה שיעור – כינוס השלוחים העולמי (תשפ״ה)",
+  "luachUrl": "https://www.torahor.app/he",
+  "fetchedAt": "2026-11-02"
  }
 }

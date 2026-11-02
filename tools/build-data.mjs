@@ -25,7 +25,7 @@ export const ALLOWED_LICENSES = ['Public Domain', 'CC0', 'CC-BY', 'CC-BY-SA', 'C
 const sources = fs.existsSync(`${OUT}/sources.json`) ? JSON.parse(fs.readFileSync(`${OUT}/sources.json`, 'utf8')) : {};
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function fetchText(ref, version) {
+export async function fetchText(ref, version) {
   const url = API + encodeURIComponent(ref) + '?version=' + encodeURIComponent('hebrew|' + version);
   for (let i = 0; i < 3; i++) {
     try {
