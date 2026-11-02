@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { numberWords, vav, prepareForTTS } from '../site/js/tts-prep.js';
 import { badLemma } from '../tools/gloss-lemma.mjs';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, PREFS } from './helpers.mjs';
 const rd = p => JSON.parse(fs.readFileSync(new URL(p, import.meta.url)));
 const G = rd('../site/data/glossary.json'), RX = rd('../tools/gloss-rambam-xcheck.json'), RR = rd('../tools/gloss-rambam-review.json');
 const strip = s => s.normalize('NFC');
@@ -54,6 +54,63 @@ test('reader: a Rambam day shows its gloss; note and About state the same counts
     assert.ok(await p.$$eval('.pe', els => els.length > 0 && els.every(e => e.textContent === '' && e.getAttribute('aria-hidden') === 'true')));
     const note2 = await p.textContent('#doc-gloss'); assert.ok(note2.includes(f(G.meta.manualReview.published)));
     await p.goto(srv.url + '#/about'); await p.waitForFunction(n => document.querySelector('#gloss-rb')?.textContent === n, f(G.rambam.meta.published));
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('offline: the 3-day prefetch starts as soon as the worker activates; the load error reflows at 390px and "נסה שוב" works', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, locale: 'he-IL' });   // the worker is allowed here
+    const p = await ctx.newPage(); p.errors = []; p.on('pageerror', e => p.errors.push(e.message));
+    await p.addInitScript(pr => { if (!localStorage.getItem('chitas-reader.v1')) localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: pr, progress: {} })); }, { ...PREFS, layout: 'pages' });
+    const t0 = Date.now();
+    await p.goto(srv.url + '#/'); await p.waitForFunction(() => document.documentElement.dataset.prefetched, null, { timeout: 20000 });
+    const dt = Date.now() - t0;
+    assert.ok(dt < 8000, `prefetch done ${dt} ms after a fresh load`);
+    const tomorrow = await p.evaluate(() => { const d = new Date(Date.now() + 864e5); return d.toLocaleDateString('sv'); });
+    await p.context().setOffline(true);
+    for (const u of ['chumash', 'tanya', 'rambam3']) { await p.goto(srv.url + `#/r/${u}/${tomorrow}`); await p.waitForSelector('.seg, #r-retry', { timeout: 8000 }); assert.ok(await p.$('.seg'), `${u} ${tomorrow} offline`); }
+    await p.goto(srv.url + '#/r/tanya/2027-08-01'); await p.waitForSelector('#r-retry', { timeout: 8000 });
+    const box = await p.evaluate(() => [...document.querySelectorAll('#rc p')].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.right]; }));
+    for (const [l, r] of box) assert.ok(l >= 0 && r <= 390, `error text inside the screen: ${l}..${r}`);
+    await p.context().setOffline(false);
+    await p.click('#r-retry'); await p.waitForSelector('.seg', { timeout: 8000, state: 'attached' });
+    assert.deepEqual(p.errors.filter(e => !/Failed to fetch|NetworkError|ERR_INTERNET_DISCONNECTED/.test(e)), []);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('home: the Rambam Introduction days are told apart by their range (Feb 3 and 4, 2026)', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { prefs: { rambamTrack: '1' } }), txt = async d => { await p.goto(srv.url + '#/d/' + d); await p.waitForFunction(() => /מסירת תורה/.test(document.querySelector('#view')?.textContent || '')); return p.textContent('#view'); };
+    const a = await txt('2026-02-03'), c = await txt('2026-02-04');
+    assert.match(a, /מסירת תורה שבעל פה א–כא/); assert.match(c, /מסירת תורה שבעל פה כב–לג/);
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('About and README: the whole app is non-commercial (Tanya CC BY-NC); real-device TTS is stated as untested', { skip: !CHROME && 'no Chrome' }, async () => {
+  const md = fs.readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  assert.match(md, /האתר כולו.*לשימוש לא מסחרי בלבד/); assert.match(md, /לא נבדקה/);
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url); await p.goto(srv.url + '#/about'); await p.waitForSelector('#noncommercial');
+    assert.match(await p.textContent('#noncommercial'), /לשימוש לא מסחרי בלבד.*CC BY-NC/);
+    assert.match(await p.textContent('#tts-untested'), /לא נבדקה/);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('320×568: page 1 of 2026-11-02 is not left mostly empty by moving Rashi on', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { viewport: { width: 320, height: 568 } });
+    await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('.seg'); await p.waitForTimeout(1500);
+    const fill = await p.evaluate(() => { const vp = document.querySelector('#vp').getBoundingClientRect(), rc = document.querySelector('#rc');
+      const bottom = vp.bottom - parseFloat(getComputedStyle(rc).paddingBottom);
+      const on = [...rc.querySelectorAll('.t, .rashi p')].flatMap(e => [...e.getClientRects()]).filter(x => x.height > 0 && x.left >= vp.left - 1 && x.right <= vp.right + 1);
+      return (Math.max(...on.map(x => x.bottom)) - vp.top) / (bottom - vp.top); });
+    assert.ok(fill > 0.75, `page 1 only ${Math.round(fill * 100)}% filled`);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

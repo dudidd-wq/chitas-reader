@@ -153,6 +153,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-viewport.pages .r-content { position: absolute; top: 0; height: 100%; padding: 3.6rem 0 3.4rem; column-fill: auto; transition: transform .32s cubic-bezier(.2, .7, .2, 1); will-change: transform; }
 .r-content.ragged { text-align: start; }
 .r-content { text-wrap: pretty; }
+/* round 5: the load-error view sits outside the page columns, so it always reflows inside the screen */
+.r-viewport .r-content.r-error { position: static; columns: auto; column-width: auto; width: auto; max-width: var(--measure); height: auto; transform: none; margin: 0 auto; padding: 4.2rem 1.25rem 2rem; text-align: start; font-size: min(var(--size), 1.2rem); overflow-wrap: anywhere; }
+.r-content.r-error .r-error-hint { font-family: var(--ui); font-size: .8em; color: var(--muted); }
 /* two-page spread: a soft spine down the middle */
 .spine { display: none; }
 .r-viewport.spread .spine { display: block; position: absolute; top: var(--pad-top, 3rem); bottom: var(--pad-bottom, 3rem); left: 50%; width: 36px; transform: translateX(-50%); pointer-events: none; z-index: 0;

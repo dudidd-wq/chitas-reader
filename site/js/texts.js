@@ -9,7 +9,8 @@ export const LICENSE_URL = { 'CC-BY-SA': 'https://creativecommons.org/licenses/?
 export const WIKISOURCE_DEED = 'https://creativecommons.org/licenses/by-sa/4.0/deed.he';
 export const licenseLabel = l => l === 'CC0' ? 'CC0 1.0' : l === 'Public Domain' ? 'נחלת הכלל (Public Domain)' : l.replace(/^CC-/, 'CC ');
 export function data(path) {
-  if (!cache.has(path)) cache.set(path, fetch('data/' + path).then(r => { if (!r.ok) throw new Error(path); return r.json(); }));
+  // a failure is not remembered (round 5): otherwise a text that failed offline could never load again without a reload
+  if (!cache.has(path)) cache.set(path, fetch('data/' + path).then(r => { if (!r.ok) throw new Error(path); return r.json(); }).catch(e => { cache.delete(path); throw e; }));
   return cache.get(path);
 }
 
@@ -104,8 +105,13 @@ function chapList(chs) {
 export async function rambamTitle(items) {
   const idx = await data('rambam/index.json');
   const books = new Map();
-  for (const it of items) { const m = idx[it.name]; if (!books.has(m.he)) books.set(m.he, { m, chs: [] }); if (m.depth === 2) books.get(m.he).chs.push(...rambamChaptersFull(it, m).map(x => x[0])); }
-  return [...books.entries()].map(([he, { chs }]) => chs.length ? `${he} ${chs.length > 1 ? 'פרקים' : 'פרק'} ${chapList(chs)}` : he).join(' · ');
+  for (const it of items) {
+    const m = idx[it.name]; if (!books.has(m.he)) books.set(m.he, { m, chs: [], rng: [] });
+    if (m.depth === 2) books.get(m.he).chs.push(...rambamChaptersFull(it, m).map(x => x[0]));
+    else if (it.range) books.get(m.he).rng.push(it.range);   // round 5: the Introduction / Sefer HaMitzvot days differ by their range
+  }
+  const rngs = rs => { const u = rs.slice().sort((a, b) => a[0] - b[0]), out = []; for (const r of u) { const l = out.at(-1); if (l && r[0] <= l[1] + 1) l[1] = Math.max(l[1], r[1]); else out.push([...r]); } return out.map(([a, b]) => a === b ? gem(a) : `${gem(a)}–${gem(b)}`).join(', '); };
+  return [...books.entries()].map(([he, { chs, rng }]) => chs.length ? `${he} ${chs.length > 1 ? 'פרקים' : 'פרק'} ${chapList(chs)}` : rng.length ? `${he} ${rngs(rng)}` : he).join(' · ');
 }
 /** Apply source-checked corrections [{from,to,kind?}] to one halacha (niqqud fixes, and kind:'text' wording fixes backed by two sources). Matching is done on NFC (the data mixes mark orders). */
 export function applyErrata(text, list) {

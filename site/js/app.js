@@ -165,11 +165,25 @@ async function renderHome(showLoc = false) {
 
 // Quietly keep today + the next two days available offline (the service worker caches every data file fetched).
 let prefetched = '';
+// Round 5: it starts as soon as the worker controls the page (on a first visit: the moment it activates and claims it),
+// not after a fixed delay – fetches made before that are not seen by the worker and would not be saved.
+function swControlled(ms = 15000) {
+  const sw = navigator.serviceWorker;
+  if (sw.controller) return Promise.resolve(true);
+  return new Promise(res => {
+    const t = setTimeout(() => res(!!sw.controller), ms);
+    sw.addEventListener('controllerchange', () => { clearTimeout(t); res(true); }, { once: true });
+    sw.ready.then(() => { if (sw.controller) { clearTimeout(t); res(true); } }).catch(() => {});
+  });
+}
 function autoPrefetch() {
-  if (prefetched === currentDate || !('serviceWorker' in navigator)) return; prefetched = currentDate;
-  setTimeout(async () => {
-    for (let i = 0; i < 3; i++) { const plan = dayPlan(shiftIso(currentDate, i), { il: prefs.il }); for (const u of unitsFor()) for (const f of await filesFor(plan, u).catch(() => [])) await fetch('data/' + f).catch(() => {}); }
-  }, 2500);
+  if (prefetched === currentDate || !('serviceWorker' in navigator) || location.protocol === 'file:') return;
+  const day = prefetched = currentDate;
+  swControlled().then(async ok => {
+    if (!ok) { if (prefetched === day) prefetched = ''; return; }   // try again on the next navigation
+    for (let i = 0; i < 3; i++) { const plan = dayPlan(shiftIso(day, i), { il: prefs.il }); for (const u of unitsFor()) await Promise.all((await filesFor(plan, u).catch(() => [])).map(f => fetch('data/' + f).catch(() => {}))); }
+    document.documentElement.dataset.prefetched = day;   // for tests
+  });
 }
 async function downloadAhead() {
   const btn = $('#dl30'), st = $('#dl-st'); btn.disabled = true;
@@ -360,7 +374,9 @@ function renderAbout() {
   <li>לחיצה אחת על כפתור ההקראה מתחילה לקרוא מיד; ההגדרות (קול, מהירות, שם ה׳) – בלחיצה ארוכה על הכפתור או בכפתור ההגדרות שבסרגל ההקראה.</li>
   <li>מה לא מוקרא: סימני פרשה פתוחה/סתומה (פ/ס), והפניות למקורות בסוגריים, כמו ״(שמות כ׳)״ או ״(מכילתא)״ – הן נשארות על המסך. ראשי תיבות מורחבים רק כשהם חד־משמעיים (למשל ת״ל – תַּלְמוּד לוֹמַר); אחרת נקראים ככתבם.</li>
   <li>שם ה׳ במצב ״השם״: שם הוי׳ה, ה׳, יי ו״ה׳״ עם מקף או אות שימוש (לַה׳ – לַהַשֵּׁם) נקראים ״הַשֵּׁם״; אֲדֹנָי כשם קודש נקרא ״אֲדוֹשֵׁם״; אלוקים, קָהּ וקֵל בק׳. במקום שהמילה אינה שם קודש (למשל ״אלהים אחרים״) – אין החלפה. זו רשימה שלנו, לא פסק הלכה.</li>
+  <li id="tts-untested"><b>מה נבדק ומה לא:</b> ההכנה לדיבור (ניקוד, מספרים, ראשי תיבות, שם ה׳) נבדקת בבדיקות אוטומטיות, והנגן נבדק בדפדפן עם קול מדומה. <b>ההקראה בפועל עם קולות עבריים אמיתיים, באייפון ובאנדרואיד, לא נבדקה</b> – לא היה בידינו מכשיר כזה לבדיקה, ולכן גם המשפט הבא מבוסס על התיעוד של הדפדפנים ולא על ניסוי.</li>
   <li>כשהמסך כבוי: במחשב ההקראה ממשיכה; באנדרואיד היא לרוב ממשיכה כשהדף פתוח; באייפון היא נעצרת בדרך כלל בנעילת המסך – מומלץ להשאיר את המסך דולק (יש אפשרות כזו בהגדרות).</li></ul>
+  <h2>שימוש לא מסחרי</h2><p id="noncommercial">האתר כולו, כפי שהוא מוגש כאן, הוא <b>לשימוש לא מסחרי בלבד</b>: טקסט התניא שבו ניתן ברישיון CC BY-NC (Kehot Publication Society), ולכן אין באתר פרסומות, תשלום או מנוי, ואין להעתיק אותו לשימוש מסחרי עם התניא הזה. קוד האתר עצמו (GPL) והטקסטים האחרים כפופים לרישיונות שלהם – ראו <a href="#/sources">מקורות ורישיונות</a>.</p>
   <p>האתר בהשראת <a href="https://dvarmalchus.co.il" target="_blank" rel="noopener">דבר מלכות</a>. זהו מיזם עצמאי ואינו קשור אליו.</p>`);
   // the list is generated from sources.json, so About can never disagree with the data
   data('glossary.json').then(g => { const el = $('#gloss-n'); if (el) el.textContent = g.meta.manualReview.published.toLocaleString('he-IL'); const r = $('#gloss-rb'); if (r && g.rambam) r.textContent = g.rambam.meta.published.toLocaleString('he-IL'); }).catch(() => {});
@@ -431,7 +447,12 @@ async function openReader(unit, iso) {
   try {
     R.doc = await buildDoc(plan, unit);
   } catch (e) {
-    $('#rc').innerHTML = '<p>לא ניתן לטעון את הטקסט. ייתכן שאין חיבור לרשת והטקסט לא נשמר מראש.</p>'; return;
+    // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
+    const rc = $('#rc'); rc.classList.add('r-error'); rc.style.cssText = '';
+    rc.innerHTML = `<p role="alert">לא ניתן לטעון את הטקסט. ${navigator.onLine === false ? 'אין חיבור לרשת, והטקסט של יום זה לא נשמר מראש במכשיר.' : 'ייתכן שהחיבור לרשת נכשל, או שהטקסט של יום זה לא נשמר מראש במכשיר.'}</p>
+      <p><button class="btn primary" id="r-retry">נסה שוב</button></p><p class="r-error-hint">כדי לקרוא בלי רשת: בדף הבית – ״שמירה לשימוש ללא רשת (30 יום)״ בזמן שיש חיבור.</p>`;
+    $('#r-retry').addEventListener('click', () => { if (R.unit === unit && R.iso === iso) openReader(unit, iso); });
+    $('#r-retry').focus(); return;
   }
   if (R.unit !== unit || R.iso !== iso) return;
   $('#r-t').textContent = R.doc.title; $('#r-s').innerHTML = `<span>${esc(plan.hebDate)}</span><span class="r-rng"><i aria-hidden="true"> · </i>${esc(R.doc.subtitle)}</span>`;
@@ -533,8 +554,10 @@ function chromePad() {
   return { top: Math.max(top, 8) + 14, bottom: Math.max(bot, 8) + 14 };
 }
 // round 4: no Rashi stub at a page edge. A Rashi block that the column flow split is moved whole to the next page
-// when it is short (≤45% of a page) and moving it leaves at most a quarter of the page empty; a longer one that would
-// start with only a line or two at the foot of a page starts on the next page instead. Inside a long block, a
+// when it is short (≤45% of a page) and moving it leaves at most a tenth of the page empty (round 5: was a quarter,
+// which left most of page 1 blank at 320×568); a longer one that would start with fewer than 2.5 lines (round 5: the
+// limit is now exactly the 2.5 lines the tests require, was 2.6, so a block that fits 2.5+ lines at the foot splits)
+// starts on the next page instead. Inside a long block, a
 // comment split into a lone line before or after the break is kept whole. A few passes, since each move shifts
 // what follows.
 function keepRashi(rc, colH) {
@@ -547,8 +570,8 @@ function keepRashi(rc, colH) {
       const rs = [...r.getClientRects()];
       if (rs.length < 2) continue;
       const lh = parseFloat(getComputedStyle(r).lineHeight) || 24;
-      if (rs.reduce((a, x) => a + x.height, 0) <= colH * 0.45 && rs[0].height <= colH * 0.25) { r.classList.add('keep'); moved++; continue; }
-      if (rs[0].height < lh * 2.6) { r.classList.add('brk'); moved++; continue; }
+      if (rs.reduce((a, x) => a + x.height, 0) <= colH * 0.45 && rs[0].height <= colH * 0.1) { r.classList.add('keep'); moved++; continue; }
+      if (rs[0].height < lh * 2.5) { r.classList.add('brk'); moved++; continue; }
       for (const q of r.children) {
         const qs = [...q.getClientRects()];
         if (qs.length > 1 && !q.classList.contains('pk') && (qs[0].height < lh * 1.6 || qs.at(-1).height < lh * 1.6)
@@ -561,6 +584,7 @@ function keepRashi(rc, colH) {
 function layout() {
   const vp = $('#vp'), rc = $('#rc'), pad = chromePad();
   vp.className = 'r-viewport ' + prefs.layout;
+  if (rc?.classList.contains('r-error')) { rc.style.cssText = ''; return; }
   if (prefs.layout === 'pages') {
     const W = vp.clientWidth, g = pageGeometry({ W, H: vp.clientHeight, size: prefs.size, spreadPref: prefs.spread });
     rc.style.width = g.P + 'px'; rc.style.columnWidth = g.P + 'px'; rc.style.columnGap = g.gap + 'px';
