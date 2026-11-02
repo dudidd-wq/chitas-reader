@@ -182,3 +182,41 @@ test('About and README: honest real-device TTS test steps', { timeout: 60000 }, 
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
+
+// CI failure of 1.0.42 (tts-bar 568x320, check 5): the web fonts (font-display: swap) can arrive after the first
+// layout, and the page breaks were measured with the fallback font. The reader now measures again when fonts load.
+test('late web fonts: pages are measured again, no text line under the bars', async () => {
+  const srv = await serve(), b = await launch();
+  try {
+    const total = async (w, h, slow) => {
+      const p = await pageWith(b, srv.url, { viewport: { width: w, height: h } });
+      if (slow) await p.route('**/fonts/*.woff2', async r => { await new Promise(f => setTimeout(f, 1500)); await r.continue(); });
+      await p.goto(srv.url + '#/r/rambam3/2026-11-02'); await p.waitForSelector('#rc .seg');
+      const early = await p.$eval('#pinfo', e => e.textContent);
+      await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(400);
+      const n = await p.$eval('#pinfo', e => e.textContent); await p.context().close(); return [early, n];
+    };
+    for (const [w, h] of [[568, 320], [390, 844]]) {
+      const [, fast] = await total(w, h, false), [early, slow] = await total(w, h, true);
+      assert.equal(slow.replace(/.*מתוך /, ''), fast.replace(/.*מתוך /, ''), `${w}x${h}: page count after the fonts arrive (first measured: ${early})`);
+    }
+    for (const [w, h] of [[568, 320], [390, 844]]) {
+      const p = await pageWith(b, srv.url, { viewport: { width: w, height: h } });
+      await p.route('**/fonts/*.woff2', async r => { await new Promise(f => setTimeout(f, 1500)); await r.continue(); });
+      await p.goto(srv.url + '#/r/rambam3/2026-11-02'); await p.waitForSelector('#rc .seg');
+      await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(400);
+      for (let pg = 0; pg < 3; pg++) {
+        const bad = await p.evaluate(() => {
+          const vp = document.querySelector('#vp').getBoundingClientRect(), rc = document.querySelector('#rc');
+          const lo = vp.top + parseFloat(rc.style.paddingTop) - 1, hi = vp.bottom - parseFloat(rc.style.paddingBottom) + 1;
+          const rg = document.createRange(); rg.selectNodeContents(rc);
+          return [...rg.getClientRects()].filter(r => r.width > 2 && r.height > 4 && r.right > vp.left + 2 && r.left < vp.right - 2 && (r.top < lo || r.bottom > hi)).map(r => `${Math.round(r.top)}-${Math.round(r.bottom)} (${Math.round(lo)}..${Math.round(hi)})`);
+        });
+        assert.deepEqual(bad, [], `${w}x${h} page ${pg + 1}`);
+        await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(700);
+      }
+      assert.deepEqual(p.errors, []);
+      await p.context().close();
+    }
+  } finally { await b.close(); srv.close(); }
+});

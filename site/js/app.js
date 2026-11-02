@@ -838,6 +838,9 @@ document.addEventListener('keydown', e => {
   else if (k === 'p' || k === 'P' || k === 'פ') ttsToggle();
   else if (k === 'f' || k === 'F' || k === 'כ') $('#b-full').click();
 }, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
+// web fonts use font-display: swap – if one arrives after the first layout, page breaks were measured with the
+// fallback font, so measure again (keeping the reading position).
+document.fonts?.addEventListener?.('loadingdone', () => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } });
 let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } }, 150); });
 
 function openSheet(kind, note = '') {
