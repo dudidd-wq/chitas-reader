@@ -1,6 +1,8 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel } from './texts.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurDoc } from './texts.js';
+import { divineName, unAbbr } from './divine.js';
+import { suggest, insertionLines } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
@@ -135,9 +137,11 @@ function route() {
   const [view, a, b] = h.split('/');
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
-  if (view !== 'r') closeReader();
+  if (view !== 'r' && view !== 's') closeReader();
   autoPrefetch();
-  if (view === 'r' && UNITS[a]) { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
+  if (view === 'r' && UNITS[a] && a !== 'siddur') { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
+  if (view === 's' && /^[a-z]+$/.test(a) && /^\d+$/.test(b)) { openReader('siddur', currentDate, `${a}/${+b}`); return; }
+  if (view === 'siddur') return renderSiddur();
   if (view === 'settings') return renderSettings();
   if (view === 'sources') return renderSources();
   if (view === 'about') return renderAbout();
@@ -220,12 +224,13 @@ async function renderHome(showLoc = false) {
       </ol>
     </section>
     ${zmanTeaser()}
+    ${tefilaCard()}
 `}
     <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -303,6 +308,85 @@ async function persistStorage() {
   } catch { return null; }
 }
 
+// ---------------- Siddur: what to pray now (home) and the full table of contents ----------------
+// Suggested by the day's zmanim at the chosen place; insertions are shown only where a calendar rule decides them.
+function tefilaCard() {
+  try {
+    const pl = zmanPlace(), z = computeZmanim(currentDate, pl, { candleMins: prefs.candleMins });
+    const isToday = currentDate === todayIso();
+    const s = suggest(currentDate, z, isToday ? Date.now() : null, { il: prefs.il, jerusalem: pl.id === 'jerusalem' });
+    const seen = new Set(), items = s.items.filter(i => { const k = `${i.book}/${i.n}`; if (seen.has(k)) return false; seen.add(k); return true; });
+    const lines = insertionLines(s.ins, prefs.il);
+    return `<section class="tefila" aria-labelledby="tf-h">
+      <div class="dayhead"><h2 id="tf-h">${isToday ? 'תפילה עכשיו' : 'תפילות היום'}</h2><span class="daysum">${esc(isToday ? s.he : 'נוסח חב״ד')}</span></div>
+      <ul class="tf-list">${items.map(i => `<li><a href="#/s/${i.book}/${i.n}">${esc(i.he)}</a></li>`).join('')}</ul>
+      ${lines.length ? `<p class="tf-ins"><b>${s.period === 'night' ? 'בתפילת הערב' : 'היום'} אומרים:</b> ${lines.map(esc).join(' · ')}</p>` : ''}
+      ${s.notes.map(n => `<p class="note">${esc(n)}</p>`).join('')}
+      <p class="tf-more"><a class="btn" href="#/siddur">הסידור המלא – תוכן וחיפוש</a></p>
+    </section>`;
+  } catch { return `<p class="tf-more"><a class="btn" href="#/siddur">סידור – נוסח חב״ד</a></p>`; }
+}
+// consonant skeleton: letters only, final forms folded – a search matches whatever the vowels, accents and mark order
+const FINAL = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+const skel = t => String(t).replace(/<[^>]*>/g, ' ').replace(/[^\u05D0-\u05EA]/g, '').replace(/[ךםןףץ]/g, c => FINAL[c]);
+async function renderSiddur() {
+  shell('סידור – נוסח חב״ד', '<p>טוען…</p>');
+  document.title = 'סידור – נוסח חב״ד';
+  let idx, srcs = {};
+  try { idx = await siddurIndex(); } catch { $('.page').innerHTML = '<h1>סידור – נוסח חב״ד</h1><p role="alert">לא ניתן לטעון את תוכן הסידור – בדקו חיבור ונסו שוב.</p>'; return; }
+  try { srcs = await data('sources.json'); } catch { /* offline */ }
+  const m = srcs.siddur;
+  const mark = (b, n) => { const p = getProgress('siddur', `${b}/${n}`); return p?.done ? '<span class="sd-done" aria-label="נקרא">✓</span>' : ''; };
+  const groups = Object.entries(idx.groups).map(([g, gh]) => `<section class="sd-group" aria-labelledby="sg-${g}"><h2 id="sg-${g}">${esc(gh)}</h2>
+    ${idx.books.filter(b => b.group === g).map(b => b.secs.length === 1
+      ? `<h3 class="sd-book"><a href="#/s/${b.id}/1">${esc(b.he)}</a>${mark(b.id, 1)}</h3>`
+      : `<h3 class="sd-book">${esc(b.he)}</h3><ol class="sd-secs">${b.secs.map((x, i) => `<li><a href="#/s/${b.id}/${i + 1}">${esc(x.he)}</a>${mark(b.id, i + 1)}</li>`).join('')}</ol>`).join('')}
+  </section>`).join('');
+  $('.page').innerHTML = `<h1>סידור – נוסח חב״ד</h1>
+  <p>נוסח האריז״ל כמנהג חב״ד, מתוך התעתיק של שמואל גונזלס ב-<a href="https://opensiddur.org" target="_blank" rel="noopener" dir="ltr">Open Siddur Project</a> (ברישיון ${m ? licenseLink(m.license, m) : 'CC0'}; ההוראות באנגלית ב-${m ? licenseLink(m.instructionsLicense) : 'CC BY'}). התעתיק נערך ״בהתאם לתהלת ה׳״, אך <b>אינו</b> סידור תהלת ה׳ עצמו; אפשר שיש בו הבדלים קטנים מהסידור המודפס. <a href="#/about">פרטים</a></p>
+  <form class="sd-search" role="search" onsubmit="return false"><label for="sd-q">חיפוש בסידור</label>
+    <input type="search" id="sd-q" placeholder="למשל: ובא לציון" autocomplete="off" aria-describedby="sd-st"><p class="note" id="sd-st" role="status" aria-live="polite"></p></form>
+  <div id="sd-res"></div>
+  <nav aria-label="תוכן הסידור" class="sd-toc">${groups}</nav>
+  <section aria-labelledby="sd-miss-h"><h2 id="sd-miss-h">מה אין בסידור זה, ומדוע</h2><ul class="sd-miss">${idx.missing.map(x => `<li><b>${esc(x.he)}</b> – ${esc(x.why)}</li>`).join('')}</ul></section>
+  <p><button class="btn" id="sd-dl">שמירת הסידור לשימוש ללא רשת</button></p><p class="note" id="sd-dl-st" role="status" aria-live="polite"></p>`;
+  const q = $('#sd-q'), st = $('#sd-st'), res = $('#sd-res');
+  let all = null, timer = 0, seq = 0;
+  const load = async () => all ||= Promise.all((await siddurOrder()).map(async s => ({ ...s, doc: await data(`siddur/${s.book}/${s.n}.json`) })));
+  q.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(async () => {
+    const my = ++seq, k = skel(q.value.replace(/(^|\s)([ובכלמשד]{0,2})ה['׳]/g, '$1$2יהוה')); // ה׳ typed = the name in the text
+    if (k.length < 2) { res.innerHTML = ''; st.textContent = ''; return; }
+    st.textContent = 'מחפש…';
+    let secs; try { secs = await load(); } catch { all = null; st.textContent = 'החיפוש דורש את כל קבצי הסידור – בדקו חיבור, או שמרו את הסידור לשימוש ללא רשת.'; return; }
+    if (my !== seq) return;
+    const hits = [];
+    for (const s of secs) {
+      if (skel(s.he).includes(k)) { hits.push({ s, snip: '' }); continue; }
+      for (const [t, h] of s.doc.b) {
+        if (t === 'n') continue;
+        const plain = h.replace(/<[^>]*>/g, ''), pos = []; let sk = '';
+        for (let i = 0; i < plain.length; i++) { const c = plain[i]; if (c >= '\u05D0' && c <= '\u05EA') { sk += FINAL[c] || c; pos.push(i); } }
+        const at = sk.indexOf(k);
+        if (at >= 0) { const a = pos[at], b = pos[at + k.length - 1] + 1; hits.push({ s, snip: [plain.slice(Math.max(0, a - 50), a), plain.slice(a, b), plain.slice(b, b + 60)] }); break; }
+      }
+      if (hits.length >= 40) break;
+    }
+    const dn = x => divineName(esc(x), prefs.divine);
+    res.innerHTML = hits.length ? `<ol class="sd-hits">${hits.map(({ s, snip }) => `<li><a href="#/s/${s.book}/${s.n}">${esc(s.bookHe)} – ${esc(s.he)}</a>${snip ? `<p>…${dn(snip[0])}<mark>${dn(snip[1])}</mark>${dn(snip[2])}…</p>` : ''}</li>`).join('')}</ol>` : '';
+    st.textContent = hits.length ? `נמצאו ${hits.length >= 40 ? 'יותר מ־40' : hits.length} קטעים` : 'לא נמצא';
+  }, 250); });
+  $('#sd-dl').addEventListener('click', async () => {
+    const b = $('#sd-dl'), s2 = $('#sd-dl-st'); b.disabled = true;
+    try {
+      const files = [...await siddurFiles(), 'sources.json']; let ok = 0;
+      for (const [i, f] of files.entries()) { if (await fetch('data/' + f).then(r => r.ok).catch(() => false)) ok++; if (i % 10 === 0) b.textContent = `מוריד… ${Math.round(100 * i / files.length)}%`; }
+      const persist = await persistStorage();
+      b.textContent = ok === files.length ? '✓ הסידור נשמר' : 'שמירה חלקית – נסו שוב'; b.disabled = ok === files.length;
+      s2.textContent = ok === files.length ? `כל ${files.length} קבצי הסידור נשמרו במכשיר.${persist === false ? ' הדפדפן לא אישר אחסון קבוע, ולכן ייתכן שימחק את השמירה אם יחסר מקום.' : ''}` : `נשמרו ${ok} מתוך ${files.length} קבצים (בדקו חיבור).`;
+    } catch { b.textContent = 'שגיאה בהורדה'; b.disabled = false; }
+  });
+}
+
 // ---------------- Generic pages ----------------
 function shell(title, body) {
   $('#view').innerHTML = `<div class="wrap"><nav class="topnav"><a class="btn" href="#/d/${currentDate}" aria-label="ראשי – חזרה לדף הבית">${ICON.back}<span>ראשי</span></a></nav>
@@ -323,6 +407,9 @@ function displayForm() {
     ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
+  <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
+    <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
+  ${check('siddurEn', prefs.siddurEn, 'הצג בסידור את ההוראות באנגלית שבתעתיק')}
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
   ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
   ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
@@ -503,16 +590,19 @@ function unvocalizedList(s) {
 }
 
 // ---------------- Reader ----------------
-const R = { unit: null, iso: null, doc: null, page: 0, pages: 1, segs: [], speaker: null, wake: null, saveT: null };
+const R = { unit: null, iso: null, sid: null, doc: null, page: 0, pages: 1, segs: [], speaker: null, wake: null, saveT: null };
 function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
-function fmt(html, isTanakh) {
+// progress key: a lesson is kept per day; a siddur section once (it is not a daily lesson)
+const pk = () => (R.sid ? ['siddur', R.sid] : [R.iso, R.unit]);
+function fmt(html, isTanakh, siddur = false) {
+  if (siddur) return divineName(html, prefs.divine); // the siddur keeps its own markup: no ketiv/qere or parasha marks
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
     .replace(/\{([פס])\}/g, (m, k) => `<span class="pe pe-${k === 'פ' ? 'p' : 's'}" aria-hidden="true" title="${k === 'פ' ? 'פרשה פתוחה' : 'פרשה סתומה'}"></span>`) // a gap, as in a Torah scroll (round 5: a bare ס puzzled readers)
     .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">')
     .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
-  if (!isTanakh) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
+  if (!isTanakh && !siddur) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
-  return s;
+  return divineName(s, prefs.divine); // the divine name: in full (default) or ה׳ – one setting for every text
 }
 // per block: true = vocalised, false = not, null = too short to tell (inherits the previous block's state)
 function vocState(blocks) {
@@ -523,21 +613,21 @@ function vocState(blocks) {
 }
 function niqqudRatio(text) { const L = (text.match(/[\u05D0-\u05EA]/g) || []).length; const N = (text.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length; return N / Math.max(L, 1); }
 
-async function openReader(unit, iso) {
+async function openReader(unit, iso, sid = null) {
   currentDate = iso;
   const auto = R.autoplay; R.autoplay = false;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
-  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(R.iso, R.unit, a); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), a); }
   R.doc = null; R.segs = []; R.ttsShown = false;
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
-  R.unit = unit; R.iso = iso; R.page = 0;
+  R.unit = unit; R.iso = iso; R.sid = sid; R.page = 0;
   el.innerHTML = `
   <header class="r-top" id="rt">
-    <a class="btn ghost" href="#/d/${iso}" aria-label="חזרה לדף הבית">${ICON.back}</a>
-    <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${esc(dayDates(plan, iso))}</small></div>
+    <a class="btn ghost" href="${sid ? '#/siddur' : '#/d/' + iso}" aria-label="${sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית'}">${ICON.back}</a>
+    <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${sid ? '' : esc(dayDates(plan, iso))}</small></div>
     <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
     <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
@@ -567,16 +657,26 @@ async function openReader(unit, iso) {
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
   bindReaderUi();
   try {
-    R.doc = await buildDoc(plan, unit);
+    if (sid) { const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurDoc(bk, +n); }
+    else R.doc = await buildDoc(plan, unit);
   } catch (e) {
     // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
     const rc = $('#rc'); rc.classList.add('r-error'); rc.style.cssText = '';
     rc.innerHTML = `<p role="alert">לא ניתן לטעון את הטקסט. ${navigator.onLine === false ? 'אין חיבור לרשת, והטקסט של יום זה לא נשמר מראש במכשיר.' : 'ייתכן שהחיבור לרשת נכשל, או שהטקסט של יום זה לא נשמר מראש במכשיר.'}</p>
       <p><button class="btn primary" id="r-retry">נסה שוב</button></p><p class="r-error-hint">כדי לקרוא בלי רשת: בדף הבית – ״שמירה לשימוש ללא רשת (30 יום)״ בזמן שיש חיבור.</p>`;
-    $('#r-retry').addEventListener('click', () => { if (R.unit === unit && R.iso === iso) openReader(unit, iso); });
+    $('#r-retry').addEventListener('click', () => { if (R.unit === unit && R.iso === iso && R.sid === sid) openReader(unit, iso, sid); });
     $('#r-retry').focus(); return;
   }
-  if (R.unit !== unit || R.iso !== iso) return;
+  if (R.unit !== unit || R.iso !== iso || R.sid !== sid) return;
+  if (sid) {
+    $('#r-t').textContent = R.doc.title; $('#r-s').textContent = R.doc.subtitle;
+    document.title = `${R.doc.title} – סידור`;
+    await renderDoc();
+    const sp = getProgress('siddur', sid);
+    if (sp?.pos && !sp.done) restore(sp);
+    requestWake(); if (auto) ttsToggle();
+    return;
+  }
   $('#r-t').textContent = R.doc.title; $('#r-s').innerHTML = `<span class="r-dt">${dayDatesHtml(plan, iso)}</span><span class="r-rng"><i aria-hidden="true"> · </i>${esc(R.doc.subtitle)}</span>`;
   document.title = `${R.doc.title} – ${plan.hebDate} (${fmtDmy(iso)})`;
   await renderDoc();
@@ -609,14 +709,16 @@ async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
-  let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
+  const sidd = !!d.siddur;
+  let html = `<header class="doc-head"><p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
   const main = { chumash: [['חומש', srcs.tanakh], showRashi && ['רש״י', srcs.rashi && { ...srcs.rashi, versionTitleInHebrew: 'מהדורת רוזנבאום–זילברמן (1929–1934)' }]], tehillim: [['תהילים', srcs.tanakh]],
     tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
     mitzvot: [['ספר המצוות', srcs.mitzvot && { ...srcs.mitzvot, versionTitleInHebrew: 'ספר המצוות, ורשה תרמ״ג' }]],
-    chassidus: [['תורה אור / לקוטי תורה', srcs.chassidus && { ...srcs.chassidus, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
+    chassidus: [['תורה אור / לקוטי תורה', srcs.chassidus && { ...srcs.chassidus, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
+    siddur: [['סידור', srcs.siddur], ['הוראות באנגלית', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || [['רמב״ם', srcs.rambam]];
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
   // round 6: vocalisation is judged per block, not for the whole lesson (Positive Mitzvot: the first ~47 mitzvot are
@@ -631,7 +733,7 @@ async function renderDoc() {
     if (mixed && voc[bi] === true && !prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט מנוקד</p>`;
     if (voc[bi] !== null) prevVoc = voc[bi];
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
-    if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += `<aside class="day-note" role="note">${esc(b.text)}</aside>`; continue; }
+    if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += b.html != null ? `<aside class="sid-note" lang="en" dir="ltr">${divineName(b.html.replace(/[\u0590-\u05FF][\u0590-\u05FF\s"'״׳־,]*[\u0590-\u05FF]|[\u0590-\u05FF]/g, m => `<bdi lang="he">${m}</bdi>`), prefs.divine)}</aside>` : `<aside class="day-note" role="note">${esc(b.text)}</aside>`; continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
     if (inline) {
@@ -639,7 +741,7 @@ async function renderDoc() {
       html += `<span class="seg inline" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${num}<span class="t">${fmt(b.text, true)}</span></span> `;
     } else {
       const rashi = showRashi && b.sub?.length ? `<div class="rashi">${b.sub.map((r, i) => `<p>${i ? '' : '<span class="lbl">רש״י </span>'}${fmt(r, false)}</p>`).join('')}</div>` : '';
-      html += `<div class="seg" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}><div class="t">${num}${fmt(b.text, !!d.tanakh)}</div>${rashi}</div>`;
+      html += `<div class="seg" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}><div class="t">${num}${fmt(b.text, !!d.tanakh, sidd)}</div>${rashi}</div>`;
     }
   }
   if (open) html += '</p>';
@@ -653,10 +755,11 @@ async function renderDoc() {
     html += `<p class="doc-credit" id="doc-fixes">${parts.join('. ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
   }
   html += `<p class="doc-credit" id="doc-report">מצאת טעות בנוסח, בניקוד, בהקראה או בביאור? <a id="b-report" href="${ISSUES}" target="_blank" rel="noopener">דיווח ב-GitHub</a> (נפתח טופס עם פרטי המקום; דבר אינו נשלח עד שתאשר שם)</p>`;
-  html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
+  if (sidd) { const nx = nextSid(); html += `<p class="endmark" id="endmark">— סוף הקטע —<br><button class="btn" id="b-nextunit">${nx ? `לחלק הבא: ${esc(nx.he)}` : 'חזרה לתוכן הסידור'}</button></p>`; }
+  else html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
   rc.innerHTML = html;
-  rc.className = 'r-content gloss-' + prefs.gloss;
-  if (prefs.gloss !== 'off') { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
+  rc.className = 'r-content gloss-' + prefs.gloss + (sidd && !prefs.siddurEn ? ' no-en' : '');
+  if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
   const rep = $('#b-report'); if (rep) { const upd = () => { rep.href = reportUrl(); }; rep.addEventListener('pointerdown', upd); rep.addEventListener('focus', upd); rep.addEventListener('click', upd); }
   $('#b-nextunit').onclick = () => nextUnit(false);
@@ -671,9 +774,11 @@ function glossNote(rc, G, kind) {
   p.innerHTML = `ביאורי מילים בשיעור זה: ${here ? n(here) : 'אין'}. בסך הכול ${n(total)} בתורה ובתהילים ו־${n(rb)} ברמב״ם – מעט בכוונה: כל ביאור עבר שתי בדיקות ובדיקה ידנית${kind === 'tanakh' ? '; ברש״י אין' : kind ? '' : '; בתניא אין'} (<a href="#/about">פירוט</a>). `;
   end.prepend(p);
 }
-function nextUnitId() { const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
+function nextSid() { if (!R.sid || !R.sorder) return null; const i = R.sorder.findIndex(x => `${x.book}/${x.n}` === R.sid); return i >= 0 ? R.sorder[i + 1] || null : null; }
+function nextUnitId() { if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
-  setProgress(R.iso, R.unit, { done: true, frac: 1 });
+  setProgress(...pk(), { done: true, frac: 1 });
+  if (R.sid) { const nx = nextSid(); R.autoplay = !!nx && autoplay; location.hash = nx ? `#/s/${nx.book}/${nx.n}` : '#/siddur'; return; }
   const n = nextUnitId();
   if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
   R.autoplay = autoplay;
@@ -795,7 +900,7 @@ function reportUrl(seg = currentSeg()) {
   const t = seg ? (seg.querySelector('.t')?.textContent || seg.textContent).replace(/\s+/g, ' ').trim() : '';
   const where = [R.doc?.title, R.doc?.subtitle].filter(Boolean).join(' – ');
   const title = `טעות בטקסט: ${where}${seg ? ` (${seg.dataset.ref || seg.dataset.id})` : ''}`.slice(0, 150);
-  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.iso ? `${fmtDmy(R.iso)} (${dayPlan(R.iso, { il: prefs.il }).hebDate})` : ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
+  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.sid ? 'סידור' : R.iso ? `${fmtDmy(R.iso)} (${dayPlan(R.iso, { il: prefs.il }).hebDate})` : ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
     sel ? `**המילים שסומנו:** ${sel}` : '', seg ? `**הנוסח המוצג:**\n> ${t.slice(0, 600)}${t.length > 600 ? '…' : ''}` : '',
     '', '**מה הטעות?** (ניקוד / מילה חסרה או מיותרת / הקראה / ביאור)', '', '**מה הנוסח הנכון, ולפי איזה מקור?**', ''].filter(x => x !== false).join('\n');
   return `${ISSUES}?title=${encodeURIComponent(title)}&labels=${encodeURIComponent('text-error')}&body=${encodeURIComponent(body)}`;
@@ -826,7 +931,7 @@ function updateProgress(save = true) {
   if (!save || !R.doc) return;
   clearTimeout(R.saveT);
   R.saveT = setTimeout(() => {
-    setProgress(R.iso, R.unit, { ...anchor(), frac, done: frac >= 0.995 });
+    setProgress(...pk(), { ...anchor(), frac, done: frac >= 0.995 });
   }, 400);
 }
 // round 4: up to 440 px tall, so large phones on their side (390–430 px tall) also get the whole height
@@ -911,7 +1016,7 @@ function bindReaderUi() {
 function turn(d) {
   R.armAutoHide?.();
   if (prefs.layout === 'pages') {
-    if (d > 0 && R.page >= R.pages - 1) { setProgress(R.iso, R.unit, { done: true, frac: 1 }); toast('סוף השיעור'); return; }
+    if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast('סוף השיעור'); return; }
     setPage(R.page + d);
   } else { const vp = $('#vp'); vp.scrollBy({ top: d * (vp.clientHeight - 80), behavior: 'smooth' }); }
 }
@@ -961,7 +1066,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if (['taamim', 'rashi', 'gloss', 'font'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
+    if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'siddurEn'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
@@ -989,7 +1094,7 @@ document.addEventListener('keydown', e => {
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
   return R.segs.map(s => {
-    const parts = [s.querySelector('.t').innerHTML.replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
+    const parts = [unAbbr(s.querySelector('.t').innerHTML).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
@@ -1028,7 +1133,7 @@ async function ttsToggle() {
     // Only a run that really reached the end with every chunk spoken marks the lesson as read / moves on.
     onEnd: ({ complete }) => {
       if (!complete) { toast(TTS_ERR.silent); return; }
-      if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(R.iso, R.unit, { done: true, frac: 1 });
+      if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(...pk(), { done: true, frac: 1 });
     },
     onError: code => {
       R.speaker = null; R.ttsShown = false; showTtsBar(false);
@@ -1057,10 +1162,10 @@ function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
   R.ttsShown = false; clearTimeout(R.hideT);
-  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(R.iso, R.unit, a); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), a); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
-  R.unit = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
+  R.unit = null; R.sid = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
   if (R.wake) { R.wake.release().catch(() => {}); R.wake = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }

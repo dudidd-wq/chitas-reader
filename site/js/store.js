@@ -7,6 +7,7 @@ export const DEFAULT_PREFS = {
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, candleMins: 0,
+  divine: 'full', siddurEn: true,
 };
 // One speed scale for the footer menu and the settings slider.
 export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];

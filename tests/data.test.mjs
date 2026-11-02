@@ -28,6 +28,7 @@ test('every portion resolves to non-empty text (both Israel and diaspora)', asyn
     for (const il of [false, true]) {
       const plan = dayPlan(new Date(d), { il });
       for (const unit of Object.keys(UNITS)) {
+        if (unit === 'siddur') continue; // not a daily portion (tests/siddur.test.mjs)
         if (il && unit !== 'chumash') continue; // only Chumash depends on location
         const doc = await buildDoc(plan, unit);
         const segs = doc.blocks.filter(b => b.type !== 'h');

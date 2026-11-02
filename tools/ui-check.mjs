@@ -10,6 +10,9 @@ const screens = [
   ['chumash', `r/chumash/${D}`], ['chumash-scroll-inline-gloss', `r/chumash/${D}`, { layout: 'scroll', gloss: 'inline', rashi: false }],
   ['tehillim', `r/tehillim/${D}`, { gloss: 'inline' }], ['tanya-dark', `r/tanya/${D}`, { theme: 'dark' }],
   ['rambam3-night', `r/rambam3/${D}`, { theme: 'night' }], ['rambam1-sepia-scroll', `r/rambam1/${D}`, { theme: 'sepia', layout: 'scroll', size: 30 }],
+  ['siddur-toc', 'siddur'], ['siddur-amida-dark', 's/shacharit/3', { theme: 'dark' }],
+  ['siddur-kabbalat-night-abbr', 's/kabbalat/2', { theme: 'night', divine: 'abbr' }],
+  ['siddur-hallel-sepia-scroll', 's/rc/1', { theme: 'sepia', layout: 'scroll', size: 30 }],
 ];
 for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   const ctx = await b.newContext({ viewport: { width: w, height: 740 }, locale: 'he-IL', serviceWorkers: 'block' });

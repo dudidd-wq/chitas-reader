@@ -98,7 +98,7 @@ input[type="date"], #datepick { min-height: 44px; padding: .3rem .6rem; border-r
 .card.done { background: color-mix(in srgb, var(--accent) 5%, var(--card)); }
 .home-foot { margin-top: 1.6rem; display: grid; justify-items: center; gap: .8rem; }
 .home-foot .links { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; justify-content: center; margin: 0; }
-.home-foot .links a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: .25em; }
+.home-foot .links a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; font-weight: 600; text-underline-offset: .25em; }
 .home-foot .note { margin: 0; }
 .links { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1.5rem; }
 .note { color: var(--muted); font-size: .9rem; text-align: center; margin-top: 1rem; }
@@ -329,3 +329,29 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .zm-special small { color: var(--ink); }
 .zm-nav .today { flex-basis: auto !important; }
 .form .hint { color: var(--muted); font-size: .9rem; margin: .25rem 0 0; }
+
+/* ---- Siddur (home suggestion, table of contents, reader notes) ---- */
+.tefila { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; box-shadow: var(--shadow); padding: .8rem 1rem 1rem; margin: 1rem 0; }
+.tefila .dayhead { margin: 0 0 .4rem; }
+.tf-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+.tf-list a { display: inline-flex; align-items: center; min-height: 44px; padding: .3rem .9rem; border-radius: 12px; border: 1px solid var(--rule); background: color-mix(in srgb, var(--accent) 7%, var(--card)); color: var(--ink); text-decoration: none; font-weight: 600; overflow-wrap: anywhere; }
+.tf-list a:hover { border-color: var(--accent); }
+.tf-ins { margin: .7rem 0 0; line-height: 1.6; overflow-wrap: anywhere; }
+.tefila .note { margin: .4rem 0 0; color: var(--muted); font-size: .9rem; }
+.tf-more { margin: .7rem 0 0; }
+.sd-search { margin: 1rem 0; }
+.sd-search label { display: block; font-weight: 600; margin-bottom: .3rem; }
+.sd-search input { width: 100%; box-sizing: border-box; min-height: 44px; padding: .3rem .7rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
+.sd-hits { padding-inline-start: 1.2rem; }
+.sd-hits li { margin: .5rem 0; }
+.sd-hits a, .sd-secs a, .sd-book a { display: inline-block; min-height: 44px; line-height: 44px; overflow-wrap: anywhere; }
+.sd-hits p { margin: 0; color: var(--muted); font-family: var(--text-font); overflow-wrap: anywhere; }
+.sd-hits mark { background: var(--hl); color: inherit; }
+.sd-group h2 { margin: 1.4rem 0 .3rem; }
+.sd-book { margin: .8rem 0 .1rem; font-size: 1.05rem; }
+.sd-secs { margin: 0; padding-inline-start: 1.4rem; }
+.sd-secs li { line-height: 1.3; }
+.sd-done { color: var(--accent); margin-inline-start: .4rem; font-weight: 700; }
+.sd-miss li { margin: .3rem 0; }
+.sid-note { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); margin: .5em 0; text-align: left; overflow-wrap: anywhere; }
+.no-en .sid-note { display: none; }

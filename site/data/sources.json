@@ -149,5 +149,92 @@
   "versionTitleInHebrew": null,
   "sefariaUrl": "https://www.sefaria.org/Torah_Ohr?vhe=Kehot%20Publication%20Society",
   "fetchedAt": "2026-11-02"
+ },
+ "siddur": {
+  "versionTitle": "Siddur Nusach Ha-Ari (Chabad), transcribed by Shmuel Gonzales – Open Siddur Project",
+  "versionTitleInHebrew": "סידור נוסח האר״י (חב״ד), תעתיק שמואל גונזלס – Open Siddur Project",
+  "versionSource": "https://opensiddur.org/compilations/liturgical/siddurim/kol-bo/siddur-torah-or-nusah-haari-zl/",
+  "license": "CC0",
+  "instructionsLicense": "CC-BY",
+  "attribution": "Contributors to the Open Siddur Project, including Shmueli Gonzales",
+  "retrieved": "Internet Archive copy (web.archive.org) of the files at https://opensiddur.org/wp-content/uploads/2010/08/",
+  "files": {
+   "The-Morning-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/The-Morning-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "a330842eb0c5ecbd44932b825073df9b5e4a2f55587a43ce219a2b207b3bdf41"
+   },
+   "Shaḥarit-Morning-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Shaḥarit-Morning-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "1ccef8bf43de3f823cf4a887ae0bb34c736e9c1c412906f5e26c8f5eec0202ba"
+   },
+   "Minḥah-Afternoon-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Minḥah-Afternoon-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "bdc571ba163583d8ddc84ea4ad18167b02205c8804f207aef8f63c89c6fbf592"
+   },
+   "Maariv-Evening-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Maariv-Evening-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "b63812ce97947808b6e7a950d0f0857fd2755b7be3c83aee167356f858ebb9dc"
+   },
+   "The-Bedtime-Shema-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/The-Bedtime-Shema-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "b9aee396df3577fae47912d5552c41e1584b37dda3ecba960ab7073424398de1"
+   },
+   "Tikkun-Ḥatzot-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Tikkun-Ḥatzot-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "5089dc388af00ad4c780ec1e0974d1027b7ebffec2e4067ea3c48c9bff51b1d2"
+   },
+   "The-Blessing-Book-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/The-Blessing-Book-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "933dea74948bcc875fd04d5287e760c1f48c7b7a3dd94ced13789628a867daca"
+   },
+   "Prayer-for-Travelers-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Prayer-for-Travelers-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "e52cebda48d8eb20dc71cc78738fed0234189bb73f6f5caf1d2d4664f890d1e9"
+   },
+   "Kabbalat-Shabbat-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Kabbalat-Shabbat-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "8a853b3bf1724f5cef8617c6fd2b84688cae7a03728a58e8d440351919285cfc"
+   },
+   "The-Shabbat-Book-Nusaḥ-Ha-Ari-ḤaBaD.odt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/The-Shabbat-Book-Nusaḥ-Ha-Ari-ḤaBaD.odt",
+    "sha256": "ae439154503aea231cccbe017ada87e23c37dabb18d576a38bb12466c57c2014"
+   },
+   "Shaḥarit-Musaf-Shabbat-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Shaḥarit-Musaf-Shabbat-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "38dd7e498124fe3d04b937905e184b47fb9bda1897b4f9b6b57d9d7e8efe4530"
+   },
+   "Minḥah-Shabbat-Afternoon-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Minḥah-Shabbat-Afternoon-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "50c40ffd5687bf4d003eaff6a23e742f8044d210cdc86955aa257f15c15cb291"
+   },
+   "Hallel-Musaf-Rosh-Ḥodesh-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Hallel-Musaf-Rosh-Ḥodesh-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "a36b154fd89d514501189b56296013f6d0458161088c7ee604637d4798440458"
+   },
+   "Shelosh-Regalim-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Shelosh-Regalim-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "d75f0c24c5ab1d5fd52f0220b3804a0cf19f1a664b6c1990852cc6048855270e"
+   },
+   "Ḥag-Sukkot-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Ḥag-Sukkot-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "4342ecf44d9dfeac8c44abb23ba4665b5fc16bb21f2c35bc7f06edfbf4c5be23"
+   },
+   "Ḥanukkah-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.odt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Ḥanukkah-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.odt",
+    "sha256": "b6c7e93ff692ccac708b2ea523cfb7bb2f2fcfee1ffc685d2640204ac64d46cf"
+   },
+   "Megillat-Esther-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Megillat-Esther-Blessings-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "920789a733581181accc37536455a5142b8e36563114dc0c83e74ce55789c749"
+   },
+   "Sefirat-HaOmer-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Sefirat-HaOmer-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "6b8764a66fcc41b58ce2c294df0e20fe906a1c2693a65702cbd758630f3faf31"
+   },
+   "Kiddush-Levana-Nusaḥ-Ha-Ari-ḤaBaD.txt": {
+    "url": "https://opensiddur.org/wp-content/uploads/2010/08/Kiddush-Levana-Nusaḥ-Ha-Ari-ḤaBaD.txt",
+    "sha256": "3cf40f4e0c91823bc3a3499baf6c85af7e374a1b40f46cfc4987c387a96c71f1"
+   }
+  }
  }
 }

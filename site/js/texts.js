@@ -22,6 +22,7 @@ export const UNITS = {
   rambam1: { he: 'רמב״ם – פרק אחד', full: 'רמב״ם – פרק אחד ליום' },
   mitzvot: { he: 'ספר המצוות', full: 'ספר המצוות היומי' },
   chassidus: { he: 'תורה אור / לקוטי תורה', full: 'חסידות הפרשה – תורה אור / לקוטי תורה' },
+  siddur: { he: 'סידור', full: 'סידור – נוסח חב״ד' }, // not a daily lesson: opened from #/siddur, never listed in the day's cards
 };
 const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
 
@@ -214,4 +215,29 @@ export async function describe(plan, unit) {
   if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');
   if (unit === 'chassidus') return chassidusTitle(plan);
   return rambamTitle(plan[unit]);
+}
+
+// ---------------- Siddur (Open Siddur Project, Nusach Ha-Ari / Chabad – see tools/build-siddur.mjs) ----------------
+export const siddurIndex = () => data('siddur/index.json');
+/** every siddur section in table-of-contents order: [{book, n, he, bookHe}] */
+export async function siddurOrder() {
+  const idx = await siddurIndex();
+  return idx.books.flatMap(b => b.secs.map((s, i) => ({ book: b.id, n: i + 1, he: s.he, bookHe: b.he, group: b.group })));
+}
+export async function siddurFiles() {
+  return ['siddur/index.json', ...(await siddurOrder()).map(s => `siddur/${s.book}/${s.n}.json`)];
+}
+// the built files contain only text with <b>/<i>; anything else is dropped here as well (defence in depth)
+const inlineOnly = h => String(h).replace(/<(?!\/?(?:b|i)>)[^>]*>/g, '');
+export async function buildSiddurDoc(book, n, { english = true } = {}) {
+  const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
+  if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
+  const sec = await data(`siddur/${book}/${n}.json`);
+  const blocks = [];
+  sec.b.forEach(([t, h], i) => {
+    if (t === 'h') blocks.push({ type: 'h', id: `${book}-${n}-${i}`, text: inlineOnly(h).replace(/<[^>]*>/g, '') });
+    else if (t === 'n') { if (english) blocks.push({ type: 'note', id: `${book}-${n}-${i}`, html: inlineOnly(h), lang: 'en' }); }
+    else blocks.push({ type: 'p', id: `${book}-${n}-${i}`, text: inlineOnly(h) });
+  });
+  return { title: sec.he, subtitle: b.he + (sec.en ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
 }
