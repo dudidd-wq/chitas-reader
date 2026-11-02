@@ -144,3 +144,21 @@ test('any word (here in Tanya, which has no glossary) can be selected and looked
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
+
+test('round 3: at 320×568 portrait page 1 is filled – the title block is compact and a Rashi block continues onto page 2', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(); const b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { viewport: { width: 320, height: 568 } });
+    await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('.seg'); await p.waitForTimeout(500);
+    const r = await p.evaluate(() => {
+      const vp = document.querySelector('#vp').getBoundingClientRect(), rc = document.querySelector('#rc');
+      const padB = parseFloat(getComputedStyle(rc).paddingBottom), bottom = vp.bottom - padB;
+      const onPage1 = [...rc.querySelectorAll('.t, .rashi p')].flatMap(e => [...e.getClientRects()]).filter(x => x.left >= vp.left - 1 && x.right <= vp.right + 1);
+      const rashi = document.querySelector('.seg .rashi p');
+      return { fill: (Math.max(...onPage1.map(x => x.bottom)) - vp.top) / (bottom - vp.top), rashiCols: new Set([...rashi.getClientRects()].map(x => Math.round(x.left))).size, kicker: getComputedStyle(document.querySelector('.doc-kicker') || document.body).display };
+    });
+    assert.ok(r.fill > 0.9, `page 1 only ${Math.round(r.fill * 100)}% filled`);
+    assert.equal(r.rashiCols, 2, 'first Rashi should start on page 1 and continue on page 2');
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});

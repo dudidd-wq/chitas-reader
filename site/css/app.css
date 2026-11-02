@@ -249,3 +249,14 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content.gloss-tap .gl::before { content: ''; position: absolute; top: -9px; bottom: -9px; left: 50%; width: max(100% + 6px, 44px); transform: translateX(-50%); }
 .gloss-pop small a { display: inline-flex; align-items: center; min-height: 44px; }
 .r-content .doc-credit { font-family: var(--ui); font-size: .55em; line-height: 1.6; color: var(--muted); text-align: start; margin-top: 1.5em; border-top: 1px solid var(--line, rgba(0,0,0,.12)); padding-top: .5em; }
+/* small phones in portrait (e.g. 320×568, round-3 review): the title block took a third of page 1 and the first Rashi
+   could not start under the verse. The kicker repeats the top bar, so drop it and the ornament, tighten the title,
+   and let Rashi paragraphs break across pages line by line */
+@media (orientation: portrait) and (max-height: 640px) {
+  .r-content .doc-head { margin-bottom: .45em; }
+  .r-content .doc-kicker, .r-content .orn { display: none; }
+  .r-content h1 { font-size: 1em; }
+  .r-content h2 { margin: .5em 0 .25em; }
+  .r-content .rashi { margin-top: .15em; }
+  .r-content p, .r-content div { orphans: 1; widows: 1; }
+}
