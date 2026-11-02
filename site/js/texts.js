@@ -1,5 +1,6 @@
 // Loads prebuilt static JSON (site/data) and assembles a day's portion into a document of blocks.
 import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe } from './calendar.js';
+import { localizeRuns } from './siddur-lang.js';
 
 const cache = new Map();
 /** Licence labels exactly as the source (Sefaria version record) states them — no version is added (round-3 review).
@@ -282,15 +283,21 @@ export async function siddurFiles() {
 }
 // the built files contain only text with <b>/<i>; anything else is dropped here as well (defence in depth)
 const inlineOnly = h => String(h).replace(/<(?!\/?(?:b|i)>)[^>]*>/g, '');
-export async function buildSiddurDoc(book, n, { english = true } = {}) {
+/** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
+ *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
+export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
-  const blocks = [];
-  sec.b.forEach(([t, h], i) => {
-    if (t === 'h') blocks.push({ type: 'h', id: `${book}-${n}-${i}`, text: inlineOnly(h).replace(/<[^>]*>/g, '') });
-    else if (t === 'n') { if (english) blocks.push({ type: 'note', id: `${book}-${n}-${i}`, html: inlineOnly(h), lang: 'en' }); }
-    else blocks.push({ type: 'p', id: `${book}-${n}-${i}`, text: inlineOnly(h) });
+  const runs = idx.heRuns, blocks = [];
+  sec.b.forEach(([t, h, he], i) => {
+    const id = `${book}-${n}-${i}`;
+    if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
+    else if (t === 'n') {
+      if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, ''), lang: 'he' });
+      if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
+    }
+    else blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang) });
   });
-  return { title: sec.he, subtitle: b.he + (sec.en ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
+  return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
 }

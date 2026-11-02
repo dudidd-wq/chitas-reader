@@ -7,7 +7,7 @@ export const DEFAULT_PREFS = {
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, candleMins: 0,
-  divine: 'full', siddurEn: true,
+  divine: 'full', siddurLang: 'he', // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
 };
 // One speed scale for the footer menu and the settings slider.
 export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
@@ -16,6 +16,10 @@ function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
+    // round 7: the old on/off switch for the English instructions became a language choice. Both old values move to
+    // the new default (Hebrew): those who hid the English did so because it was English.
+    delete prefs.siddurEn;
+    if (!['he', 'en', 'both'].includes(prefs.siddurLang)) prefs.siddurLang = 'he';
     return { prefs, progress: d.progress || {} };
   }
   catch { return { prefs: { ...DEFAULT_PREFS }, progress: {} }; }

@@ -9,6 +9,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fullName } from '../site/js/divine.js';
+import { applySiddurHebrew } from './siddur-he.mjs';
 
 const OUT = 'site/data/siddur';
 const BASE = 'https://opensiddur.org/wp-content/uploads/2010/08/';
@@ -166,6 +167,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   for (const f of TEXT_FIX) if (USED.get(f) !== f[2]) throw new Error(`TEXT_FIX ${f[0]}: applied ${USED.get(f) || 0}×, expected ${f[2]}×`);
   index.fixes = TEXT_FIX.map(([from, to, , why]) => ({ from, to, why }));
   fs.writeFileSync(`${OUT}/index.json`, JSON.stringify(index));
+  console.log('Hebrew instructions', applySiddurHebrew()); // round 7: tools/data/siddur-he.json
   const sp = 'site/data/sources.json', sources = JSON.parse(fs.readFileSync(sp, 'utf8'));
   sources.siddur = {
     versionTitle: 'Siddur Nusach Ha-Ari (Chabad), transcribed by Shmuel Gonzales – Open Siddur Project',

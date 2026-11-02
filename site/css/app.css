@@ -355,4 +355,6 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sd-done { color: var(--accent); margin-inline-start: .4rem; font-weight: 700; }
 .sd-miss li { margin: .3rem 0; }
 .sid-note { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); margin: .5em 0; text-align: left; overflow-wrap: anywhere; }
-.no-en .sid-note { display: none; }
+.sid-note.sid-he { text-align: right; font-size: .82em; overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
+.sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
+.sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
