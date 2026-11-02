@@ -186,3 +186,17 @@ test('round 4: no lone Rashi lines at a page edge (568×320 after the bars hide,
     }
   } finally { await b.close(); srv.close(); }
 });
+
+test('round 4: the reader top-bar subtitle (date + range) is not cut with an ellipsis at 390 wide', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(); const b = await launch();
+  try {
+    for (const iso of ['2026-11-03', '2026-02-06']) {
+      const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
+      await p.goto(srv.url + `#/r/chumash/${iso}`); await p.waitForSelector('.seg'); await p.waitForTimeout(300);
+      const r = await p.$$eval('#r-s span', ss => ss.map(s => ({ t: s.textContent, cut: s.scrollWidth > s.clientWidth + 1 })));
+      assert.equal(r.length, 2, iso); assert.deepEqual(r.filter(x => x.cut), [], iso);
+      assert.match(r[1].t, /\S/);
+      await p.close();
+    }
+  } finally { await b.close(); srv.close(); }
+});

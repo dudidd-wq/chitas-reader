@@ -133,6 +133,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-title { flex: 1; min-width: 0; text-align: center; line-height: 1.25; }
 .r-title b { display: block; font-size: 1rem; font-family: var(--text-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .r-title small { color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
+/* round 4: on narrow screens the date and the verse range get a line each instead of one line cut with an ellipsis */
+@media (max-width: 480px) { .r-title small { line-height: 1.2; } .r-title small span { display: block; overflow: hidden; text-overflow: ellipsis; } .r-title small i { display: none; } }
 #reader.immersive .r-top { transform: translateY(-110%); opacity: 0; pointer-events: none; }
 #reader.immersive .r-bottom:not(.speaking) { transform: translateY(110%); opacity: 0; pointer-events: none; }
 .progress { position: absolute; top: 0; inset-inline: 0; height: 3px; background: var(--paper2); }

@@ -36,6 +36,9 @@ test('network voices: local voice is the default, network voices are labelled an
     assert.match(about, /קולות מקוונים|קולות <b>מקוונים|מקוונים/);
     assert.match(about, /שולח את הטקסט המוקרא לשרת/);
     assert.doesNotMatch(about, /אין שליחת נתונים/, 'no absolute "nothing is sent" claim');
+    // round 4: About documents the reading rules that are implemented (one tap, what is skipped, divine names)
+    assert.match(about, /לחיצה אחת על כפתור ההקראה מתחילה/); assert.match(about, /פ\/ס/); assert.match(about, /\(מכילתא\)/);
+    assert.match(about, /אֲדוֹשֵׁם/); assert.match(about, /לַהַשֵּׁם/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
