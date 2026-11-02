@@ -1,4 +1,5 @@
 // Local-only storage: preferences + reading progress. Nothing ever leaves the device.
+import { dayPlan } from './calendar.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
@@ -26,7 +27,19 @@ function save() {
 }
 export const prefs = state.prefs;
 export function setPref(k, v) { state.prefs[k] = v; save(); document.dispatchEvent(new CustomEvent('prefs', { detail: { k, v } })); }
-export const progressKey = (iso, unit) => `${iso}|${unit}`;
+// On days when Israel and the Diaspora read a different Chumash portion (~30–40 days a year), the reading position is
+// kept per location ("|il" / "|dl"), so switching location never resumes in the middle of a different text.
+const divergent = new Map();
+export function isDivergent(iso, unit) {
+  if (unit !== 'chumash') return false;
+  if (!divergent.has(iso)) {
+    let d = false;
+    try { d = JSON.stringify(dayPlan(iso, { il: true }).chumash?.parts) !== JSON.stringify(dayPlan(iso, { il: false }).chumash?.parts); } catch { /* bad date */ }
+    divergent.set(iso, d);
+  }
+  return divergent.get(iso);
+}
+export const progressKey = (iso, unit, il = state.prefs.il) => `${iso}|${unit}${isDivergent(iso, unit) ? (il ? '|il' : '|dl') : ''}`;
 export function getProgress(iso, unit) { return state.progress[progressKey(iso, unit)] || null; }
 export function setProgress(iso, unit, p) {
   const k = progressKey(iso, unit), old = state.progress[k] || {};
@@ -43,7 +56,7 @@ export function importBackup(text) {
   const d = JSON.parse(text);
   if (d.app !== 'chitas-reader' || typeof d.progress !== 'object') throw new Error('bad file');
   for (const [k, v] of Object.entries(d.prefs || {})) if (k in DEFAULT_PREFS && typeof v === typeof DEFAULT_PREFS[k]) state.prefs[k] = v;
-  for (const [k, v] of Object.entries(d.progress)) if (/^\d{4}-\d\d-\d\d\|[a-z0-9]+$/.test(k) && v && typeof v === 'object') state.progress[k] = v;
+  for (const [k, v] of Object.entries(d.progress)) if (/^\d{4}-\d\d-\d\d\|[a-z0-9]+(\|il|\|dl)?$/.test(k) && v && typeof v === 'object') state.progress[k] = v;
   save();
 }
 export function resetAll() { localStorage.removeItem(KEY); location.reload(); }

@@ -294,7 +294,7 @@ async function openReader(unit, iso) {
   currentDate = iso;
   const auto = R.autoplay; R.autoplay = false;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
-  if (R.doc && R.unit) { const s = currentSeg(); if (s) setProgress(R.iso, R.unit, { pos: s.dataset.id }); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(R.iso, R.unit, a); }
   R.doc = null; R.segs = []; R.ttsShown = false;
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
@@ -341,7 +341,7 @@ async function openReader(unit, iso) {
   document.title = `${R.doc.title} – ${plan.hebDate}`;
   await renderDoc();
   const p = getProgress(iso, unit);
-  if (p?.pos && !p.done) goToSeg(p.pos, false);
+  if (p?.pos && !p.done) restore(p);
   requestWake();
   if (auto) ttsToggle();
 }
@@ -440,8 +440,7 @@ function setPage(n, save = true) {
 // i.e. between the top bar and the player bar – also for long segments that run over several pages.
 function followSpeech(el, frac) {
   if (prefs.layout === 'pages') {
-    const rc = $('#rc').getBoundingClientRect(), e = el.getBoundingClientRect();
-    const p0 = pageOf(el), p1 = Math.max(p0, Math.floor((rc.right - e.left - 2) / R.W));
+    const [p0, p1] = segSpan(el);
     const p = Math.min(p1, p0 + Math.floor(frac * (p1 - p0 + 1)));
     if (p !== R.page) setPage(p);
   } else {
@@ -456,13 +455,27 @@ function pageOf(el) {
 }
 function currentSeg() {
   if (!R.segs.length) return null;
-  if (prefs.layout === 'pages') return R.segs.find(s => pageOf(s) >= R.page) || R.segs[R.segs.length - 1];
+  if (prefs.layout === 'pages') {
+    // the first segment that starts on this page; if the whole page is the middle of one long segment, that segment
+    const i = R.segs.findIndex(s => pageOf(s) >= R.page); if (i < 0) return R.segs[R.segs.length - 1];
+    return pageOf(R.segs[i]) > R.page && i > 0 && segSpan(R.segs[i - 1])[1] >= R.page ? R.segs[i - 1] : R.segs[i];
+  }
   const top = $('#vp').getBoundingClientRect().top + 60;
   return R.segs.find(s => s.getBoundingClientRect().bottom > top) || R.segs[R.segs.length - 1];
 }
-function goToSeg(id, smooth = true) {
+// Pages a segment occupies: a long verse can run over several pages, so a position is "segment + page within it".
+function segSpan(el) {
+  const rc = $('#rc').getBoundingClientRect(), e = el.getBoundingClientRect(), p0 = pageOf(el);
+  return [p0, Math.max(p0, Math.floor((rc.right - e.left - 2) / R.W))];
+}
+function anchor() {
+  const s = currentSeg(); if (!s) return null;
+  return { pos: s.dataset.id, sub: prefs.layout === 'pages' ? Math.max(0, R.page - segSpan(s)[0]) : 0 };
+}
+function restore(a) { if (a?.pos) goToSeg(a.pos, false, a.sub || 0); }
+function goToSeg(id, smooth = true, sub = 0) {
   const el = R.segs.find(s => s.dataset.id === id); if (!el) return;
-  if (prefs.layout === 'pages') { const p = pageOf(el); if (p !== R.page) setPage(p); }
+  if (prefs.layout === 'pages') { const [p0, p1] = segSpan(el), p = Math.min(p1, p0 + sub); if (p !== R.page) setPage(p); }
   else el.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
 }
 function updateProgress(save = true) {
@@ -480,8 +493,7 @@ function updateProgress(save = true) {
   if (!save || !R.doc) return;
   clearTimeout(R.saveT);
   R.saveT = setTimeout(() => {
-    const s = currentSeg();
-    setProgress(R.iso, R.unit, { pos: s?.dataset.id, frac, done: frac >= 0.995 });
+    setProgress(R.iso, R.unit, { ...anchor(), frac, done: frac >= 0.995 });
   }, 400);
 }
 const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 360px)');
@@ -492,7 +504,7 @@ function bindReaderUi() {
     const before = el.classList.contains('immersive'), after = el.classList.toggle('immersive', force);
     if (!after) armAutoHide();
     if (before === after || !R.doc) return;
-    const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false);
+    const a = anchor(); layout(); restore(a);
   };
   R.toggleChrome = toggleChrome;
   // Very short landscape screens (phone on its side, ≤360 px tall): the bars hide themselves after a few seconds
@@ -591,7 +603,7 @@ document.addEventListener('keydown', e => {
   else if (k === 'p' || k === 'P' || k === 'פ') ttsToggle();
   else if (k === 'f' || k === 'F' || k === 'כ') $('#b-full').click();
 }, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
-let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); } }, 150); });
+let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } }, 150); });
 
 function openSheet(kind) {
   const sh = $('#sheet');
@@ -604,8 +616,8 @@ function openSheet(kind) {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if (['taamim', 'rashi', 'gloss', 'font'].includes(name)) { const s = currentSeg()?.dataset.id; await renderDoc(); if (s) goToSeg(s, false); }
-    else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
+    if (['taamim', 'rashi', 'gloss', 'font'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
+    else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
@@ -660,7 +672,7 @@ async function ttsToggle() {
       showTtsBar(st !== 'stopped' || R.ttsShown);
       const was = $('#rb').classList.contains('speaking');
       $('#rb').classList.toggle('speaking', st !== 'stopped');
-      if (was !== (st !== 'stopped') && $('#reader').classList.contains('immersive')) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
+      if (was !== (st !== 'stopped') && $('#reader').classList.contains('immersive')) { const a = anchor(); layout(); restore(a); }
       $('#t-play').innerHTML = st === 'playing' ? ICON.pause : ICON.play;
       $('#t-play').setAttribute('aria-label', st === 'playing' ? 'השהה' : 'הפעל');
       if (st === 'stopped') R.segs.forEach(s => s.classList.remove('speaking'));
@@ -696,7 +708,7 @@ function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
   R.ttsShown = false; clearTimeout(R.hideT);
-  if (R.doc && R.unit) { const s = currentSeg(); if (s) setProgress(R.iso, R.unit, { pos: s.dataset.id }); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(R.iso, R.unit, a); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
   R.unit = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
