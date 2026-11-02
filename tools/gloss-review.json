@@ -11,7 +11,8 @@
    "speculative": "זיהוי משוער/אנכרוניסטי"
   },
   "reviewed2": "2026-11-02: occurrence-exact glosses (form#k) + 3 weak entries rejected after external review round 2",
-  "reviewed3": "2026-11-02: two-check rule. Every candidate that passed check (a) (Wiktionary sense citing the verse, no defect flag) and check (b) (automated agreement with STEPBible TAHOT + JPS 1917, tools/gloss-xcheck.py) was re-read by hand against TAHOT, JPS 1917 and the verse; 6 more rejected (note3)."
+  "reviewed3": "2026-11-02: two-check rule. Every candidate that passed check (a) (Wiktionary sense citing the verse, no defect flag) and check (b) (automated agreement with STEPBible TAHOT + JPS 1917, tools/gloss-xcheck.py) was re-read by hand against TAHOT, JPS 1917 and the verse; 6 more rejected (note3).",
+  "reviewed4": "2026-11-02: round 4 – Psalms 37:17 וְסוֹמֵךְ rejected (wrong-sense: physical \"hold\" vs. \"uphold\"); not rewritten, because a rewording would not be a sourced Wiktionary sense."
  },
  "entries": [
   {
@@ -6885,7 +6886,9 @@
    "l": "סָמַךְ",
    "g": "החזיק בדבר אחר",
    "src": "https://he.wiktionary.org/wiki/%D7%A1%D7%9E%D7%9A#%D7%A1%D6%B8%D7%9E%D6%B7%D7%9A%D6%B0",
-   "decision": "keep"
+   "decision": "reject",
+   "note4": "סבב 4 – נדחה בבדיקה הידנית: בפסוק \"וסומך צדיקים ה׳\" = תומך, מקיים (TAHOT: sustaining; JPS: upholdeth). הגדרת ויקימילון \"החזיק בדבר אחר\" היא אחיזה פיזית ואינה מבארת את הפסוק; ניסוח חלופי (\"תומך\") אינו מופיע כהגדרה בוויקימילון לפסוק זה ולכן אינו עומד בכלל שתי הבדיקות – הוסר במקום לשכתב.",
+   "why": "wrong-sense"
   },
   {
    "ref": "Psalms 37:25",

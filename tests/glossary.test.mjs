@@ -42,7 +42,7 @@ test('glossary: curated allow-list — every published entry was reviewed by han
   assert.equal(n, G.meta.curated.published);
   const has = (ref, w) => Object.keys(G.verses[ref] || {}).some(f => f.split('#')[0] === norm(w));
   for (const [ref, w] of [['Genesis 18:7', 'רַךְ'], ['Genesis 27:41', 'הַבְּרָכָה'], ['Genesis 31:27', 'וַתִּגְנֹב'], ['Genesis 42:7', 'וַיִּתְנַכֵּר'],
-    ['Psalms 11:2', 'כּוֹנְנוּ'], ['Leviticus 11:18', 'הָרָחָם'], ['Exodus 30:25', 'רֹקַח'], ['Psalms 19:5', 'קַוָּם'], ['Genesis 37:3', 'יוֹסֵף'], ['Psalms 78:67', 'יוֹסֵף'], ['Genesis 1:6', 'בֵּין']])
+    ['Psalms 11:2', 'כּוֹנְנוּ'], ['Leviticus 11:18', 'הָרָחָם'], ['Exodus 30:25', 'רֹקַח'], ['Psalms 19:5', 'קַוָּם'], ['Genesis 37:3', 'יוֹסֵף'], ['Psalms 78:67', 'יוֹסֵף'], ['Genesis 1:6', 'בֵּין'], ['Psalms 37:17', 'וְסוֹמֵךְ']])
     assert.ok(!has(ref, w), `${ref} ${w} should be removed`);
   for (const ws of Object.values(G.verses)) for (const e of Object.values(ws)) {
     assert.ok(!/יחסי.?מין|איבר מין|דמות מקראית|ביאה|פליטת זרע/.test(e.g), e.g);
