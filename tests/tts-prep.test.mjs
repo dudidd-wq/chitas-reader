@@ -38,3 +38,36 @@ test('chunks are ≤180 chars and keep all words', () => {
   assert.ok(ch.every(c => c.length <= 180));
   assert.equal(ch.join(' ').split(/\s+/).filter(Boolean).length, t.split(/\s+/).filter(Boolean).length);
 });
+
+// review 2: ה׳ / ר׳ / ס״א are numerals in citations and counts, not השם / רבי / סטרא אחרא
+test('numerals in citations and counts are read as numbers', () => {
+  const T = { stress: false };
+  assert.equal(P('שָׁמוֹר (דברים ה׳), הָלוֹךְ', T), 'שמור (דברים הֵא), הלוך'.replace(/[\u05B0-\u05C7]/g, ''));
+  assert.equal(P('(מכות ה׳):', T), '(מכות הא):');
+  assert.equal(P('(שמואל ב ה׳:כ״ד)', T), '(שמואל ב הא:כ"ד)');
+  assert.equal(P('(סנהדרין ס״א):', T), '(סנהדרין סמך אלף):');
+  assert.equal(P('בְּעָמוֹס סוֹף סִימָן ה׳. פֵּירוּשׁ', T), 'בעמוס סוף סימן הא. פירוש');
+  assert.equal(P('יִתְעַנֶּה ס״א תַּעֲנִיּוֹת', T), 'יתענה ששים ואחת תעניות');
+  assert.equal(P('הרי שהיה המסלול ר׳ מעלות.', T), 'הרי שהיה המסלול מאתים מעלות.');
+  assert.equal(P('וכן אם תהיה מנת ר׳ תהיה', T), 'וכן אם תהיה מנת מאתים תהיה');
+  assert.equal(P('והריני בן ה׳ שנים', T), 'והריני בן חמש שנים');
+});
+test('the same tokens keep their word reading elsewhere', () => {
+  const T = { stress: false };
+  assert.equal(P('כִּי חֵלֶק ה׳ עַמּוֹ', T), 'כי חלק השם עמו');
+  assert.equal(P('ושער ה׳. וחכמים', T), 'ושער השם. וחכמים');
+  assert.equal(P('(ואם ירצה ה׳ נלך)', T), '(ואם ירצה השם נלך)');
+  assert.equal(P('יִגְדַּל נָא כֹּחַ ה׳. לעשות', T), 'יגדל נא כח השם. לעשות');
+  assert.equal(P('לבוא לפני ה׳:', T), 'לבוא לפני השם:');
+  assert.equal(P('אמר ר׳ יוחנן', T), 'אמר רבי יוחנן');
+  assert.equal(P('לְעוּמַּת ס״א וּקְלִיפּוֹת', T), 'לעומת סטרא אחרא וקליפות');
+});
+test('gematria and number words', async () => {
+  const { gematria, numberWords } = await import('../site/js/tts-prep.js');
+  assert.equal(gematria("ה'"), 5); assert.equal(gematria('ס"א'), 61); assert.equal(gematria('ט"ו'), 15); assert.equal(gematria('קס"ה'), 165);
+  assert.equal(gematria('א"ס'), 0); assert.equal(gematria('הוי"ה'), 0);
+  assert.equal(numberWords(200).replace(/[\u05B0-\u05C7]/g, ''), 'מאתים');
+  assert.equal(numberWords(61).replace(/[\u05B0-\u05C7]/g, ''), 'ששים ואחת');
+  assert.equal(numberWords(165).replace(/[\u05B0-\u05C7]/g, ''), 'מאה ששים וחמש');
+  assert.equal(numberWords(15).replace(/[\u05B0-\u05C7]/g, ''), 'חמש עשרה');
+});

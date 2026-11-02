@@ -110,6 +110,68 @@ export function replaceWord(w, opt) {
  *   stress=true  ("הקראה בהטעמה"): keep niqqud, remove cantillation only.
  *   stress=false: remove niqqud too (plain spelling; engine guesses vowels).
  */
+
+// ---- Hebrew numerals in context (ה׳ / ר׳ / ס״א are also abbreviations: השם / רבי / סטרא אחרא) ----
+const GEM = { א: 1, ב: 2, ג: 3, ד: 4, ה: 5, ו: 6, ז: 7, ח: 8, ט: 9, י: 10, כ: 20, ך: 20, ל: 30, מ: 40, ם: 40, נ: 50, ן: 50, ס: 60, ע: 70, פ: 80, ף: 80, צ: 90, ץ: 90, ק: 100, ר: 200, ש: 300, ת: 400 };
+const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };
+/** gematria value of a numeral token like ה' / ס"א / קס"ה (letters in non-increasing order), else 0 */
+export function gematria(sk) {
+  const m = /^([\u05D0-\u05EA]+)"([\u05D0-\u05EA])$|^([\u05D0-\u05EA])'$/.exec(sk);
+  if (!m) return 0;
+  const ls = [...(m[3] || m[1] + m[2])];
+  if (ls.length > 4 || ls.some(l => !GEM[l])) return 0;
+  for (let i = 1; i < ls.length; i++) if (GEM[ls[i]] > GEM[ls[i - 1]] && !(ls[i - 1] === 'ט' && /[וז]/.test(ls[i]))) return 0;
+  return ls.reduce((a, l) => a + GEM[l], 0);
+}
+const ONES_F = ['', 'אַחַת', 'שְׁתַּיִם', 'שָׁלוֹשׁ', 'אַרְבַּע', 'חָמֵשׁ', 'שֵׁשׁ', 'שֶׁבַע', 'שְׁמוֹנֶה', 'תֵּשַׁע'];
+const TEENS_F = ['עֶשֶׂר', 'אַחַת עֶשְׂרֵה', 'שְׁתֵּים עֶשְׂרֵה', 'שְׁלוֹשׁ עֶשְׂרֵה', 'אַרְבַּע עֶשְׂרֵה', 'חֲמֵשׁ עֶשְׂרֵה', 'שֵׁשׁ עֶשְׂרֵה', 'שְׁבַע עֶשְׂרֵה', 'שְׁמוֹנֶה עֶשְׂרֵה', 'תְּשַׁע עֶשְׂרֵה'];
+const TENS = ['', '', 'עֶשְׂרִים', 'שְׁלוֹשִׁים', 'אַרְבָּעִים', 'חֲמִשִּׁים', 'שִׁשִּׁים', 'שִׁבְעִים', 'שְׁמוֹנִים', 'תִּשְׁעִים'];
+const HUNDREDS = ['', 'מֵאָה', 'מָאתַיִם', 'שְׁלוֹשׁ מֵאוֹת', 'אַרְבַּע מֵאוֹת', 'חֲמֵשׁ מֵאוֹת', 'שֵׁשׁ מֵאוֹת', 'שְׁבַע מֵאוֹת', 'שְׁמוֹנֶה מֵאוֹת', 'תְּשַׁע מֵאוֹת'];
+/** cardinal number in words (feminine counting forms, as used with מעלות / תעניות / מנה), 1–999 */
+export function numberWords(n) {
+  const parts = [];
+  const h = Math.floor(n / 100), r = n % 100, t = Math.floor(r / 10), u = r % 10;
+  if (h) parts.push(HUNDREDS[h]);
+  if (r >= 10 && r < 20) parts.push(TEENS_F[u]);
+  else { if (t) parts.push(TENS[t]); if (u) parts.push(ONES_F[u]); }
+  return parts.map((p, i) => (i && i === parts.length - 1 ? 'וְ' + p : p)).join(' ');
+}
+const CITE_UNIT = /^(ו|ב|וב|ל|מ)?(פרק|פ'|סימן|סי'|דף|עמוד|אות|מאמר|משנה|הלכה|פסוק|סעיף|פרשה)$/;
+const COUNT_PREV = /^(מנת|המסלול|מסלול)$/;
+const COUNT_NEXT = /^(מעלות|מעלה|חלקים|תעניות|ימים|שנים|פעמים|אמות|מלקות)$/;
+/** Reading of a numeral token in context, or null when it is not (clearly) a number. */
+export function numeralReading(words, i) {
+  const w = words[i];
+  const m = /^([^\u05D0-\u05EA]*)([\u05D0-\u05EA\u0591-\u05C7]+["'][\u05D0-\u05EA\u0591-\u05C7]?)(.*)$/s.exec(w);
+  if (!m) return null;
+  const sk = skeleton(m[2]).replace(/״/g, '"').replace(/׳/g, "'");
+  const n = gematria(sk);
+  // only tokens that would otherwise be expanded as a word (ה׳ → השם, ר׳ → רבי, ס״א → סטרא אחרא …);
+  // other numerals are left to the speech engine as before
+  if (!n || !ABBR.has(sk)) return null;
+  const near = dir => { for (let j = i + dir; j >= 0 && j < words.length; j += dir) if (words[j] && !/^\s+$/.test(words[j])) return words[j]; return ''; };
+  const pv = near(-1), nx = near(1);
+  const pvs = skeleton(pv).replace(/״/g, '"').replace(/׳/g, "'"), nxs = skeleton(nx).replace(/["']/g, '');
+  const names = () => [...sk.replace(/["']/g, '')].map(l => LETTER_NAME[l]).join(' ');
+  // a count: "ס״א תעניות", "ר׳ מעלות", "מנת ר׳", "המסלול ר׳"
+  if (COUNT_NEXT.test(nxs) || (COUNT_PREV.test(pvs) && !/[.,;:]$/.test(pv))) return m[1] + numberWords(n) + m[3];
+  // a citation after a unit word: "סימן ה׳", "פרק ה׳", "דף ה׳", "אות ה׳" (the letter itself)
+  if (CITE_UNIT.test(pvs) && !/[.,;:)]$/.test(pv)) return m[1] + names() + m[3];
+  // a short parenthesised reference ending in the numeral: "(דברים ה׳)", "(מכות ה׳):", "(שמואל ב ה׳:כ״ד)"
+  if (/^\)|^:[\u05D0-\u05EA]/.test(m[3]) || (m[3] === '' && /^\)/.test(nx))) {
+    let j = i - 1, cnt = 0, open = false;
+    for (; j >= 0 && cnt < 5; j--) {
+      const x = words[j];
+      if (!x || /^\s+$/.test(x)) continue;
+      if (/\)/.test(x) || /^["״]|[^\u05D0-\u05EA]["״]$|^[\u05D0-\u05EA\u0591-\u05C7]+["״][.,;:]?$/.test(x) && !/[\u05D0-\u05EA]["״][\u05D0-\u05EA]/.test(x)) break;
+      cnt++;
+      if (/^\(/.test(x) || /;/.test(x) && /^\(/.test(x)) { open = true; break; }
+    }
+    if (open || (/^\(/.test(m[1]))) return m[1] + names() + m[3];
+  }
+  return null;
+}
+
 export function prepareForTTS(html, opt = {}) {
   const o = { stress: true, divineName: 'hashem', ...opt };
   let t = String(html)
@@ -149,6 +211,8 @@ export function prepareForTTS(html, opt = {}) {
       const pv = words.slice(0, i).reverse().find(x => x && !/^\s+$/.test(x));
       if (/^(רבינו|רבנו|המלך|אבינו|הכהן|הנביא|אמנו)$/.test(skeleton(pv || ''))) return 'עָלָיו הַשָּׁלוֹם' + (w.match(/[.,:;]$/)?.[0] || '');
     }
+    const num = numeralReading(words, i);
+    if (num !== null) return num;
     return replaceWord(w, chol ? { ...o, chol: true } : { ...o, chol: undefined });
   }).join('');
   if (!o.stress) t = t.replace(RE_NIQQUD, '');
