@@ -2,6 +2,8 @@
 import { gem, tanya as tanyaRange } from './calendar.js';
 
 const cache = new Map();
+/** Creative Commons deed for a Sefaria licence label (Wikimedia/Sefaria texts are offered under the 4.0 licences). */
+export const LICENSE_URL = { 'CC-BY-SA': 'https://creativecommons.org/licenses/by-sa/4.0/deed.he', 'CC-BY-NC': 'https://creativecommons.org/licenses/by-nc/4.0/deed.he', 'CC-BY': 'https://creativecommons.org/licenses/by/4.0/deed.he', 'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/deed.he' };
 export function data(path) {
   if (!cache.has(path)) cache.set(path, fetch('data/' + path).then(r => { if (!r.ok) throw new Error(path); return r.json(); }));
   return cache.get(path);
@@ -103,16 +105,21 @@ export async function rambamTitle(items) {
 }
 async function rambamDoc(plan, unit) {
   const idx = await data('rambam/index.json');
-  const blocks = [];
+  let src = {}; try { src = await data('sources.json'); } catch { /* offline and not cached: no credit line */ }
+  const blocks = [], credits = [];
   for (const it of plan[unit]) {
     const meta = idx[it.name];
     for (const [c, a, b] of rambamChaptersFull(it, meta)) {
       const d = await data(`rambam/${meta.slug}/${c}.json`);
-      blocks.push({ type: 'h', text: meta.he + (meta.depth === 2 ? ` – פרק ${gem(c)}` : '') });
+      const label = meta.he + (meta.depth === 2 ? ` – פרק ${gem(c)}` : '');
+      // texts that do not come from the main edition (Torat Emet) are credited in the reader, chapter by chapter
+      const ov = src.rambamChapterOverrides?.[`${it.name} ${c}`] || src.rambamOverrides?.[it.name];
+      if (ov && !/Torat Emet/.test(ov.versionTitle) && !credits.some(x => x.label === label)) credits.push({ label, ...ov });
+      blocks.push({ type: 'h', text: label });
       for (let s = a; s <= Math.min(b, d.s.length); s++) if (d.s[s - 1]?.trim()) blocks.push({ type: 'p', id: `${meta.slug}.${c}.${s}`, num: gem(s), text: d.s[s - 1], src: 'rambam', srcName: it.name });
     }
   }
-  return { title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks };
+  return { title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits };
 }
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);

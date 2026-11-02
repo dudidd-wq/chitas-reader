@@ -58,7 +58,7 @@ function showPop(el) {
   if (el.closest('.gloss-off')) return;
   pop = document.createElement('div');
   pop.className = 'gloss-pop'; pop.setAttribute('role', 'tooltip');
-  const src = el.dataset.src ? `<small>מקור: <a href="${el.dataset.src}" target="_blank" rel="noopener">ויקימילון${el.dataset.lemma ? ' – ' + el.dataset.lemma : ''}</a> (CC BY-SA)${el.dataset.adapted ? ' · ניסוח מעודן' : ''}</small>` : '';
+  const src = el.dataset.src ? `<small>מקור: <a href="${el.dataset.src}" target="_blank" rel="noopener">ויקימילון${el.dataset.lemma ? ' – ' + el.dataset.lemma : ''}</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>)${el.dataset.adapted ? ' · ניסוח מעודן' : ''}</small>` : '';
   pop.innerHTML = `<b></b> ${src}`; pop.querySelector('b').textContent = el.dataset.g;
   document.body.appendChild(pop);
   const r = el.getBoundingClientRect(), pr = pop.getBoundingClientRect();

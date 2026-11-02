@@ -240,3 +240,4 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content.gloss-tap .gl { position: relative; }
 .r-content.gloss-tap .gl::before { content: ''; position: absolute; top: -9px; bottom: -9px; left: 50%; width: max(100% + 6px, 44px); transform: translateX(-50%); }
 .gloss-pop small a { display: inline-flex; align-items: center; min-height: 44px; }
+.r-content .doc-credit { font-family: var(--ui); font-size: .55em; line-height: 1.6; color: var(--muted); text-align: start; margin-top: 1.5em; border-top: 1px solid var(--line, rgba(0,0,0,.12)); padding-top: .5em; }

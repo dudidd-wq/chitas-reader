@@ -2,6 +2,7 @@
 // This compares every book's chapter count with Sefaria's index and fills missing chapters from an allowed open version,
 // recording each filled chapter in data/sources.json (rambamChapterOverrides). Never edits text.
 import fs from 'node:fs';
+import { fixWikisource } from './wikisource-pages.mjs';
 const D = new URL('../site/data/', import.meta.url);
 const idx = JSON.parse(fs.readFileSync(new URL('rambam/index.json', D)));
 const sources = JSON.parse(fs.readFileSync(new URL('sources.json', D)));
@@ -10,6 +11,7 @@ const ALLOWED = ['Public Domain', 'CC0', 'CC-BY', 'CC-BY-SA'];
 const PREF = ['Torat Emet 363', 'Torat Emet 370', 'Wikisource Mishneh Torah'];
 const j = async u => { for (let i = 0; i < 3; i++) { try { const r = await fetch(u); if (r.ok) return r.json(); } catch {} await new Promise(r => setTimeout(r, 1500)); } throw new Error(u); };
 sources.rambamChapterOverrides ||= {};
+const niq = a => { const t = a.join(' '); return (t.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length / Math.max((t.match(/[\u05D0-\u05EA]/g) || []).length, 1); };
 for (const [name, meta] of Object.entries(idx)) {
   if (meta.depth !== 2) continue;
   const ix = await j(`https://www.sefaria.org/api/v2/index/${encodeURIComponent('Mishneh Torah, ' + name)}`);
@@ -21,7 +23,7 @@ for (const [name, meta] of Object.entries(idx)) {
     if (!v) { console.log('NO allowed version for', name, c); continue; }
     fs.writeFileSync(new URL(`rambam/${meta.slug}/${c}.json`, D), JSON.stringify({ s: v.text }));
     meta.chapters[c - 1] = v.text.length;
-    sources.rambamChapterOverrides[`${name} ${c}`] = { versionTitle: v.versionTitle, license: v.license, versionSource: v.versionSource };
+    sources.rambamChapterOverrides[`${name} ${c}`] = fixWikisource(`${name} ${c}`, { versionTitle: v.versionTitle, versionTitleInHebrew: v.versionTitleInHebrew, license: v.license, versionSource: v.versionSource, vocalized: niq(v.text) >= 0.3 });
     console.log('filled', name, c, v.versionTitle, v.license, v.text.length);
   }
 }

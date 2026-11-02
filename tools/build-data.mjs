@@ -2,6 +2,7 @@
 // and writes static JSON under site/data/. Never runs in the browser.
 // Usage: node tools/build-data.mjs [torah|tehillim|rambam|tanya|all]
 import fs from 'node:fs';
+import { fixWikisource } from './wikisource-pages.mjs';
 import path from 'node:path';
 import mt from '../node_modules/@hebcal/learning/dist/esm/mishnehTorah.json.js';
 
@@ -125,7 +126,7 @@ async function rambam(only) {
     if (t.meta.versionTitle === VERSIONS.rambam) record('rambam', t.meta, { sefariaUrl: 'https://www.sefaria.org/Mishneh_Torah,_Foundations_of_the_Torah?vhe=' + encodeURIComponent(VERSIONS.rambam) });
     sources.rambamOverrides ||= {};
     const all = JSON.stringify(t.text), L = (all.match(/[\u05D0-\u05EA]/g) || []).length, N = (all.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length;
-    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = { ...t.meta, vocalized: N / Math.max(L, 1) >= 0.3 }; else delete sources.rambamOverrides[name];
+    if (t.meta.versionTitle !== VERSIONS.rambam) sources.rambamOverrides[name] = { ...fixWikisource(name, t.meta), vocalized: N / Math.max(L, 1) >= 0.3 }; else delete sources.rambamOverrides[name];
     const he = (t.heRef || '').replace(/^משנה תורה,\s*/, '');
     const depth2 = Array.isArray(t.text[0]);
     const chapters = depth2 ? t.text : [t.text];

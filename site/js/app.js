@@ -1,6 +1,6 @@
 import { CHOL } from './chol.js';
-import { dayPlan, isoDate, toHDate, HDate, Locale } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data } from './texts.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale, gem } from './calendar.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL } from './texts.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
 import { RE_TAAMIM } from './tts-prep.js';
@@ -230,10 +230,11 @@ function renderSettings() {
   $('#imp').onchange = async e => { const file = e.target.files[0]; if (!file) return; try { importBackup(await file.text()); applyPrefs(); toast('הגיבוי שוחזר'); renderSettings(); } catch { toast('קובץ לא תקין'); } };
   $('#rst').onclick = () => { if (confirm('למחוק את כל ההתקדמות וההעדפות מהמכשיר?')) resetAll(); };
 }
+const licenseLink = l => LICENSE_URL[l] ? `<a href="${LICENSE_URL[l]}" target="_blank" rel="noopener" dir="ltr">${l === 'CC0' ? 'CC0 1.0' : esc(l.replace(/^CC-/, 'CC ')) + ' 4.0'}</a>` : esc(l);
 async function renderSources() {
   shell('מקורות ורישיונות', '<p>טוען…</p>');
   let s = {}; try { s = await data('sources.json'); } catch { /* offline */ }
-  const row = (what, m, note = '') => m ? `<tr><td data-h="חלק">${what}</td><td data-h="גרסה">${esc(m.versionTitleInHebrew || m.versionTitle)}</td><td data-h="רישיון">${esc(m.license)}</td><td data-h="קישור"><a href="${esc(m.versionSource)}" rel="noopener" target="_blank">מקור</a> · <a href="${esc(m.sefariaUrl || 'https://www.sefaria.org')}" rel="noopener" target="_blank">ספריא</a></td><td data-h="הערות">${note}</td></tr>` : '';
+  const row = (what, m, note = '') => m ? `<tr><td data-h="חלק">${what}</td><td data-h="גרסה">${esc(m.versionTitleInHebrew || m.versionTitle)}</td><td data-h="רישיון">${licenseLink(m.license)}</td><td data-h="קישור"><a href="${esc(m.versionSource)}" rel="noopener" target="_blank">מקור</a> · <a href="${esc(m.sefariaUrl || 'https://www.sefaria.org')}" rel="noopener" target="_blank">ספריא</a></td><td data-h="הערות">${note}</td></tr>` : '';
   const ov = Object.entries(s.rambamOverrides || {});
   $('.page').innerHTML = `<h1>מקורות ורישיונות</h1>
   <p>כל הטקסטים נלקחו מגרסאות ברישיון פתוח דרך ה-API של <a href="https://www.sefaria.org" rel="noopener" target="_blank">ספריא</a>, נשמרו מראש כקבצים סטטיים ומוגשים מהאתר עצמו. לא נוסף ניקוד ידני ולא שונה נוסח.</p>
@@ -244,9 +245,10 @@ async function renderSources() {
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
   ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : '<b>לא מנוקד</b> (או מנוקד חלקית) – אין גרסה מנוקדת ברישיון פתוח')).join('')}
+  ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
   </tbody></table>
-  <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (CC BY-SA 4.0). לכל ביאור מצורף קישור לערך המקור. רשימת הביאורים חלקית – ראו ״אודות ומגבלות״. לכל מילה אחרת, בכל השיעורים (גם רש״י, תניא ורמב״ם), אפשר לסמן את המילה (לחיצה ארוכה או לחיצה כפולה) ולבחור ״חיפוש בוויקימילון״ – קישור חיצוני שנפתח בלשונית חדשה; האפליקציה עצמה אינה שולחת דבר.</p>
-  <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> (‎@hebcal/core – GPL-2.0, ‎@hebcal/learning ו-‎@hebcal/leyning – BSD-2). החישוב נעשה במכשיר, ללא רשת.</p>
+  <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>). לכל ביאור מצורף קישור לערך המקור. רשימת הביאורים חלקית – ראו ״אודות ומגבלות״. לכל מילה אחרת, בכל השיעורים (גם רש״י, תניא ורמב״ם), אפשר לסמן את המילה (לחיצה ארוכה או לחיצה כפולה) ולבחור ״חיפוש בוויקימילון״ – קישור חיצוני שנפתח בלשונית חדשה; האפליקציה עצמה אינה שולחת דבר.</p>
+  <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> מאת Michael J. Radwin, Danny Sadinoff ושותפים, ארוזות ללא שינוי בקובץ js/vendor/hebcal.js: ‎@hebcal/core ו-‎@hebcal/hdate (GPL-2.0-or-later), ‎@hebcal/learning ו-‎@hebcal/leyning (BSD-2-Clause, ‏Copyright (c) 2020–2026 hebcal), ‎@hebcal/noaa (LGPL-2.1). נוסח הרישיונות המלא והודעות זכויות היוצרים: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>. החישוב נעשה במכשיר, ללא רשת.</p>
   <h2>גופנים</h2><p>Noto Serif Hebrew, Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>).</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
 }
@@ -259,13 +261,21 @@ function renderAbout() {
   <li>תניא יומי לפי הלוח המקובל (מחזור שנתי החל מי״ט כסלו).</li>
   <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו קובץ verification במאגר.</li>
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li></ul>
-  <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מכמה ספרים ברמב״ם (ספר אהבה, מניין המצוות ותוכן החיבור) שלא נמצאה להם גרסה מנוקדת ברישיון פתוח. בטקסטים אלה מוצגת הודעה.</li></ul>
+  <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון פתוח<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>ביאור מילים</h2><ul><li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון בלבד; לא נוספו ביאורים ״מהראש״ ולא נוצרו אוטומטית.</li><li>כדי למנוע ביאור שגוי, מילה מבוארת רק כשערך ויקימילון עצמו מצטט את <b>אותו פסוק</b> כדוגמה לאותה משמעות; וכשהמילה חוזרת באותו פסוק – רק המופע שהציטוט מדגיש מבואר (ואם אי אפשר לקבוע איזה – המילה אינה מבוארת). לכן יש ביאורים רק בחומש ובתהילים (כ־800 מילים בכל התורה ותהילים, כולן נבדקו ידנית), ולא ברש״י, בתניא וברמב״ם. בכל מקום אפשר לסמן מילה ולפתוח את ערכה בוויקימילון (קישור חיצוני).</li></ul>
   <h2>הקראה</h2><ul>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
   <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
   <li>כשהמסך כבוי: במחשב ההקראה ממשיכה; באנדרואיד היא לרוב ממשיכה כשהדף פתוח; באייפון היא נעצרת בדרך כלל בנעילת המסך – מומלץ להשאיר את המסך דולק (יש אפשרות כזו בהגדרות).</li></ul>
   <p>האתר בהשראת <a href="https://dvarmalchus.co.il" target="_blank" rel="noopener">דבר מלכות</a>. זהו מיזם עצמאי ואינו קשור אליו.</p>`);
+  // the list is generated from sources.json, so About can never disagree with the data
+  data('sources.json').then(s => { const el = $('#unvoc-list'); if (el) el.textContent = ': ' + unvocalizedList(s).join(', '); }).catch(() => {});
+}
+/** Names (Hebrew) of the Rambam texts that are shown without niqqud, from sources.json. */
+function unvocalizedList(s) {
+  const n = k => Locale.gettext(k, 'he-x-NoNikud');
+  return [...Object.entries(s.rambamOverrides || {}).filter(([, m]) => m.vocalized === false).map(([k]) => n(k)),
+    ...Object.entries(s.rambamChapterOverrides || {}).filter(([, m]) => m.vocalized === false).map(([k]) => { const [, b, c] = k.match(/^(.*) (\d+)$/); return `${n(b)} פרק ${gem(+c)}`; })];
 }
 
 // ---------------- Reader ----------------
@@ -353,6 +363,7 @@ async function renderDoc() {
   let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   const allText = d.blocks.filter(b => b.text).map(b => b.text).join(' ');
   html += simchatTorahNote();
+  const credit = (d.credits || []).map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license)})`).join(' · ');
   if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון פתוח.</p>`;
   let open = false;
   for (const b of d.blocks) {
@@ -367,6 +378,7 @@ async function renderDoc() {
     }
   }
   if (open) html += '</p>';
+  if (credit) html += `<p class="doc-credit">מקור הנוסח – ${credit}</p>`;
   html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
   rc.innerHTML = html;
   rc.className = 'r-content gloss-' + prefs.gloss;
