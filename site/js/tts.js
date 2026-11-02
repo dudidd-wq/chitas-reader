@@ -26,11 +26,29 @@ function silentWavUrl() {
   return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
 }
 
+// A chunk that "ends" faster than any human-audible voice could say it (or never fired onstart) is treated as a
+// failed / silent engine – e.g. no Hebrew voice installed. Normal speech is ≥ ~45 ms per character even at ×1.6.
+export const MIN_MS_PER_CHAR = 8;
+
+/** Wait (max `ms`) for the browser to publish its voice list – Chrome fills it asynchronously. */
+export function waitForVoices(ms = 1500) {
+  if (!ttsSupported()) return Promise.resolve([]);
+  if (hebrewVoices().length) return Promise.resolve(hebrewVoices());
+  return new Promise(res => {
+    const done = () => { clearTimeout(t); synth.removeEventListener?.('voiceschanged', on); res(hebrewVoices()); };
+    const on = () => { if (hebrewVoices().length) done(); };
+    const t = setTimeout(done, ms);
+    synth.addEventListener?.('voiceschanged', on);
+  });
+}
+
 export class Speaker {
-  constructor({ onSegment, onState, onEnd }) {
-    this.onSegment = onSegment; this.onState = onState; this.onEnd = onEnd;
+  /** onEnd({complete}) is called only when the queue ran to its end; complete=true only if every chunk was really spoken.
+   *  onError(code) is called when speech fails – playback stops, nothing is marked as read. */
+  constructor({ onSegment, onState, onEnd, onError }) {
+    this.onSegment = onSegment; this.onState = onState; this.onEnd = onEnd; this.onError = onError;
     this.queue = []; this.i = 0; this.state = 'stopped'; this.opts = {};
-    this.keepAlive = null;
+    this.keepAlive = null; this.failed = 0;
   }
   /** segments: [{el, parts:[html…]}] */
   load(segments, opts, meta) {
@@ -40,15 +58,20 @@ export class Speaker {
     segments.forEach((s, si) => s.parts.forEach(html => {
       for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName }))) this.queue.push({ si, text: c });
     }));
-    this.segCount = segments.length;
+    this.segCount = segments.length; this.bad = 0;
   }
   startAt(segIndex = 0) { const k = this.queue.findIndex(q => q.si >= segIndex); this.i = k < 0 ? 0 : k; this.play(); }
   play() {
-    if (!ttsSupported() || !this.queue.length) return;
-    this.state = 'playing'; this.onState?.('playing');
+    if (!ttsSupported() || !this.queue.length) return false;
+    if (!hebrewVoices().length) { this.fail('no-voice'); return false; }
+    this.state = 'playing'; this.onState?.('playing'); this.failed = 0;
     this.mediaSession(true);
     synth.cancel();
     this.speakCurrent();
+    return true;
+  }
+  fail(code) {
+    this.stop(true); this.onState?.('stopped'); this.onError?.(code);
   }
   speakCurrent() {
     if (this.state !== 'playing') return;
@@ -57,14 +80,25 @@ export class Speaker {
     const u = new SpeechSynthesisUtterance(q.text);
     u.lang = 'he-IL';
     const v = hebrewVoices().find(v => v.name === this.opts.voice) || hebrewVoices()[0];
-    if (v) u.voice = v;
+    try { if (v) u.voice = v; } catch { /* non-native voice object */ }
     u.rate = this.opts.rate || 1;
     const token = this.token = Symbol();
-    u.onstart = () => this.onSegment?.(q.si);
-    u.onend = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };
-    u.onerror = e => { if (this.token !== token) return; if (e.error === 'interrupted' || e.error === 'canceled') return; this.i++; this.speakCurrent(); };
+    let started = 0;
+    u.onstart = () => { if (this.token !== token) return; started = performance.now(); this.onSegment?.(q.si); };
+    u.onend = () => {
+      if (this.token !== token || this.state !== 'playing') return;
+      const min = q.text.length * (globalThis.__ttsMinMsPerChar ?? MIN_MS_PER_CHAR) / (u.rate || 1);
+      if (!started || performance.now() - started < min) { this.bad++; if (++this.failed >= 2) return this.fail('silent'); }
+      else this.failed = 0;
+      this.i++; this.speakCurrent();
+    };
+    u.onerror = e => {
+      if (this.token !== token) return;
+      if (e.error === 'interrupted' || e.error === 'canceled') return; // our own cancel() (pause/skip/rate)
+      this.fail(e.error || 'error');                                      // real failure: stop, never advance
+    };
     this.onSegment?.(q.si);
-    synth.speak(u);
+    try { synth.speak(u); } catch (e) { this.fail('error'); }
   }
   pause() {
     // cancel + resume-from-chunk is more reliable across browsers than synth.pause()
@@ -73,7 +107,7 @@ export class Speaker {
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     this.keepAlive?.pause();
   }
-  toggle() { this.state === 'playing' ? this.pause() : this.play(); }
+  toggle() { return this.state === 'playing' ? (this.pause(), true) : this.play(); }
   stop(silent) {
     this.token = null; this.state = 'stopped';
     if (ttsSupported()) synth.cancel();
@@ -87,7 +121,7 @@ export class Speaker {
     if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } else this.onSegment?.(target); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
-  finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.(); }
+  finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.({ complete: this.bad === 0 }); }
   mediaSession(on) {
     if (!on) { this.keepAlive?.pause(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; return; }
     if (this.opts.lockscreen) {

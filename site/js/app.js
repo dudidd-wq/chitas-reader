@@ -1,7 +1,7 @@
 import { dayPlan, isoDate, toHDate, HDate, Locale } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data } from './texts.js';
 import { prefs, setPref, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
-import { Speaker, ttsSupported, hebrewVoices, onVoices } from './tts.js';
+import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
 import { RE_TAAMIM } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 
@@ -255,7 +255,7 @@ async function openReader(unit, iso) {
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
-  $('#app').setAttribute('aria-hidden', 'true'); $('#app').inert = true;
+  $('#app').hidden = true; // the home page is never visible or reachable behind the reader
   R.unit = unit; R.iso = iso; R.page = 0;
   el.innerHTML = `
   <div class="r-top">
@@ -477,34 +477,47 @@ function ttsSegments() {
     return { el: s, parts };
   });
 }
-function ttsToggle() {
+const TTS_ERR = {
+  'no-voice': 'לא נמצא במכשיר קול עברי, ולכן ההקראה לא הופעלה. הוראות התקנה – בחלון ההקראה.',
+  silent: 'מנוע הדיבור לא השמיע את הטקסט (ייתכן שאין קול עברי). ההקראה נעצרה, והשיעור לא סומן כנלמד.',
+};
+async function ttsToggle() {
   if (!ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
-  if (!hebrewVoices().length) toast('לא נמצא קול עברי במכשיר – ראו הוראות בהגדרות ההקראה');
-  if (!R.speaker) {
-    R.speaker = new Speaker({
-      onSegment: i => {
-        R.segs.forEach(s => s.classList.remove('speaking'));
-        const el = R.segs[i]; if (!el) return;
-        el.classList.add('speaking');
-        if (prefs.layout === 'pages') { const p = pageOf(el); if (p !== R.page) setPage(p); }
-        else { const r = el.getBoundingClientRect(), vh = $('#vp').clientHeight; if (r.top < 60 || r.top > vh * 0.7) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
-      },
-      onState: st => {
-        $('#ttsctl').hidden = st === 'stopped' && !R.ttsShown;
-        $('#rb').classList.toggle('speaking', st !== 'stopped');
-        $('#t-play').innerHTML = st === 'playing' ? ICON.pause : ICON.play;
-        $('#t-play').setAttribute('aria-label', st === 'playing' ? 'השהה' : 'הפעל');
-        if (st === 'stopped') R.segs.forEach(s => s.classList.remove('speaking'));
-      },
-      onEnd: () => { if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(R.iso, R.unit, { done: true, frac: 1 }); },
-    });
-    R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, lockscreen: prefs.ttsLockscreen },
-      { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
-    R.ttsShown = true; $('#ttsctl').hidden = false;
-    const cur = currentSeg(); R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
-    return;
-  }
-  R.speaker.toggle();
+  if (R.speaker) { R.speaker.toggle(); return; }
+  const unit = R.unit, iso = R.iso;
+  await waitForVoices();
+  if (R.unit !== unit || R.iso !== iso || R.speaker) return;
+  R.speaker = new Speaker({
+    onSegment: i => {
+      R.segs.forEach(s => s.classList.remove('speaking'));
+      const el = R.segs[i]; if (!el) return;
+      el.classList.add('speaking');
+      if (prefs.layout === 'pages') { const p = pageOf(el); if (p !== R.page) setPage(p); }
+      else { const r = el.getBoundingClientRect(), vh = $('#vp').clientHeight; if (r.top < 60 || r.top > vh * 0.7) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+    },
+    onState: st => {
+      $('#ttsctl').hidden = st === 'stopped' && !R.ttsShown;
+      $('#rb').classList.toggle('speaking', st !== 'stopped');
+      $('#t-play').innerHTML = st === 'playing' ? ICON.pause : ICON.play;
+      $('#t-play').setAttribute('aria-label', st === 'playing' ? 'השהה' : 'הפעל');
+      if (st === 'stopped') R.segs.forEach(s => s.classList.remove('speaking'));
+    },
+    // Only a run that really reached the end with every chunk spoken marks the lesson as read / moves on.
+    onEnd: ({ complete }) => {
+      if (!complete) { toast(TTS_ERR.silent); return; }
+      if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(R.iso, R.unit, { done: true, frac: 1 });
+    },
+    onError: code => {
+      R.speaker = null; R.ttsShown = false; $('#ttsctl').hidden = true;
+      toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
+      if (code === 'no-voice') openSheet('tts');
+    },
+  });
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, lockscreen: prefs.ttsLockscreen },
+    { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
+  const cur = currentSeg();
+  R.ttsShown = true; $('#ttsctl').hidden = false;
+  R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
 }
 
 // ---------------- Wake lock ----------------
@@ -522,7 +535,7 @@ function closeReader() {
   R.ttsShown = false;
   if (R.doc && R.unit) { const s = currentSeg(); if (s) setProgress(R.iso, R.unit, { pos: s.dataset.id }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
-  $('#app').removeAttribute('aria-hidden'); $('#app').inert = false;
+  $('#app').hidden = false;
   R.unit = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
   if (R.wake) { R.wake.release().catch(() => {}); R.wake = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
