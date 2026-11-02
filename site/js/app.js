@@ -339,6 +339,7 @@ async function errataCounts() {
     let t = `תוקנו ${n(m.fixes)} טעויות ניקוד ב־${n(m.halachot)} הלכות${m.textFixes ? (m.textFixes === 1 ? ', ותיקון נוסח אחד (מלכים יא, ד)' : `, ו־${n(m.textFixes)} תיקוני נוסח`) : ''}.`;
     const g = m.scans?.gaps;
     if (g) t += ` סריקת השמטות (השוואה לנוסח ויקיטקסט, פרק מול פרק): ${n(g.missing)} מקומות שבהם בוויקיטקסט יש 3 מילים או יותר שאין אצלנו, ו־${n(g.paren)} קטעים בסוגריים שאינם מראי מקום; כולם נבדקו ידנית – פירוט בקובץ השיטה.`;
+    const iv = m.scans?.invariants?.meta || m.scans?.invariants; if (iv) t += ` סריקת ניקוד בלתי אפשרי (למשל שווא לפני חטף, ״בְּאֳ…״): ${n(iv.words)} מילים; ${n(m.invariantsFixed)} מהן תוקנו${iv.words > m.invariantsFixed ? `, ו־${n(iv.words - m.invariantsFixed)} נשארו (קטע משוחזר בסוגריים בדפוס, או שאין לו מקור שני – פירוט בקובץ השיטה)` : ''}.`;
     if (q) t += ` סריקה אוטומטית סימנה עוד ${n(q.wordsFlagged)} מילים בעלות ניקוד חריג ב־${n(q.halachotFlagged)} הלכות; רובן צורות תקינות (למשל בניין או זמן אחר), ולכן לא שונו – הן ברשימה לבדיקה ידנית.`;
     if (w) t += ` השוואת עיצורים מול נוסח ויקיטקסט: ${n(w.identical)} מתוך ${n(w.halachot)} הלכות זהות; בשאר יש הבדלי נוסח בין המהדורות (מתוכם ${n(w.nearIdenticalSubstitutions)} החלפות של מילה בודדת במילה כמעט זהה), שגם הם רק מסומנים ולא שונו.`;
     return t;

@@ -1,0 +1,145 @@
+{
+"meta": {
+"words": 12,
+"halachot": 12,
+"byKind": {
+"sheva-hataf": 8,
+"final-hataf": 1,
+"two-shevas": 3
+}
+},
+"hits": [
+{
+"ref": "Appraisals_and_Devoted_Property.4.8",
+"word": "וְחֳדָשִׁים",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "וחדשים",
+"key": "וְחֳדָשִים",
+"candidate": null,
+"candidateCount": 0
+},
+{
+"ref": "Borrowing_and_Deposit.1.2",
+"word": "שְאֲלָה",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "שאלה",
+"key": "שְאֲלָה",
+"candidate": "שְאֵלָה",
+"candidateCount": 30
+},
+{
+"ref": "Borrowing_and_Deposit.4.2",
+"word": "בְּאֳנָסָיו",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "באנסיו",
+"key": "בְאֳנָסָיו",
+"candidate": "בָאֳנָסָיו",
+"candidateCount": 1
+},
+{
+"ref": "First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary.12.5",
+"word": "בְּהֲנָיָתוֹ",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "בהניתו",
+"key": "בְהֲנָיָתוֹ",
+"candidate": "בַהֲנָיָתוֹ",
+"candidateCount": 5
+},
+{
+"ref": "Inheritances.11.8",
+"word": "הָאֲ",
+"kinds": [
+"final-hataf"
+],
+"cons": "הא",
+"key": "הָאֲ",
+"candidate": "הָא",
+"candidateCount": 105
+},
+{
+"ref": "Levirate_Marriage_and_Release.4.30",
+"word": "בְּיֳדָהּ",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "בידה",
+"key": "בְיֳדָה",
+"candidate": "בְיָדָה",
+"candidateCount": 44
+},
+{
+"ref": "Prayer_and_the_Priestly_Blessing.7.6",
+"word": "כְּשְׁחוֹגֵר",
+"kinds": [
+"two-shevas"
+],
+"cons": "כשחוגר",
+"key": "כְשְחוֹגֵר",
+"candidate": null,
+"candidateCount": 0
+},
+{
+"ref": "Robbery_and_Lost_Property.3.11",
+"word": "בְּאֳנָסָיו",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "באנסיו",
+"key": "בְאֳנָסָיו",
+"candidate": "בָאֳנָסָיו",
+"candidateCount": 1
+},
+{
+"ref": "Sabbath.18.7",
+"word": "לְאֳכָלִים",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "לאכלים",
+"key": "לְאֳכָלִים",
+"candidate": "לָאֳכָלִים",
+"candidateCount": 2
+},
+{
+"ref": "Sanctification_of_the_New_Month.14.1",
+"word": "אְמְצָעיּים",
+"kinds": [
+"two-shevas"
+],
+"cons": "אמצעיים",
+"key": "אְמְצָעיים",
+"candidate": null,
+"candidateCount": 0
+},
+{
+"ref": "Sanctification_of_the_New_Month.18.7",
+"word": "וְחֳדָשִׁים",
+"kinds": [
+"sheva-hataf"
+],
+"cons": "וחדשים",
+"key": "וְחֳדָשִים",
+"candidate": null,
+"candidateCount": 0
+},
+{
+"ref": "Tithes.13.2",
+"word": "שְׁיְּקַפְּלוּ",
+"kinds": [
+"two-shevas"
+],
+"cons": "שיקפלו",
+"key": "שְיְקַפְלו",
+"candidate": null,
+"candidateCount": 0
+}
+]
+}

@@ -22,6 +22,21 @@ E = [
  ('Foundations_of_the_Torah.5.8', 'בְּחָלָב שֵׁהֵן אֲסוּרִים אֲפִלּוּ שֵׁלֹּא דֵּרֵךְ הֲנָאָתָן', 'בְּחָלָב שֶׁהֵן אֲסוּרִים אֲפִלּוּ שֶׁלֹּא דֶּרֶךְ הֲנָאָתָן'),
  ('Foundations_of_the_Torah.5.8', 'שֶׁלֹּא דֶּרֵךְ הֲנָאָתָן אֵלָּא בִּמִקוֹם סַכָּנָה', 'שֶׁלֹּא דֶּרֶךְ הֲנָאָתָן אֶלָּא בִּמְקוֹם סַכָּנָה'),
  ('Marriage.3.8', 'לוֹמַר לָהֵם אַתֵּם עֵדַי. אֵלָּא כֵּיוָן שֵׁגֵּרֵשׁ אוֹ קִדֵּשׁ בִּפִנֵיהֵם הֲרֵי זוֹ מְקֻדֶּשֶׁת אוֹ מִגֹרֵשֵׁת', 'לוֹמַר לָהֶם אַתֶּם עֵדַי. אֶלָּא כֵּיוָן שֶׁגֵּרֵשׁ אוֹ קִדֵּשׁ בִּפְנֵיהֶם הֲרֵי זוֹ מְקֻדֶּשֶׁת אוֹ מְגֹרֶשֶׁת'),
+ # round 5: structurally impossible niqqud found by tools/rambam-niqqud-invariants.py (sheva before a hataf, two
+ # shevas at the start of a word); the fix is the one Hebrew grammar forces, and it matches this edition's own usage
+ # (exact word or, where the word occurs only here, the same prefix pattern – see ANALOGUE). Inheritances 11:8
+ # "הָאֲ [חֵ] רִים" is a bracketed reconstruction in the print and is left as is; Levirate 4:30 בְּיֳדָהּ (in the get
+ # formula) is not fixed because that passage is absent from the Wikisource text, so there is no second source.
+ ('Appraisals_and_Devoted_Property.4.8', 'שָׁנָה וְחֳדָשִׁים', 'שָׁנָה וָחֳדָשִׁים'),
+ ('Sanctification_of_the_New_Month.18.7', 'בָּהֶם וְחֳדָשִׁים', 'בָּהֶם וָחֳדָשִׁים'),
+ ('Borrowing_and_Deposit.1.2', 'שְאֲלָה מִמֶּנּוּ', 'שְׁאָלָהּ מִמֶּנּוּ'),
+ ('Borrowing_and_Deposit.4.2', 'חַיָּב בְּאֳנָסָיו', 'חַיָּב בָּאֳנָסָיו'),
+ ('Robbery_and_Lost_Property.3.11', 'וְנִתְחַיֵּב בְּאֳנָסָיו', 'וְנִתְחַיֵּב בָּאֳנָסָיו'),
+ ('First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary.12.5', 'וּמֻתָּר בְּהֲנָיָתוֹ', 'וּמֻתָּר בַּהֲנָיָתוֹ'),
+ ('Prayer_and_the_Priestly_Blessing.7.6', 'כְּשְׁחוֹגֵר', 'כְּשֶׁחוֹגֵר'),
+ ('Sabbath.18.7', 'אֵזוֹב לְאֳכָלִים', 'אֵזוֹב לָאֳכָלִים'),
+ ('Sanctification_of_the_New_Month.14.1', 'אְמְצָעיּים', 'אֶמְצָעִיִּים'),
+ ('Tithes.13.2', 'אַחַר שְׁיְּקַפְּלוּ', 'אַחַר שֶׁיְּקַפְּלוּ'),
 ]
 # Transmission of the Oral Law (Introduction) comes from Wikisource (vocalised there); systematic שְׁ/אֵלָא for שֶׁ/אֶלָּא
 INTRO = [('שְׁהִיא', 'שֶׁהִיא'), ('שְׁהוּא', 'שֶׁהוּא'), ('שְׁאֵין', 'שֶׁאֵין'), ('שְׁאֵינוּ', 'שֶׁאֵינוֹ'), ('שְׁהֶם', 'שֶׁהֵם'), ('שְׁהֶן', 'שֶׁהֵן'), ('אֵלָא', 'אֶלָּא')]
@@ -38,6 +53,8 @@ import os
 def wsk(t):  # consonant key, ignoring matres ו/י and final forms (Wikisource spells מלא)
   t = re.sub(r'<[^>]+>|\([^)]*\)', ' ', t); t = re.sub(r'[\u0591-\u05C7]', '', t); t = re.sub(r'[^\u05D0-\u05EA\s]', ' ', t)
   return ' '.join(re.sub(r'[וי]', '', w).translate(str.maketrans('ךםןףץ', 'כמנפצ')) for w in t.split())
+# round 5: for a corrected word that occurs only here, the same-edition evidence is an analogous form (count added below)
+ANALOGUE = {'וָחֳדָשִׁים': 'וָאֳכָלִין', 'כְּשֶׁחוֹגֵר': 'שֶׁחוֹגֵר', 'אֶמְצָעִיִּים': 'הָאֶמְצָעִיִּים', 'שֶׁיְּקַפְּלוּ': 'שֶׁיְּקַבְּלוּ'}
 wsChecked = 0
 out = {}
 for ref, a, b in E:
@@ -46,6 +63,9 @@ for ref, a, b in E:
   assert N(a) in h, ('not found', ref, a)
   assert re.sub(r'[\u0591-\u05C7]', '', a) == re.sub(r'[\u0591-\u05C7]', '', b), ('consonants changed', ref)
   ev = {w: cnt[w] for w in re.findall(r'[\u05D0-\u05EA\u0591-\u05C7]+', N(b)) if w not in N(a).split()}
+  for w in list(ev):
+    if not ev[w] and N(w) in {N(k) for k in ANALOGUE}:
+      an = N(dict((N(k), v) for k, v in ANALOGUE.items())[N(w)]); ev['analogue: ' + an] = cnt[an]; assert cnt[an] >= 5, ('weak analogue', w)
   # evidence (1): the same consonants in Sefaria's Wikisource text (cache from tools/rambam-ws-compare.py; the
   # Introduction IS the Wikisource text, so it is checked against itself trivially and marked as such)
   wsf = f'/tmp/rs/ws/{slug}.{c}.json'
@@ -82,9 +102,11 @@ for ref, a, b, sources, note in TEXT:
   out.setdefault(ref, []).append({'from': N(a), 'to': N(b), 'kind': 'text', 'sources': sources, 'note': note, 'elsewhere': {w: cnt[w] for w in added}})
   textFixes += 1
 total = sum(len(v) for v in out.values()) - textFixes
+inv = json.load(open(f'{ROOT}/verification/rambam-niqqud-invariants.json'))['hits'] if os.path.exists(f'{ROOT}/verification/rambam-niqqud-invariants.json') else []
+invFixed = sum(1 for h in inv if any(N(h['word']) in N(f['from']).split() for f in out.get(h['ref'], [])))
 niqqudHalachot = sum(1 for v in out.values() if any(f.get('kind') != 'text' for f in v))
 json.dump({'meta': {'edition': 'Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource', 'fixes': total, 'textFixes': textFixes, 'halachot': niqqudHalachot,
   'method': 'niqqud-only corrections; consonants identical to Sefaria "Wikisource Mishneh Torah"; corrected form = the form this edition uses elsewhere ("elsewhere" = occurrences); checked by hand',
-  'doc': 'verification/RAMBAM-ERRATA.md', 'wikisourceConsonantsChecked': wsChecked,
-  'scans': {k: json.load(open(f'{ROOT}/verification/{f}'))['meta'] for k, f in (('niqqud', 'rambam-niqqud-flags.json'), ('wikisource', 'rambam-ws-mismatches.json'), ('gaps', 'rambam-gap-scan.json')) if os.path.exists(f'{ROOT}/verification/{f}')}}, 'fixes': out}, open(f'{ROOT}/site/data/rambam-errata.json', 'w'), ensure_ascii=False, indent=1)
+  'doc': 'verification/RAMBAM-ERRATA.md', 'wikisourceConsonantsChecked': wsChecked, 'invariantsFixed': invFixed,
+  'scans': {k: json.load(open(f'{ROOT}/verification/{f}'))['meta'] for k, f in (('niqqud', 'rambam-niqqud-flags.json'), ('invariants', 'rambam-niqqud-invariants.json'), ('wikisource', 'rambam-ws-mismatches.json'), ('gaps', 'rambam-gap-scan.json')) if os.path.exists(f'{ROOT}/verification/{f}')}}, 'fixes': out}, open(f'{ROOT}/site/data/rambam-errata.json', 'w'), ensure_ascii=False, indent=1)
 print(total, 'fixes in', niqqudHalachot, 'halachot;', textFixes, 'text fix(es);', wsChecked, 'checked against Wikisource consonants')

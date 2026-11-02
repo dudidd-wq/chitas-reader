@@ -114,3 +114,13 @@ test('320×568: page 1 of 2026-11-02 is not left mostly empty by moving Rashi on
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
+
+test('Rambam niqqud: every structurally impossible form is corrected, except the two documented ones', () => {
+  const inv = JSON.parse(fs.readFileSync(new URL('../verification/rambam-niqqud-invariants.json', import.meta.url), 'utf8'));
+  const er = JSON.parse(fs.readFileSync(new URL('../site/data/rambam-errata.json', import.meta.url), 'utf8'));
+  const N = s => s.normalize('NFC'), left = [];
+  for (const h of inv.hits) if (!(er.fixes[h.ref] || []).some(f => N(f.from).split(' ').includes(N(h.word)))) left.push(h.ref);
+  assert.deepEqual(left.sort(), ['Inheritances.11.8', 'Levirate_Marriage_and_Release.4.30']);
+  for (const ref of ['Prayer_and_the_Priestly_Blessing.7.6', 'Tithes.13.2', 'Borrowing_and_Deposit.1.2'])
+    for (const f of er.fixes[ref]) { assert.equal(f.wikisourceConsonants, true, ref); assert.equal(N(f.from).replace(/[\u0591-\u05C7]/g, ''), N(f.to).replace(/[\u0591-\u05C7]/g, '')); }
+});

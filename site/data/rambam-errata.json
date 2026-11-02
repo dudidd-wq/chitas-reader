@@ -1,18 +1,28 @@
 {
  "meta": {
   "edition": "Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource",
-  "fixes": 31,
+  "fixes": 41,
   "textFixes": 1,
-  "halachot": 24,
+  "halachot": 34,
   "method": "niqqud-only corrections; consonants identical to Sefaria \"Wikisource Mishneh Torah\"; corrected form = the form this edition uses elsewhere (\"elsewhere\" = occurrences); checked by hand",
   "doc": "verification/RAMBAM-ERRATA.md",
-  "wikisourceConsonantsChecked": 14,
+  "wikisourceConsonantsChecked": 24,
+  "invariantsFixed": 10,
   "scans": {
    "niqqud": {
     "halachotFlagged": 2279,
     "halachotWith3plus": 104,
     "wordsFlagged": 2847,
     "method": "rare vocalisation (<=2) of consonants vocalised one way >=8 times elsewhere in the same edition; for human review only"
+   },
+   "invariants": {
+    "words": 12,
+    "halachot": 12,
+    "byKind": {
+     "sheva-hataf": 8,
+     "final-hataf": 1,
+     "two-shevas": 3
+    }
    },
    "wikisource": {
     "halachot": 14284,
@@ -191,6 +201,111 @@
      "שֶׁגֵּרֵשׁ": 13,
      "בִּפְנֵיהֶם": 81,
      "מְגֹרֶשֶׁת": 135
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Appraisals_and_Devoted_Property.4.8": [
+   {
+    "from": "שָׁנָה וְחֳדָשִׁים",
+    "to": "שָׁנָה וָחֳדָשִׁים",
+    "elsewhere": {
+     "וָחֳדָשִׁים": 0,
+     "analogue: וָאֳכָלִין": 6
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Sanctification_of_the_New_Month.18.7": [
+   {
+    "from": "בָּהֶם וְחֳדָשִׁים",
+    "to": "בָּהֶם וָחֳדָשִׁים",
+    "elsewhere": {
+     "וָחֳדָשִׁים": 0,
+     "analogue: וָאֳכָלִין": 6
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Borrowing_and_Deposit.1.2": [
+   {
+    "from": "שְאֲלָה מִמֶּנּוּ",
+    "to": "שְׁאָלָהּ מִמֶּנּוּ",
+    "elsewhere": {
+     "שְׁאָלָהּ": 4
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Borrowing_and_Deposit.4.2": [
+   {
+    "from": "חַיָּב בְּאֳנָסָיו",
+    "to": "חַיָּב בָּאֳנָסָיו",
+    "elsewhere": {
+     "בָּאֳנָסָיו": 1
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Robbery_and_Lost_Property.3.11": [
+   {
+    "from": "וְנִתְחַיֵּב בְּאֳנָסָיו",
+    "to": "וְנִתְחַיֵּב בָּאֳנָסָיו",
+    "elsewhere": {
+     "בָּאֳנָסָיו": 1
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary.12.5": [
+   {
+    "from": "וּמֻתָּר בְּהֲנָיָתוֹ",
+    "to": "וּמֻתָּר בַּהֲנָיָתוֹ",
+    "elsewhere": {
+     "בַּהֲנָיָתוֹ": 5
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Prayer_and_the_Priestly_Blessing.7.6": [
+   {
+    "from": "כְּשְׁחוֹגֵר",
+    "to": "כְּשֶׁחוֹגֵר",
+    "elsewhere": {
+     "כְּשֶׁחוֹגֵר": 0,
+     "analogue: שֶׁחוֹגֵר": 5
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Sabbath.18.7": [
+   {
+    "from": "אֵזוֹב לְאֳכָלִים",
+    "to": "אֵזוֹב לָאֳכָלִים",
+    "elsewhere": {
+     "לָאֳכָלִים": 2
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Sanctification_of_the_New_Month.14.1": [
+   {
+    "from": "אְמְצָעיּים",
+    "to": "אֶמְצָעִיִּים",
+    "elsewhere": {
+     "אֶמְצָעִיִּים": 0,
+     "analogue: הָאֶמְצָעִיִּים": 7
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Tithes.13.2": [
+   {
+    "from": "אַחַר שְׁיְּקַפְּלוּ",
+    "to": "אַחַר שֶׁיְּקַפְּלוּ",
+    "elsewhere": {
+     "שֶׁיְּקַפְּלוּ": 0,
+     "analogue: שֶׁיְּקַבְּלוּ": 5
     },
     "wikisourceConsonants": true
    }

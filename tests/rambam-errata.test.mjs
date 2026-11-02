@@ -53,7 +53,7 @@ test('scan outputs are committed with their counts, and the SW precaches the err
   const sw = R('site/sw.js');
   assert.match(sw, /'data\/rambam-errata\.json'/);
   assert.match(sw, /rambam-errata\\\.json\$/);
-  assert.match(R('verification/RAMBAM-ERRATA.md'), /31 fixes in 24 halachot/);
+  assert.match(R('verification/RAMBAM-ERRATA.md'), /41 fixes in 34 halachot/);
   const g = JSON.parse(R('verification/rambam-gap-scan.json')).meta;
   assert.deepEqual(E.meta.scans.gaps, g);
   assert.equal(g.unreviewed, 0); assert.equal(g.confirmedGapsOpen, 0);
@@ -70,7 +70,8 @@ test('reader shows the corrected words and a correction line; Sources page shows
     assert.ok(!body.replace(fx, '').includes(N('לִהִתְגַּיֵּר')), 'typo still shown in the text');
     assert.match(N(await p.textContent('#doc-fixes')), new RegExp(N('לִהִתְגַּיֵּר ← לְהִתְגַּיֵּר')));
     await p.goto(srv.url + '#/sources'); await p.waitForFunction(() => document.querySelector('#rambam-errata-counts')?.textContent);
-    assert.match(await p.textContent('#rambam-errata-counts'), /תוקנו 31 טעויות ניקוד ב־24 הלכות, ותיקון נוסח אחד \(מלכים יא, ד\)/);
+    assert.match(await p.textContent('#rambam-errata-counts'), /תוקנו 41 טעויות ניקוד ב־34 הלכות, ותיקון נוסח אחד \(מלכים יא, ד\)/);
+    assert.match(await p.textContent('#rambam-errata-counts'), /ניקוד בלתי אפשרי.*12 מילים; 10 מהן תוקנו/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

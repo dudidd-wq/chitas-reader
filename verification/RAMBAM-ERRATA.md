@@ -22,7 +22,7 @@ A fix is included only if **all** of the following hold. The generator asserts t
    and לְהִתְגַּיֵּר 5 times.
 4. **Checked by hand.** The source form is not a valid vocalisation in context.
 
-Current count: see `meta` in `site/data/rambam-errata.json`. It holds 31 fixes in 24 halachot (plus 1 text fix, Kings 11:4 – see "Text fixes" below), and 14 of them (all
+Current count: see `meta` in `site/data/rambam-errata.json`. It holds 41 fixes in 34 halachot (plus 1 text fix, Kings 11:4 – see "Text fixes" below), and 24 of them (all
 outside the Introduction) are confirmed against the Wikisource consonants. The reviewer's examples are among them:
 לִהִתְגַּיֵּר → לְהִתְגַּיֵּר (Forbidden Intercourse 14:1) and שִׁאוֹסֵר → שֶׁאוֹסֵר (Forbidden Foods 12:1). Three
 halachot have a damaged stretch in which the vowels have shifted (Forbidden Intercourse 1:11, Foundations of the
@@ -46,6 +46,28 @@ Rejected candidates include וְשֶׁמִּן (Forbidden Foods 12:21, correct: 
 
 Reproduce: `python3 tools/rambam-ws-compare.py && python3 tools/rambam-niqqud-scan.py && python3 tools/rambam-errata-src.py`.
 The Wikisource text excerpts in the mismatch list are © Wikisource contributors, CC BY-SA, via Sefaria.
+
+## Structurally impossible niqqud (round 5): `tools/rambam-niqqud-invariants.py` → `rambam-niqqud-invariants.json`
+
+The 2,279 flagged halachot above are *rare* vocalisations, and most are valid homographs, so they cannot be fixed
+automatically. This scan instead looks for niqqud that no Hebrew word can have, so a hit is a defect without any
+judgement call:
+
+- **sheva-hataf**: the first letter has sheva and the second a hataf (e.g. בְּאֳ… – the grammar requires בָּאֳ…);
+- **two-shevas**: the first two letters both carry sheva (כְּשְׁחוֹגֵר);
+- **final-hataf**: a hataf on the last letter;
+- **two-vowels**: two vowel signs on one letter. Holam is not counted, because a holam written on the next letter
+  (לוֶֹה = lo-veh, בשֶֹׁם) is the normal typographic convention; with holam counted the scan gave 258 false hits.
+
+Result: **12 words in 12 halachot**. 10 are corrected (overlay, same rules 1–4 above; every one is confirmed
+against the Wikisource consonants; where the corrected word occurs only here, the evidence is the same prefix
+pattern in this edition, recorded as `analogue:` with its count, at least 5): וָחֳדָשִׁים ×2, שְׁאָלָהּ (Borrowing 1:2,
+"borrowed it"), בָּאֳנָסָיו ×2, בַּהֲנָיָתוֹ, כְּשֶׁחוֹגֵר, לָאֳכָלִים, אֶמְצָעִיִּים, שֶׁיְּקַפְּלוּ. Two are left: Inheritances
+11:8 "הָאֲ [חֵ] רִים" is a bracketed reconstruction in the print, and Levirate 4:30 בְּיֳדָהּ is in the get formula,
+which the Wikisource text lacks, so there is no second source. `tests/round5.test.mjs` asserts exactly these two remain.
+
+What this does **not** do: it cannot find a wrong but *possible* vocalisation (e.g. a wrong binyan). Those remain in
+the rare-vocalisation list for human review; no further automatic fix was found that we could verify.
 
 ## Text fixes (round 5)
 
