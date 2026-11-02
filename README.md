@@ -19,7 +19,7 @@
 | רש"י | רוזנבאום–זילברמן 1929–34 (Sefaria) | נחלת הכלל | מנוקד (דיבור המתחיל לא) |
 | תניא | Kehot Publication Society (Sefaria) | CC-BY-NC | מנוקד |
 | רמב"ם | תורת אמת 363; קריאת שמע ותפילה – תורת אמת 370; ההקדמות, שאר ספר אהבה וחמץ ומצה ט – ויקיטקסט (גרסאות מכון ממרא אינן בשימוש – האתר אוסר העתקה לאתר אחר) | נחלת הכלל / CC-BY-SA | מנוקד, מלבד: מניין המצוות (עשה ולא תעשה) ותוכן החיבור; בספר אהבה – הלכות תפילין ומזוזה וספר תורה, ציצית, ברכות, מילה וסדר התפילה; חמץ ומצה פרק ט (נוסח ההגדה). מסירת תורה שבעל פה, קריאת שמע ותפילה – מנוקדים |
-| ביאורים | ויקימילון העברי | CC BY-SA 4.0 | – |
+| ביאורים | ויקימילון העברי (נבדקו מול STEPBible TAHOT ו-JPS 1917 – verification/GLOSSARY-VERIFICATION.md) | CC BY-SA 4.0 | – |
 | לוח | @hebcal/core, hdate, learning, leyning, noaa (ארוזים ב-site/js/vendor/hebcal.js) | GPL-2.0-or-later (core, hdate) / BSD-2-Clause (learning, leyning) / LGPL-2.1 (noaa) | – |
 
 פירוט מלא בעמוד "מקורות" באתר וב־`site/data/sources.json`.
@@ -33,4 +33,4 @@ npm run ui                # axe + גלישה + אופליין (דורש Chrome �
 ```
 
 ## רישיון
-הקוד: GPL-2.0-or-later (ראו LICENSE). הטקסטים – לפי רישיון כל מקור (טבלה למעלה; CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/ , CC BY-NC 4.0: https://creativecommons.org/licenses/by-nc/4.0/). ספריות צד שלישי – נוסח הרישיונות והודעות זכויות היוצרים ב-site/THIRD-PARTY-NOTICES.txt (נוצר ב-`npm run vendor`). גופנים – SIL OFL 1.1 (site/fonts/licenses/).
+הקוד: GPL-2.0-or-later (ראו LICENSE). הטקסטים – לפי רישיון כל מקור, בדיוק כפי שהמקור מציין אותו (טבלה למעלה). בספריא הרישיונות רשומים "CC-BY-SA" / "CC-BY-NC" ללא מספר גרסה, ולכן איננו מוסיפים גרסה; לטקסטים שמקורם בוויקיטקסט (המקרא על פי המסורה וחלקי הרמב"ם) – ויקיטקסט עצמו מציין CC BY-SA 4.0. ביאורים: ויקימילון, CC BY-SA 4.0; אימות הביאורים – ראו verification/GLOSSARY-VERIFICATION.md. ספריות צד שלישי – נוסח הרישיונות והודעות זכויות היוצרים ב-site/THIRD-PARTY-NOTICES.txt (נוצר ב-`npm run vendor`). גופנים – SIL OFL 1.1 (site/fonts/licenses/).

@@ -39,7 +39,12 @@ test('Sources page: chapter override row, CC deed links, all Hebcal packages; Ab
     const p = await pageWith(b, srv.url);
     await p.goto(srv.url + '#/sources'); await p.waitForSelector('table.src');
     const rows = await p.$$eval('table.src tbody tr', t => t.map(r => r.textContent));
-    assert.ok(rows.some(r => /חמץ ומצה, פרק ט/.test(r) && /CC BY-SA 4\.0/.test(r) && /לא מנוקד/.test(r)), 'ch. 9 row');
+    assert.ok(rows.some(r => /חמץ ומצה, פרק ט/.test(r) && /CC BY-SA \(במקור, ויקיטקסט: CC BY-SA 4\.0\)/.test(r) && /לא מנוקד/.test(r)), 'ch. 9 row');
+    // round 3 MUST 3: labels exactly as the source states them – Sefaria gives no version, so none is invented
+    const lic = await p.$$eval('table.src td[data-h="רישיון"]', t => t.map(e => e.textContent.trim()));
+    assert.ok(lic.includes('CC BY-NC'), 'Tanya: CC BY-NC (no version) – ' + lic);
+    assert.ok(lic.some(l => /^CC BY-SA \(במקור/.test(l)), 'MAM');
+    for (const l of lic) assert.ok(!/^CC BY(-SA|-NC)? 4\.0/.test(l), 'invented version: ' + l);
     const deeds = await p.$$eval('table.src a[href*="creativecommons.org/licenses/"]', a => a.length);
     assert.ok(deeds >= 10, `CC deed links: ${deeds}`);
     const txt = await p.textContent('.page');
@@ -64,8 +69,15 @@ test('reader credits the Wikisource chapter (Chametz uMatzah ch. 9) with a link 
     assert.ok(c.links.some(h => decodeURIComponent(h).includes('נוסח_ההגדה')));
     assert.ok(c.links.some(h => h.includes('creativecommons.org/licenses/by-sa/4.0')));
     assert.doesNotMatch(c.t, /פרק ח/, 'ch. 8 is from the main edition');
+    // round 3: every lesson carries a one-line source + licence credit (exact source wording)
     await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('.seg');
-    assert.equal(await p.$('.doc-credit'), null);
+    const ch = await p.textContent('.doc-credit');
+    assert.match(ch, /חומש: מקרא על פי המסורה \(CC BY-SA \(במקור, ויקיטקסט: CC BY-SA 4\.0\)\)/);
+    assert.match(ch, /רש״י: מהדורת רוזנבאום–זילברמן.*נחלת הכלל/);
+    await p.goto(srv.url + '#/r/tanya/2026-11-02'); await p.waitForSelector('.seg');
+    assert.match(await p.textContent('.doc-credit'), /תניא: הוצאת קה״ת \(Kehot\) \(CC BY-NC\)$/);
+    await p.goto(srv.url + '#/r/tehillim/2026-11-02'); await p.waitForSelector('.seg');
+    assert.match(await p.textContent('.doc-credit'), /תהילים: מקרא על פי המסורה/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

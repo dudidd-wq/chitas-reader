@@ -1,8 +1,8 @@
-// Curated allow-list for the glossary (tools/gloss-review.json).
+// Curated allow-list for the glossary (tools/gloss-review.json) — the manual step of the two-check rule (verification/GLOSSARY-VERIFICATION.md).
 // Every automatically extracted Wiktionary entry was reviewed by hand against its verse; only entries marked
 // "keep" (verbatim) or "adapt" (a softened wording, flagged as such in the UI) are published. Anything the builder
 // produces that is not in the review file — or whose definition text changed since review — is NOT published
-// until it is reviewed. Usage: node tools/gloss-review.mjs   (rewrites site/data/glossary.json from the review)
+// until it is reviewed.
 import fs from 'node:fs';
 const root = new URL('../', import.meta.url);
 export const REVIEW = JSON.parse(fs.readFileSync(new URL('tools/gloss-review.json', root)));
@@ -19,21 +19,20 @@ export function applyReview(raw, review = REVIEW) {
   }
   return { verses: out, unreviewed };
 }
-export function rawFromReview(review = REVIEW) {
-  const raw = {};
-  for (const e of review.entries) (raw[e.ref] ??= {})[e.form] = { g: e.g, l: e.l, src: e.src };
-  return raw;
+const XF = new URL('tools/gloss-xcheck.json', root);
+// Two-check rule (round 3): only entries that passed the automated cross-check (same definition text) AND the manual review are published.
+export function onlyCrossChecked(raw, xc = fs.existsSync(XF) ? JSON.parse(fs.readFileSync(XF)).entries : {}) {
+  const out = {};
+  for (const [ref, ws] of Object.entries(raw)) for (const [k, e] of Object.entries(ws)) { const x = xc[`${ref}|${k}`]; if (x && x.pass && x.g === e.g) (out[ref] ??= {})[k] = e; }
+  return out;
 }
-export function buildGlossary(raw, meta) {
+export function buildGlossary(raw0, meta) {
+  const raw = onlyCrossChecked(raw0);
+  const survivors = Object.values(raw).reduce((a, w) => a + Object.keys(w).length, 0);
   const { verses, unreviewed } = applyReview(raw);
   const n = Object.values(verses).reduce((a, w) => a + Object.keys(w).length, 0);
   const c = d => REVIEW.entries.filter(e => e.decision === d).length;
-  return { meta: { ...meta, curated: { reviewed: REVIEW.meta.reviewed, candidates: REVIEW.entries.length, kept: c('keep'), adapted: c('adapt'), rejected: c('reject'), unreviewedSkipped: unreviewed, published: n } }, verses };
+  return { meta: { ...meta, curated: { reviewed: REVIEW.meta.reviewed, candidates: REVIEW.entries.length, kept: c('keep'), adapted: c('adapt'), rejected: c('reject'), unreviewedSkipped: unreviewed, published: n },
+    manualReview: { survivorsOfBothChecks: survivors, rejectedByHand: survivors - n - unreviewed, notReviewedSoNotPublished: unreviewed, published: n } }, verses };
 }
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const f = new URL('site/data/glossary.json', root);
-  const old = JSON.parse(fs.readFileSync(f));
-  const res = buildGlossary(rawFromReview(), { ...old.meta, curated: undefined });
-  fs.writeFileSync(f, JSON.stringify(res));
-  console.log(JSON.stringify(res.meta.curated));
-}
+// The glossary is built only by tools/build-glossary.mjs (check a → gloss-xcheck.py check b → this manual review).

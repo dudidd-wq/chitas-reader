@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { serve, launch, CHROME, pageWith } from './helpers.mjs';
 
 const D = '2026-11-02';
+const DG = '2026-12-06'; // Gen 41:1–14: a cross-checked gloss (41:2 בְּרִיאֹת) on the first page
 const skip = !CHROME && 'no Chrome/Chromium installed';
 let srv, browser;
 test.before(async () => { if (skip) return; srv = await serve(); browser = await launch(); });
@@ -29,7 +30,7 @@ test('#b-full aria-pressed follows fullscreenchange (incl. leaving full screen b
 
 test('Escape: closes pop-up, then sheet, then shows the bars – and never navigates home', { skip }, async () => {
   const p = await pageWith(browser, srv.url);
-  await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(300);
+  await p.goto(srv.url + `#/r/chumash/${DG}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(300);
   // gloss pop-up open + bars hidden: first Esc only closes the pop-up
   await p.evaluate(() => document.querySelector('#reader').classList.add('immersive'));
   const gl = await p.$('.gl');

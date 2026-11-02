@@ -5,6 +5,7 @@ import { serve, launch, pageWith, CHROME } from './helpers.mjs';
 
 const skip = !CHROME && 'no Chrome';
 const D = '2026-11-02';
+const DG = '2026-12-06'; // Gen 41:1–14: a cross-checked gloss (41:2 בְּרִיאֹת) on the first page
 const scan = p => p.evaluate(() => [...document.querySelectorAll('a, button, select, input, label, [role=button], [tabindex]')].filter(e => {
   if (e.closest('[hidden], [inert]') || e.closest('.r-content') || e.matches('.sr, .skip')) return false;
   const r = e.getBoundingClientRect(); if (!r.width || !r.height) return false;
@@ -37,7 +38,7 @@ test('glossed words have a ≥44 px tall hit area without changing the text layo
   const srv = await serve(), b = await launch();
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
-    await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('.seg'); await p.waitForTimeout(400);
+    await p.goto(srv.url + `#/r/chumash/${DG}`); await p.waitForSelector('.seg'); await p.waitForTimeout(400);
     const r = await p.evaluate(() => {
       const g = [...document.querySelectorAll('.r-content .gl')].find(e => { const b = e.getBoundingClientRect(); return b.width && b.top > 100 && b.bottom < innerHeight - 100 && b.left > 30 && b.right < innerWidth - 30; });
       if (!g) return null;

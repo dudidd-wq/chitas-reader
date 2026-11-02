@@ -1,4 +1,6 @@
 // Builds site/data/glossary.json: light glosses (a few words) for words of Chumash and Tehillim,
+// Round 3 ("accuracy first"): a gloss is published only if it passes TWO independent checks — (a) below, plus no Wiktionary
+// defect flag; (b) tools/gloss-xcheck.py (STEPBible TAHOT + JPS 1917) — and then a manual review. See verification/GLOSSARY-VERIFICATION.md.
 // taken ONLY from Hebrew Wiktionary (CC BY-SA 4.0). Nothing is written by hand or generated.
 // Precision first — a wrong gloss is worse than none. Two strictly mechanical rules (see NOTES.md):
 //  A. Tanakh (Chumash, Tehillim): a word gets a gloss only when a Wiktionary sense explicitly quotes THIS verse
@@ -15,6 +17,7 @@ globalThis.fetch = async p => { if (/^https?:/.test(p)) return realFetch(p, { he
 import { norm, cons } from '../site/js/hnorm.js';
 import { buildGlossary } from './gloss-review.mjs';
 import { occurrencesOf } from './gloss-occ.mjs';
+import { SENSE_FLAGS, ENTRY_FLAGS } from './gloss-flags.mjs';
 const PREF = 'והבלמכש';
 function variants(n) {
   const out = [n]; let w = n;
@@ -73,16 +76,20 @@ function shortGloss(def) {
 const BOOKS = { 'בראשית': 'Genesis', 'שמות': 'Exodus', 'ויקרא': 'Leviticus', 'במדבר': 'Numbers', 'דברים': 'Deuteronomy', 'תהלים': 'Psalms', 'תהילים': 'Psalms' };
 const GV = { א: 1, ב: 2, ג: 3, ד: 4, ה: 5, ו: 6, ז: 7, ח: 8, ט: 9, י: 10, כ: 20, ך: 20, ל: 30, מ: 40, ם: 40, נ: 50, ן: 50, ס: 60, ע: 70, פ: 80, ף: 80, צ: 90, ץ: 90, ק: 100, ר: 200, ש: 300, ת: 400 };
 const gnum = s => /^\s*\d+\s*$/.test(s) ? +s : [...s.replace(/[^א-ת]/g, '')].reduce((a, c) => a + (GV[c] || 0), 0);
+// Round-3 review: definitions carrying a Wiktionary defect/quality template are dropped (tools/gloss-flags.mjs).
 const byVerse = {};        // ref → {form: rec}
 for (const page of Object.values(cache)) {
   if (!page) continue;
   const secs = page.c.split(/^==\s*([^=].*?)\s*==\s*$/m);
+  const pageFlag = ENTRY_FLAGS.exec(secs[0])?.[1];
   const heads = [];
   for (let i = 1; i < secs.length; i += 2) {
     const head = secs[i].replace(/\{\{[^}]*\}\}/g, '').trim(), body = secs[i + 1];
     if (!/[\u05B0-\u05BB]/.test(head)) continue;
     heads.push(norm(head));
     const senses = body.split(/\n(?=#(?![:*#]))/).filter(x => /^#(?![:*#])/.test(x)).map(x => x.split(/\n(?=[^#])/)[0]);
+    let outside = body; for (const x of senses) outside = outside.replace(x, '');
+    const entryFlag = pageFlag || ENTRY_FLAGS.exec(outside)?.[1];
     senses.forEach((sense, si) => {
       const def = sense.split('\n')[0];
       const g = shortGloss(clean(def.slice(1)));
@@ -92,7 +99,8 @@ for (const page of Object.values(cache)) {
         const f = m[1].split('|'); if (f.length < 4) continue;
         const book = BOOKS[f[1].trim()]; if (!book) continue;
         const ref = `${book} ${gnum(f[2])}:${gnum(f[3])}`;
-        for (const b of f[0].matchAll(/'''([^']+)'''/g)) { const nf = norm(b[1]); if (cons(nf).length >= 2) ((byVerse[ref] ??= {})[nf] ??= []).push({ ...rec, q: f[0] }); }
+        const sf = SENSE_FLAGS.exec(sense), flag = sf ? 'sense: ' + sf[1] : entryFlag ? 'entry: ' + entryFlag : null;
+        for (const b of f[0].matchAll(/'''([^']+)'''/g)) { const nf = norm(b[1]); if (cons(nf).length >= 2) ((byVerse[ref] ??= {})[nf] ??= []).push({ ...rec, q: f[0], flag }); }
       }
     });
   }
@@ -100,7 +108,7 @@ for (const page of Object.values(cache)) {
 // 4. match — occurrence-exact. A Wiktionary citation quotes the verse with ONE word in bold; when the same form occurs
 // more than once in the verse, the quoted context decides which occurrence is meant (key "form#k", k 1-based).
 // If the context does not pin down a single occurrence, the gloss is dropped (round-2 review: never gloss every copy).
-const outV = {}; let matchedV = 0, tokV = 0, droppedAmbiguous = 0, splitOcc = 0;
+const outV = {}; const flagged = []; let matchedV = 0, tokV = 0, droppedAmbiguous = 0, splitOcc = 0;
 for (const [ref, set] of verses) {
   tokV += set.size;
   const cand = byVerse[ref]; if (!cand) continue;
@@ -111,7 +119,8 @@ for (const [ref, set] of verses) {
     const repeated = toks.filter(t => t === n).length > 1;
     const byKey = {};
     for (const r of recs) {
-      const { q, ...rec } = r;
+      const { q, flag, ...rec } = r;
+      if (flag) { flagged.push({ ref, form: n, g: rec.g, l: rec.l, flag }); continue; }
       const ks = occurrencesOf(toks, n, q);
       if (!ks) { droppedAmbiguous++; continue; }
       for (const k of ks) {
@@ -125,9 +134,25 @@ for (const [ref, set] of verses) {
     }
   }
 }
+console.log('flagged (dropped)', flagged.length, 'sense', flagged.filter(f => f.flag.startsWith('sense')).length, 'entry', flagged.filter(f => f.flag.startsWith('entry')).length);
+fs.writeFileSync('/tmp/gloss-cands.json', JSON.stringify(outV));
+fs.writeFileSync(new URL('../tools/gloss-flagged.json', import.meta.url), JSON.stringify(flagged.sort((a, b) => (a.ref + a.form).localeCompare(b.ref + b.form)), null, 0).replace(/},{/g, '},\n{'));
+// 5. second, independent check (tools/gloss-xcheck.py → tools/gloss-xcheck.json): only candidates whose meaning agrees with
+// STEPBible TAHOT (word-level, in context) AND the JPS 1917 translation of the verse survive. Missing/stale result = dropped.
+const XF = new URL('../tools/gloss-xcheck.json', import.meta.url);
+const XC = fs.existsSync(XF) ? JSON.parse(fs.readFileSync(XF)) : { entries: {} };
+let xPass = 0, xFail = 0, xMissing = 0;
+const passV = {};
+for (const [ref, ws] of Object.entries(outV)) for (const [key, rec] of Object.entries(ws)) {
+  const x = XC.entries[`${ref}|${key}`];
+  if (!x || x.g !== rec.g) { xMissing++; continue; }
+  if (!x.pass) { xFail++; continue; }
+  (passV[ref] ??= {})[key] = rec; xPass++;
+}
+console.log('xcheck pass', xPass, 'fail', xFail, 'missing', xMissing);
 console.log('occurrence-specific', splitOcc, 'dropped (ambiguous occurrence/conflicting senses)', droppedAmbiguous);
 // Publish only hand-reviewed entries (tools/gloss-review.json); new/changed candidates are skipped until reviewed.
-const res = buildGlossary(outV, { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
-    stats: { tanakh: { verses: verses.size, verseWordForms: tokV, glossed: matchedV, versesWithGloss: Object.keys(outV).length } } });
+const res = buildGlossary(passV, { source: 'ויקימילון העברי (he.wiktionary.org)', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', built: new Date().toISOString().slice(0, 10), scope: 'Torah + Tehillim (all verses)',
+    stats: { tanakh: { verses: verses.size, verseWordForms: tokV, wiktionaryVerseCited: matchedV + flagged.length, droppedFlagged: flagged.length, checkA: matchedV, checkB: xPass, failedB: xFail + xMissing } }, verification: XC.meta || null });
 fs.writeFileSync(new URL('data/glossary.json', root), JSON.stringify(res));
 console.log(JSON.stringify(res.meta.stats), JSON.stringify(res.meta.curated));

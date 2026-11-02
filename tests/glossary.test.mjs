@@ -23,14 +23,14 @@ test('glossary: licence + every entry sourced, ≤ 4 words, anchored to a real w
       assert.ok(e.l);
     }
   }
-  assert.ok(n > 500, 'coverage collapsed: ' + n);
+  assert.ok(n > 400, 'coverage collapsed: ' + n);
   console.log('glossed verse-words:', n, 'verses:', Object.keys(G.verses).length);
 });
 
 test('glossary: curated allow-list — every published entry was reviewed by hand; known-bad entries removed', async () => {
   const R = JSON.parse(fs.readFileSync(new URL('../tools/gloss-review.json', import.meta.url)));
   const idx = new Map(R.entries.map(e => [`${e.ref}|${e.form}`, e]));
-  assert.equal(R.entries.length, 1046);
+  assert.ok(R.entries.length >= 1046);
   for (const e of R.entries) assert.ok(['keep', 'reject', 'adapt'].includes(e.decision) && (e.decision !== 'reject' || R.meta.codes[e.why]), JSON.stringify(e));
   let n = 0;
   for (const [ref, ws] of Object.entries(G.verses)) for (const [form, e] of Object.entries(ws)) {
@@ -48,5 +48,6 @@ test('glossary: curated allow-list — every published entry was reviewed by han
     assert.ok(!/יחסי.?מין|איבר מין|דמות מקראית|ביאה|פליטת זרע/.test(e.g), e.g);
     assert.ok(!/[<>(]$|\(\d\)|^בנסמך$|^בפרט$/.test(e.g), 'garbled: ' + e.g);
   }
-  assert.equal(G.verses['Genesis 4:1'][norm('יָדַע')]?.adapted, 1);
+  // round 3: the hand-softened (adapted) wordings did not pass the two-check rule and are no longer published
+  assert.ok(!G.verses['Genesis 4:1']?.[norm('יָדַע')]);
 });

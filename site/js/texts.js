@@ -2,8 +2,12 @@
 import { gem, tanya as tanyaRange } from './calendar.js';
 
 const cache = new Map();
-/** Creative Commons deed for a Sefaria licence label (Wikimedia/Sefaria texts are offered under the 4.0 licences). */
-export const LICENSE_URL = { 'CC-BY-SA': 'https://creativecommons.org/licenses/by-sa/4.0/deed.he', 'CC-BY-NC': 'https://creativecommons.org/licenses/by-nc/4.0/deed.he', 'CC-BY': 'https://creativecommons.org/licenses/by/4.0/deed.he', 'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/deed.he' };
+/** Licence labels exactly as the source (Sefaria version record) states them — no version is added (round-3 review).
+ *  Sefaria records "CC-BY-SA"/"CC-BY-NC" without a version, so the link goes to the licence family page; texts whose
+ *  original publisher is Wikisource additionally cite the version stated there (CC BY-SA 4.0, page footer). */
+export const LICENSE_URL = { 'CC-BY-SA': 'https://creativecommons.org/licenses/?lang=he#by-sa', 'CC-BY-NC': 'https://creativecommons.org/licenses/?lang=he#by-nc', 'CC-BY': 'https://creativecommons.org/licenses/?lang=he#by', 'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/deed.he' };
+export const WIKISOURCE_DEED = 'https://creativecommons.org/licenses/by-sa/4.0/deed.he';
+export const licenseLabel = l => l === 'CC0' ? 'CC0 1.0' : l === 'Public Domain' ? 'נחלת הכלל (Public Domain)' : l.replace(/^CC-/, 'CC ');
 export function data(path) {
   if (!cache.has(path)) cache.set(path, fetch('data/' + path).then(r => { if (!r.ok) throw new Error(path); return r.json(); }));
   return cache.get(path);

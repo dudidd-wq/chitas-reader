@@ -19,12 +19,13 @@ test('occurrencesOf: picks the bold copy by its neighbours, handles "..." gaps, 
   assert.deepEqual(occurrencesOf(v, norm('תֵצֵא'), "כִּי '''תֵצֵא'''"), [0]); // unique form
 });
 
-test('glossary: Deut 20:1 and 8:3 gloss only the cited "כי"; no other repeated form is glossed on every copy blindly', () => {
+test('glossary: Deut 20:1 / 8:3 "כי" never glossed on the uncited copy (round 3: the כי entry is now dropped entirely — Wiktionary flags it {{לשכתוב}})', () => {
   const ki = norm('כִּי');
-  assert.deepEqual(Object.keys(G.verses['Deuteronomy 20:1']).filter(k => k.startsWith(ki)), [`${ki}#1`]);
-  assert.equal(G.verses['Deuteronomy 20:1'][`${ki}#1`].g, 'כאשר');
-  assert.deepEqual(Object.keys(G.verses['Deuteronomy 8:3']).filter(k => k.startsWith(ki)), [`${ki}#2`]);
-  assert.ok(!G.verses['Deuteronomy 8:3'][ki]);
+  for (const ref of ['Deuteronomy 20:1', 'Deuteronomy 8:3']) assert.ok(!(G.verses[ref] || {})[ki], ref);
+  assert.ok(!Object.keys(G.verses['Deuteronomy 8:3'] || {}).includes(`${ki}#1`));
+  // generic: every occurrence key in the glossary is checked against the verse by glossary.test.mjs
+  const occ = Object.values(G.verses).flatMap(ws => Object.keys(ws)).filter(k => k.includes('#'));
+  assert.ok(occ.length >= 1);
 });
 
 const skip = !CHROME && 'no Chrome';
