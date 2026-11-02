@@ -134,7 +134,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-title b { display: block; font-size: 1rem; font-family: var(--text-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .r-title small { color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
 /* round 4: on narrow screens the date and the verse range get a line each instead of one line cut with an ellipsis */
-@media (max-width: 480px) { .r-title small { line-height: 1.2; } .r-title small span { display: block; overflow: hidden; text-overflow: ellipsis; } .r-title small i { display: none; } }
+@media (max-width: 480px) { .r-title small { line-height: 1.2; } .r-title small span { display: block; overflow: hidden; text-overflow: ellipsis; } .r-title small i { display: none; } .r-title small span.r-dt { white-space: normal; text-overflow: clip; } .r-title small span.r-dt bdi { white-space: nowrap; } .r-title small span.r-dt bdi + i + bdi { margin-inline-start: .5em; } }
+@media (max-width: 360px) { .r-title small { font-size: .72rem; } .r-title small span.r-rng { white-space: normal; text-overflow: clip; } }
 #reader.immersive .r-top { transform: translateY(-110%); opacity: 0; pointer-events: none; }
 #reader.immersive .r-bottom:not(.speaking) { transform: translateY(110%); opacity: 0; pointer-events: none; }
 .progress { position: absolute; top: 0; inset-inline: 0; height: 3px; background: var(--paper2); }

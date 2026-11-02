@@ -174,7 +174,21 @@ export function gem(n) {
   s += tens[Math.floor(n / 10)] + ones[n % 10];
   return s;
 }
-export function hebDateHe(hd) { return hd.renderGematriya(true); }
+// Hebrew date as written in Israel: "כ״ב במרחשוון תשפ״ז" (day and year in gematria from Hebcal, month names in the
+// common Israeli full spelling with the ב prefix).
+const HE_MONTH = { 1: 'ניסן', 2: 'אייר', 3: 'סיוון', 4: 'תמוז', 5: 'אב', 6: 'אלול', 7: 'תשרי', 8: 'מרחשוון', 9: 'כסלו', 10: 'טבת', 11: 'שבט', 12: 'אדר', 13: 'אדר ב׳' };
+export function hebMonthHe(hd) { const m = hd.getMonth(); return m === 12 && HDate.isLeapYear(hd.getFullYear()) ? 'אדר א׳' : HE_MONTH[m]; }
+export function hebDateHe(hd) {
+  const parts = hd.renderGematriya(true).split(' ');
+  return `${parts[0]} ב${hebMonthHe(hd)} ${parts[parts.length - 1]}`;
+}
+// Gregorian date in Hebrew, Israeli order: "2 בנובמבר 2026" / "יום שני, 2 בנובמבר 2026" – not left to the browser
+// locale, so it reads the same on every device.
+const GREG_MONTH = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+export function gregLongHe(iso, { weekday = false } = {}) {
+  const [y, m, d] = iso.split('-').map(Number), wd = new Date(y, m - 1, d).getDay();
+  return `${weekday ? (wd === 6 ? 'שבת' : DAY_HE[wd]) + ', ' : ''}${d} ב${GREG_MONTH[m - 1]} ${y}`;
+}
 
 export function dayPlan(date, { il = true } = {}) {
   const hd = toHDate(date);

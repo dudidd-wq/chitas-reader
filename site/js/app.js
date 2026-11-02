@@ -1,5 +1,5 @@
 import { CHOL } from './chol.js';
-import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy } from './calendar.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel } from './texts.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
@@ -40,7 +40,10 @@ let toastAfterNav = ''; // a message meant for the screen being navigated to
 function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
 const todayIso = () => isoDate(new HDate(new Date()));
 const unitsFor = () => ['chumash', 'tehillim', 'tanya', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1'])];
-const gregHe = iso => { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' }); };
+// Dates shown to the reader: Israeli order only (2 בנובמבר 2026 / 02/11/2026); ISO stays in URLs and storage keys.
+const gregHe = iso => gregLongHe(iso);
+const dayDates = (plan, iso) => `${plan.hebDate} · ${fmtDmy(iso)}`;
+const dayDatesHtml = (plan, iso) => `<bdi>${esc(plan.hebDate)}</bdi><i aria-hidden="true"> · </i><bdi dir="ltr">${esc(fmtDmy(iso))}</bdi>`;
 const shiftIso = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); return isoDate(new HDate(new Date(y, m - 1, d + n))); };
 
 // ---------------- Router ----------------
@@ -100,6 +103,7 @@ async function renderHome(showLoc = false) {
   const first = !prefs.locationChosen;
   const units = unitsFor();
   const v = $('#view');
+  document.title = `חת״ת ורמב״ם – ${plan.hebDate} (${fmtDmy(currentDate)})`;
   v.innerHTML = `<div class="wrap home">
     <header class="hero">
       <p class="kicker">${esc(plan.dayHe)}${isToday ? ' · <b>היום</b>' : ''}</p>
@@ -109,14 +113,14 @@ async function renderHome(showLoc = false) {
     </header>
     ${first || showLoc ? locationPanel(first) : ''}
     ${first ? '' : `    <nav class="datebar" aria-label="בחירת תאריך">
-      <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם">${ICON.prev}<span>הקודם</span></a>
+      <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם, ${fmtDmy(shiftIso(currentDate, -1))}">${ICON.prev}<span>הקודם</span></a>
       <span class="datefield">
         <label class="sr" for="datepick">תאריך (יום/חודש/שנה)</label>
         <input type="text" id="datepick" dir="ltr" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="10" placeholder="יי/חח/שששש" value="${fmtDmy(currentDate)}" aria-describedby="dateerr">
         <button type="button" class="btn icon" id="calbtn" aria-label="פתיחת לוח שנה">${ICON.cal}</button>
         <input type="date" id="datenative" value="${currentDate}" tabindex="-1" aria-hidden="true">
       </span>
-      <a class="btn" href="#/d/${shiftIso(currentDate, 1)}" aria-label="היום הבא"><span>הבא</span>${ICON.next}</a>
+      <a class="btn" href="#/d/${shiftIso(currentDate, 1)}" aria-label="היום הבא, ${fmtDmy(shiftIso(currentDate, 1))}"><span>הבא</span>${ICON.next}</a>
       ${isToday ? '' : `<a class="btn today" href="#/d/${todayIso()}">חזרה להיום</a>`}
       <p id="dateerr" class="dateerr" role="alert"></p>
     </nav>
@@ -363,7 +367,9 @@ function renderAbout() {
   <li>תהילים לפי ימי החודש; בחודש חסר לומדים ביום כ״ט גם את של יום ל׳.</li>
   <li>תניא יומי לפי הלוח המקובל (מחזור שנתי החל מי״ט כסלו).</li>
   <li>הלוח נבדק אוטומטית מול לוח השיעורים של Chabad.org (חוץ לארץ) לכל יום בטווח של יותר משנתיים – ראו <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">verification/VERIFICATION.md</a>.</li>
-  <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li></ul>
+  <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li>
+  <li><b>התאריך העברי מוצג לפי היום האזרחי:</b> לכל תאריך לועזי מוצג התאריך העברי של שעות היום שלו (חישוב של ספריית Hebcal). לפי ההלכה התאריך העברי מתחלף כבר בשקיעה, כך שבערב, אחרי השקיעה, כבר מתחיל התאריך העברי הבא – האתר אינו מחליף אותו בשקיעה.</li>
+  <li>תאריכים לועזיים מוצגים בסדר הישראלי: יום/חודש/שנה (למשל <bdi dir="ltr">02/11/2026</bdi>) או ״2 בנובמבר 2026״.</li></ul>
   <h2>ניקוד</h2><ul><li>כל הטקסטים מנוקדים, חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
@@ -433,7 +439,7 @@ async function openReader(unit, iso) {
   el.innerHTML = `
   <header class="r-top" id="rt">
     <a class="btn ghost" href="#/d/${iso}" aria-label="חזרה לדף הבית">${ICON.back}</a>
-    <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${esc(plan.hebDate)}</small></div>
+    <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${esc(dayDates(plan, iso))}</small></div>
     <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
     <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
@@ -473,8 +479,8 @@ async function openReader(unit, iso) {
     $('#r-retry').focus(); return;
   }
   if (R.unit !== unit || R.iso !== iso) return;
-  $('#r-t').textContent = R.doc.title; $('#r-s').innerHTML = `<span>${esc(plan.hebDate)}</span><span class="r-rng"><i aria-hidden="true"> · </i>${esc(R.doc.subtitle)}</span>`;
-  document.title = `${R.doc.title} – ${plan.hebDate}`;
+  $('#r-t').textContent = R.doc.title; $('#r-s').innerHTML = `<span class="r-dt">${dayDatesHtml(plan, iso)}</span><span class="r-rng"><i aria-hidden="true"> · </i>${esc(R.doc.subtitle)}</span>`;
+  document.title = `${R.doc.title} – ${plan.hebDate} (${fmtDmy(iso)})`;
   await renderDoc();
   const p = getProgress(iso, unit);
   if (p?.pos && !p.done) restore(p);
@@ -505,7 +511,7 @@ async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
-  let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
+  let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
@@ -688,7 +694,7 @@ function reportUrl(seg = currentSeg()) {
   const t = seg ? (seg.querySelector('.t')?.textContent || seg.textContent).replace(/\s+/g, ' ').trim() : '';
   const where = [R.doc?.title, R.doc?.subtitle].filter(Boolean).join(' – ');
   const title = `טעות בטקסט: ${where}${seg ? ` (${seg.dataset.ref || seg.dataset.id})` : ''}`.slice(0, 150);
-  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.iso || ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
+  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.iso ? `${fmtDmy(R.iso)} (${dayPlan(R.iso, { il: prefs.il }).hebDate})` : ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
     sel ? `**המילים שסומנו:** ${sel}` : '', seg ? `**הנוסח המוצג:**\n> ${t.slice(0, 600)}${t.length > 600 ? '…' : ''}` : '',
     '', '**מה הטעות?** (ניקוד / מילה חסרה או מיותרת / הקראה / ביאור)', '', '**מה הנוסח הנכון, ולפי איזה מקור?**', ''].filter(x => x !== false).join('\n');
   return `${ISSUES}?title=${encodeURIComponent(title)}&labels=${encodeURIComponent('text-error')}&body=${encodeURIComponent(body)}`;
