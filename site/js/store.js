@@ -6,8 +6,15 @@ export const DEFAULT_PREFS = {
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
 };
+// One speed scale for the footer menu and the settings slider.
+export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
+export const snapRate = r => TTS_RATES.reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a), 1);
 function load() {
-  try { const d = JSON.parse(localStorage.getItem(KEY) || '{}'); return { prefs: { ...DEFAULT_PREFS, ...(d.prefs || {}) }, progress: d.progress || {} }; }
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
+    prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
+    return { prefs, progress: d.progress || {} };
+  }
   catch { return { prefs: { ...DEFAULT_PREFS }, progress: {} }; }
 }
 const state = load();

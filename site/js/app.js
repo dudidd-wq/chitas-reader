@@ -1,7 +1,7 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data } from './texts.js';
-import { prefs, setPref, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
+import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
 import { RE_TAAMIM } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
@@ -180,7 +180,7 @@ function ttsForm() {
   return `
   <div id="voice-warn"></div>
   <label class="field"><span>קול</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
-  <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="0.6" max="1.6" step="0.05" value="${prefs.ttsRate}"></label>
+  <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
@@ -313,7 +313,7 @@ async function openReader(unit, iso) {
       <button class="btn ghost" id="t-fwd" aria-label="קטע הבא">${ICON.rew}</button>
       <button class="btn ghost" id="t-stop" aria-label="עצור">${ICON.stop}</button>
       <label class="sr" for="t-rate">מהירות</label>
-      <select id="t-rate">${[0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.35, 1.5].map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
+      <select id="t-rate">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
     </div>
     <span style="flex:1" id="spacer"></span>
     <button class="btn ghost" id="b-next" aria-label="עמוד הבא">${ICON.next}</button>
@@ -412,6 +412,20 @@ function setPage(n, save = true) {
   $('#rc').style.transform = `translateX(${R.page * R.W}px)`;
   updateProgress(save);
 }
+// Keep the part of the segment being spoken (frac = share of the segment already read) inside the visible text area,
+// i.e. between the top bar and the player bar – also for long segments that run over several pages.
+function followSpeech(el, frac) {
+  if (prefs.layout === 'pages') {
+    const rc = $('#rc').getBoundingClientRect(), e = el.getBoundingClientRect();
+    const p0 = pageOf(el), p1 = Math.max(p0, Math.floor((rc.right - e.left - 2) / R.W));
+    const p = Math.min(p1, p0 + Math.floor(frac * (p1 - p0 + 1)));
+    if (p !== R.page) setPage(p);
+  } else {
+    const vp = $('#vp'), pad = chromePad(), e = el.getBoundingClientRect(), v = vp.getBoundingClientRect();
+    const y = e.top + frac * e.height, lo = v.top + pad.top, hi = v.bottom - pad.bottom - 40;
+    if (y < lo || y > hi) vp.scrollBy({ top: y - lo - 20, behavior: 'smooth' });
+  }
+}
 function pageOf(el) {
   const rc = $('#rc'), r = rc.getBoundingClientRect(), e = el.getBoundingClientRect();
   return Math.max(0, Math.floor((r.right - e.right + 2) / R.W));
@@ -454,6 +468,18 @@ function bindReaderUi() {
     const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false);
   };
   R.toggleChrome = toggleChrome;
+  // Re-paginate whenever a bar changes height (player bar shown/hidden, wrapping, rotation) and keep the position.
+  let lastH = '';
+  R.ro?.disconnect();
+  R.ro = new ResizeObserver(() => {
+    if (!$('#rt') || !$('#rb') || !$('#rc')) { R.ro?.disconnect(); return; } // reader was left
+    const h = $('#rt').offsetHeight + ':' + $('#rb').offsetHeight;
+    if (h === lastH) return; const first = !lastH; lastH = h;
+    if (first || !R.doc) return;
+    cancelAnimationFrame(R.roF);
+    R.roF = requestAnimationFrame(() => { if (!$('#rc')) return; const s = (R.segs.find(x => x.classList.contains('speaking')) || currentSeg())?.dataset.id; layout(); if (s) goToSeg(s, false); });
+  });
+  R.ro.observe($('#rt')); R.ro.observe($('#rb'));
   $('#b-prev').onclick = $('#b-prev2').onclick = () => turn(-1);
   $('#b-next').onclick = $('#b-next2').onclick = () => turn(1);
   $('#b-full').onclick = () => {
@@ -484,7 +510,7 @@ function bindReaderUi() {
   $('#t-stop').onclick = () => { R.speaker?.stop(); };
   $('#t-back').onclick = () => R.speaker?.skip(-1);
   $('#t-fwd').onclick = () => R.speaker?.skip(1);
-  $('#t-rate').onchange = e => { setPref('ttsRate', Number(e.target.value)); R.speaker?.setRate(prefs.ttsRate); };
+  $('#t-rate').onchange = e => { setPref('ttsRate', snapRate(Number(e.target.value))); R.speaker?.setRate(prefs.ttsRate); };
 }
 function turn(d) {
   if (prefs.layout === 'pages') {
@@ -521,7 +547,7 @@ function openSheet(kind) {
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
-    else if (name === 'ttsRate') R.speaker?.setRate(prefs.ttsRate);
+    else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
   });
 }
 function closeSheet() {
@@ -554,6 +580,9 @@ const TTS_ERR = {
   'no-voice': 'לא נמצא במכשיר קול עברי, ולכן ההקראה לא הופעלה. הוראות התקנה – בחלון ההקראה.',
   silent: 'מנוע הדיבור לא השמיע את הטקסט (ייתכן שאין קול עברי). ההקראה נעצרה, והשיעור לא סומן כנלמד.',
 };
+// The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
+// follows the pages by itself). The text area is re-laid out for the bar's real height (ResizeObserver in bindReaderUi).
+function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('tts-on', on); }
 async function ttsToggle() {
   if (!ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
   if (R.speaker) { R.speaker.toggle(); return; }
@@ -561,15 +590,13 @@ async function ttsToggle() {
   await waitForVoices();
   if (R.unit !== unit || R.iso !== iso || R.speaker) return;
   R.speaker = new Speaker({
-    onSegment: i => {
-      R.segs.forEach(s => s.classList.remove('speaking'));
+    onSegment: (i, frac = 0) => {
       const el = R.segs[i]; if (!el) return;
-      el.classList.add('speaking');
-      if (prefs.layout === 'pages') { const p = pageOf(el); if (p !== R.page) setPage(p); }
-      else { const r = el.getBoundingClientRect(), vh = $('#vp').clientHeight; if (r.top < 60 || r.top > vh * 0.7) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
+      if (!el.classList.contains('speaking')) { R.segs.forEach(s => s.classList.remove('speaking')); el.classList.add('speaking'); }
+      followSpeech(el, frac);
     },
     onState: st => {
-      $('#ttsctl').hidden = st === 'stopped' && !R.ttsShown;
+      showTtsBar(st !== 'stopped' || R.ttsShown);
       const was = $('#rb').classList.contains('speaking');
       $('#rb').classList.toggle('speaking', st !== 'stopped');
       if (was !== (st !== 'stopped') && $('#reader').classList.contains('immersive')) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
@@ -583,7 +610,7 @@ async function ttsToggle() {
       if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(R.iso, R.unit, { done: true, frac: 1 });
     },
     onError: code => {
-      R.speaker = null; R.ttsShown = false; $('#ttsctl').hidden = true;
+      R.speaker = null; R.ttsShown = false; showTtsBar(false);
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
       if (code === 'no-voice') openSheet('tts');
     },
@@ -591,7 +618,7 @@ async function ttsToggle() {
   R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, lockscreen: prefs.ttsLockscreen },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
-  R.ttsShown = true; $('#ttsctl').hidden = false;
+  R.ttsShown = true; showTtsBar(true);
   R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
 }
 

@@ -55,9 +55,13 @@ export class Speaker {
     this.stop(true);
     this.opts = opts; this.meta = meta;
     this.queue = [];
-    segments.forEach((s, si) => s.parts.forEach((html, pi) => {
-      for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined }))) this.queue.push({ si, text: c });
-    }));
+    segments.forEach((s, si) => {
+      const chunks = [];
+      s.parts.forEach((html, pi) => { for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined }))) chunks.push(c); });
+      // frac: share of the segment already spoken when this chunk starts (lets the view follow long segments)
+      const total = chunks.reduce((a, c) => a + c.length, 0) || 1; let done = 0;
+      for (const c of chunks) { this.queue.push({ si, text: c, frac: done / total }); done += c.length; }
+    });
     this.segCount = segments.length; this.bad = 0;
   }
   startAt(segIndex = 0) { const k = this.queue.findIndex(q => q.si >= segIndex); this.i = k < 0 ? 0 : k; this.play(); }
@@ -84,7 +88,7 @@ export class Speaker {
     u.rate = this.opts.rate || 1;
     const token = this.token = Symbol();
     let started = 0;
-    u.onstart = () => { if (this.token !== token) return; started = performance.now(); this.onSegment?.(q.si); };
+    u.onstart = () => { if (this.token !== token) return; started = performance.now(); this.onSegment?.(q.si, q.frac); };
     u.onend = () => {
       if (this.token !== token || this.state !== 'playing') return;
       const min = q.text.length * (globalThis.__ttsMinMsPerChar ?? MIN_MS_PER_CHAR) / (u.rate || 1);
@@ -97,7 +101,7 @@ export class Speaker {
       if (e.error === 'interrupted' || e.error === 'canceled') return; // our own cancel() (pause/skip/rate)
       this.fail(e.error || 'error');                                      // real failure: stop, never advance
     };
-    this.onSegment?.(q.si);
+    this.onSegment?.(q.si, q.frac);
     try { synth.speak(u); } catch (e) { this.fail('error'); }
   }
   pause() {

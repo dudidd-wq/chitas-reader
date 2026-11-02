@@ -211,3 +211,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .t small { font-size: .68em; line-height: 0; vertical-align: .12em; }
 .t .fn { font-style: normal; font-family: var(--ui); font-size: .6em; color: var(--muted); margin-inline: .3em; white-space: normal; letter-spacing: 0; }
 .t .fn::before { content: '('; } .t .fn::after { content: ')'; }
+/* Read-aloud player: a single compact row in place of the pager */
+.r-bottom.tts-on { flex-wrap: nowrap; gap: .15rem; }
+.r-bottom.tts-on #spacer { display: none; }
+.r-bottom.tts-on .tts-ctl { flex: 1 1 auto; flex-wrap: nowrap; min-width: 0; gap: .15rem; }
+.tts-ctl .btn { min-width: 44px; min-height: 44px; padding: .2rem .4rem; }
+.tts-ctl select { min-height: 44px; padding-inline: .3rem; max-width: 5.2rem; }
+@media (max-width: 560px) {
+  .r-bottom.tts-on #b-prev, .r-bottom.tts-on #b-next, .r-bottom.tts-on #pinfo { display: none; }
+  .r-bottom.tts-on .tts-ctl { justify-content: space-between; }
+}
