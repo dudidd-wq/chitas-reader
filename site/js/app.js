@@ -1,7 +1,7 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel } from './texts.js';
-import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS } from './store.js';
+import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
@@ -66,14 +66,16 @@ const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const guessIsrael = () => { try { return /^Asia\/(Jerusalem|Tel_Aviv)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { return true; } };
 const locLabel = il => il ? 'ארץ ישראל' : 'חוץ לארץ';
+// First visit (round 4): the two choices are equal – nothing is pre-selected and no lessons are listed until one is
+// chosen. A reader opened by a direct link before that uses the device time-zone guess and says so (readerLocNote).
 function locationPanel(first) {
-  const guess = first ? guessIsrael() : prefs.il;
+  const cur = prefs.il;
   return `<section class="locq" id="locq" aria-labelledby="locq-h">
     <h2 id="locq-h">${first ? 'ברוכים הבאים! היכן אתם לומדים?' : 'בחירת לוח'}</h2>
-    <p>פרשת השבוע – ולכן שיעור החומש – שונה לעיתים בין ארץ ישראל לחוץ לארץ (כשיום טוב שני של גלויות חל בשבת). ${first ? 'אפשר לשנות זאת בכל עת בהגדרות.' : ''}</p>
+    <p>פרשת השבוע – ולכן שיעור החומש – שונה לעיתים בין ארץ ישראל לחוץ לארץ (כשיום טוב שני של גלויות חל בשבת). ${first ? 'בחרו לוח כדי לראות את שיעורי היום; אפשר לשנות זאת בכל עת בהגדרות.' : ''}</p>
     <div class="locq-btns">
-      <button class="btn ${guess ? 'primary' : ''}" data-il="true">${PIN}ארץ ישראל</button>
-      <button class="btn ${guess ? '' : 'primary'}" data-il="false">${PIN}חוץ לארץ</button>
+      <button class="btn ${!first && cur ? 'primary' : ''}" data-il="true"${first ? '' : ` aria-pressed="${cur}"`}>${PIN}ארץ ישראל</button>
+      <button class="btn ${!first && !cur ? 'primary' : ''}" data-il="false"${first ? '' : ` aria-pressed="${!cur}"`}>${PIN}חוץ לארץ</button>
     </div></section>`;
 }
 // Date field: typed as dd/mm/yyyy whatever the browser locale; the calendar button opens the native picker
@@ -102,10 +104,10 @@ async function renderHome(showLoc = false) {
       <p class="kicker">${esc(plan.dayHe)}${isToday ? ' · <b>היום</b>' : ''}</p>
       <h1 class="hd">${esc(plan.hebDate)}</h1>
       <p class="sub">${esc(gregHe(currentDate))} · פרשת ${esc(plan.weekParsha)}</p>
-      <button class="chip" id="loc" aria-expanded="${first || showLoc}" aria-controls="locq">${PIN}<span>לוח ${locLabel(prefs.il)}</span><span class="sr"> – שינוי</span></button>
+      ${first ? '' : `<button class="chip" id="loc" aria-expanded="${showLoc}" aria-controls="locq">${PIN}<span>לוח ${locLabel(prefs.il)}</span><span class="sr"> – שינוי</span></button>`}
     </header>
     ${first || showLoc ? locationPanel(first) : ''}
-    <nav class="datebar" aria-label="בחירת תאריך">
+    ${first ? '' : `    <nav class="datebar" aria-label="בחירת תאריך">
       <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם">${ICON.prev}<span>הקודם</span></a>
       <span class="datefield">
         <label class="sr" for="datepick">תאריך (יום/חודש/שנה)</label>
@@ -129,6 +131,7 @@ async function renderHome(showLoc = false) {
       </li>`).join('')}
       </ol>
     </section>
+`}
     <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
@@ -138,13 +141,14 @@ async function renderHome(showLoc = false) {
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
   </div>`;
-  bindDateField();
   $('#dl30').addEventListener('click', downloadAhead);
-  $('#loc').addEventListener('click', () => { renderHome(!showLoc && !first); if (!showLoc && !first) $('#locq [data-il]')?.focus(); });
   v.querySelectorAll('#locq [data-il]').forEach(b => b.addEventListener('click', () => {
     setPref('il', b.dataset.il === 'true'); setPref('locationChosen', true);
     renderHome(); toast(`הלוח מוצג לפי ${locLabel(prefs.il)}`); $('#loc')?.focus();
   }));
+  if (first) return;
+  bindDateField();
+  $('#loc').addEventListener('click', () => { renderHome(!showLoc); if (!showLoc) $('#locq [data-il]')?.focus(); });
   let done = 0;
   for (const u of units) {
     const p = getProgress(currentDate, u);
@@ -236,7 +240,7 @@ function bindForm(root, onChange) {
     const el = e.target; if (!el.name || !(el.name in DEFAULT_PREFS)) return;
     let v = el.type === 'checkbox' ? el.checked : el.value;
     if (typeof DEFAULT_PREFS[el.name] === 'number') v = Number(v);
-    if (el.name === 'il') v = v === 'true' || v === true;
+    if (el.name === 'il') { v = v === 'true' || v === true; setPref('locationChosen', true); }
     setPref(el.name, v);
     if (el.name === 'font' && v === 'frank') setPref('taamim', false);
     const o = root.querySelector('#o-' + ({ size: 'size', lineHeight: 'lh', ttsRate: 'rate' })[el.name]); if (o) o.textContent = v;
@@ -362,7 +366,8 @@ function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 function fmt(html, isTanakh) {
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
     .replace(/\{([פס])\}/g, '<span class="pe" aria-hidden="true">$1</span>')
-    .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">');
+    .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">')
+    .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
   return s;
 }
@@ -435,13 +440,18 @@ function simchatTorahNote() {
     : `בשמחת תורה מסיימים את ״וזאת הברכה״ מעליית היום (${c.aliyahHe}) עד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום – ע״פ שיחת הרבי (תורת מנחם תשל״ב ח״א עמ׳ 129) ו״מנהגי חב״ד לשמחת תורה״ (chabad.org.il). בלוחות אחרים, כמו Chabad.org, מופיעה היום רק ״וזאת הברכה״.`;
   return `<aside class="day-note" role="note"><b>לתשומת לב:</b> ${esc(t)}</aside>`;
 }
+// A reader opened before the location was chosen (e.g. from a shared link): state which calendar is shown and why.
+function readerLocNote() {
+  if (prefs.locationChosen || R.unit !== 'chumash') return '';
+  return `<aside class="day-note" role="note"><b>לוח:</b> מוצג לפי לוח ${locLabel(prefs.il)} – ברירת מחדל לפי אזור הזמן של המכשיר, כי עדיין לא נבחר לוח. ${isDivergent(R.iso, 'chumash') ? 'השבוע הפרשה שונה בין ארץ ישראל לחוץ לארץ. ' : ''}אפשר לבחור בעמוד הבית או בהגדרות.</aside>`;
+}
 async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
   let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   const allText = d.blocks.filter(b => b.text).map(b => b.text).join(' ');
-  html += simchatTorahNote();
+  html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
   const main = { chumash: [['חומש', srcs.tanakh], showRashi && ['רש״י', srcs.rashi && { ...srcs.rashi, versionTitleInHebrew: 'מהדורת רוזנבאום–זילברמן (1929–1934)' }]], tehillim: [['תהילים', srcs.tanakh]],
@@ -452,7 +462,8 @@ async function renderDoc() {
   let open = false;
   for (const b of d.blocks) {
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
-    const num = b.num ? `<span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
+    // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
+    const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
     if (inline) {
       if (!open) { html += '<p>'; open = true; }
       html += `<span class="seg inline" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${num}<span class="t">${fmt(b.text, true)}</span></span> `;
@@ -491,6 +502,32 @@ function chromePad() {
   const top = imm ? 0 : $('#rt').offsetHeight, bot = imm ? ($('#rb').classList.contains('speaking') ? $('#rb').offsetHeight : 0) : $('#rb').offsetHeight;
   return { top: Math.max(top, 8) + 14, bottom: Math.max(bot, 8) + 14 };
 }
+// round 4: no Rashi stub at a page edge. A Rashi block that the column flow split is moved whole to the next page
+// when it is short (≤45% of a page) and moving it leaves at most a quarter of the page empty; a longer one that would
+// start with only a line or two at the foot of a page starts on the next page instead. Inside a long block, a
+// comment split into a lone line before or after the break is kept whole. A few passes, since each move shifts
+// what follows.
+function keepRashi(rc, colH) {
+  const blocks = [...rc.querySelectorAll('.rashi')];
+  for (const r of blocks) { r.classList.remove('keep', 'brk'); for (const q of r.children) q.classList.remove('pk'); }
+  for (let pass = 0; pass < 4; pass++) {
+    let moved = 0;
+    for (const r of blocks) {
+      if (r.classList.contains('keep') || r.classList.contains('brk')) continue;
+      const rs = [...r.getClientRects()];
+      if (rs.length < 2) continue;
+      const lh = parseFloat(getComputedStyle(r).lineHeight) || 24;
+      if (rs.reduce((a, x) => a + x.height, 0) <= colH * 0.45 && rs[0].height <= colH * 0.25) { r.classList.add('keep'); moved++; continue; }
+      if (rs[0].height < lh * 2.6) { r.classList.add('brk'); moved++; continue; }
+      for (const q of r.children) {
+        const qs = [...q.getClientRects()];
+        if (qs.length > 1 && !q.classList.contains('pk') && (qs[0].height < lh * 1.6 || qs.at(-1).height < lh * 1.6)
+          && qs.reduce((a, x) => a + x.height, 0) <= colH * 0.5) { q.classList.add('pk'); moved++; }
+      }
+    }
+    if (!moved) break;
+  }
+}
 function layout() {
   const vp = $('#vp'), rc = $('#rc'), pad = chromePad();
   vp.className = 'r-viewport ' + prefs.layout;
@@ -501,6 +538,7 @@ function layout() {
     rc.style.paddingTop = pad.top + 'px'; rc.style.paddingBottom = pad.bottom + 'px';
     rc.classList.toggle('ragged', g.ragged); vp.classList.toggle('spread', g.spread);
     vp.style.setProperty('--pad-top', pad.top + 'px'); vp.style.setProperty('--pad-bottom', pad.bottom + 'px');
+    keepRashi(rc, vp.clientHeight - pad.top - pad.bottom);
     const end = $('#endmark');
     const prevT = rc.style.transform; rc.style.transition = 'none'; rc.style.transform = 'none';
     const rcR = rc.getBoundingClientRect().right, endL = end ? end.getBoundingClientRect().left : rcR - g.P;
@@ -736,7 +774,7 @@ document.addEventListener('keydown', e => {
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
   return R.segs.map(s => {
-    const parts = [s.querySelector('.t').innerHTML.replace(/<span class="(vn|hn|ketiv)[^>]*>.*?<\/span>/g, '')];
+    const parts = [s.querySelector('.t').innerHTML.replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
@@ -811,6 +849,7 @@ function closeReader() {
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }
 
+if (!prefs.locationChosen) prefs.il = guessIsrael();  // stated default until the reader chooses (not saved as a choice)
 applyPrefs();
 route();
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {

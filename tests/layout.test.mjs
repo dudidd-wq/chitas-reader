@@ -145,7 +145,7 @@ test('any word (here in Tanya, which has no glossary) can be selected and looked
   } finally { await b.close(); srv.close(); }
 });
 
-test('round 3: at 320×568 portrait page 1 is filled – the title block is compact and a Rashi block continues onto page 2', { skip: !CHROME && 'no Chrome' }, async () => {
+test('round 3+4: at 320×568 portrait page 1 is well filled (compact title) and no Rashi block leaves a stub at a page edge', { skip: !CHROME && 'no Chrome' }, async () => {
   const srv = await serve(); const b = await launch();
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 320, height: 568 } });
@@ -155,10 +155,34 @@ test('round 3: at 320×568 portrait page 1 is filled – the title block is comp
       const padB = parseFloat(getComputedStyle(rc).paddingBottom), bottom = vp.bottom - padB;
       const onPage1 = [...rc.querySelectorAll('.t, .rashi p')].flatMap(e => [...e.getClientRects()]).filter(x => x.left >= vp.left - 1 && x.right <= vp.right + 1);
       const rashi = document.querySelector('.seg .rashi p');
-      return { fill: (Math.max(...onPage1.map(x => x.bottom)) - vp.top) / (bottom - vp.top), rashiCols: new Set([...rashi.getClientRects()].map(x => Math.round(x.left))).size, kicker: getComputedStyle(document.querySelector('.doc-kicker') || document.body).display };
+      const lh = parseFloat(getComputedStyle(rashi).lineHeight);
+      // round 4: a short Rashi block is moved whole rather than split (it may leave up to a quarter of the page);
+      // any block that is split starts with at least 2.5 lines
+      const stubs = [...rc.querySelectorAll('.rashi')].filter(r => { const rs = r.getClientRects(); return rs.length > 1 && rs[0].height < lh * 2.5; }).length;
+      return { fill: (Math.max(...onPage1.map(x => x.bottom)) - vp.top) / (bottom - vp.top), stubs, kicker: getComputedStyle(document.querySelector('.doc-kicker') || document.body).display };
     });
-    assert.ok(r.fill > 0.9, `page 1 only ${Math.round(r.fill * 100)}% filled`);
-    assert.equal(r.rashiCols, 2, 'first Rashi should start on page 1 and continue on page 2');
+    assert.ok(r.fill > 0.75, `page 1 only ${Math.round(r.fill * 100)}% filled`);
+    assert.equal(r.stubs, 0, 'no Rashi stub at the foot of a page');
+    assert.equal(r.kicker, 'none');
     assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('round 4: no lone Rashi lines at a page edge (568×320 after the bars hide, 390×740, 320×568)', { skip: !CHROME && 'no Chrome' }, async () => {
+  const srv = await serve(); const b = await launch();
+  try {
+    for (const [w, h, iso] of [[568, 320, '2026-11-02'], [568, 320, '2026-02-06'], [390, 740, '2026-02-06'], [320, 568, '2026-11-03']]) {
+      const p = await pageWith(b, srv.url, { viewport: { width: w, height: h } });
+      await p.goto(srv.url + `#/r/chumash/${iso}`); await p.waitForSelector('.seg'); await p.waitForTimeout(w === 568 ? 3500 : 500);
+      // a split block starts with ≥2.5 lines; no comment is split leaving a single line on either side
+      const bad = await p.evaluate(() => [...document.querySelectorAll('.rashi')].flatMap(r => {
+        const rs = [...r.getClientRects()], lh = parseFloat(getComputedStyle(r).lineHeight);
+        const out = rs.length > 1 && rs[0].height < lh * 2.5 ? ['block starts with ' + Math.round(rs[0].height)] : [];
+        for (const q of r.children) { const qs = [...q.getClientRects()]; if (qs.length > 1 && (qs[0].height < lh * 1.5 || qs.at(-1).height < lh * 1.5)) out.push('comment ' + qs.map(x => Math.round(x.height)).join('/')); }
+        return out;
+      }));
+      assert.deepEqual(bad, [], `${w}×${h} ${iso}`);
+      await p.close();
+    }
   } finally { await b.close(); srv.close(); }
 });

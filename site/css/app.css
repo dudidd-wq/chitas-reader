@@ -184,7 +184,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .seg.inline { display: inline; margin: 0; }
 .r-content .vn, .r-content .hn { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .25em; vertical-align: .25em; }
 .r-content .rashi { font-size: .78em; line-height: 1.75; margin: .25em 0 .7em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 88%, var(--muted)); }
-.r-content .rashi p { margin: 0 0 .3em; orphans: 1; widows: 1; }
+.r-content .rashi p { margin: 0 0 .3em; orphans: 2; widows: 2; /* round 4: never a lone Rashi line at a page edge */ }
+.r-content .rashi.keep { break-inside: avoid; }
+.r-content .rashi.brk { break-before: column; }
+.r-content .rashi p.pk { break-inside: avoid; }
 .r-content .rashi .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
 .r-content b { font-weight: 700; }
 .r-content .ketiv { color: var(--muted); font-size: .8em; }

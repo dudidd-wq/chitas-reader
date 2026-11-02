@@ -155,6 +155,6 @@ export function buildDoc(plan, unit) {
 export async function describe(plan, unit) {
   if (unit === 'chumash') return plan.chumash.title;
   if (unit === 'tehillim') return plan.tehillim.title;
-  if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.subtitle; }
+  if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)
   return rambamTitle(plan[unit]);
 }
