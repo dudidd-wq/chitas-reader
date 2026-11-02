@@ -1,11 +1,11 @@
 // Service worker: app shell precache + cache-first for static text data.
 // VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs);
 // when texts are rebuilt the data cache name changes, the old cache is deleted on activate, and texts are re-fetched.
-const VERSION = '1.0.10';
+const VERSION = '1.0.11';
 const DATA_VERSION = 'd02e9101f9a2';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
-const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/vendor/hebcal.js',
+const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/layout.js', 'js/vendor/hebcal.js',
   'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(SHELL).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())); });

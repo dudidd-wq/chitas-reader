@@ -4,7 +4,7 @@ export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both',
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsContinuous: true,
-  ttsLockscreen: true, wakeLock: true,
+  ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
 };
 function load() {
   try { const d = JSON.parse(localStorage.getItem(KEY) || '{}'); return { prefs: { ...DEFAULT_PREFS, ...(d.prefs || {}) }, progress: d.progress || {} }; }

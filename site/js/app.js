@@ -5,6 +5,7 @@ import { prefs, setPref, getProgress, setProgress, clearProgress, exportBackup, 
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices } from './tts.js';
 import { RE_TAAMIM } from './tts-prep.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
+import { pageGeometry } from './layout.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -53,16 +54,35 @@ function route() {
 window.addEventListener('hashchange', route);
 
 // ---------------- Home ----------------
-async function renderHome() {
+const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר' };
+const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const guessIsrael = () => { try { return /^Asia\/(Jerusalem|Tel_Aviv)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { return true; } };
+const locLabel = il => il ? 'ארץ ישראל' : 'חוץ לארץ';
+function locationPanel(first) {
+  const guess = first ? guessIsrael() : prefs.il;
+  return `<section class="locq" id="locq" aria-labelledby="locq-h">
+    <h2 id="locq-h">${first ? 'ברוכים הבאים! היכן אתם לומדים?' : 'בחירת לוח'}</h2>
+    <p>פרשת השבוע – ולכן שיעור החומש – שונה לעיתים בין ארץ ישראל לחוץ לארץ (כשיום טוב שני של גלויות חל בשבת). ${first ? 'אפשר לשנות זאת בכל עת בהגדרות.' : ''}</p>
+    <div class="locq-btns">
+      <button class="btn ${guess ? 'primary' : ''}" data-il="true">${PIN}ארץ ישראל</button>
+      <button class="btn ${guess ? '' : 'primary'}" data-il="false">${PIN}חוץ לארץ</button>
+    </div></section>`;
+}
+async function renderHome(showLoc = false) {
   const plan = dayPlan(currentDate, { il: prefs.il });
   const isToday = currentDate === todayIso();
+  const first = !prefs.locationChosen;
+  const units = unitsFor();
   const v = $('#view');
-  v.innerHTML = `<div class="wrap">
+  v.innerHTML = `<div class="wrap home">
     <header class="hero">
-      <p class="sub">${esc(plan.dayHe)}${isToday ? ' · היום' : ''}</p>
+      <p class="kicker">${esc(plan.dayHe)}${isToday ? ' · <b>היום</b>' : ''}</p>
       <h1 class="hd">${esc(plan.hebDate)}</h1>
       <p class="sub">${esc(gregHe(currentDate))} · פרשת ${esc(plan.weekParsha)}</p>
+      <button class="chip" id="loc" aria-expanded="${first || showLoc}" aria-controls="locq">${PIN}<span>לוח ${locLabel(prefs.il)}</span><span class="sr"> – שינוי</span></button>
     </header>
+    ${first || showLoc ? locationPanel(first) : ''}
     <nav class="datebar" aria-label="בחירת תאריך">
       <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם">${ICON.prev}<span>הקודם</span></a>
       <label class="sr" for="datepick">תאריך</label>
@@ -70,35 +90,45 @@ async function renderHome() {
       <a class="btn" href="#/d/${shiftIso(currentDate, 1)}" aria-label="היום הבא"><span>הבא</span>${ICON.next}</a>
       ${isToday ? '' : `<a class="btn today" href="#/d/${todayIso()}">חזרה להיום</a>`}
     </nav>
-    <section class="cards" aria-label="שיעורי היום">${unitsFor().map(u => `
-      <article class="card" id="card-${u}">
-        <h2>${esc(UNITS[u].he)}</h2>
-        <p class="what" data-what="${u}">…</p>
-        <p class="meta" data-meta="${u}"></p>
-        <a class="btn primary go" href="#/r/${u}/${currentDate}" data-go="${u}">פתח</a>
-        <div class="bar" aria-hidden="true"><i style="width:0"></i></div>
-      </article>`).join('')}
+    <section aria-labelledby="day-h">
+      <div class="dayhead"><h2 id="day-h">שיעורי היום</h2><span id="daysum" class="daysum"></span></div>
+      <ol class="cards">${units.map(u => `
+      <li class="card" id="card-${u}" data-unit="${u}">
+        <a class="card-link" href="#/r/${u}/${currentDate}" data-go="${u}">
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="16"/><circle class="ring" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="0 100"/></svg><span class="glyph">${UNIT_MARK[u]}</span><span class="tick">${CHECK}</span></span>
+          <span class="body"><span class="ttl">${esc(UNITS[u].he)}</span><span class="what" data-what="${u}">…</span><span class="meta" data-meta="${u}"></span></span>
+          <span class="go" data-btn>פתח</span>
+        </a>
+      </li>`).join('')}
+      </ol>
     </section>
-    <div class="links">
+    <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
-      <a class="btn" href="#/settings">הגדרות</a>
-      <a class="btn" href="#/sources">מקורות ורישיונות</a>
-      <a class="btn" href="#/about">אודות ומגבלות</a>
-    </div>
-    <p class="note">${prefs.il ? 'לוח לפי מנהג ארץ ישראל' : 'לוח לפי חוץ לארץ'} · הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
+      <nav class="links" aria-label="קישורים">
+        <a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+      </nav>
+      <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
+    </footer>
   </div>`;
   $('#datepick').addEventListener('change', e => { if (e.target.value) location.hash = '#/d/' + e.target.value; });
   $('#dl30').addEventListener('click', downloadAhead);
-  for (const u of unitsFor()) {
+  $('#loc').addEventListener('click', () => { renderHome(!showLoc && !first); if (!showLoc && !first) $('#locq [data-il]')?.focus(); });
+  v.querySelectorAll('#locq [data-il]').forEach(b => b.addEventListener('click', () => {
+    setPref('il', b.dataset.il === 'true'); setPref('locationChosen', true);
+    renderHome(); toast(`הלוח מוצג לפי ${locLabel(prefs.il)}`); $('#loc')?.focus();
+  }));
+  let done = 0;
+  for (const u of units) {
     const p = getProgress(currentDate, u);
-    const card = $('#card-' + u), btn = card.querySelector('[data-go]'), meta = card.querySelector('[data-meta]');
+    const card = $('#card-' + u), btn = card.querySelector('[data-btn]'), meta = card.querySelector('[data-meta]');
     const frac = p ? (p.done ? 1 : p.frac || 0) : 0;
-    card.querySelector('.bar i').style.width = Math.round(frac * 100) + '%';
-    if (p?.done) { card.classList.add('done'); meta.textContent = '✓ נלמד'; btn.textContent = 'קרא שוב'; }
-    else if (p && p.frac > 0.01) { meta.textContent = `נקרא ${Math.round(p.frac * 100)}%`; btn.textContent = 'המשך'; }
-    btn.setAttribute('aria-label', `${btn.textContent} – ${UNITS[u].he}`);
-    describe(plan, u).then(t => { card.querySelector('[data-what]').textContent = t; }).catch(() => { card.querySelector('[data-what]').textContent = 'שגיאה בטעינה – בדקו חיבור'; });
+    card.querySelector('.ring').setAttribute('stroke-dasharray', `${Math.round(frac * 100)} 100`);
+    if (p?.done) { done++; card.classList.add('done'); meta.textContent = 'נלמד'; btn.textContent = 'קרא שוב'; }
+    else if (p && p.frac > 0.01) { card.classList.add('started'); meta.textContent = `נקרא ${Math.round(p.frac * 100)}%`; btn.textContent = 'המשך'; }
+    describe(plan, u).then(t => { card.querySelector('[data-what]').textContent = t; })
+      .catch(() => { card.querySelector('[data-what]').textContent = 'שגיאה בטעינה – בדקו חיבור'; });
   }
+  $('#daysum').textContent = done === units.length ? 'כל השיעורים נלמדו · יישר כח!' : `${done} מתוך ${units.length} נלמדו`;
 }
 
 // Quietly keep today + the next two days available offline (the service worker caches every data file fetched).
@@ -139,7 +169,8 @@ function displayForm() {
     <small>פרנק־רוהל אינו כולל טעמי מקרא; בבחירתו הטעמים מוסתרים.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
-  <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}</fieldset>
+  <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}
+    ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
@@ -261,15 +292,18 @@ async function openReader(unit, iso) {
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
   R.unit = unit; R.iso = iso; R.page = 0;
   el.innerHTML = `
-  <div class="r-top">
+  <header class="r-top" id="rt">
     <a class="btn ghost" href="#/d/${iso}" aria-label="חזרה לדף הבית">${ICON.back}</a>
     <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${esc(plan.hebDate)}</small></div>
-    <button class="btn ghost" id="b-tts" aria-label="הקראה">${ICON.speak}</button>
-    <button class="btn ghost" id="b-aa" aria-label="הגדרות תצוגה">${ICON.aa}</button>
-    <button class="btn ghost" id="b-full" aria-label="מסך מלא">${ICON.full}</button>
-  </div>
-  <div class="r-viewport ${prefs.layout}" id="vp"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article></div>
-  <div class="r-bottom" id="rb">
+    <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
+    <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
+    <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
+    <button class="btn ghost" id="b-tts" aria-label="הקראה" aria-haspopup="dialog">${ICON.speak}</button>
+    <button class="btn ghost" id="b-aa" aria-label="הגדרות תצוגה" aria-haspopup="dialog">${ICON.aa}</button>
+    <button class="btn ghost" id="b-full" aria-label="מסך מלא – הסתרת הסרגלים">${ICON.full}</button>
+  </header>
+  <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
+  <footer class="r-bottom" id="rb" aria-label="דפדוף והקראה">
     <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
     <button class="btn ghost" id="b-prev" aria-label="עמוד קודם">${ICON.prev}</button>
     <span class="pageinfo" id="pinfo" aria-live="polite"></span>
@@ -283,9 +317,9 @@ async function openReader(unit, iso) {
     </div>
     <span style="flex:1" id="spacer"></span>
     <button class="btn ghost" id="b-next" aria-label="עמוד הבא">${ICON.next}</button>
-  </div>
+  </footer>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
-  <div class="sheet" id="sheet" hidden role="dialog" aria-label="הגדרות"></div>`;
+  <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
   bindReaderUi();
   try {
     R.doc = await buildDoc(plan, unit);
@@ -305,7 +339,7 @@ async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
-  let html = `<h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p>`;
+  let html = `<header class="doc-head"><p class="doc-kicker">${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
   const allText = d.blocks.filter(b => b.text).map(b => b.text).join(' ');
   if (niqqudRatio(allText) < 0.3) html += `<p class="unvoc">טקסט זה אינו מנוקד – לא נמצאה לו גרסה מנוקדת ברישיון פתוח.</p>`;
   let open = false;
@@ -339,26 +373,37 @@ function nextUnit(autoplay) {
 }
 
 // layout: page geometry
+// The text area is padded by the chrome that is actually visible (none in immersive mode), so hiding the bars
+// re-paginates into the freed space. Wide landscape screens get a two-page spread; narrow measures are set
+// ragged (start-aligned) because justifying ~4 words per line leaves wide gaps.
+function chromePad() {
+  const el = $('#reader'), imm = el.classList.contains('immersive');
+  const top = imm ? 0 : $('#rt').offsetHeight, bot = imm ? ($('#rb').classList.contains('speaking') ? $('#rb').offsetHeight : 0) : $('#rb').offsetHeight;
+  return { top: Math.max(top, 8) + 14, bottom: Math.max(bot, 8) + 14 };
+}
 function layout() {
-  const vp = $('#vp'), rc = $('#rc');
+  const vp = $('#vp'), rc = $('#rc'), pad = chromePad();
   vp.className = 'r-viewport ' + prefs.layout;
   if (prefs.layout === 'pages') {
-    const W = vp.clientWidth;
-    const fs = prefs.size;
-    const P = Math.min(W - 40, Math.round(fs * 30));
-    const gap = W - P;
-    rc.style.width = P + 'px'; rc.style.columnWidth = P + 'px'; rc.style.columnGap = gap + 'px';
-    rc.style.right = gap / 2 + 'px'; rc.style.left = 'auto';
+    const W = vp.clientWidth, g = pageGeometry({ W, H: vp.clientHeight, size: prefs.size, spreadPref: prefs.spread });
+    rc.style.width = g.P + 'px'; rc.style.columnWidth = g.P + 'px'; rc.style.columnGap = g.gap + 'px';
+    rc.style.right = g.gap / 2 + 'px'; rc.style.left = 'auto';
+    rc.style.paddingTop = pad.top + 'px'; rc.style.paddingBottom = pad.bottom + 'px';
+    rc.classList.toggle('ragged', g.ragged); vp.classList.toggle('spread', g.spread);
+    vp.style.setProperty('--pad-top', pad.top + 'px'); vp.style.setProperty('--pad-bottom', pad.bottom + 'px');
     const end = $('#endmark');
-    const rcR = rc.getBoundingClientRect().right + R.page * W; // undo transform
-    const endL = end ? end.getBoundingClientRect().left + R.page * W : 0;
-    R.W = W;
-    R.pages = Math.max(1, Math.round((rcR - endL - P) / W) + 1);
-    if (R.pages < 1 || !isFinite(R.pages)) R.pages = 1;
+    const prevT = rc.style.transform; rc.style.transition = 'none'; rc.style.transform = 'none';
+    const rcR = rc.getBoundingClientRect().right, endL = end ? end.getBoundingClientRect().left : rcR - g.P;
+    rc.style.transform = prevT; void rc.offsetWidth; rc.style.transition = '';
+    const step = g.spread ? W / 2 : W;
+    R.W = W; R.spread = g.spread;
+    R.cols = Math.max(1, Math.floor((rcR - endL - g.P) / step + 0.02) + 1);
+    R.pages = g.spread ? Math.ceil(R.cols / 2) : R.cols;
     R.page = Math.min(R.page, R.pages - 1);
     setPage(R.page, false);
   } else {
-    rc.style.cssText = '';
+    rc.style.cssText = ''; rc.classList.toggle('ragged', pageGeometry({ W: Math.min(vp.clientWidth, prefs.size * 34), H: 1, size: prefs.size, spreadPref: false }).ragged);
+    rc.style.paddingTop = pad.top + 'px'; rc.style.paddingBottom = (pad.bottom + 40) + 'px';
     updateProgress();
   }
 }
@@ -386,11 +431,12 @@ function updateProgress(save = true) {
   let frac;
   if (prefs.layout === 'pages') {
     frac = R.pages <= 1 ? 1 : R.page / (R.pages - 1);
-    $('#pinfo').textContent = `עמוד ${R.page + 1} מתוך ${R.pages}`;
+    const a = R.spread ? 2 * R.page + 1 : R.page + 1, b = R.spread ? Math.min(2 * R.page + 2, R.cols) : a;
+    $('#pinfo').textContent = $('#pinfo2').textContent = a === b ? `עמוד ${a} מתוך ${R.cols}` : `עמודים ${a}–${b} מתוך ${R.cols}`;
   } else {
     const vp = $('#vp'); const max = vp.scrollHeight - vp.clientHeight;
     frac = max <= 0 ? 1 : vp.scrollTop / max;
-    $('#pinfo').textContent = `${Math.round(frac * 100)}%`;
+    $('#pinfo').textContent = $('#pinfo2').textContent = `${Math.round(frac * 100)}%`;
   }
   $('#pbar').style.width = $('#tbar').style.width = (frac * 100).toFixed(1) + '%';
   if (!save || !R.doc) return;
@@ -402,14 +448,20 @@ function updateProgress(save = true) {
 }
 function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
-  const toggleChrome = force => el.classList.toggle('immersive', force);
-  $('#b-prev').onclick = () => turn(-1);
-  $('#b-next').onclick = () => turn(1);
+  const toggleChrome = force => {
+    const before = el.classList.contains('immersive'), after = el.classList.toggle('immersive', force);
+    if (before === after || !R.doc) return;
+    const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false);
+  };
+  R.toggleChrome = toggleChrome;
+  $('#b-prev').onclick = $('#b-prev2').onclick = () => turn(-1);
+  $('#b-next').onclick = $('#b-next2').onclick = () => turn(1);
   $('#b-full').onclick = () => {
     if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
     else if (document.fullscreenElement) document.exitFullscreen();
     toggleChrome(true);
   };
+  $('#b-full').setAttribute('aria-pressed', 'false');
   $('#b-aa').onclick = () => openSheet('display');
   $('#b-tts').onclick = () => openSheet('tts');
   vp.addEventListener('scroll', () => { if (prefs.layout === 'scroll') updateProgress(); }, { passive: true });
@@ -456,21 +508,39 @@ let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); re
 
 function openSheet(kind) {
   const sh = $('#sheet');
-  sh.innerHTML = `<h2>${kind === 'tts' ? 'הקראה' : 'תצוגה'}<button class="btn ghost" id="sh-x" aria-label="סגירה">${ICON.close}</button></h2>
+  if (sh.hidden) R.sheetOpener = document.activeElement;
+  sh.innerHTML = `<h2><span id="sh-title">${kind === 'tts' ? 'הקראה' : 'תצוגה'}</span><button class="btn ghost" id="sh-x" aria-label="סגירה">${ICON.close}</button></h2>
     <form class="form" onsubmit="return false">${kind === 'tts' ? `<button class="btn primary" id="sh-play" type="button">${R.speaker?.state === 'playing' ? 'השהה הקראה' : 'התחל הקראה מהעמוד הנוכחי'}</button>` + ttsForm() : displayForm()}</form>`;
   sh.hidden = false;
+  for (const id of ['#rt', '#vp', '#rb']) $(id).inert = true;
   $('#sh-x').onclick = closeSheet;
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
     if (['taamim', 'rashi', 'gloss', 'font'].includes(name)) { const s = currentSeg()?.dataset.id; await renderDoc(); if (s) goToSeg(s, false); }
-    else if (['size', 'lineHeight', 'layout'].includes(name)) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
+    else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') R.speaker?.setRate(prefs.ttsRate);
   });
 }
-function closeSheet() { $('#sheet').hidden = true; }
+function closeSheet() {
+  const sh = $('#sheet'); if (sh.hidden) return;
+  sh.hidden = true;
+  for (const id of ['#rt', '#vp', '#rb']) if ($(id)) $(id).inert = false;
+  const o = R.sheetOpener; R.sheetOpener = null;
+  if (o?.isConnected && !o.closest('[hidden]')) o.focus(); else $('#b-aa')?.focus();
+}
+// Focus trap for the modal sheet (Tab / Shift+Tab cycle inside it).
+document.addEventListener('keydown', e => {
+  const sh = $('#sheet'); if (e.key !== 'Tab' || !sh || sh.hidden) return;
+  const f = [...sh.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(x => !x.disabled && x.getClientRects().length);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (!sh.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
 
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
@@ -500,7 +570,9 @@ async function ttsToggle() {
     },
     onState: st => {
       $('#ttsctl').hidden = st === 'stopped' && !R.ttsShown;
+      const was = $('#rb').classList.contains('speaking');
       $('#rb').classList.toggle('speaking', st !== 'stopped');
+      if (was !== (st !== 'stopped') && $('#reader').classList.contains('immersive')) { const s = currentSeg()?.dataset.id; layout(); if (s) goToSeg(s, false); }
       $('#t-play').innerHTML = st === 'playing' ? ICON.pause : ICON.play;
       $('#t-play').setAttribute('aria-label', st === 'playing' ? 'השהה' : 'הפעל');
       if (st === 'stopped') R.segs.forEach(s => s.classList.remove('speaking'));
