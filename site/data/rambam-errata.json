@@ -1,0 +1,343 @@
+{
+ "meta": {
+  "edition": "Torat Emet 363 (Sefaria) and, for the Introduction, Wikisource",
+  "fixes": 31,
+  "halachot": 24,
+  "method": "niqqud-only corrections; consonants identical to Sefaria \"Wikisource Mishneh Torah\"; corrected form = the form this edition uses elsewhere (\"elsewhere\" = occurrences); checked by hand",
+  "doc": "verification/RAMBAM-ERRATA.md",
+  "wikisourceConsonantsChecked": 14,
+  "scans": {
+   "niqqud": {
+    "halachotFlagged": 2279,
+    "halachotWith3plus": 104,
+    "wordsFlagged": 2847,
+    "method": "rare vocalisation (<=2) of consonants vocalised one way >=8 times elsewhere in the same edition; for human review only"
+   },
+   "wikisource": {
+    "halachot": 14284,
+    "identical": 9287,
+    "withDiff": 4997,
+    "missing": 83,
+    "diffs": 8247,
+    "abbreviationOrNumeral": 999,
+    "singleWordSubstitutions": 890,
+    "nearIdenticalSubstitutions": 642,
+    "method": "word-level consonant comparison against Sefaria \"Wikisource Mishneh Torah\" after removing niqqud, punctuation, parenthesised verse citations and the matres ו/י; every difference is listed for human review, none is applied automatically"
+   }
+  }
+ },
+ "fixes": {
+  "Forbidden_Intercourse.14.1": [
+   {
+    "from": "לִהִתְגַּיֵּר",
+    "to": "לְהִתְגַּיֵּר",
+    "elsewhere": {
+     "לְהִתְגַּיֵּר": 5
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Forbidden_Foods.12.1": [
+   {
+    "from": "שִׁאוֹסֵר",
+    "to": "שֶׁאוֹסֵר",
+    "elsewhere": {
+     "שֶׁאוֹסֵר": 1
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Robbery_and_Lost_Property.15.1": [
+   {
+    "from": "בֵּין שִׁאִין בָּהּ",
+    "to": "בֵּין שֶׁאֵין בָּהּ",
+    "elsewhere": {
+     "שֶׁאֵין": 2656
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Defilement_by_a_Corpse.19.1": [
+   {
+    "from": "כַּוְּרֶת שְׁהִיא",
+    "to": "כַּוְּרֶת שֶׁהִיא",
+    "elsewhere": {
+     "שֶׁהִיא": 862
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Foreign_Worship_and_Customs_of_the_Nations.3.4": [
+   {
+    "from": "כְּמוֹ שֵׁהוּא",
+    "to": "כְּמוֹ שֶׁהוּא",
+    "elsewhere": {
+     "שֶׁהוּא": 2471
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Sabbath.11.1": [
+   {
+    "from": "וְלֹא שׁוֹחִט בִּלְבַד",
+    "to": "וְלֹא שׁוֹחֵט בִּלְבַד",
+    "elsewhere": {
+     "שׁוֹחֵט": 39
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Ritual_Slaughter.14.1": [
+   {
+    "from": "דָּם שִׁחִיטַת",
+    "to": "דָּם שְׁחִיטַת",
+    "elsewhere": {
+     "שְׁחִיטַת": 32
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Offerings_for_Unintentional_Transgressions.10.13": [
+   {
+    "from": "קְדֵשַּׁת דָּמִים",
+    "to": "קְדֻשַּׁת דָּמִים",
+    "elsewhere": {
+     "קְדֻשַּׁת": 30
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction.11.2": [
+   {
+    "from": "לְהָרְגוֹֹ",
+    "to": "לְהָרְגוֹ",
+    "elsewhere": {
+     "לְהָרְגוֹ": 34
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Forbidden_Intercourse.1.11": [
+   {
+    "from": "וְלֹא מַלִקוֹת וִאֵין צָרִיךְ לוֹמַר מִיתָה. שֵׁאֵין זוֹ",
+    "to": "וְלֹא מַלְקוֹת וְאֵין צָרִיךְ לוֹמַר מִיתָה. שֶׁאֵין זוֹ",
+    "elsewhere": {
+     "מַלְקוֹת": 55,
+     "וְאֵין": 2420,
+     "מִיתָה": 164,
+     "שֶׁאֵין": 2656
+    },
+    "wikisourceConsonants": true
+   },
+   {
+    "from": "מִן הַתִּרוּמָה. וּבֵית דִּין מַכִּין אֵת שִׁנֵיהֵם מַכַּת מַרִדּוּת",
+    "to": "מִן הַתְּרוּמָה. וּבֵית דִּין מַכִּין אֶת שְׁנֵיהֶם מַכַּת מַרְדּוּת",
+    "elsewhere": {
+     "הַתְּרוּמָה": 108,
+     "אֶת": 4946,
+     "שְׁנֵיהֶם": 253,
+     "מַרְדּוּת": 132
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Foundations_of_the_Torah.5.8": [
+   {
+    "from": "בְּחָלָב שֵׁהֵן אֲסוּרִים אֲפִלּוּ שֵׁלֹּא דֵּרֵךְ הֲנָאָתָן",
+    "to": "בְּחָלָב שֶׁהֵן אֲסוּרִים אֲפִלּוּ שֶׁלֹּא דֶּרֶךְ הֲנָאָתָן",
+    "elsewhere": {
+     "שֶׁהֵן": 889,
+     "שֶׁלֹּא": 3738,
+     "דֶּרֶךְ": 503
+    },
+    "wikisourceConsonants": true
+   },
+   {
+    "from": "שֶׁלֹּא דֶּרֵךְ הֲנָאָתָן אֵלָּא בִּמִקוֹם סַכָּנָה",
+    "to": "שֶׁלֹּא דֶּרֶךְ הֲנָאָתָן אֶלָּא בִּמְקוֹם סַכָּנָה",
+    "elsewhere": {
+     "דֶּרֶךְ": 503,
+     "אֶלָּא": 5045,
+     "בִּמְקוֹם": 126
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Marriage.3.8": [
+   {
+    "from": "לוֹמַר לָהֵם אַתֵּם עֵדַי. אֵלָּא כֵּיוָן שֵׁגֵּרֵשׁ אוֹ קִדֵּשׁ בִּפִנֵיהֵם הֲרֵי זוֹ מְקֻדֶּשֶׁת אוֹ מִגֹרֵשֵׁת",
+    "to": "לוֹמַר לָהֶם אַתֶּם עֵדַי. אֶלָּא כֵּיוָן שֶׁגֵּרֵשׁ אוֹ קִדֵּשׁ בִּפְנֵיהֶם הֲרֵי זוֹ מְקֻדֶּשֶׁת אוֹ מְגֹרֶשֶׁת",
+    "elsewhere": {
+     "לָהֶם": 698,
+     "אַתֶּם": 51,
+     "עֵדַי": 11,
+     "אֶלָּא": 5045,
+     "שֶׁגֵּרֵשׁ": 13,
+     "בִּפְנֵיהֶם": 81,
+     "מְגֹרֶשֶׁת": 135
+    },
+    "wikisourceConsonants": true
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.3": [
+   {
+    "from": "שְׁהִיא",
+    "to": "שֶׁהִיא",
+    "elsewhere": {
+     "שֶׁהִיא": 862
+    },
+    "wikisourceConsonants": null
+   },
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.4": [
+   {
+    "from": "שְׁהוּא",
+    "to": "שֶׁהוּא",
+    "elsewhere": {
+     "שֶׁהוּא": 2471
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.12": [
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.13": [
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.31": [
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.33": [
+   {
+    "from": "שְׁאֵין",
+    "to": "שֶׁאֵין",
+    "elsewhere": {
+     "שֶׁאֵין": 2656
+    },
+    "wikisourceConsonants": null
+   },
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.36": [
+   {
+    "from": "שְׁהוּא",
+    "to": "שֶׁהוּא",
+    "elsewhere": {
+     "שֶׁהוּא": 2471
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.39": [
+   {
+    "from": "שְׁהוּא",
+    "to": "שֶׁהוּא",
+    "elsewhere": {
+     "שֶׁהוּא": 2471
+    },
+    "wikisourceConsonants": null
+   },
+   {
+    "from": "שְׁאֵינוּ",
+    "to": "שֶׁאֵינוֹ",
+    "elsewhere": {
+     "שֶׁאֵינוֹ": 1104
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.40": [
+   {
+    "from": "שְׁהֶם",
+    "to": "שֶׁהֵם",
+    "elsewhere": {
+     "שֶׁהֵם": 128
+    },
+    "wikisourceConsonants": null
+   },
+   {
+    "from": "שְׁהֶן",
+    "to": "שֶׁהֵן",
+    "elsewhere": {
+     "שֶׁהֵן": 889
+    },
+    "wikisourceConsonants": null
+   },
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.41": [
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.42": [
+   {
+    "from": "אֵלָא",
+    "to": "אֶלָּא",
+    "elsewhere": {
+     "אֶלָּא": 5045
+    },
+    "wikisourceConsonants": null
+   }
+  ],
+  "Transmission_of_the_Oral_Law.1.44": [
+   {
+    "from": "שְׁהֶן",
+    "to": "שֶׁהֵן",
+    "elsewhere": {
+     "שֶׁהֵן": 889
+    },
+    "wikisourceConsonants": null
+   }
+  ]
+ }
+}

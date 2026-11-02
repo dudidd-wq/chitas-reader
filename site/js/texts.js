@@ -107,10 +107,24 @@ export async function rambamTitle(items) {
   for (const it of items) { const m = idx[it.name]; if (!books.has(m.he)) books.set(m.he, { m, chs: [] }); if (m.depth === 2) books.get(m.he).chs.push(...rambamChaptersFull(it, m).map(x => x[0])); }
   return [...books.entries()].map(([he, { chs }]) => chs.length ? `${he} ${chs.length > 1 ? 'פרקים' : 'פרק'} ${chapList(chs)}` : he).join(' · ');
 }
+/** Apply niqqud-only corrections [{from,to}] to one halacha. Matching is done on NFC (the data mixes mark orders). */
+export function applyErrata(text, list) {
+  if (!list?.length) return { text, applied: [] };
+  let t = text.normalize('NFC');
+  const applied = [];
+  for (const f of list) {
+    // whole words only (a Hebrew letter or mark on either side means a different word); every occurrence
+    const re = new RegExp(`(?<![\u05D0-\u05EA\u0591-\u05C7])${f.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\u05D0-\u05EA\u0591-\u05C7])`, 'g');
+    if (re.test(t)) { t = t.replace(re, f.to); applied.push({ from: f.from, to: f.to }); }
+  }
+  return applied.length ? { text: t, applied } : { text, applied };
+}
 async function rambamDoc(plan, unit) {
   const idx = await data('rambam/index.json');
   let src = {}; try { src = await data('sources.json'); } catch { /* offline and not cached: no credit line */ }
-  const blocks = [], credits = [];
+  // source-checked niqqud corrections (verification/RAMBAM-ERRATA.md), applied as an overlay so the source data stays untouched
+  let errata = {}; try { errata = (await data('rambam-errata.json')).fixes || {}; } catch { /* not cached offline: show the edition as is */ }
+  const blocks = [], credits = [], fixes = [];
   for (const it of plan[unit]) {
     const meta = idx[it.name];
     for (const [c, a, b] of rambamChaptersFull(it, meta)) {
@@ -120,10 +134,16 @@ async function rambamDoc(plan, unit) {
       const ov = src.rambamChapterOverrides?.[`${it.name} ${c}`] || src.rambamOverrides?.[it.name];
       if (ov && !/Torat Emet/.test(ov.versionTitle) && !credits.some(x => x.label === label)) credits.push({ label, ...ov });
       blocks.push({ type: 'h', text: label });
-      for (let s = a; s <= Math.min(b, d.s.length); s++) if (d.s[s - 1]?.trim()) blocks.push({ type: 'p', id: `${meta.slug}.${c}.${s}`, num: gem(s), text: d.s[s - 1], src: 'rambam', srcName: it.name });
+      for (let s = a; s <= Math.min(b, d.s.length); s++) {
+        if (!d.s[s - 1]?.trim()) continue;
+        const id = `${meta.slug}.${c}.${s}`;
+        const { text, applied } = applyErrata(d.s[s - 1], errata[id]);
+        for (const f of applied) fixes.push({ id, label: `${label}, הלכה ${gem(s)}`, ...f });
+        blocks.push({ type: 'p', id, num: gem(s), text, src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}) });
+      }
     }
   }
-  return { title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits };
+  return { title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits, fixes };
 }
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);
