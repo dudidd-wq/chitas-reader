@@ -31,7 +31,7 @@ test('every portion resolves to non-empty text (both Israel and diaspora)', asyn
         if (unit === 'siddur') continue; // not a daily portion (tests/siddur.test.mjs)
         if (il && unit !== 'chumash') continue; // only Chumash depends on location
         const doc = await buildDoc(plan, unit);
-        const segs = doc.blocks.filter(b => b.type !== 'h');
+        const segs = doc.blocks.filter(b => b.type !== 'h' && b.type !== 'notes'); // notes: separate study-notes section (tests/study-notes.test.mjs)
         assert.ok(segs.length > 0, `${plan.iso} ${unit} empty`);
         for (const b of segs) {
           assert.equal(typeof b.text, 'string', `${plan.iso} ${unit} ${b.id} missing`);
