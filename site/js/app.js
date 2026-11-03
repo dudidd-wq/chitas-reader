@@ -1144,13 +1144,22 @@ function updateProgress(save = true) {
   }
   $('#pbar').style.width = $('#tbar').style.width = (frac * 100).toFixed(1) + '%';
   if (!save || !R.doc) return;
+  // 1.0.57: a page turn is a discrete step – the siddur's address, subtitle and section follow it at once (they used
+  // to lag 400 ms behind, so a quick second turn or a refresh right after a turn acted on the previous section)
+  if (prefs.layout === 'pages') siddurTrack();
   clearTimeout(R.saveT);
-  R.saveT = setTimeout(() => {
+  R.saveFn = () => {
+    R.saveT = null; R.saveFn = null;
     if (!R.doc || $('#reader').hidden) return;
     siddurTrack();
     setProgress(...pk(), { sec: null, ...anchor(), frac, done: frac >= 0.995 });
-  }, 400);
+  };
+  R.saveT = setTimeout(R.saveFn, 400);
 }
+// 1.0.57: a refresh, closing the app or switching away inside the 400 ms save delay still keeps the place just reached
+function flushProgress() { if (R.saveFn) { clearTimeout(R.saveT); R.saveFn(); } }
+window.addEventListener('pagehide', flushProgress);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushProgress(); });
 // round 4: up to 440 px tall, so large phones on their side (390–430 px tall) also get the whole height
 const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 440px)');
 const AUTO_HIDE_MS = 2500;

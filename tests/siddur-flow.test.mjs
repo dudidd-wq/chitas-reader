@@ -91,6 +91,27 @@ for (const [w, h] of [[390, 800], [320, 568], [568, 320], [1366, 800]]) {
   });
 }
 
+// 1.0.57: the address follows a page turn at once (it lagged 400 ms, so a quick second turn overshot the section's start),
+// and a refresh right after a turn – inside the save delay – still comes back to the page just reached
+for (const [w, h] of [[320, 568], [390, 800]]) {
+  test(`${w}x${h}: the address follows a page turn at once; an immediate refresh keeps the page`, { skip }, async () => {
+    const p = await pageWith(browser, srv.url, { viewport: { width: w, height: h } });
+    await open(p, '#/s/shacharit/4');
+    assert.ok(await inView(p, '#sec-4'));
+    await p.keyboard.press('ArrowRight'); await p.waitForTimeout(60);
+    assert.equal(await p.evaluate(() => location.hash), '#/s/shacharit/3', 'back one page: section 3 at once');
+    await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
+    assert.equal(await p.evaluate(() => location.hash), '#/s/shacharit/4', 'forward again: section 4 at once');
+    await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
+    const at = await p.textContent('#pinfo');
+    await p.reload(); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(600);
+    assert.equal(await p.evaluate(() => location.hash), '#/s/shacharit/4');
+    assert.equal(await p.textContent('#pinfo'), at, 'a refresh right after a page turn keeps that page');
+    assert.deepEqual(p.errors, []);
+    await p.context().close();
+  });
+}
+
 test('scroll mode: one continuous column, the address follows the section on screen', { skip }, async () => {
   const p = await pageWith(browser, srv.url, { prefs: { layout: 'scroll' } });
   await open(p, '#/s/kabbalat/2');
