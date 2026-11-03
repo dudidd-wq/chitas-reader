@@ -5,7 +5,8 @@
   "scripts": {
     "data-version": "node tools/data-version.mjs",
     "vendor": "esbuild tools/vendor-entry.mjs --bundle --format=esm --minify --legal-comments=eof --outfile=site/js/vendor/hebcal.js && node tools/third-party-notices.mjs",
-    "data": "node tools/build-data.mjs all && node tools/patch-missing-chapters.mjs && node tools/data-version.mjs",
+    "data": "node tools/build-data.mjs all && node tools/patch-missing-chapters.mjs && node tools/build-search.mjs && node tools/data-version.mjs",
+    "search": "node tools/build-search.mjs && node tools/data-version.mjs",
     "glossary": "node tools/build-glossary.mjs",
     "rss": "node tools/fetch-chabad-rss.mjs",
     "test": "node --test tests/*.test.mjs",

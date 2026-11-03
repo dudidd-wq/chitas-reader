@@ -18,8 +18,9 @@ export function fullName(html) {
     const L = letters(w), sk = L.map(l => l.ch).join('');
     if (!RE_YY.test(sk)) return w;
     const y1 = L[L.length - 2].m, y2 = L[L.length - 1].m, bare = L.every(l => !l.m);
-    // the abbreviation is vocalised sheva + qamats (or not at all); anything else is another word
-    if (!bare && !(/\u05B8/.test(y2) && !/[^\u05B0\u05B8\u0591-\u05AF\u05BD]/.test(y1 + y2))) return w;
+    // the abbreviation is vocalised sheva + qamats, or only partly (יְי, יָי – also after a vocalised prefix, לַיי),
+    // or not at all; any other vowel on the two yods makes it another word
+    if (/[^\u05B0\u05B8\u0591-\u05AF\u05BD]/.test(y1 + y2)) return w;
     const pre = L.slice(0, -2).map(l => l.ch + l.m).join('');
     if (bare) return pre + 'יהוה';
     const lastM = L.length > 2 ? L[L.length - 3].m : '';

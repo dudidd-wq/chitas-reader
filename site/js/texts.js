@@ -117,7 +117,7 @@ async function optional(path) { try { return await data(path); } catch { return 
 async function tanyaDoc(plan) {
   const index = await data('tanya/index.json');
   const blocks = [];
-  for (const [k, c, a, b] of await tanyaPositions(plan)) {
+  for (const [k, c, a, b] of plan.positions || await tanyaPositions(plan)) {  // plan.positions: the library (a whole chapter)
     const d = await data(`tanya/${k}/${c}.json`);
     const multi = index[k].depth === 2 && index[k].chapters.length > 1;
     blocks.push({ type: 'h', text: index[k].he + (multi ? ` – ${k === 'IK' ? 'אגרת' : 'פרק'} ${gem(c)}` : '') + (a > 1 ? ' (המשך)' : '') });
@@ -275,6 +275,14 @@ async function ravDoc(plan) {
   if (word(d.t) && d.t[3] !== 1) blocks.push({ type: 'note', text: `לפי הלוח, השיעור מסתיים באמצע סעיף ${gem(d.t[1])}, במילים ״${d.t[2]}״. ההמשך נלמד מחר.` });
   blocks.push(credit);
   return { title: UNITS.ravyomi.full, subtitle: ravLabel(d), blocks, raw: true };
+}
+/** The library (js/library.js): one whole siman, with the same blocks (ids n.se.k) as the daily lesson. */
+export async function ravSimanDoc(n) {
+  const sm = await data(`ravyomi/s/${n}.json`), blocks = [];
+  blocks.push({ type: 'h', text: `סימן ${gem(n)}${sm.title ? ' – ' + sm.title.replace(/[,:]?\s*וּ?בוֹ\s.*$/, '') : ''}` });
+  sm.s.forEach((parts, i) => parts.forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${i + 1}.${k + 1}`, text: k ? t : `<b>${gem(i + 1)}</b> ${t}`, src: 'ravyomi' })));
+  blocks.push({ type: 'note', text: 'הטקסט: שולחן ערוך הרב, אורח חיים, המהדורה המנוקדת של הוצאת קה״ת, דרך ספריא (CC BY-NC). הערות השוליים וקונטרס אחרון אינם מוצגים.' });
+  return { title: UNITS.ravyomi.he, subtitle: `סימן ${gem(n)}`, blocks, raw: true };
 }
 export function buildDoc(plan, unit) {
   if (unit === 'chumash') return chumashDoc(plan);

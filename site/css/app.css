@@ -466,3 +466,39 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .zm-kivun a { display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; }
 .zm-kivun svg { width: 1.2em; height: 1.2em; }
 @media (prefers-reduced-motion: reduce) { .kv-dial #kv-rose, .kv-dial #kv-arrow { transition: none !important; } }
+
+/* ---- library (#/lib) and global search (#/search) ---- */
+.hero { position: relative; }
+.hero-tools { display: flex; justify-content: flex-end; gap: .25rem; margin: -.9rem 0 0; }
+.hero-tools .btn { min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
+.hero-tools svg { width: 22px; height: 22px; }
+.lib-fams { list-style: none; padding: 0; margin: 1rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: .6rem; }
+.lib-card { display: flex; flex-direction: column; gap: .2rem; min-height: 44px; padding: .7rem .9rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper); color: var(--ink); text-decoration: none; height: 100%; box-sizing: border-box; }
+.lib-card b { font-size: 1.1rem; color: var(--accent); }
+.lib-card span { color: var(--muted); font-size: .9rem; }
+.lib-card:hover, .lib-card:focus-visible { border-color: var(--accent); }
+.lib-crumbs { font-size: .9rem; color: var(--muted); margin: 0 0 .4rem; overflow-wrap: anywhere; }
+.lib-crumbs a { display: inline-flex; align-items: center; min-height: 44px; }
+.r-content .lib-crumbs { font-family: var(--ui); font-size: .55em; margin: 0 0 .1em; }
+.r-content .lib-crumbs a { min-height: 32px; }
+.lib-list { list-style: none; padding: 0; margin: .3rem 0; }
+.lib-list a { display: flex; align-items: center; min-height: 44px; padding: .15rem .3rem; border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+.lib-list small { color: var(--muted); margin-inline-start: .3rem; }
+.lib-grid { list-style: none; padding: 0; margin: .3rem 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); gap: .35rem; }
+.lib-grid a { display: flex; align-items: center; justify-content: center; min-height: 44px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); text-decoration: none; text-align: center; padding: .1rem .3rem; }
+.lib-grid a.done, .lib-list a.done { border-color: var(--accent); }
+.lib-grid a:focus-visible, .lib-list a:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.lib-sbar { display: flex; gap: .4rem; }
+.lib-sbar input { flex: 1; min-width: 0; }
+.lib-sbar .btn { min-height: 44px; flex: none; }
+.lib-sbar .btn svg { width: 20px; height: 20px; }
+.lib-scope { display: inline-block; margin-top: .6rem; font-weight: 600; }
+.lib-search select { min-height: 44px; border-radius: 10px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; padding: 0 .5rem; max-width: 100%; }
+.lib-search .note, .lib-note { text-align: start; }
+.lib-credits { margin-top: 1.4rem; font-size: .92rem; }
+.lib-save { margin-top: 1.2rem; }
+.gs-book h2 small { color: var(--muted); font-weight: 400; }
+.gs-hits p mark { background: var(--hl); color: inherit; border-radius: 3px; }
+.gs-more { min-height: 44px; margin: .2rem 0 .6rem; }
+.r-content .seg.seek-hit { background: var(--hl); border-radius: 4px; box-shadow: 0 0 0 .2em var(--hl); }
+@media (max-width: 420px) { .lib-sbar .btn span { display: none; } }

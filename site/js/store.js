@@ -72,7 +72,7 @@ export function importBackup(text) {
   if (d.app !== 'chitas-reader' || typeof d.progress !== 'object') throw new Error('bad file');
   for (const [k, v] of Object.entries(d.prefs || {})) if (k in DEFAULT_PREFS && typeof v === typeof DEFAULT_PREFS[k] && Array.isArray(v) === Array.isArray(DEFAULT_PREFS[k])) state.prefs[k] = v;
   if (Array.isArray(state.prefs.tehillimProfiles)) state.prefs.tehillimProfiles = state.prefs.tehillimProfiles.map(cleanProfile).filter(Boolean).slice(0, 50);
-  for (const [k, v] of Object.entries(d.progress)) if (/^\d{4}-\d\d-\d\d\|[a-z0-9]+(\|il|\|dl)?$/.test(k) && v && typeof v === 'object') state.progress[k] = v;
+  for (const [k, v] of Object.entries(d.progress)) if ((/^\d{4}-\d\d-\d\d\|[a-z0-9]+(\|il|\|dl)?$/.test(k) || /^siddur\|[a-z]+\/\d+$/.test(k) || /^lib\|[a-z]+(\/[A-Za-z0-9_-]+){1,3}$/.test(k)) && v && typeof v === 'object') state.progress[k] = v;
   save();
 }
 export function resetAll() { localStorage.removeItem(KEY); location.reload(); }

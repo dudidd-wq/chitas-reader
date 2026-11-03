@@ -14,6 +14,8 @@ import { CITIES, cityById, computeZmanim, fmtTime } from './zmanim.js';
 import { hebDateHe } from './calendar.js';
 import { renderKivun, stopKivun, COMPASS } from './kivun-ui.js';
 import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH } from './personal.js';
+import { libNode, libDoc, FAMILIES } from './library.js';
+import { renderLibrary, renderSearch, SEARCH_ICON, LIB_ICON } from './library-ui.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -137,15 +139,18 @@ function renderZmanim() {
 // ---------------- Router ----------------
 let currentDate = todayIso();
 function route() {
-  const h = location.hash.replace(/^#\/?/, '');
-  const [view, a, b] = h.split('/');
+  const [h, qs = ''] = location.hash.replace(/^#\/?/, '').split('?');
+  const [view, a, b] = h.split('/'), params = new URLSearchParams(qs);
+  libSeq++; // a pending library lookup is stale once the address changes
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
-  if (view !== 'r' && view !== 's') closeReader();
+  if (view !== 'r' && view !== 's' && view !== 'lib') closeReader();
   stopKivun();
   autoPrefetch();
   if (view === 'r' && UNITS[a] && a !== 'siddur') { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
-  if (view === 's' && /^[a-z]+$/.test(a) && /^\d+$/.test(b)) { openReader('siddur', currentDate, `${a}/${+b}`); return; }
+  if (view === 's' && /^[a-z]+$/.test(a) && /^\d+$/.test(b)) { openReader('siddur', currentDate, `${a}/${+b}`, params.get('s') ? { seek: params.get('s') } : null); return; }
+  if (view === 'lib') return libRoute(h.slice(4), params.get('s'));
+  if (view === 'search') { closeReader(); return renderSearch(params.get('q') || '', params.get('in') || '', { shell, $, prefs }); }
   if (view === 'siddur') return renderSiddur();
   if (view === 'kivun') return renderKivun({ prefs, setPref, esc, $, shell, PIN, zmanPlace });
   if (view === 'settings') return renderSettings();
@@ -157,6 +162,18 @@ function route() {
   renderHome();
 }
 window.addEventListener('hashchange', route);
+// #/lib → the list of books; #/lib/<node> → its list; #/lib/<chapter>[?s=<segment>] → the reader (same as the lessons)
+let libSeq = 0;
+async function libRoute(path, seek) {
+  path = decodeURIComponent(path || '').replace(/\/+$/, '');
+  const my = ++libSeq;
+  if (!path) { closeReader(); return renderLibrary('', libCtx()); }
+  let r = null; try { r = await libNode(path); } catch { /* the book's index is not cached and we are offline */ }
+  if (my !== libSeq) return;
+  if (r?.node.leaf) return openReader(r.node.unit, currentDate, null, { path, seek, info: r });
+  closeReader(); renderLibrary(path, libCtx());
+}
+const libCtx = () => ({ shell, $, getProgress, toast, prefs });
 
 // ---------------- Home ----------------
 const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ', tolt: 'ל', ravyomi: 'ש' };
@@ -200,6 +217,7 @@ async function renderHome(showLoc = false) {
   document.title = `חת״ת ורמב״ם – ${plan.hebDate} (${fmtDmy(currentDate)})`;
   v.innerHTML = `<div class="wrap home">
     <header class="hero">
+      <nav class="hero-tools" aria-label="ספרייה וחיפוש"><a class="btn ghost" href="#/lib" aria-label="ספרייה – כל הספרים">${LIB_ICON}</a><a class="btn ghost" href="#/search" aria-label="חיפוש בכל הספרים">${SEARCH_ICON}</a></nav>
       <p class="kicker">${esc(plan.dayHe)}${isToday ? ' · <b>היום</b>' : ''}</p>
       <h1 class="hd">${esc(plan.hebDate)}</h1>
       <p class="sub">${esc(gregHe(currentDate))} · פרשת ${esc(plan.weekParsha)}</p>
@@ -238,7 +256,7 @@ async function renderHome(showLoc = false) {
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/kivun">כיוון התפילה</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        <a href="#/lib">ספרייה</a><a href="#/search">חיפוש בספרים</a><a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/kivun">כיוון התפילה</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -546,6 +564,7 @@ async function renderSources() {
   const ov = Object.entries(s.rambamOverrides || {});
   $('.page').innerHTML = `<h1>מקורות ורישיונות</h1>
   <p>כל הטקסטים נלקחו דרך ה-API של <a href="https://www.sefaria.org" rel="noopener" target="_blank">ספריא</a> מגרסאות שהרישיון שלהן מתיר הצגה באתר חינמי זה: נחלת הכלל, CC BY-SA, ובתניא – <b>CC BY-NC (שימוש לא מסחרי בלבד</b>; זה אינו רישיון ״פתוח״ במובן המקובל, ולכן גם מי שמעתיק את האתר או את המאגר כפוף להגבלה זו לגבי התניא). הטקסטים נשמרו מראש כקבצים סטטיים ומוגשים מהאתר עצמו. לא נוסף ניקוד ידני ולא שונה נוסח.</p>
+  <p>ה<a href="#/lib">ספרייה</a> ו<a href="#/search">החיפוש</a> מציגים את אותם טקסטים בדיוק; אינדקס החיפוש (קבצי <bdi dir="ltr">data/search</bdi>) נבנה מהם מראש, נשמר באתר ובמכשיר בלבד, וכפוף לרישיון של כל ספר – כולל ״לשימוש לא מסחרי בלבד״ בתניא, בתורה אור ולקוטי תורה (וניקוד ״חסידות בהירה״) ובשולחן ערוך אדמו״ר הזקן.</p>
   <p>מעמד ״נחלת הכלל״ של גרסאות תורת אמת ורוזנבאום–זילברמן מבוסס על הסימון בספריא; לא בדקנו אותו באופן עצמאי.</p>
   <p>מסמכי הבדיקה (במאגר הקוד): <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">VERIFICATION.md</a> (לוח השיעורים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/GLOSSARY-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">GLOSSARY-VERIFICATION.md</a> (ביאור מילים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/RAMBAM-ERRATA.md" target="_blank" rel="noopener" dir="ltr">RAMBAM-ERRATA.md</a> (נוסח הרמב״ם), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/SIDDUR-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">SIDDUR-VERIFICATION.md</a> (הסידור), ו<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/README.md#data-licence" target="_blank" rel="noopener">הערת רישיון הנתונים</a>.</p>
   <p>גרסאות שמקורן באתר <a href="https://mechon-mamre.org/copy.htm" rel="noopener" target="_blank">מכון ממרא</a> אינן בשימוש: אף שבספריא הן מסומנות ״נחלת הכלל״, האתר עצמו מתיר שימוש פרטי לשם לימוד והוראה בלבד ואוסר להעתיק את החומר לאתר אחר. לכן ההקדמה למשנה תורה ומניין המצוות נלקחו מוויקיטקסט (CC BY-SA).</p>
@@ -620,6 +639,12 @@ function renderAbout() {
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li>
   <li><b>התאריך העברי מוצג לפי היום האזרחי:</b> לכל תאריך לועזי מוצג התאריך העברי של שעות היום שלו (חישוב של ספריית Hebcal). לפי ההלכה התאריך העברי מתחלף כבר בשקיעה, כך שבערב, אחרי השקיעה, כבר מתחיל התאריך העברי הבא – האתר אינו מחליף אותו בשקיעה.</li>
   <li>תאריכים לועזיים מוצגים בסדר הישראלי: יום/חודש/שנה (למשל <bdi dir="ltr">02/11/2026</bdi>) או ״2 בנובמבר 2026״.</li></ul>
+  <h2 id="about-lib">ספרייה וחיפוש</h2><ul>
+    <li>ב<a href="#/lib">ספרייה</a> אפשר לעיין בכל פרק של כל הספרים שבאתר – חומש עם רש״י, תהילים (150 הפרקים, וגם לפי ימי החודש והשבוע), תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה, שולחן ערוך אדמו״ר הזקן והסידור – בלי קשר ללוח: ספר ← חלק ← פרק, עם ״הקודם/הבא״ לפי סדר הספר (גם מספר לספר, למשל מסוף בראשית לתחילת שמות). הפרק נפתח באותו קורא, עם אותן הגדרות.</li>
+    <li>לכל פרק קישור קבוע (למשל <bdi dir="ltr">#/lib/torah/Genesis/1</bdi>, ולפסוק או להלכה – <bdi dir="ltr">?s=1:1</bdi>); פרק שנפתח פעם אחת – או ספר שנשמר בכפתור ״שמירה לשימוש ללא רשת״ בדף שלו – זמין גם בלי רשת.</li>
+    <li><b>עיון בספרייה אינו מסמן את שיעורי היום כנלמדו.</b> המקום והסימון ✓ של הספרייה נשמרים בנפרד, ברשימות הספרייה בלבד.</li>
+    <li><a href="#/search">חיפוש בכל הספרים</a>: עם ניקוד וטעמים או בלעדיהם, בלי תלות בגרש ובגרשיים, ובכתיב מלא או חסר (ו׳ ו־י׳ באמצע מילה); ״ה׳״ בחיפוש מוצא גם את השם המלא. התוצאות מקובצות לפי ספר, עם קטע מודגש וקישור לפסוק או להלכה. אפשר לצמצם לספר אחד.</li>
+    <li>החיפוש נעשה כולו במכשיר: האינדקס נבנה מראש מהטקסטים שבאתר, מחולק לפי ספר (כ־12 מגה־בייט בסך הכול, כ־4.3 מגה־בייט בהעברה דחוסה) ונטען רק כשמחפשים; אחרי חיפוש ראשון הוא נשמר במכשיר ועובד גם בלי רשת. <b>מה שמחפשים לא נשלח לשום מקום.</b></li></ul>
   <h2>תהילים אישי</h2><ul>
     <li>מנהג חב״ד לומר בכל יום את פרק התהילים של שנות החיים – מספר השנים שמלאו ועוד אחת – ולהתחיל פרק חדש ביום ההולדת העברי. הורים אומרים גם את פרקי ילדיהם.</li>
     <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה או גיל), לראות את הפרק של היום המוצג ולקרוא אותו מנוקד; שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
@@ -782,10 +807,11 @@ function unvocalizedList(s) {
 }
 
 // ---------------- Reader ----------------
-const R = { unit: null, iso: null, sid: null, doc: null, page: 0, pages: 1, segs: [], speaker: null, wake: null, saveT: null };
+const R = { unit: null, iso: null, sid: null, lib: null, libInfo: null, doc: null, page: 0, pages: 1, segs: [], speaker: null, wake: null, saveT: null };
 function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 // progress key: a lesson is kept per day; a siddur section once (it is not a daily lesson)
-const pk = () => (R.sid ? ['siddur', R.sid] : [R.iso, R.unit]);
+// a library chapter (#/lib/…) once, under its own key – free browsing never marks a daily lesson as done
+const pk = () => (R.lib ? ['lib', R.lib] : R.sid ? ['siddur', R.sid] : [R.iso, R.unit]);
 function fmt(html, isTanakh, siddur = false) {
   if (siddur) return divineName(html, prefs.divine); // the siddur keeps its own markup: no ketiv/qere or parasha marks
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
@@ -826,8 +852,9 @@ function vocState(blocks) {
 }
 function niqqudRatio(text) { const L = (text.match(/[\u05D0-\u05EA]/g) || []).length; const N = (text.match(/[\u05B0-\u05BC\u05C1\u05C2\u05C7]/g) || []).length; return N / Math.max(L, 1); }
 
-async function openReader(unit, iso, sid = null) {
+async function openReader(unit, iso, sid = null, lib = null) {
   currentDate = iso;
+  const lpath = lib?.path || null, seek = lib?.seek || null;
   const auto = R.autoplay; R.autoplay = false;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
@@ -836,12 +863,13 @@ async function openReader(unit, iso, sid = null) {
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
-  R.unit = unit; R.iso = iso; R.sid = sid; R.page = 0; R.sidReady = false;
+  R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
+  const lparent = R.libInfo?.crumbs.at(-1);
   const dayFocus = R.dayFocus; R.dayFocus = null;
   el.innerHTML = `
   <header class="r-top" id="rt">
-    <a class="btn ghost" href="${sid ? '#/siddur' : '#/d/' + iso}" aria-label="${sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית'}">${ICON.back}</a>
-    <div class="r-title"><b id="r-t">${esc(UNITS[unit].full)}</b><small id="r-s">${sid ? '' : esc(dayDates(plan, iso))}</small></div>
+    <a class="btn ghost" href="${lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso}" aria-label="${lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית'}">${ICON.back}</a>
+    <div class="r-title"><b id="r-t">${esc(lpath ? 'ספרייה' : UNITS[unit].full)}</b><small id="r-s">${lpath ? esc(R.libInfo?.node.label || '') : sid ? '' : esc(dayDates(plan, iso))}</small></div>
     <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
     <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
@@ -875,22 +903,37 @@ async function openReader(unit, iso, sid = null) {
       const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang });
       if (!R.doc.siddur.secs[n - 1]) throw new Error('siddur section not found');
     }
+    else if (lpath) R.doc = (await libDoc(lpath)).doc;
     else R.doc = await buildDoc(plan, unit);
   } catch (e) {
     // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
     const rc = $('#rc'); rc.classList.add('r-error'); rc.style.cssText = '';
     rc.innerHTML = `<p role="alert">לא ניתן לטעון את הטקסט. ${navigator.onLine === false ? 'אין חיבור לרשת, והטקסט של יום זה לא נשמר מראש במכשיר.' : 'ייתכן שהחיבור לרשת נכשל, או שהטקסט של יום זה לא נשמר מראש במכשיר.'}</p>
       <p><button class="btn primary" id="r-retry">נסה שוב</button></p><p class="r-error-hint">כדי לקרוא בלי רשת: בדף הבית – ״שמירה לשימוש ללא רשת (30 יום)״ בזמן שיש חיבור.</p>`;
-    $('#r-retry').addEventListener('click', () => { if (R.unit === unit && R.iso === iso && R.sid === sid) openReader(unit, iso, sid); });
+    if (lpath) $('.r-error-hint', rc).textContent = 'כדי לקרוא בלי רשת: בספרייה – ״שמירה לשימוש ללא רשת״ בדף הספר, בזמן שיש חיבור.';
+    $('#r-retry').addEventListener('click', () => { if (R.unit === unit && R.iso === iso && R.sid === sid && R.lib === lpath) openReader(unit, iso, sid, lib); });
     $('#r-retry').focus(); return;
   }
-  if (R.unit !== unit || R.iso !== iso || R.sid !== sid) return;
+  if (R.unit !== unit || R.iso !== iso || R.sid !== sid || R.lib !== lpath) return;
+  if (lpath) {
+    $('#r-t').textContent = R.doc.title; $('#r-s').textContent = R.doc.subtitle;
+    document.title = `${R.doc.subtitle} – ספרייה`;
+    await renderDoc();
+    const p = getProgress('lib', lpath);
+    if (seek && seekSeg(seek)) { /* a search result or a shared link to a verse */ }
+    else if (p?.pos && !p.done) restore(p);
+    requestWake();
+    if (dayFocus) { toast(R.libInfo.node.label); const b = $(`.daynav-top [data-day="${dayFocus}"]`); if (b && (R.page === 0 || prefs.layout !== 'pages') && b.getClientRects().length) b.focus({ preventScroll: true }); }
+    if (auto) ttsToggle();
+    return;
+  }
   if (sid) {
     $('#r-t').textContent = R.doc.title;
     await renderDoc();
     // the whole seder is one document: open at the saved place in this section, or at the section's start
     const sp = getProgress('siddur', sid);
-    if (sp?.pos && !sp.done && sp.pos.startsWith(sid.split('/')[0] + '-')) restore(sp); else goToSec(+sid.split('/')[1]);
+    if (lib?.seek && seekSeg(lib.seek)) { /* a search result */ }
+    else if (sp?.pos && !sp.done && sp.pos.startsWith(sid.split('/')[0] + '-')) restore(sp); else goToSec(+sid.split('/')[1]);
     R.sidReady = true; siddurTrack();
     requestWake(); if (auto) ttsToggle();
     return;
@@ -917,7 +960,28 @@ function dayNavHtml(pos) {
     <a class="btn" data-day="next" href="#/r/${u}/${next}" aria-label="יום הבא – ${esc(UNITS[u].he)} של ${esc(when(next))}" aria-keyshortcuts="Shift+ArrowLeft"><span>יום הבא</span>${ICON.next}</a>
   </nav>`;
 }
+// Library: the previous / next chapter of the same book (across parts and books: Genesis 50 → Exodus 1)
+function libNavHtml(pos) {
+  const { prev, next } = R.libInfo || {};
+  return `<nav class="daynav libnav daynav-${pos}" aria-label="${pos === 'top' ? 'מעבר בין פרקים' : 'מעבר בין פרקים – סוף הפרק'}">
+    ${prev ? `<a class="btn" data-day="prev" href="#/lib/${prev.id}" aria-label="הקודם – ${esc(prev.label)}" aria-keyshortcuts="Shift+ArrowRight">${ICON.prev}<span>הקודם</span></a>` : ''}
+    ${next ? `<a class="btn" data-day="next" href="#/lib/${next.id}" aria-label="הבא – ${esc(next.label)}" aria-keyshortcuts="Shift+ArrowLeft"><span>הבא</span>${ICON.next}</a>` : ''}
+  </nav>`;
+}
+function libCrumbsHtml() {
+  const c = R.libInfo?.crumbs || [];
+  return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום בספרייה"><a href="#/lib">ספרייה</a>${c.map(x => ` <i aria-hidden="true">›</i> <a href="#/lib/${x.id}">${esc(x.he)}</a>`).join('')}</nav>`;
+}
+// open at one segment (?s= in a library or siddur link) and mark it until the next tap
+function seekSeg(id) {
+  const el = R.segs.find(s => s.dataset.id === id) || R.segs.find(s => s.dataset.id === id.replace(/^r/, ''));
+  if (!el) return false;
+  goToSeg(el.dataset.id, false);
+  el.classList.add('seek-hit'); setTimeout(() => document.addEventListener('pointerdown', () => el.classList.remove('seek-hit'), { once: true }), 0);
+  return true;
+}
 function goDay(which) {
+  if (R.lib) { const t = which === 'prev' ? R.libInfo?.prev : which === 'next' ? R.libInfo?.next : null; if (t) { R.dayFocus = which; location.hash = `#/lib/${t.id}`; } return; }
   if (!R.unit || R.sid || !R.iso) return;
   R.dayFocus = which;
   location.hash = `#/r/${R.unit}/${which === 'today' ? todayIso() : shiftIso(R.iso, which === 'prev' ? -1 : 1)}`;
@@ -967,7 +1031,7 @@ function siddurTrack() {
 // Simchat Torah: the Chumash shiur differs between calendars – say what we do and why, so the reader is not
 // surprised when another calendar (e.g. Chabad.org) shows something else.
 function simchatTorahNote() {
-  if (R.unit !== 'chumash') return '';
+  if (R.unit !== 'chumash' || R.lib) return '';
   const c = dayPlan(R.iso, { il: prefs.il }).chumash;
   if (!c?.simchatTorah) return '';
   const t = c.shabbat
@@ -981,7 +1045,7 @@ function simchatTorahNote() {
 }
 // A reader opened before the location was chosen (e.g. from a shared link): state which calendar is shown and why.
 function readerLocNote() {
-  if (prefs.locationChosen || R.unit !== 'chumash') return '';
+  if (prefs.locationChosen || R.unit !== 'chumash' || R.lib) return '';
   return `<aside class="day-note" role="note"><b>לוח:</b> מוצג לפי לוח ${locLabel(prefs.il)} – ברירת מחדל לפי אזור הזמן של המכשיר, כי עדיין לא נבחר לוח. ${isDivergent(R.iso, 'chumash') ? 'השבוע הפרשה שונה בין ארץ ישראל לחוץ לארץ. ' : ''}אפשר לבחור בעמוד הבית או בהגדרות.</aside>`;
 }
 async function renderDoc() {
@@ -989,7 +1053,8 @@ async function renderDoc() {
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
   const sidd = !!d.siddur;
-  let html = `<header class="doc-head"><p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p>${sidd ? '<div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>' : dayNavHtml('top')}</header>`;
+  const lib = !!R.lib;
+  let html = `<header class="doc-head">${lib ? libCrumbsHtml() : `<p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p>`}<h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p>${sidd ? '<div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>' : lib ? libNavHtml('top') : dayNavHtml('top')}</header>`;
   html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
@@ -1038,12 +1103,13 @@ async function renderDoc() {
   }
   html += `<p class="doc-credit" id="doc-report">מצאת טעות בנוסח, בניקוד, בהקראה או בביאור? <a id="b-report" href="${ISSUES}" target="_blank" rel="noopener">דיווח ב-GitHub</a> (נפתח טופס עם פרטי המקום; דבר אינו נשלח עד שתאשר שם)</p>`;
   if (sidd) { const nx = nextSid(); html += `<div class="endmark" id="endmark"><p>— סוף ״${esc(d.title)}״ —</p><button class="btn" id="b-nextunit">${nx ? `לחלק הבא: ${esc(nx.bookHe)} – ${esc(nx.he)}` : 'חזרה לתוכן הסידור'}</button></div>`; }
+  else if (lib) { const nx = R.libInfo?.next; html += `<div class="endmark" id="endmark"><p>— סוף ${esc(R.libInfo?.node.label || 'הפרק')} —</p><button class="btn" id="b-nextunit">${nx ? `להמשך: ${esc(nx.label)}` : `חזרה ל${esc(R.libInfo?.crumbs.at(-1)?.he || 'ספרייה')}`}</button>${libNavHtml('end')}</div>`; }
   else html += `<div class="endmark" id="endmark"><p>— סוף השיעור —</p><button class="btn" id="b-nextunit">לשיעור הבא</button>${dayNavHtml('end')}</div>`;
   rc.innerHTML = html;
   // an opened/closed notes section changes the page count in the paged layout
   rc.querySelectorAll('details.study-notes').forEach(el => el.addEventListener('toggle', () => { const a = anchor(); layout(); restore(a); }));
   rc.className = 'r-content gloss-' + prefs.gloss;
-  if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
+  if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); if (!rc.isConnected) return; /* the reader was closed or replaced meanwhile */ applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
   const rep = $('#b-report'); if (rep) { const upd = () => { rep.href = reportUrl(); }; rep.addEventListener('pointerdown', upd); rep.addEventListener('focus', upd); rep.addEventListener('click', upd); }
   $('#b-nextunit').onclick = () => nextUnit(false);
@@ -1071,12 +1137,13 @@ function glossNote(rc, G, kind) {
 }
 // the siddur reader shows a whole book (seder); "next" is the first section of the next book
 function nextSid() { if (!R.sid || !R.sorder) return null; const bk = R.sid.split('/')[0], i = R.sorder.findLastIndex(x => x.book === bk); return i >= 0 ? R.sorder[i + 1] || null : null; }
-function nextUnitId() { if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
+function nextUnitId() { if (R.lib) return R.libInfo?.next ? 'lib' : null; if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
   setProgress(...pk(), { done: true, frac: 1 });
   // the end of a seder is the end of its last section
   if (R.sid && R.doc?.siddur) setProgress('siddur', `${R.sid.split('/')[0]}/${R.doc.siddur.secs.length}`, { done: true, frac: 1 });
   if (R.sid) { const nx = nextSid(); R.autoplay = !!nx && autoplay; location.hash = nx ? `#/s/${nx.book}/${nx.n}` : '#/siddur'; return; }
+  if (R.lib) { const nx = R.libInfo?.next; R.autoplay = !!nx && autoplay; location.hash = nx ? `#/lib/${nx.id}` : `#/lib/${R.libInfo?.crumbs.at(-1)?.id || ''}`; return; }
   const n = nextUnitId();
   if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
   R.autoplay = autoplay;
@@ -1204,7 +1271,7 @@ function reportUrl(seg = currentSeg()) {
   const t = seg ? (seg.querySelector('.t')?.textContent || seg.textContent).replace(/\s+/g, ' ').trim() : '';
   const where = [R.doc?.title, R.doc?.subtitle].filter(Boolean).join(' – ');
   const title = `טעות בטקסט: ${where}${seg ? ` (${seg.dataset.ref || seg.dataset.id})` : ''}`.slice(0, 150);
-  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.sid ? 'סידור' : R.iso ? `${fmtDmy(R.iso)} (${dayPlan(R.iso, { il: prefs.il }).hebDate})` : ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
+  const body = [`**שיעור:** ${where}`, `**תאריך:** ${R.lib ? 'ספרייה (עיון חופשי)' : R.sid ? 'סידור' : R.iso ? `${fmtDmy(R.iso)} (${dayPlan(R.iso, { il: prefs.il }).hebDate})` : ''}`, `**קישור:** ${location.href}`, seg ? `**מקום:** ${seg.dataset.ref || seg.dataset.id}` : '',
     sel ? `**המילים שסומנו:** ${sel}` : '', seg ? `**הנוסח המוצג:**\n> ${t.slice(0, 600)}${t.length > 600 ? '…' : ''}` : '',
     '', '**מה הטעות?** (ניקוד / מילה חסרה או מיותרת / הקראה / ביאור)', '', '**מה הנוסח הנכון, ולפי איזה מקור?**', ''].filter(x => x !== false).join('\n');
   return `${ISSUES}?title=${encodeURIComponent(title)}&labels=${encodeURIComponent('text-error')}&body=${encodeURIComponent(body)}`;
@@ -1331,7 +1398,7 @@ function bindReaderUi() {
 function turn(d) {
   R.armAutoHide?.();
   if (prefs.layout === 'pages') {
-    if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast('סוף השיעור'); return; }
+    if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast(R.lib ? 'סוף הפרק' : 'סוף השיעור'); return; }
     setPage(R.page + d);
   } else { const vp = $('#vp'); vp.scrollBy({ top: d * (vp.clientHeight - 80), behavior: 'smooth' }); }
 }
@@ -1491,7 +1558,7 @@ async function ttsToggle() {
     },
   });
   R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender },
-    { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
+    { title: R.doc.title + ' – ' + R.doc.subtitle, album: R.lib ? 'ספרייה' : dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);
   R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
@@ -1513,7 +1580,7 @@ function closeReader() {
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
-  R.unit = null; R.sid = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
+  R.unit = null; R.sid = null; R.lib = null; R.libInfo = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
   if (R.wake) { R.wake.release().catch(() => {}); R.wake = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }

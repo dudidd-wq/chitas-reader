@@ -1,0 +1,218 @@
+{
+ "v": 1,
+ "source": "fc4e710e6eaf306e",
+ "bytes": 12926348,
+ "segs": 46929,
+ "shards": [
+  {
+   "id": "torah-Genesis",
+   "fam": "torah",
+   "he": "חומש בראשית ורש״י",
+   "bytes": 349843,
+   "segs": 3549
+  },
+  {
+   "id": "torah-Exodus",
+   "fam": "torah",
+   "he": "חומש שמות ורש״י",
+   "bytes": 335399,
+   "segs": 3021
+  },
+  {
+   "id": "torah-Leviticus",
+   "fam": "torah",
+   "he": "חומש ויקרא ורש״י",
+   "bytes": 213940,
+   "segs": 2188
+  },
+  {
+   "id": "torah-Numbers",
+   "fam": "torah",
+   "he": "חומש במדבר ורש״י",
+   "bytes": 254130,
+   "segs": 2580
+  },
+  {
+   "id": "torah-Deuteronomy",
+   "fam": "torah",
+   "he": "חומש דברים ורש״י",
+   "bytes": 234390,
+   "segs": 2324
+  },
+  {
+   "id": "tehillim",
+   "fam": "tehillim",
+   "he": "תהילים",
+   "bytes": 127203,
+   "segs": 2527
+  },
+  {
+   "id": "tanya",
+   "fam": "tanya",
+   "he": "תניא",
+   "bytes": 451054,
+   "segs": 1623
+  },
+  {
+   "id": "rambam-0",
+   "fam": "rambam",
+   "he": "רמב״ם – הקדמה ומניין המצוות",
+   "bytes": 117320,
+   "segs": 805
+  },
+  {
+   "id": "rambam-1",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר המדע",
+   "bytes": 206181,
+   "segs": 457
+  },
+  {
+   "id": "rambam-2",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר אהבה",
+   "bytes": 263568,
+   "segs": 765
+  },
+  {
+   "id": "rambam-3",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר זמנים",
+   "bytes": 528821,
+   "segs": 1739
+  },
+  {
+   "id": "rambam-4",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר נשים",
+   "bytes": 328966,
+   "segs": 1185
+  },
+  {
+   "id": "rambam-5",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר קדושה",
+   "bytes": 306206,
+   "segs": 1206
+  },
+  {
+   "id": "rambam-6",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר הפלאה",
+   "bytes": 199807,
+   "segs": 809
+  },
+  {
+   "id": "rambam-7",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר זרעים",
+   "bytes": 396370,
+   "segs": 1594
+  },
+  {
+   "id": "rambam-8",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר עבודה",
+   "bytes": 413667,
+   "segs": 1532
+  },
+  {
+   "id": "rambam-9",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר קרבנות",
+   "bytes": 168109,
+   "segs": 510
+  },
+  {
+   "id": "rambam-10",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר טהרה",
+   "bytes": 527286,
+   "segs": 1808
+  },
+  {
+   "id": "rambam-11",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר נזיקין",
+   "bytes": 245724,
+   "segs": 941
+  },
+  {
+   "id": "rambam-12",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר קנין",
+   "bytes": 269194,
+   "segs": 985
+  },
+  {
+   "id": "rambam-13",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר משפטים",
+   "bytes": 281669,
+   "segs": 790
+  },
+  {
+   "id": "rambam-14",
+   "fam": "rambam",
+   "he": "רמב״ם – ספר שופטים",
+   "bytes": 262667,
+   "segs": 810
+  },
+  {
+   "id": "mitzvot",
+   "fam": "mitzvot",
+   "he": "ספר המצוות",
+   "bytes": 376612,
+   "segs": 682
+  },
+  {
+   "id": "tolt-1",
+   "fam": "tolt",
+   "he": "תורה אור ולקוטי תורה – חומש בראשית",
+   "bytes": 998009,
+   "segs": 1808
+  },
+  {
+   "id": "tolt-2",
+   "fam": "tolt",
+   "he": "תורה אור ולקוטי תורה – חומש שמות",
+   "bytes": 969465,
+   "segs": 1897
+  },
+  {
+   "id": "tolt-3",
+   "fam": "tolt",
+   "he": "תורה אור ולקוטי תורה – חומש ויקרא",
+   "bytes": 722893,
+   "segs": 1157
+  },
+  {
+   "id": "tolt-4",
+   "fam": "tolt",
+   "he": "תורה אור ולקוטי תורה – חומש במדבר",
+   "bytes": 1201483,
+   "segs": 1717
+  },
+  {
+   "id": "tolt-5",
+   "fam": "tolt",
+   "he": "תורה אור ולקוטי תורה – חומש דברים",
+   "bytes": 1253097,
+   "segs": 1569
+  },
+  {
+   "id": "rav",
+   "fam": "rav",
+   "he": "שולחן ערוך אדמו״ר הזקן",
+   "bytes": 585439,
+   "segs": 2362
+  },
+  {
+   "id": "siddur",
+   "fam": "siddur",
+   "he": "סידור",
+   "bytes": 337836,
+   "segs": 1989
+  }
+ ]
+}
