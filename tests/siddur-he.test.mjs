@@ -17,11 +17,14 @@ const text = h => h.replace(/<[^>]*>/g, ' ').replace(/&[a-z]+;/g, ' ');
 const latinLeft = h => text(h).replace(/\b[\w-]+(\.[\w-]+)*\.(org|com|net|il)\b[\w/.\-]*/g, '').match(/[A-Za-z]+/g);
 const hebWords = h => (text(h).match(/[\u05D0-\u05EA][\u0591-\u05BD\u05BF-\u05C7\u05D0-\u05EA]*/g) || []).filter(w => /[\u05B0-\u05BC]/.test(w)).map(w => w.replace(/[\u0591-\u05AF\u05BD\u05C0]/g, ''));
 
+// 1.0.61: a table block ['t', rows, cls] – its cells are blocks of their own (empty cells skipped)
+const blocks = s => s.b.flatMap(b => b[0] === 't' ? b[1].flat().filter(c => c[0]) : [b]);
+
 test('default: instructions in Hebrew', () => assert.equal(DEFAULT_PREFS.siddurLang, 'he'));
 
 test('every English instruction has a Hebrew translation, with no English left in it', () => {
   let n = 0; const used = new Set();
-  for (const s of sections) s.b.forEach(([t, en, he], i) => {
+  for (const s of sections) blocks(s).forEach(([t, en, he], i) => {
     if (t !== 'n') return;
     n++; used.add(en);
     const where = `${s.id} #${i}: ${text(en).slice(0, 60)}`;
@@ -35,7 +38,7 @@ test('every English instruction has a Hebrew translation, with no English left i
 
 test('Hebrew quoted (vocalized) in an English instruction is kept in the translation', () => {
   const miss = [];
-  for (const s of sections) s.b.forEach(([t, en, he]) => {
+  for (const s of sections) blocks(s).forEach(([t, en, he]) => {
     if (t !== 'n') return;
     const h = new Set(hebWords(he));
     for (const w of hebWords(en)) if (!h.has(w)) miss.push(`${s.id}: ${w}`);
@@ -45,7 +48,7 @@ test('Hebrew quoted (vocalized) in an English instruction is kept in the transla
 
 test('every English phrase inside a prayer line or heading has a Hebrew replacement', () => {
   const left = [];
-  for (const s of sections) s.b.forEach(([t, h]) => {
+  for (const s of sections) blocks(s).forEach(([t, h]) => {
     if (t === 'n') return;
     for (const r of englishRuns(h)) if (!Object.hasOwn(idx.heRuns, r)) left.push(`${s.id}: ${r}`);
     for (const mode of ['he', 'both']) {
@@ -70,7 +73,7 @@ let srv, browser;
 test.before(async () => { srv = await serve(); browser = await launch(); });
 test.after(async () => { await browser?.close(); srv?.close(); });
 // a section with many instructions
-const sec = sections.map(s => ({ id: s.id, n: s.b.filter(b => b[0] === 'n').length })).sort((a, b) => b.n - a.n)[0].id;
+const sec = sections.map(s => ({ id: s.id, n: blocks(s).filter(b => b[0] === 'n').length })).sort((a, b) => b.n - a.n)[0].id;
 
 test('reader: Hebrew by default, English or both by the setting, divine name follows its setting', async () => {
   const p = await pageWith(browser, srv.url, { prefs: { divine: 'abbr' } });

@@ -373,7 +373,8 @@ async function renderSiddur() {
       if (skel(s.he).includes(k)) { hits.push({ s, snip: '' }); continue; }
       for (const [t, h] of s.doc.b) {
         if (t === 'n') continue;
-        const plain = h.replace(/<[^>]*>/g, ''), pos = []; let sk = '';
+        // 1.0.61: a table block – its prayer cells and the Names / chart cells (not its instructions)
+        const plain = (t === 't' ? h.flatMap(r => r.filter(c => c[0] === 'p' || c[0] === 'x').map(c => c[1])).join(' ') : h).replace(/<[^>]*>/g, ''), pos = []; let sk = '';
         for (let i = 0; i < plain.length; i++) { const c = plain[i]; if (c >= '\u05D0' && c <= '\u05EA') { sk += FINAL[c] || c; pos.push(i); } }
         const at = sk.indexOf(k);
         if (at >= 0) { const a = pos[at], b = pos[at + k.length - 1] + 1; hits.push({ s, snip: [plain.slice(Math.max(0, a - 50), a), plain.slice(a, b), plain.slice(b, b + 60)] }); break; }
@@ -795,6 +796,27 @@ function fmt(html, isTanakh, siddur = false) {
   if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
   return divineName(s, prefs.divine); // the divine name: in full (default) or ה׳ – one setting for every text
 }
+// 1.0.61: a siddur table (texts.js siddurTable) – one segment; each cell isolated in its own direction. Cells that are
+// not said (the Divine Names, the Omer chart's Sefirah/words/letter, the instructions) carry data-nr: the reader's TTS
+// drops them (ttsHtml) and tts-prep drops them again.
+function siddurTableHtml(b) {
+  const td = (c, j, head) => {
+    const tag = head ? 'th' : 'td', cls = `sd-${c.k || 'e'} c${j}`, nr = c.k === 'p' ? '' : ' data-nr';
+    if (c.k === 'n') return c.lang === 'he' ? `<${tag} class="${cls}"${nr} dir="rtl" lang="he"${head ? ' scope="col"' : ''}>${divineName(c.html, prefs.divine)}</${tag}>` : `<${tag} class="${cls} sd-en"${nr} dir="ltr" lang="en"${head ? ' scope="col"' : ''}>${divineName(c.html, prefs.divine)}</${tag}>`;
+    if (c.k === 'x') return `<td class="${cls}"${nr} dir="rtl">${c.html}</td>`;
+    return `<td class="${cls}"${nr} dir="rtl">${c.k ? fmt(c.html, false, true) : ''}</td>`;
+  };
+  const head = b.cls === 'omer' && b.rows[0].every(c => c.k === 'n');
+  const rows = b.rows.map((r, i) => `<tr>${r.map((c, j) => td(c, j, head && i === 0)).join('')}</tr>`);
+  const body = head ? `<thead>${rows[0]}</thead><tbody>${rows.slice(1).join('')}</tbody>` : `<tbody>${rows.join('')}</tbody>`;
+  return `<div class="seg sd-tab-seg" data-id="${b.id}"><div class="t"><table class="sd-tab sd-t-${b.cls}" dir="rtl">${body}</table></div></div>`;
+}
+/** the html of a segment that TTS reads: without the cells/parts marked data-nr (shown, not said) */
+function ttsHtml(el) {
+  if (!el.querySelector('[data-nr]')) return el.innerHTML;
+  const c = el.cloneNode(true); c.querySelectorAll('[data-nr]').forEach(x => x.remove());
+  return c.innerHTML;
+}
 // per block: true = vocalised, false = not, null = too short to tell (inherits the previous block's state)
 function vocState(blocks) {
   let last = null;
@@ -993,6 +1015,7 @@ async function renderDoc() {
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += b.sec ? `<h2 class="sd-sec" id="sec-${b.sec}" data-sec="${b.sec}">${esc(b.text)}</h2>` : `<h2>${esc(b.text)}</h2>`; continue; }
     if (b.type === 'notes') { if (open) { html += '</p>'; open = false; } if (prefs.studyNotes !== false) html += notesHtml(b); continue; }
     if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += b.html != null ? (b.lang === 'he' ? `<aside class="sid-note sid-he" lang="he" dir="rtl">${divineName(b.html, prefs.divine)}</aside>` : `<aside class="sid-note" lang="en" dir="ltr">${divineName(b.html.replace(/[\u0590-\u05FF][\u0590-\u05FF\s"'״׳־,]*[\u0590-\u05FF]|[\u0590-\u05FF]/g, m => `<bdi lang="he">${m}</bdi>`), prefs.divine)}</aside>`) : `<aside class="day-note" role="note">${esc(b.text)}${(b.links || []).map(([t, u], i) => `${i ? '; ' : ''}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join('')}${esc(b.tail || '')}${b.href ? ` <a href="${esc(b.href)}" target="_blank" rel="noopener">${esc(b.hrefText || 'קישור')}</a>` : ''}</aside>`; continue; }
+    if (b.type === 'table') { if (open) { html += '</p>'; open = false; } html += siddurTableHtml(b); continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
     if (inline) {
@@ -1397,7 +1420,7 @@ document.addEventListener('keydown', e => {
 function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
   return R.segs.map(s => {
-    const parts = [unAbbr(s.querySelector('.t').innerHTML).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
+    const parts = [unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya

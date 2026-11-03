@@ -308,6 +308,22 @@ export async function siddurFiles() {
 }
 // the built files contain only text with <b>/<i>; anything else is dropped here as well (defence in depth)
 const inlineOnly = h => String(h).replace(/<(?!\/?(?:b|i)>)[^>]*>/g, '');
+/** 1.0.61: a siddur table ['t', rows, cls] (Ana Bekoach with the Divine Names, the Hallel responses, the Omer chart) →
+ *  {type:'table', cls, rows:[[{k, html, lang}]]}. k: 'p' prayer text (spoken), 'x' shown only (the Names, the chart's
+ *  Sefirah / words / letter – never read aloud), 'n' an instruction (translated like a note), '' an empty cell.
+ *  text = the spoken cells, for the vocalisation check and search. */
+function siddurTable(id, rows, cls, runs, lang) {
+  const cell = ([k, h, he]) => {
+    if (!k) return { k: '', html: '' };
+    if (k === 'n') {
+      if (lang === 'en' || !he) return { k, html: inlineOnly(h), lang: 'en' };
+      return { k, html: inlineOnly(he).replace(/<\/?i>/g, '') + (lang === 'both' ? ` <span lang="en" dir="ltr">${inlineOnly(h)}</span>` : ''), lang: 'he' };
+    }
+    return { k, html: localizeRuns(inlineOnly(h), runs, lang) };
+  };
+  const R = rows.map(r => r.map(cell));
+  return { type: 'table', id, cls: /^[a-z]+$/.test(cls) ? cls : 'plain', rows: R, text: R.flat().filter(c => c.k === 'p').map(c => c.html).join(' ') };
+}
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
 export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
@@ -322,6 +338,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
       if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, ''), lang: 'he' });
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
+    else if (t === 't') blocks.push(siddurTable(id, h, he, runs, lang));
     else blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang) });
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };

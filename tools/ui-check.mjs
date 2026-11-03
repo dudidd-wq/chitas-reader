@@ -14,6 +14,8 @@ const screens = [
   ['siddur-toc', 'siddur'], ['kivun', 'kivun', { kivunPlace: 'newyork' }], ['kivun-night-manual', 'kivun', { theme: 'night', kivunPlace: 'manual' }], ['siddur-amida-dark', 's/shacharit/3', { theme: 'dark' }],
   ['siddur-kabbalat-night-abbr', 's/kabbalat/2', { theme: 'night', divine: 'abbr' }],
   ['siddur-hallel-sepia-scroll', 's/rc/1', { theme: 'sepia', layout: 'scroll', size: 30 }],
+  ['siddur-omer-chart-dark-scroll', 's/omer/1', { theme: 'dark', layout: 'scroll', siddurLang: 'both' }],
+  ['siddur-ana-bekoach-sepia', 's/boker/5', { theme: 'sepia', layout: 'scroll' }],
 ];
 for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   const ctx = await b.newContext({ viewport: { width: w, height: 740 }, locale: 'he-IL', serviceWorkers: 'block' });

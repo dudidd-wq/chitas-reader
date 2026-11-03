@@ -73,10 +73,45 @@ async function getFile(src, name) {
   }
   throw new Error('download failed: ' + name);
 }
-function odtText(buf) {
+// The Shabbat Book's zemirot are printed in two columns (ODT tables). Stripping the tags read them cell after cell,
+// i.e. the left column first in the left-to-right tables ("lr-tb") – "אסדר לסעודתא" began with its 6th stanza.
+// Each table is listed here with its reading order (paragraph lists [cell, paragraph]); a new or changed table fails
+// the build instead of being guessed. The order follows the acrostic (אני יצחק לוריא בן שלמה; אני יצחק לוריא) and
+// he.wikisource "אזמר בשבחין" / "אסדר לסעודתא" – see verification/SIDDUR-TABLES.md.
+const range = (c, a, b) => Array.from({ length: b - a + 1 }, (_, i) => [c, a + i]);
+export const ODT_TABLES = {
+  'The-Shabbat-Book': {
+    Table1: { order: 'cells' }, // Kiddush alternatives (bread / wine) – right-to-left table, cell 1 is the right one
+    Table2: { order: 'cells' }, // the same, for the day Kiddush
+    // Azamer Bishvachin: 20 stanzas, 10 per column; neither column order gives the acrostic, the stanza list does
+    Table3: { order: [...range(2, 0, 3), ...range(1, 0, 3), [2, 8], [2, 9], ...range(2, 4, 7), ...range(1, 4, 9)],
+      first: 'אזמר נזמין ימינא יחבק צוחין חדו קריבו למעבד ועטורין רשימין יהא אסדר בחמרא נעביד שכינתא שביתין למבצע משח הלא אתעטרא' },
+    Table4: { order: [...range(2, 0, 4), ...range(1, 0, 4)], first: 'אסדר נהורה ישדר יגלה צרורא חדו קדם לעטר ואלין רבו' }, // lr-tb: the right cell first
+    Table5: { order: 'cells', first: 'בני יהון צבו חדו קריבו לבר והא רעו ישוי ארי' }, // rl-tb: already in reading order
+  },
+};
+function odtTables(x, stem) {
+  const conf = ODT_TABLES[stem] || {}, seen = [];
+  x = x.replace(/<table:table [^>]*table:name="([^"]+)"[^>]*>[\s\S]*?<\/table:table>/g, (t, name) => {
+    const c = conf[name]; if (!c) throw new Error(`${stem}: ODT table ${name} has no reading order in ODT_TABLES`);
+    seen.push(name);
+    const cells = [...t.matchAll(/<table:table-cell\b[\s\S]*?<\/table:table-cell>/g)].map(m => [...m[0].matchAll(/<text:(p|h)\b[^>]*?(?:\/>|>[\s\S]*?<\/text:\1>)/g)].map(p => p[0]));
+    const paras = c.order === 'cells' ? cells.flat() : c.order.map(([ci, pi]) => { const p = cells[ci - 1]?.[pi]; if (p == null) throw new Error(`${stem} ${name}: no paragraph ${ci}/${pi}`); return p; });
+    if (c.order !== 'cells' && paras.length !== cells.flat().filter(p => p.replace(/<[^>]+>/g, '').trim()).length) throw new Error(`${stem} ${name}: the reading order does not cover every paragraph`);
+    if (c.first) {
+      const got = paras.map(p => p.replace(/<[^>]+>/g, '').replace(/[\u0591-\u05C7]/g, '').trim()).filter(Boolean).map(p => p.split(/[\s,]/)[0]).join(' ');
+      if (got !== c.first) throw new Error(`${stem} ${name}: stanzas changed: ${got}`);
+    }
+    return paras.join('');
+  });
+  for (const n of Object.keys(conf)) if (!seen.includes(n)) throw new Error(`${stem}: ODT table ${n} not found`);
+  return x;
+}
+function odtText(buf, stem) {
   const tmp = fs.mkdtempSync('/tmp/odt-'); const f = path.join(tmp, 'x.odt'); fs.writeFileSync(f, buf);
   let x = execFileSync('unzip', ['-p', f, 'content.xml']).toString('utf8');
   fs.rmSync(tmp, { recursive: true });
+  x = odtTables(x, stem);
   x = x.replace(/<text:tab\/>/g, '\t').replace(/<text:s[^>]*\/>/g, ' ').replace(/<text:line-break\/>/g, '\n').replace(/<\/text:(p|h)>/g, '\n').replace(/<[^>]+>/g, '');
   return x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
 }
@@ -87,65 +122,135 @@ const escH = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '
 const HEB = /[\u05D0-\u05EA]/g, LAT = /[A-Za-z]/g;
 const cnt = (s, re) => (s.match(re) || []).length;
 
-// MediaWiki tables ({| … |-  … |}) hold responsive readings laid out in columns from left to right: each row becomes
-// one line in reading order (the Hebrew cells right-to-left), followed by its English instruction cells.
-// Wiki tables → plain lines in reading order. A cell starts at a "|" line and runs until the next one; an RTL table's first
-// cell is the right-most, i.e. the first to read, so cells keep their source order and each line of a cell stays a line.
-// Two Hebrew cells with the same number of lines (Ana Bekoach and its acronyms) are paired line by line.
-function tables(lines) {
-  const out = []; let inT = false, row = [], cell = null;
-  const endCell = () => { if (cell) { const c = cell.filter(x => x.trim()); if (c.length) row.push(c); } cell = null; };
-  const flush = () => {
-    endCell();
-    const heb = c => c.every(x => cnt(x, HEB) >= cnt(x, LAT));
-    if (row.length === 2 && row.every(heb) && row[0].length > 1 && row[0].length === row[1].length) out.push(...row[0].map((x, i) => `${x.trim()} · ${row[1][i].trim()}`));
-    else for (const c of row) out.push(...c.map(x => x.trim()));
-    row = [];
+// MediaWiki tables ({| … |}). The transcription lays out responsive readings, the Divine Names next to Ana Bekoach and
+// alternatives in columns, and the direction of the columns is not consistent from table to table (some cells list the
+// response before the verse, the label after the text). Up to 1.0.60 every row was flattened in source order and two
+// Hebrew cells with the same number of lines were glued with " · " – Ana Bekoach came out as "prayer · Names" in one
+// spoken line. Now every table has an explicit reading decision (WIKI_TABLES, keyed by book, n = 1-based order in the
+// file); a table that is not listed fails the build, so a changed source is looked at instead of guessed.
+//   flat  – rows in order, each row's cells in source order (already the reading order)
+//   rev   – each row's cells in reverse order (the label/instruction first, then the text)
+//   names – a real table: the prayer (spoken) | the Divine Names formed by its acronyms (shown, never read aloud)
+//   resp  – a real table of responsive verses: label | verse | response, each row reversed from the source
+//   amen  – the "Do not respond / אָמֵן" cell becomes one instruction (the אָמֵן is not a line of prayer to be said)
+export const WIKI_TABLES = {
+  rc: ['flat', 'resp', 'flat', 'flat', 'flat', 'flat', 'flat', 'flat', 'flat', 'flat', 'rev', 'flat', 'rev', 'flat'],
+  kabbalat: ['names', 'flat', 'flat', 'flat', 'flat'],
+  levana: ['flat', 'flat', 'flat'],
+  shacharit: ['flat', 'rev', 'flat', 'flat', 'flat'],
+  shema: ['rev', 'names', 'flat', 'flat', 'flat', 'flat', 'flat', 'flat'],
+  boker: ['amen', 'flat', 'names'],
+};
+const TABLE = '\u0000T';
+function tables(lines, book) {
+  const out = []; let inT = false, row = [], rows = [], cell = null, n = 0;
+  const endCell = () => { if (cell) row.push(cell.map(x => x.trim()).filter(Boolean)); cell = null; };
+  const endRow = () => { endCell(); if (row.some(c => c.length)) rows.push(row); row = []; };
+  const endTable = () => {
+    endRow(); n++;
+    const how = WIKI_TABLES[book]?.[n - 1];
+    if (!how) throw new Error(`${book}: wiki table #${n} has no reading decision in WIKI_TABLES`);
+    if (how === 'flat') for (const r of rows) for (const c of r) out.push(...c);
+    else if (how === 'rev') for (const r of rows) for (const c of [...r].reverse()) out.push(...c);
+    else if (how === 'amen') {
+      const [text, empty, amen] = rows.length === 1 && rows[0].length === 3 ? rows[0] : [];
+      if (!text || empty.length || amen.join(' ') !== "''Do not respond'' אָמֵן") throw new Error(`${book}#${n}: amen table changed: ${JSON.stringify(rows)}`);
+      out.push(...text, "''Do not respond'' אָמֵן");
+    } else if (how === 'names') {
+      const [pr, nm] = rows.length === 1 && rows[0].length === 2 ? rows[0] : [];
+      if (!pr || pr.length !== 7 || nm.length !== 7) throw new Error(`${book}#${n}: Ana Bekoach table changed`);
+      out.push(TABLE + JSON.stringify({ cls: 'names', rows: pr.map((x, i) => [['p', x], ['x', nm[i]]]) }));
+    } else if (how === 'resp') {
+      if (!rows.every(r => r.length === 3 && r[0].length === 1 && r[1].length === 1)) throw new Error(`${book}#${n}: responsive table changed`);
+      out.push(TABLE + JSON.stringify({ cls: 'resp', rows: rows.map(([resp, verse, label]) => [label.length ? ['n', label.join(' ')] : ['', ''], ['p', verse[0]], ['p', resp[0]]]) }));
+    } else throw new Error('unknown table decision ' + how);
+    rows = [];
   };
   for (const l of lines) {
     if (/^\s*\{\|/.test(l)) { inT = true; continue; }
     if (!inT) { out.push(l); continue; }
-    if (/^\s*\|\}/.test(l)) { flush(); inT = false; continue; }
-    if (/^\s*\|-/.test(l)) { flush(); continue; }
+    if (/^\s*\|\}/.test(l)) { endTable(); inT = false; continue; }
+    if (/^\s*\|-/.test(l)) { endRow(); continue; }
     if (/^\s*\|/.test(l)) { endCell(); cell = [l.replace(/^\s*\|\|?\s*(style="[^"]*"\s*\|)?\s*/, '')]; continue; }
     (cell ||= []).push(l);
   }
-  if (row.length || cell) flush();
+  if (inT) endTable();
+  if ((WIKI_TABLES[book]?.length || 0) !== n) throw new Error(`${book}: ${n} wiki tables, WIKI_TABLES lists ${WIKI_TABLES[book]?.length || 0}`);
   return out;
 }
+const strip = h => String(h).replace(/<[^>]+>/g, '').replace(/[\u0591-\u05C7]/g, '').trim();
+const ACRO = /^[א-ת]{2}"[א-ת] [א-ת]{2}"[א-ת]$/;
+// Ana Bekoach outside a wiki table (Minchah, Shabbat Minchah, after the Omer): its seven lines, then the seven Names, as
+// fourteen lines of "prayer" – the Names were read aloud. Seven prayer lines followed by seven acronym lines → a table.
+export function anaBekoach(b) {
+  let n = 0;
+  for (let i = 0; i + 14 <= b.length; i++) {
+    const s = b.slice(i, i + 14);
+    if (!strip(s[0][1]).startsWith('אנא בכח') || !s.every(x => x[0] === 'p') || !s.slice(7).every(x => ACRO.test(strip(x[1]))) || s.slice(0, 7).some(x => ACRO.test(strip(x[1])))) continue;
+    b.splice(i, 14, ['t', s.slice(0, 7).map((x, j) => [['p', x[1]], ['x', s[7 + j][1]]]), 'names']); n++;
+  }
+  return n;
+}
+// The Omer chart (Sefirat HaOmer): a header row (Day / Count / Sefirah) and 49 rows of six lines – the day, the count
+// (the one thing said), its Sefirah, the word of Ana Bekoach, the word of Psalm 67 and its letter (to be mindful of,
+// not said). The transcription has them as 297 separate lines; they become one table, only the count is spoken.
+export function omerChart(b) {
+  const i = b.findIndex((x, j) => x[0] === 'n' && x[1] === 'Day' && b[j + 1]?.[1] === 'Count' && b[j + 2]?.[1] === 'Sefirah');
+  if (i < 0) return 0;
+  const rows = [[['n', 'Day'], ['n', 'Count'], ['n', 'Sefirah']]];
+  for (let d = 1; d <= 49; d++) {
+    const r = b.slice(i + 3 + (d - 1) * 6, i + 3 + d * 6);
+    if (r.length !== 6 || !r.every(x => x[0] === 'p') || r[0][1] !== String(d) || !strip(r[1][1]).startsWith('היום')) throw new Error(`Omer chart: day ${d} does not have the expected six lines`);
+    rows.push([['x', r[0][1]], ['p', r[1][1]], ['x', r[2][1]], ['x', r[3][1]], ['x', r[4][1]], ['x', r[5][1]]]);
+  }
+  b.splice(i, 3 + 49 * 6, ['t', rows, 'omer']);
+  return 1;
+}
 /** One source file → sections [{he, en, b:[[type, html]]}] */
-export function parse(raw) {
+export function parse(raw, book = '') {
   let t = fixText(cleanUnicode(raw).replace(/\r/g, ''), null, USED);
   // an English instruction run straight into the next Hebrew verse ("…when saying the second'''''עֵ'''ינֵי כֹל") – split them
   t = t.replace(/([a-z])'''''(?=[\u05D0-\u05EA][\u0591-\u05C7]*''')/g, "$1.''\n'''");
   t = t.replace(/<ref[^>]*\/>/g, '').replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, '').replace(/<references\s*\/>/g, '').replace(/\[\[Image:[^\]]*\]\]/g, '')
     .replace(/<\/?(nowiki|center|u)>/g, '').replace(/<div[^>]*>|<\/div>/g, '').replace(/<sup>[\s\S]*?<\/sup>/g, '');
-  const lines = tables(t.split('\n'));
+  const lines = tables(t.split('\n'), book);
   let start = lines.findIndex(l => /^\s*Version\s+\d/.test(l.replace(/'/g, '')));
   start = start >= 0 ? start + 1 : lines.findIndex(l => /✶/.test(l));
   const secs = [];
   let cur = null;
-  const push = (type, html) => { if (!cur) { cur = { he: '', en: '', b: [] }; secs.push(cur); } cur.b.push([type, html]); };
-  for (let l of lines.slice(start)) {
-    if (/^\s*'*I am the original transcriber/.test(l)) break;
+  const push = (type, html, cls) => { if (!cur) { cur = { he: '', en: '', b: [] }; secs.push(cur); } cur.b.push(cls ? [type, html, cls] : [type, html]); };
+  // one source line → [type, html, line] (null to skip it; '✶' a section title, 'h' a heading)
+  const conv = l => {
     l = l.replace(/([ךםןףץ][\u0591-\u05C7]*)(יְיָ)/g, '$1 $2').replace(/\t+/g, ' ').replace(/\s+/g, ' ').trim();
     // footnote numbers glued to the Hebrew text (":1") – the references themselves are dropped
     l = l.replace(/([\u05D0-\u05EA\u0591-\u05C7][:׃.,;!?"”)]*)\d+/g, '$1');
-    if (!l || /^'*$/.test(l) || l === 'בס"ד') continue;
+    if (!l || /^'*$/.test(l) || l === 'בס"ד') return null;
     let html = escH(l).replace(/'''(.*?)'''/g, '<b>$1</b>').replace(/''(.*?)''/g, '<i>$1</i>').replace(/'{2,}/g, '').replace(/<b>\s*<\/b>|<i>\s*<\/i>/g, ' ').replace(/\s+/g, ' ').trim();
     html = fullName(html).replace(/ \| /g, ' ׀ ');
-    if (/✶/.test(l)) { cur = { he: fixTitle(l.replace(/[✶'*]/g, '').replace(/\s+/g, ' ').trim()), en: '', b: [] }; secs.push(cur); continue; }
-    if (/★/.test(l)) { push('h', fixTitle(html.replace(/★/g, '').replace(/<\/?[bi]>/g, '').trim())); continue; }
+    if (/✶/.test(l)) return ['✶', fixTitle(l.replace(/[✶'*]/g, '').replace(/\s+/g, ' ').trim()), l];
+    if (/★/.test(l)) return ['h', fixTitle(html.replace(/★/g, '').replace(/<\/?[bi]>/g, '').trim()), l];
     const H = cnt(l, HEB), L = cnt(l, LAT), out = l.replace(/\([^)]*\)/g, '');
     // prayer text with an English aside in brackets ("עֹשֶׂה שָׁלוֹם (During the Ten Days … הַשָּׁלוֹם) בִּמְרוֹמָיו …") is text
     const textWithAside = cnt(out, HEB) > 3 * cnt(out, LAT) && cnt(out, HEB) >= 12;
-    if (L > H && !textWithAside) {
-      // the English line right under a section title is its subtitle
-      if (cur && !cur.en && !cur.b.length && l.length < 90) { cur.en = l.replace(/'/g, '').trim(); continue; }
-      push('n', html); continue;
+    return [L > H && !textWithAside ? 'n' : 'p', html, l];
+  };
+  for (const line of lines.slice(start)) {
+    if (/^\s*'*I am the original transcriber/.test(line)) break;
+    if (line.startsWith(TABLE)) {
+      // every cell keeps the kind its table decision gave it (p spoken, x shown only, n instruction, '' empty); the html
+      // is the same conversion as for a line
+      const T = JSON.parse(line.slice(TABLE.length));
+      push('t', T.rows.map(r => r.map(([k, x]) => { if (!k) return ['', '']; const c = conv(x); if (!c) throw new Error('empty table cell: ' + x); return [k, c[1]]; })), T.cls);
+      continue;
     }
-    push('p', html);
+    const c = conv(line); if (!c) continue;
+    const [type, html, l] = c;
+    if (type === '✶') { cur = { he: html, en: '', b: [] }; secs.push(cur); continue; }
+    // the English line right under a section title is its subtitle
+    if (type === 'n' && cur && !cur.en && !cur.b.length && l.length < 90) { cur.en = l.replace(/'/g, '').trim(); continue; }
+    push(type, html);
   }
+  for (const s of secs) { anaBekoach(s.b); omerChart(s.b); }
   return secs.filter(s => s.b.length);
 }
 
@@ -157,7 +262,7 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
   for (const [id, stem, he, group, fmt = 'txt'] of BOOKS) {
     const name = `${stem}.${fmt}`, buf = await getFile(src, name);
     files[name] = { url: BASE + name, sha256: sha(buf) };
-    const secs = parse(fmt === 'odt' ? odtText(buf) : buf.toString('utf8'));
+    const secs = parse(fmt === 'odt' ? odtText(buf, stem.replace(/-Nusa.*$/, '')) : buf.toString('utf8'), id);
     if (!secs.length) throw new Error('no sections: ' + name);
     fs.mkdirSync(`${OUT}/${id}`, { recursive: true });
     secs.forEach((s, n) => fs.writeFileSync(`${OUT}/${id}/${n + 1}.json`, JSON.stringify({ he: s.he || he, en: s.en, b: s.b })));
@@ -176,5 +281,5 @@ if (process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1])))
     attribution: 'Contributors to the Open Siddur Project, including Shmueli Gonzales',
     retrieved: 'Internet Archive copy (web.archive.org) of the files at ' + BASE, files,
   };
-  fs.writeFileSync(sp, JSON.stringify(sources, null, 1));
+  fs.writeFileSync(sp, JSON.stringify(sources, null, 2) + '\n');
 }

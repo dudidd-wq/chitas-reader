@@ -75,7 +75,7 @@ export function diff(A, B) {
 }
 const plene = w => w.replace(/[וי]/g, '');
 export const kind = ([a, b]) => a.length && b.length && plene(a.join('')) === plene(b.join('')) ? 'כתיב מלא/חסר' : a.join('') === b.join('') ? 'חלוקת מילים' : 'נוסח';
-const ourText = sec => JSON.parse(fs.readFileSync(`${root}site/data/siddur/${sec}.json`)).b.filter(x => x[0] === 'p').map(x => x[1]).join(' ');
+const ourText = sec => JSON.parse(fs.readFileSync(`${root}site/data/siddur/${sec}.json`)).b.flatMap(x => x[0] === 'p' ? [x[1]] : x[0] === 't' ? x[1].flatMap(r => r.filter(c => c[0] === 'p').map(c => c[1])) : []).join(' '); // 1.0.61: the spoken cells of a table
 export function compare(ref) {
   return PASSAGES.map(([name, sec, node, a, b]) => {
     const ours = cut(words(ourText(sec)), a, b), theirs = ref[name] ? ref[name].split(' ') : null;

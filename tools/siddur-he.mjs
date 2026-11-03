@@ -13,11 +13,13 @@ export function applySiddurHebrew() {
   const missing = [], usedRuns = new Set();
   for (const b of idx.books) b.secs.forEach((s, i) => {
     const p = path.join(OUT, b.id, `${i + 1}.json`), d = JSON.parse(fs.readFileSync(p, 'utf8'));
-    d.b = d.b.map(([t, h]) => {
+    const one = ([t, h]) => {
       if (t === 'n') { const he = T.notes[h]; if (!he) missing.push(`note ${b.id}/${i + 1}: ${h.slice(0, 60)}`); return he ? [t, h, he] : [t, h]; }
       for (const r of englishRuns(h)) { if (!Object.hasOwn(T.runs, r)) missing.push(`run ${b.id}/${i + 1}: ${r}`); else usedRuns.add(r); }
       return [t, h];
-    });
+    };
+    // 1.0.61: a table block ['t', rows, cls] – every cell is a block of its own ('p' / 'x' / 'n' / '' for an empty cell)
+    d.b = d.b.map(x => x[0] === 't' ? ['t', x[1].map(r => r.map(c => c[0] ? one(c) : ['', ''])), x[2]] : one(x));
     fs.writeFileSync(p, JSON.stringify(d));
   });
   idx.heRuns = Object.fromEntries(Object.entries(T.runs).filter(([k]) => usedRuns.has(k)));

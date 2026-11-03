@@ -243,6 +243,9 @@ export function prepareForTTS(html, opt = {}) {
   let t = String(html)
     .replace(/<i class="fn"[^>]*>[\s\S]*?<\/i>/g, '') // edition footnotes (e.g. וי"ו קטיעא) are not read
     .replace(/<span class="daf"[^>]*>[^<]*<\/span>/g, ' ') // Torah Or / Likkutei Torah page markers are not read
+    // 1.0.61: what is shown but not said – the Divine Names next to Ana Bekoach, the Omer chart's Sefirah, an instruction cell
+    .replace(/<(td|th|span|div)\b[^>]*\bdata-nr\b[^>]*>[\s\S]*?<\/\1>/g, ' ')
+    .replace(/<\/(td|th)>/g, ', ')
     .replace(/<span class="sid-in">[^<]*<\/span>/g, ' ') // round 7: an instruction inside a prayer line ("הקהל:") is not prayer text
     // round 4: anything hidden from screen readers is not spoken either – the petucha/setuma markers פ / ס in particular
     .replace(/<(span|i|b)\b[^>]*aria-hidden="true"[^>]*>[^<]*<\/\1>/g, ' ')

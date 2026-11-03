@@ -358,6 +358,35 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sid-note.sid-he { text-align: right; font-size: .82em; overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
 .sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
 .sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
+/* 1.0.61: siddur tables – a real grid instead of "prayer · Names" lines. RTL: the first cell (the prayer) on the right.
+   Every cell is isolated in its own direction; nothing may be wider than the column (no overflow at 320px). */
+.r-content .sd-tab-seg .t { overflow-wrap: anywhere; }
+.sd-tab { width: 100%; border-collapse: collapse; table-layout: auto; margin: 0; direction: rtl; }
+.sd-tab td, .sd-tab th { unicode-bidi: isolate; vertical-align: baseline; padding: .12em 0; text-align: start; font-weight: inherit; }
+.sd-tab .sd-en { text-align: left; }
+.sd-tab .sd-n { font-family: system-ui, sans-serif; font-size: .72em; color: var(--muted); }
+.sd-t-names { break-inside: avoid; }
+.sd-t-names td.sd-p { padding-inline-end: .6em; }
+.sd-t-names td.sd-x { width: 1%; white-space: nowrap; text-align: end; color: var(--muted); font-size: .86em; padding-inline-start: .5em; border-inline-start: 1px solid var(--rule); }
+.sd-t-resp tr { break-inside: avoid; }
+.sd-t-resp td { padding-block: .18em; }
+.sd-t-resp td.c0 { width: 1%; white-space: nowrap; padding-inline-end: .5em; }
+.sd-t-resp td.c1 { padding-inline-end: .5em; }
+/* the Omer chart: day | count on the first line, the things to be mindful of (not said) under the count */
+.sd-t-omer, .sd-t-omer thead, .sd-t-omer tbody { display: block; }
+.sd-t-omer tr { display: grid; grid-template-columns: 2em repeat(4, minmax(0, 1fr)); column-gap: .45em; padding: .3em 0; border-bottom: 1px solid var(--rule); break-inside: avoid; }
+.sd-t-omer td, .sd-t-omer th { min-width: 0; }
+.sd-t-omer .c0 { grid-row: 1 / span 2; color: var(--muted); font-family: var(--ui); font-size: .7em; font-variant-numeric: tabular-nums; padding-top: .35em; }
+.sd-t-omer .c1 { grid-column: 2 / -1; }
+.sd-t-omer .c2, .sd-t-omer .c3, .sd-t-omer .c4, .sd-t-omer .c5 { grid-row: 2; font-size: .68em; color: var(--muted); }
+.sd-t-omer .c2 { grid-column: 2; } .sd-t-omer .c3 { grid-column: 3; } .sd-t-omer .c4 { grid-column: 4; } .sd-t-omer .c5 { grid-column: 5; }
+.sd-t-omer thead th { font-size: .68em; }
+.sd-t-omer thead th.c0 { grid-row: 1 / span 2; }
+.sd-t-omer thead th.c2 { grid-column: 2 / -1; }
+@media print {
+  .sd-tab tr { break-inside: avoid; }
+  .sd-tab .sd-n, .sd-tab td.sd-x, .sd-t-omer .c0, .sd-t-omer .c2, .sd-t-omer .c3, .sd-t-omer .c4, .sd-t-omer .c5 { color: #444; }
+}
 /* 1.0.55: day navigation inside a lesson – under the title and at the end of the lesson */
 .r-content .daynav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; margin: 0 0 .9em; font-family: var(--ui); font-size: .95rem; line-height: 1.3; break-inside: avoid; }
 .r-content .daynav .btn { min-height: 44px; padding: .3rem .75rem; }
