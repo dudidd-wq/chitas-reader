@@ -1,5 +1,6 @@
 // Local-only storage: preferences + reading progress. Nothing ever leaves the device.
 import { dayPlan } from './calendar.js';
+import { cleanProfile } from './personal.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
@@ -8,6 +9,7 @@ export const DEFAULT_PREFS = {
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
+  tehillimProfiles: [], tehillimRebbe: false, // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only
 };
 // One speed scale for the footer menu and the settings slider.
 export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
@@ -61,7 +63,8 @@ export function exportBackup() {
 export function importBackup(text) {
   const d = JSON.parse(text);
   if (d.app !== 'chitas-reader' || typeof d.progress !== 'object') throw new Error('bad file');
-  for (const [k, v] of Object.entries(d.prefs || {})) if (k in DEFAULT_PREFS && typeof v === typeof DEFAULT_PREFS[k]) state.prefs[k] = v;
+  for (const [k, v] of Object.entries(d.prefs || {})) if (k in DEFAULT_PREFS && typeof v === typeof DEFAULT_PREFS[k] && Array.isArray(v) === Array.isArray(DEFAULT_PREFS[k])) state.prefs[k] = v;
+  if (Array.isArray(state.prefs.tehillimProfiles)) state.prefs.tehillimProfiles = state.prefs.tehillimProfiles.map(cleanProfile).filter(Boolean).slice(0, 50);
   for (const [k, v] of Object.entries(d.progress)) if (/^\d{4}-\d\d-\d\d\|[a-z0-9]+(\|il|\|dl)?$/.test(k) && v && typeof v === 'object') state.progress[k] = v;
   save();
 }

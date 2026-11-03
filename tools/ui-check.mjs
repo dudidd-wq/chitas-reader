@@ -7,6 +7,7 @@ const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
 const D = new Date().toLocaleDateString('sv'), fails = [], log = [];
 const screens = [
   ['home', `d/${D}`], ['settings', 'settings'], ['sources', 'sources'], ['about', 'about'],
+  ['personal-tehillim-dark', 'tehillim/14', { theme: 'dark', tehillimRebbe: true, tehillimProfiles: [{ id: 'a', name: 'ילד בכיתה ז', greg: '2013-05-01' }, { id: 'b', name: 'ילדה בכיתה ד', age: 9 }, { id: 'c', name: 'מעל 150', age: 150 }] }],
   ['chumash', `r/chumash/${D}`], ['chumash-scroll-inline-gloss', `r/chumash/${D}`, { layout: 'scroll', gloss: 'inline', rashi: false }],
   ['tehillim', `r/tehillim/${D}`, { gloss: 'inline' }], ['tanya-dark', `r/tanya/${D}`, { theme: 'dark' }],
   ['rambam3-night', `r/rambam3/${D}`, { theme: 'night' }], ['rambam1-sepia-scroll', `r/rambam1/${D}`, { theme: 'sepia', layout: 'scroll', size: 30 }],

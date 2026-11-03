@@ -11,6 +11,7 @@ import { pageGeometry } from './layout.js';
 import { fixNiqqud } from './niqqud.js';
 import { CITIES, cityById, computeZmanim, fmtTime } from './zmanim.js';
 import { hebDateHe } from './calendar.js';
+import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH } from './personal.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -145,6 +146,7 @@ function route() {
   if (view === 'settings') return renderSettings();
   if (view === 'sources') return renderSources();
   if (view === 'about') return renderAbout();
+  if (view === 'tehillim') return renderPersonal(/^\d{1,3}$/.test(a || '') ? +a : 0);
   if (view === 'zmanim') { if (/^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a; return renderZmanim(); }
   if (view === 'd' && /^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a;
   renderHome();
@@ -224,13 +226,14 @@ async function renderHome(showLoc = false) {
       </ol>
     </section>
     ${zmanTeaser()}
+    ${personalTeaser()}
     ${tefilaCard()}
 `}
     <footer class="home-foot">
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -461,6 +464,8 @@ function renderSettings() {
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
     <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}
     <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>
+    <h2 id="pt-settings">תהילים אישי</h2>
+    <p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>
     <h2>תצוגה</h2>${displayForm()}
     <h2>הקראה</h2>${ttsForm()}
     <h2>גיבוי ושחזור</h2>
@@ -548,6 +553,10 @@ function renderAbout() {
   <li>היום מתחלף בחצות לפי שעון המכשיר (ולא בשקיעה).</li>
   <li><b>התאריך העברי מוצג לפי היום האזרחי:</b> לכל תאריך לועזי מוצג התאריך העברי של שעות היום שלו (חישוב של ספריית Hebcal). לפי ההלכה התאריך העברי מתחלף כבר בשקיעה, כך שבערב, אחרי השקיעה, כבר מתחיל התאריך העברי הבא – האתר אינו מחליף אותו בשקיעה.</li>
   <li>תאריכים לועזיים מוצגים בסדר הישראלי: יום/חודש/שנה (למשל <bdi dir="ltr">02/11/2026</bdi>) או ״2 בנובמבר 2026״.</li></ul>
+  <h2>תהילים אישי</h2><ul>
+    <li>מנהג חב״ד לומר בכל יום את פרק התהילים של שנות החיים – מספר השנים שמלאו ועוד אחת – ולהתחיל פרק חדש ביום ההולדת העברי. הורים אומרים גם את פרקי ילדיהם.</li>
+    <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה או גיל), לראות את הפרק של היום המוצג ולקרוא אותו מנוקד; שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
+    <li>השמות ותאריכי הלידה נשמרים במכשיר בלבד ולא נשלחים לשום מקום.</li></ul>
   <h2>זמני היום</h2><ul>
   <li>בעמוד <a href="#/zmanim/${currentDate}">זמני היום</a>: עלות השחר, משיכיר, הנץ, סוף זמן ק״ש ותפילה, חצות, מנחה גדולה וקטנה, פלג, שקיעה, צאת הכוכבים וחצות הלילה, ובערב שבת ויום טוב – הדלקת נרות וצאת השבת/החג. לכל זמן מצוינת השיטה; השורה הראשונה היא שיטת אדמו״ר הזקן כפי שמפרסם Chabad.org.</li>
   <li>החישוב נעשה במכשיר (ספריית Hebcal, אלגוריתם NOAA), בלי רשת, בגובה פני הים, ונבדק מול Hebcal ומול Chabad.org עד דקה. <b>זהו חישוב – יש לבדוק מול לוח מקומי.</b></li>
@@ -593,6 +602,102 @@ function renderAbout() {
   // the list is generated from sources.json, so About can never disagree with the data
   data('glossary.json').then(g => { const el = $('#gloss-n'); if (el) el.textContent = g.meta.manualReview.published.toLocaleString('he-IL'); const r = $('#gloss-rb'); if (r && g.rambam) r.textContent = g.rambam.meta.published.toLocaleString('he-IL'); }).catch(() => {});
   data('sources.json').then(s => { const el = $('#unvoc-list'); if (el) el.textContent = ': ' + unvocalizedList(s).join(', '); }).catch(() => {});
+}
+// ---------------- Personal Tehillim (תהילים אישי) ----------------
+// The chapter by age, for the user and for family profiles. Profiles are kept in prefs (localStorage) only.
+const ptProfiles = () => (Array.isArray(prefs.tehillimProfiles) ? prefs.tehillimProfiles : []).map(cleanProfile).filter(Boolean);
+const hDateOf = hd => esc(hebDateHe(hd));
+const ptLine = (p, iso) => {
+  const r = personalChapter(p, iso);
+  if (r.error === 'future') return { r, html: 'תאריך הלידה אחרי התאריך המוצג' };
+  if (r.error) return { r, html: 'חסר תאריך לידה או גיל' };
+  if (r.over150) return { r, html: `גיל ${r.years}: אין פרק – בתהילים ${MAX_CHAPTER} פרקים, ולא מצאנו מקור מוסמך מה אומרים אחרי גיל ${MAX_CHAPTER - 1}` };
+  return { r, html: `<a href="#/tehillim/${r.chapter}">פרק ${gem(r.chapter)}</a>` };
+};
+function personalTeaser() {
+  const ps = ptProfiles(), rebbe = prefs.tehillimRebbe;
+  if (!ps.length && !rebbe) return '';
+  const items = [...(rebbe ? [['פרק הרבי', REBBE_BIRTH]] : []), ...ps.map(p => [p.name, p])].map(([n, p]) => {
+    const { r } = ptLine(p, currentDate);
+    return `<span class="pt-chip"><b>${esc(n)}</b> ${r.chapter ? `פרק ${gem(r.chapter)}` : '—'}${r.isBirthday ? ' <span class="pt-bd">(יום הולדת – פרק חדש)</span>' : ''}</span>`;
+  }).join('');
+  return `<a class="zm-teaser pt-teaser" id="pt-teaser" href="#/tehillim"><span class="zt-h">תהילים אישי</span><span class="zt-next">${items}</span><span class="go">פתח</span></a>`;
+}
+let ptKind = 'date';
+async function renderPersonal(ch = 0) {
+  const iso = currentDate, plan = dayPlan(iso, { il: prefs.il }), ps = ptProfiles();
+  document.title = `תהילים אישי – ${plan.hebDate} (${fmtDmy(iso)})`;
+  const rb = rebbeChapter(iso);
+  const row = p => {
+    const { r, html } = ptLine(p, iso);
+    const facts = r.source === 'date' ? [`יום הולדת עברי: ${hDateOf(r.birth)}`, `${r.years} שנים מלאות`, r.chapter && r.next && r.chapter < MAX_CHAPTER ? `פרק ${gem(r.chapter + 1)} מתחיל ב־${hDateOf(r.next)} (<bdi dir="ltr">${fmtDmy(isoDate(r.next))}</bdi>)` : '']
+      : r.source === 'age' ? [`לפי גיל ${r.years} שהוזן – אינו מתעדכן לבד; כדאי להזין תאריך לידה`] : [];
+    return `<li class="pt-item" data-id="${esc(p.id)}"><div class="pt-main"><b>${esc(p.name)}</b>: ${html}${r.isBirthday ? ' <span class="pt-bd">– היום יום ההולדת: אומרים רק את הפרק החדש</span>' : ''}</div>
+      ${facts.filter(Boolean).length ? `<small>${facts.filter(Boolean).join(' · ')}</small>` : ''}
+      <button type="button" class="btn pt-del" data-del="${esc(p.id)}" aria-label="מחיקה – ${esc(p.name)}">מחיקה</button></li>`;
+  };
+  let text = '';
+  if (ch >= 1 && ch <= MAX_CHAPTER) {
+    try {
+      const d = await data(`tehillim/${ch}.json`);
+      text = `<section class="pt-text" id="pt-text" aria-labelledby="pt-text-h"><h2 id="pt-text-h">תהילים פרק ${gem(ch)}</h2>
+        <div class="pt-verses" lang="he">${d.v.map((v, i) => `<p class="pt-v"><span class="pt-n" aria-hidden="true">${gem(i + 1)}</span> ${fmt(v, true)}</p>`).join('')}</div>
+        <p class="note">נוסח: <span id="pt-ver">כמו בתהילים היומי</span> – אותו נוסח של התהילים היומי באתר (<a href="#/sources">מקורות ורישיונות</a>). <a href="https://www.sefaria.org/Psalms.${ch}?lang=he" target="_blank" rel="noopener">הפרק בספריא</a></p></section>`;
+    } catch { text = '<p class="warn" role="alert">לא ניתן לטעון את הפרק (אין חיבור?). </p>'; }
+  }
+  shell('תהילים אישי', `
+  <p>מנהג חב״ד: בכל יום אומרים, נוסף על התהילים היומי, את הפרק המתאים לשנות החיים – <b>מספר השנים שמלאו ועוד אחת</b> (בן 13 אומר פרק יד; בשנה הראשונה – פרק א). הפרק החדש מתחיל ביום ההולדת העברי. הורים נוהגים לומר גם את הפרקים של ילדיהם. <a href="#/tehillim" id="pt-src-link">מקורות ומה לא אומת</a></p>
+  <p class="pt-day">ליום: <b>${esc(plan.hebDate)}</b> · <bdi dir="ltr">${fmtDmy(iso)}</bdi>${iso === todayIso() ? '' : ` · <a href="#/d/${todayIso()}">חזרה להיום</a>`}</p>
+  <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח.</p>
+  <h2>הפרקים שלי</h2>
+  ${ps.length ? `<ul class="pt-list">${ps.map(row).join('')}</ul>` : '<p id="pt-empty">עדיין לא נוספו אנשים. הוסיפו את עצמכם ואת בני המשפחה בטופס שלמטה.</p>'}
+  <label class="check"><input type="checkbox" id="pt-rebbe" ${prefs.tehillimRebbe ? 'checked' : ''}>הצג גם את פרק הרבי (נולד י״א בניסן תרס״ב) – כיום <a href="#/tehillim/${rb.chapter}">פרק ${gem(rb.chapter)}</a></label>
+  <form class="form pt-form" id="pt-form" novalidate onsubmit="return false" aria-labelledby="pt-add-h">
+    <h2 id="pt-add-h">הוספת אדם</h2>
+    <label class="field"><span>שם</span><input type="text" id="pt-name" maxlength="40" autocomplete="off" aria-required="true"></label>
+    <fieldset><legend>לפי</legend><div class="seg-ctl" role="radiogroup">
+      <label><input type="radio" name="pt-kind" value="date" ${ptKind === 'date' ? 'checked' : ''}>תאריך לידה</label><label><input type="radio" name="pt-kind" value="age" ${ptKind === 'age' ? 'checked' : ''}>גיל</label></div></fieldset>
+    <div id="pt-date-f" ${ptKind === 'date' ? '' : 'hidden'}><label class="field"><span>תאריך לידה לועזי (יום/חודש/שנה)</span><input type="text" id="pt-greg" dir="ltr" inputmode="numeric" maxlength="10" placeholder="יי/חח/שששש" autocomplete="off"></label>
+      <label class="check"><input type="checkbox" id="pt-sunset">נולד/ה אחרי השקיעה (התאריך העברי כבר התחלף)</label></div>
+    <div id="pt-age-f" ${ptKind === 'age' ? '' : 'hidden'}><label class="field"><span>גיל (שנים מלאות)</span><input type="number" id="pt-age" min="0" max="199" inputmode="numeric"></label>
+      <small>בלי תאריך לידה הפרק אינו מתחלף לבד ביום ההולדת.</small></div>
+    <p class="dateerr" id="pt-err" role="alert"></p>
+    <button class="btn" type="submit" id="pt-add">הוספה</button>
+  </form>
+  <h2>פתיחת פרק</h2>
+  <div class="zm-place"><label for="pt-go-n">פרק (1–150)</label><input type="number" id="pt-go-n" min="1" max="150" inputmode="numeric" value="${ch || ''}"><button class="btn" type="button" id="pt-go">פתיחה</button></div>
+  ${text}
+  <h2 id="pt-sources" tabindex="-1">מקורות ומה לא אומת</h2><ul class="pt-src">
+  <li><b>אומת בשני מקורות לפחות:</b> אומרים את הפרק של השנה הנוכחית – מספר השנים שמלאו ועוד אחת (אגרות קודש אדמו״ר הריי״צ ח״י עמ׳ נג; ספר המנהגים עמ׳ 17 – כפי שהובאו ב<a href="https://www.chabad.org/library/article_cdo/aid/4779124/jewish/Saying-Psalms-According-to-Your-Loved-Ones-Age.htm" target="_blank" rel="noopener">Chabad.org</a> וב<a href="https://chabadpedia.co.il/index.php/%D7%AA%D7%94%D7%99%D7%9C%D7%99%D7%9D_%D7%94%D7%9E%D7%AA%D7%90%D7%99%D7%9D_%D7%9C%D7%A9%D7%A0%D7%95%D7%AA%D7%99%D7%95" target="_blank" rel="noopener">חב״דפדיה</a>).</li>
+  <li><b>אומת:</b> הפרק החדש מתחיל ביום ההולדת, וביום ההולדת עצמו אומרים רק את החדש (חב״דפדיה; <a href="https://www.chabad.org/therebbe/article_cdo/aid/2539406/jewish/" target="_blank" rel="noopener">שיחת כ׳ מרחשוון תשמ״ב</a>). יום ההולדת הוא התאריך העברי.</li>
+  <li><b>אומת:</b> הורים אומרים את פרקי ילדיהם; חסידים אומרים גם את פרק הרבי, ונוהגים בכך גם היום (Chabad.org וחב״דפדיה).</li>
+  <li><b>חישוב:</b> התאריך העברי ויום ההולדת מחושבים במכשיר בספריית Hebcal. מי שנולד אחרי השקיעה – יש לסמן זאת. מקרי קצה שבהם מוטב לשאול רב: נולד/ה באדר בשנה מעוברת או בל׳ חשוון/כסלו (Hebcal קובע את יום ההולדת בשנים אחרות לפי כלל קבוע).</li>
+  <li><b>לא נמצא מקור – ולכן אינו מחושב:</b> מה אומרים מגיל 150 ואילך. לא מוצג פרק.</li>
+  <li><b>לא מנהג גיל:</b> אמירת פסוקי פרק קיט לפי אותיות השם היא מנהג כללי (מובא בספרי תהילים בשם החיד״א) ואינה קשורה לגיל; לא מצאנו שהיא חלק ממנהג זה, ולכן היא אינה מוצגת כאן.</li>
+  <li>זהו כלי עזר ואינו פסק הלכה.</li></ul>`);
+  const f = $('#pt-form'), kind = () => f.querySelector('[name="pt-kind"]:checked').value;
+  f.addEventListener('change', e => { if (e.target.name === 'pt-kind') { ptKind = kind(); $('#pt-date-f').hidden = kind() !== 'date'; $('#pt-age-f').hidden = kind() !== 'age'; } });
+  f.addEventListener('submit', () => {
+    const err = $('#pt-err'), name = $('#pt-name').value.trim();
+    if (!name) { err.textContent = 'יש לכתוב שם.'; $('#pt-name').focus(); return; }
+    let p = { name };
+    if (kind() === 'date') { const g = parseDmy($('#pt-greg').value); if (!g) { err.textContent = 'תאריך לא תקין – יש לכתוב יום/חודש/שנה, למשל 21/05/2015.'; $('#pt-greg').focus(); return; } if (g > todayIso()) { err.textContent = 'תאריך הלידה בעתיד.'; return; } p = { name, greg: g, afterSunset: $('#pt-sunset').checked }; }
+    else p = { name, age: $('#pt-age').value };
+    const c = cleanProfile(p);
+    if (!c) { err.textContent = 'יש להזין גיל (0–199).'; $('#pt-age').focus(); return; }
+    setPref('tehillimProfiles', [...ps, c]); renderPersonal(ch); toast(`נוסף: ${c.name}`);
+    $(`.pt-item[data-id="${CSS.escape(c.id)}"] a`)?.focus();
+  });
+  $('#view').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    const p = ps.find(x => x.id === b.dataset.del);
+    if (p && confirm(`למחוק את ${p.name}?`)) { setPref('tehillimProfiles', ps.filter(x => x.id !== p.id)); renderPersonal(ch); toast('נמחק'); $('#pt-name')?.focus(); }
+  }));
+  $('#pt-rebbe').onchange = e => setPref('tehillimRebbe', e.target.checked);
+  const go = () => { const n = Math.floor(Number($('#pt-go-n').value)); if (n >= 1 && n <= MAX_CHAPTER) location.hash = `#/tehillim/${n}`; else toast('מספר פרק בין 1 ל־150'); };
+  $('#pt-go').onclick = go; $('#pt-go-n').onkeydown = e => { if (e.key === 'Enter') go(); };
+  $('#pt-src-link').onclick = e => { e.preventDefault(); const h = $('#pt-sources'); h.scrollIntoView({ block: 'start' }); h.focus(); };
+  data('sources.json').then(s => { const el = $('#pt-ver'); if (el && s.tanakh) el.textContent = s.tanakh.versionTitleInHebrew || s.tanakh.versionTitle; }).catch(() => {});
+  if (ch) $('#pt-text-h')?.scrollIntoView({ block: 'start' });
 }
 /** Names (Hebrew) of the Rambam texts that are shown without niqqud, from sources.json. */
 function unvocalizedList(s) {

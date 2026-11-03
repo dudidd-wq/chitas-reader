@@ -372,3 +372,19 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .r-content h2.sd-sec { font-family: var(--ui); font-size: .62em; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 1.1em 0 .5em; display: flex; align-items: center; gap: .6em; break-before: auto; break-after: avoid; }
 .r-content h2.sd-sec::before, .r-content h2.sd-sec::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
 .r-content .doc-head + h2.sd-sec, .r-content .doc-head + * + h2.sd-sec { margin-top: .3em; }
+/* Personal Tehillim (round 8) */
+.pt-list { list-style: none; padding: 0; margin: .5em 0; }
+.pt-item { display: grid; grid-template-columns: 1fr auto; gap: .2em .6em; align-items: center; padding: .6em 0; border-bottom: 1px solid var(--line, #ccc6); }
+.pt-item small { grid-column: 1; opacity: .85; }
+.pt-item .pt-del { grid-row: 1 / span 2; grid-column: 2; min-height: 44px; min-width: 44px; }
+.pt-item a, .pt-src a, .pt-privacy a { overflow-wrap: anywhere; }
+.pt-bd { font-weight: bold; }
+.pt-form fieldset { border: 0; padding: 0; margin: .4em 0; }
+.pt-form input[type=text], .pt-form input[type=number], #pt-go-n { min-height: 44px; font-size: 1em; max-width: 100%; }
+#pt-go-n { width: 6em; }
+.pt-teaser .zt-next { display: flex; flex-wrap: wrap; gap: .2em .8em; }
+.pt-chip { white-space: nowrap; }
+.pt-verses { line-height: var(--lh, 1.9); font-size: var(--size, 1.2em); }
+.pt-v { margin: .3em 0; }
+.pt-n { font-weight: bold; margin-inline-end: .3em; opacity: .7; }
+.check a { padding-inline: .2em; }
