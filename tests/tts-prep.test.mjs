@@ -85,7 +85,8 @@ test('inverted nun (U+05C6) is stripped; citation numerals after a unit word are
   assert.equal(P('הֲלָכָה י"ב', T), 'הלכה שתים עשרה');
   assert.equal(P('פֶּרֶק א\'', T), 'פרק אלף');
   assert.equal(P('בְּעָמוֹס סוֹף סִימָן ה׳. פֵּירוּשׁ', T), 'בעמוס סוף סימן הא. פירוש');
-  assert.equal(P('וְהָיָה כ"ג', T), 'והיה כ"ג', 'a numeral in running text without a unit word is left alone');
+  // 1.0.64: no longer left alone (a bare consonant was not heard) – no unit word, no counted noun → the letter names
+  assert.equal(P('וְהָיָה כ"ג', T), 'והיה כף גימל', 'a numeral in running text without a unit word is read letter by letter');
 });
 
 test('round 3: Rashi headwords are read with the verse\'s vowels when they are the verse\'s words', async () => {
@@ -127,14 +128,14 @@ test('round 4: Rashi abbreviations ת״ל, ד״א, ק״ו …', () => {
   assert.equal(P('תַּ"לֹ כִּי מִן הַשָּׁמַיִם', H), 'תַּלְמוּד לוֹמַר כִּי מִן הַשָּׁמַיִם');
   assert.equal(P('ד״א מִכָּאן ק״ו', H), 'דָּבָר אַחֵר מִכָּאן קַל וָחוֹמֶר');
   assert.equal(P('שנא׳ כו׳', H), 'שֶׁנֶּאֱמַר כּוּלֵּי');
-  // ambiguous ones are still left alone
-  assert.equal(P('ע״ב', H), 'ע"ב');
+  // 1.0.64: an ambiguous one is no longer left to the engine (it was not heard) – its letters are named
+  assert.equal(P('ע״ב', H), 'עַיִן בֵּית');
 });
 test('round 4: source citations in parentheses are skipped when asked (Rashi/Rambam), kept otherwise', async () => {
   const { isCitation } = await import('../site/js/tts-prep.js');
   const t = 'כִּי מִן הַשָּׁמַיִם (שמות כ׳) (מכילתא) וְכֵן (זבחים קט״ו) (דברים ו ה, יא א) (שם; זבחים ק"א) (שם) סוֹף';
   assert.equal(P(t, { ...H, cites: true }), 'כִּי מִן הַשָּׁמַיִם וְכֵן סוֹף');
-  assert.match(P(t, H), /\(שמות כ'\)/);
+  assert.match(P(t, H), /\(שמות כָּף\)/);
   // not citations: list numbers, ketiv-like words, prose
   for (const x of ['א', 'יא', 'ולא כשהוא בינו לבין עצמו', 'שם הוא אדם גדול מאד', 'לא']) assert.equal(isCitation(x), false, x);
   assert.equal(P('(א) לְהַאֲמִין', { ...H, cites: true }), '(א) לְהַאֲמִין');

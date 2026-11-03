@@ -57,6 +57,6 @@ test('consistent rule for אֱלוֹהַּ, יָהּ and the noun אֵל', () =>
 });
 test('ע"ה expanded only after a name/title, not as a number or folio', () => {
   assert.equal(prepareForTTS('משה רבינו ע"ה אמר', H), 'משה רבינו עָלָיו הַשָּׁלוֹם אמר');
-  assert.equal(prepareForTTS('בֶּן ע"ה שָׁנָה', H), 'בֶּן ע"ה שָׁנָה');
-  assert.equal(prepareForTTS('(יומא ע"ה)', H), '(יומא ע"ה)');
+  assert.equal(prepareForTTS('בֶּן ע"ה שָׁנָה', H), 'בֶּן שִׁבְעִים וְחָמֵשׁ שָׁנָה'); // 1.0.64: an age is read as a number
+  assert.equal(prepareForTTS('(יומא ע"ה)', H), '(יומא עַיִן הֵא)'); // 1.0.64: a folio is read by its letters
 });

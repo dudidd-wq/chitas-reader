@@ -258,6 +258,9 @@ export function wordToIPA(word, k = null, data = {}, opt = {}) {
   return modern(postNormalize(phonemizeLetters(L)));
 }
 
+/** Names of the letters (the same table as tts-prep.js – a test keeps them equal), for spelling an unexpanded token. */
+export const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };
+
 /** Prepared TTS text (vocalised Hebrew, accents removed, divine names and numbers already expanded by tts-prep) → IPA.
  *  opt.accents: Map from accentStressMap() for the verse; opt.data: stress data (exc, lex, suf, qk).
  *  opt.trace: array that receives {word, ipa, k, src} per word (for tests). */
@@ -271,7 +274,14 @@ export function textToIPA(text, opt = {}) {
     let k = null, src = 'acc';
     if (acc && acc.has(key)) k = acc.get(key);
     if (k === null) [k, src] = predictStress(core, data);
-    const ipa = wordToIPA(core.replace(/"/g, ''), k, data, opt);
+    let ipa = wordToIPA(core.replace(/"/g, ''), k, data, opt);
+    // 1.0.64 safety net: an abbreviation / numeral that reached here unexpanded (ד׳, י״ב) has no vowel and was not heard –
+    // spell it with the names of its letters instead (tts-prep normally does this already; verification/VOICE-NUMERALS.md)
+    // (an internal ״ or a trailing ׳ after ≤ 4 letters; a closing quotation mark after a plain word is not an abbreviation)
+    if (!/[aeiou]/.test(ipa) && (/['"]/.test(core) || /^[\u05D0-\u05EA][\u05B0-\u05C7]*$/.test(core) || /^(?:[\u05D0-\u05EA][\u05B0-\u05C7]*){1,4}'$/.test(w.replace(/^['"]+/, '')))) {
+      ipa = [...core.replace(/[^\u05D0-\u05EA]/g, '')].map(l => { const n = LETTER_NAME[l]; return wordToIPA(n, predictStress(n, data)[0], data, opt); }).join(' ');
+      src = 'spell';
+    }
     opt.trace?.push({ word: core, ipa, k, src });
     return ipa;
   }).replace(/[^ .,!?aeiouʔvɡdhzχtjklmnsfʁʃbpˈʒw]/g, ' ').replace(/\s+([.,!?])/g, '$1').replace(/\s+/g, ' ').trim();
