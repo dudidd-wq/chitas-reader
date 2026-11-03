@@ -7,7 +7,7 @@ export const DEFAULT_PREFS = {
   taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
-  zmanPlace: '', zmanGeo: null, candleMins: 0,
+  zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
   tehillimProfiles: [], tehillimRebbe: false,
   studyNotes: true, // round 8: "מראי מקומות" / short-explanation link after the text (texts.js 'notes' blocks) // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only

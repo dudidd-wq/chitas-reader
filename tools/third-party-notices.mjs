@@ -9,6 +9,8 @@ let out = `THIRD-PARTY NOTICES – chitas-reader
 site/js/vendor/hebcal.js is a minified esbuild bundle of the following npm packages (unmodified).
 Their source code is available at https://github.com/hebcal and on https://www.npmjs.com/.
 The site's own code is GPL-2.0-or-later (see LICENSE in the repository). Fonts: SIL OFL 1.1, see fonts/licenses/.
+site/js/wmm.js embeds the World Magnetic Model WMM2025 coefficients (NOAA NCEI / British Geological Survey) –
+a work of the U.S. Government, public domain: https://www.ncei.noaa.gov/products/world-magnetic-model
 
 `;
 const sum = P.map(p => { const j = JSON.parse(fs.readFileSync(new URL(`${p}/package.json`, NM))); return { p, j }; });

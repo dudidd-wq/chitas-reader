@@ -399,3 +399,41 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .study-notes .sn-w { font-family: var(--text, inherit); }
 .study-notes.sn-link p:first-child { margin: .3em 0; }
 .study-notes.sn-link a { display: inline-flex; align-items: center; min-height: 44px; }
+/* כיוון התפילה (#/kivun) */
+.kv-lead { margin-top: 0; }
+.kv-man { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem .8rem; margin: .4rem 0; }
+.kv-man[hidden] { display: none; }
+.kv-man label { display: grid; gap: .2rem; font-weight: 600; font-size: .95rem; }
+.kv-man input { min-height: 44px; width: 9.5rem; max-width: 100%; padding: .3rem .6rem; border-radius: 10px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
+.kv-man input[aria-invalid="true"] { border-color: var(--err); }
+.kv-man .dateerr { flex-basis: 100%; margin: 0; }
+#kv-geo-st:empty { display: none; }
+.kv-res { margin: .8rem 0; padding: .8rem 1rem; border-radius: 14px; background: color-mix(in srgb, var(--accent) 10%, var(--card)); border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--rule)); text-align: center; }
+.kv-big { margin: 0; font-size: 1.6rem; }
+.kv-big b { font-variant-numeric: tabular-nums; font-size: 2.2rem; }
+.kv-sub, .kv-level { margin: .3rem 0 0; }
+.kv-sub { color: var(--ink); font-size: .92rem; }
+.kv-dial { width: min(78vw, 300px); margin: 1rem auto .4rem; }
+.kv-svg { display: block; width: 100%; height: auto; }
+.kv-face { fill: var(--card); stroke: var(--rule); stroke-width: 2; }
+.kv-tick { stroke: var(--muted); stroke-width: 1; }
+.kv-tick-l { stroke: var(--ink); stroke-width: 2; }
+.kv-lab { fill: var(--ink); font-size: 15px; font-weight: 700; text-anchor: middle; font-family: inherit; }
+.kv-lab.kv-n { fill: var(--err); }
+.kv-tgt { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+.kv-arr { fill: var(--accent); stroke: var(--card); stroke-width: 1.5; }
+.kv-me { fill: var(--ink); }
+.kv-hub { fill: var(--ink); }
+.kv-dial.kv-on .kv-face { stroke: #2e7d32; stroke-width: 6; }
+.kv-dial[data-mode="live"] #kv-rose, .kv-dial[data-mode="live"] #kv-arrow { transition: transform .12s linear; }
+.kv-hint { text-align: center; font-weight: 600; min-height: 1.5em; }
+.kv-warn { margin: .5rem 0; padding: .6rem .8rem; border-radius: 10px; border: 1px solid #b26a00; background: color-mix(in srgb, #ffb300 16%, var(--card)); color: var(--ink); }
+.kv-warn[hidden] { display: none; }
+.kv-btns { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; }
+.kv-btns [hidden] { display: none; }
+.kv-disc { margin-top: 1rem; padding: .6rem .8rem; border-inline-start: 4px solid var(--accent); background: var(--card); }
+.tf-more .btn svg, .sd-kivun .btn svg { width: 1.2em; height: 1.2em; }
+.zm-kivun { margin: .2rem 0 .6rem; }
+.zm-kivun a { display: inline-flex; align-items: center; gap: .35rem; min-height: 44px; }
+.zm-kivun svg { width: 1.2em; height: 1.2em; }
+@media (prefers-reduced-motion: reduce) { .kv-dial #kv-rose, .kv-dial #kv-arrow { transition: none !important; } }

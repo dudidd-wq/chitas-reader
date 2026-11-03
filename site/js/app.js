@@ -11,6 +11,7 @@ import { pageGeometry } from './layout.js';
 import { fixNiqqud } from './niqqud.js';
 import { CITIES, cityById, computeZmanim, fmtTime } from './zmanim.js';
 import { hebDateHe } from './calendar.js';
+import { renderKivun, stopKivun, COMPASS } from './kivun-ui.js';
 import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH } from './personal.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -96,6 +97,7 @@ function renderZmanim() {
     <button class="btn" type="button" id="zm-geo">${PIN}<span>המיקום שלי</span></button>
   </div>
   <p class="note" id="zm-geo-st" role="status" aria-live="polite">${pl.id === 'geo' ? `לפי המיקום שנשמר במכשיר; שעון: <bdi dir="ltr">${esc(pl.tz)}</bdi>` : prefs.zmanPlace ? '' : 'לא נבחר מקום – מוצג ' + esc(pl.he) + ' כברירת מחדל.'}</p>
+  <p class="zm-kivun"><a href="#/kivun">${COMPASS}<span>כיוון התפילה (מצפן)</span></a></p>
   ${z.special.length ? `<ul class="zm-special">${z.special.map(x => `<li><span><b>${esc(x.he)}</b><small>${esc(x.op)}</small></span>${tm(x.r)}</li>`).join('')}</ul>` : ''}
   <ul class="zm-list">${z.rows.map(r => `
     <li class="zm-row" data-z="${r.key}">
@@ -139,10 +141,12 @@ function route() {
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
   if (view !== 'r' && view !== 's') closeReader();
+  stopKivun();
   autoPrefetch();
   if (view === 'r' && UNITS[a] && a !== 'siddur') { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
   if (view === 's' && /^[a-z]+$/.test(a) && /^\d+$/.test(b)) { openReader('siddur', currentDate, `${a}/${+b}`); return; }
   if (view === 'siddur') return renderSiddur();
+  if (view === 'kivun') return renderKivun({ prefs, setPref, esc, $, shell, PIN, zmanPlace });
   if (view === 'settings') return renderSettings();
   if (view === 'sources') return renderSources();
   if (view === 'about') return renderAbout();
@@ -233,7 +237,7 @@ async function renderHome(showLoc = false) {
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        <a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/kivun">כיוון התפילה</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -325,7 +329,7 @@ function tefilaCard() {
       <ul class="tf-list">${items.map(i => `<li><a href="#/s/${i.book}/${i.n}">${esc(i.he)}</a></li>`).join('')}</ul>
       ${lines.length ? `<p class="tf-ins"><b>${s.period === 'night' ? 'בתפילת הערב' : 'היום'} אומרים:</b> ${lines.map(esc).join(' · ')}</p>` : ''}
       ${s.notes.map(n => `<p class="note">${esc(n)}</p>`).join('')}
-      <p class="tf-more"><a class="btn" href="#/siddur">הסידור המלא – תוכן וחיפוש</a></p>
+      <p class="tf-more"><a class="btn" href="#/siddur">הסידור המלא – תוכן וחיפוש</a> <a class="btn" href="#/kivun">${COMPASS}<span>כיוון התפילה</span></a></p>
     </section>`;
   } catch { return `<p class="tf-more"><a class="btn" href="#/siddur">סידור – נוסח חב״ד</a></p>`; }
 }
@@ -350,6 +354,7 @@ async function renderSiddur() {
   <form class="sd-search" role="search" onsubmit="return false"><label for="sd-q">חיפוש בסידור</label>
     <input type="search" id="sd-q" placeholder="למשל: ובא לציון" autocomplete="off" aria-describedby="sd-st"><p class="note" id="sd-st" role="status" aria-live="polite"></p></form>
   <div id="sd-res"></div>
+  <p class="sd-kivun"><a class="btn" href="#/kivun">${COMPASS}<span>כיוון התפילה – מצפן</span></a></p>
   <nav aria-label="תוכן הסידור" class="sd-toc">${groups}</nav>
   <section aria-labelledby="sd-miss-h"><h2 id="sd-miss-h">מה אין בסידור זה, ומדוע</h2><ul class="sd-miss">${idx.missing.map(x => `<li><b>${esc(x.he)}</b> – ${esc(x.why)}</li>`).join('')}</ul></section>
   <p><button class="btn" id="sd-dl">שמירת הסידור לשימוש ללא רשת</button></p><p class="note" id="sd-dl-st" role="status" aria-live="polite"></p>`;
@@ -567,6 +572,10 @@ function renderAbout() {
   <li>החישוב נעשה במכשיר (ספריית Hebcal, אלגוריתם NOAA), בלי רשת, בגובה פני הים, ונבדק מול Hebcal ומול Chabad.org עד דקה. <b>זהו חישוב – יש לבדוק מול לוח מקומי.</b></li>
   <li>הדלקת נרות: 18 דקות לפני השקיעה, בירושלים 40 ובחיפה 30; יש מנהגים מקומיים אחרים (Chabad.org: תל אביב 22, אילת 30; Hebcal: 20 בשאר הארץ) – אפשר לבחור בעמוד.</li>
   <li>״המיקום שלי״ נקרא רק בלחיצה, נשמר במכשיר בלבד ואינו נשלח.</li></ul>
+  <h2>כיוון התפילה</h2><ul>
+  <li>בעמוד <a href="#/kivun">כיוון התפילה</a>: הכיוון (במעלות מצפון אמיתי ובשם הרוח) והמרחק אל אבן השתייה בהר הבית, לפי ״קשת גדולה״, מעיר מהרשימה, מהמיקום (בלחיצה בלבד) או מקואורדינטות שמקלידים. נקודת היעד: <bdi dir="ltr">31.7780, 35.2354</bdi> (ויקיפדיה ״אבן השתייה״/״כיפת הסלע״ ו-OpenStreetMap; מקומו המדויק של קודש הקודשים שנוי במחלוקת, וזה משנה רק סמוך להר).</li>
+  <li>מצפן חי: במכשיר עם חיישן כיוון (באייפון – אחרי אישור). החיישן מודד צפון מגנטי, והאתר מתקן לצפון אמיתי לפי המודל המגנטי העולמי WMM2025 (NOAA ו-BGS, נחלת הכלל), תקף עד 2030. בלי חיישן מוצג הכיוון במעלות.</li>
+  <li>החישוב נבדק אוטומטית מול geographiclib (אליפסואיד WGS-84; הפרש עד 0.2°) ומול ערכי הבדיקה הרשמיים של WMM2025. <b>המצפן מדויק עד כדי חיישן המכשיר; יש להרחיק ממתכות ומגנטים; במקרה ספק – לפי הוראת רב.</b></li></ul>
   <h2 id="more-lessons">שיעורים נוספים (לבחירה בהגדרות)</h2><ul>
   <li><b>ספר המצוות היומי:</b> לוח הרבי לספר המצוות של הרמב״ם, שנלמד במקביל לשיעור הרמב״ם (ספריית Hebcal). הלוח נבדק מול לוח השיעורים של Chabad.org ב־23 תאריכים בשנים 2026–2027, ונמצאה התאמה בכולם. הטקסט: ספר המצוות, ורשה תרמ״ג (נחלת הכלל, דרך ספריא), <b>בלי ניקוד</b>.</li>
   <li>בימים שבהם השיעור הוא טקסט מתוך משנה תורה (נוסח התפילה, נוסח ההגדה, הלכות מגילה וחנוכה), מוצגת הפניה בלבד. ביום סיום המחזור Chabad.org מציין גם ״סיום״; במהדורה הפתוחה אין לו קטע נפרד, ולכן גם הוא מוצג כהפניה.</li>
