@@ -358,3 +358,17 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sid-note.sid-he { text-align: right; font-size: .82em; overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
 .sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
 .sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
+/* 1.0.55: day navigation inside a lesson – under the title and at the end of the lesson */
+.r-content .daynav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem; margin: 0 0 .9em; font-family: var(--ui); font-size: .95rem; line-height: 1.3; break-inside: avoid; }
+.r-content .daynav .btn { min-height: 44px; padding: .3rem .75rem; }
+.r-content .daynav .btn svg { width: 18px; height: 18px; }
+.r-content .daynav-top { margin: .45em 0 0; flex-basis: 100%; } /* in place of the ornament under the title */
+.r-content .daynav-end { margin: 1.1em 0 0; }
+.r-content .endmark p { margin: 0 0 .5em; }
+/* short screens: page 1 is kept for the text; the day controls stay at the end of the lesson */
+@media (orientation: landscape) and (max-height: 500px) { .r-content .daynav-top { display: none; } }
+@media (orientation: portrait) and (max-height: 640px) { .r-content .daynav-top { display: none; } }
+/* 1.0.55: the siddur flows through a whole seder – a section start is a light marker, never a break */
+.r-content h2.sd-sec { font-family: var(--ui); font-size: .62em; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 1.1em 0 .5em; display: flex; align-items: center; gap: .6em; break-before: auto; break-after: avoid; }
+.r-content h2.sd-sec::before, .r-content h2.sd-sec::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+.r-content .doc-head + h2.sd-sec, .r-content .doc-head + * + h2.sd-sec { margin-top: .3em; }

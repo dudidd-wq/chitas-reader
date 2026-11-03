@@ -68,9 +68,10 @@ test('table of contents, search and reader', async () => {
   assert.match(await p.locator('#b-nextunit').innerText(), /לחלק הבא/);
   assert.equal(await p.locator('.r-top a.btn').getAttribute('href'), '#/siddur');
   await p.click('#b-nextunit');
-  await p.waitForFunction(() => location.hash === '#/s/shacharit/2');
+  // 1.0.55: the reader holds the whole seder, so "next" leads to the next seder (מנחה), and the last section is done
+  await p.waitForFunction(() => location.hash === '#/s/mincha/1');
   const prog = await progressOf(p);
-  assert.ok(prog['siddur|shacharit/1']?.done);
+  assert.ok(prog['siddur|shacharit/7']?.done);
   assert.deepEqual(p.errors, []);
   await p.context().close();
 });

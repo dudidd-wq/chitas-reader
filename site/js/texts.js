@@ -306,3 +306,18 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
 }
+/** The whole prayer sequence of one book (e.g. Shacharit) as one continuous document: the sections follow one another
+ *  with a light marker (type 'h', `sec`) instead of a break, so paging flows from one section into the next. */
+export async function buildSiddurBookDoc(book, { lang = 'he' } = {}) {
+  const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
+  if (!b) throw new Error('siddur book not found');
+  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang })));
+  const blocks = [], secs = [];
+  parts.forEach((d, i) => {
+    secs.push({ n: i + 1, he: d.title });
+    if (parts.length > 1) blocks.push({ type: 'h', id: `${book}-${i + 1}-h`, text: d.title, sec: i + 1 });
+    blocks.push(...d.blocks);
+  });
+  const names = secs.map(s => s.he);
+  return { title: b.he, subtitle: names.length === 1 ? '' : names.length <= 4 ? names.join(' · ') : `${names.length} חלקים ברצף אחד`, blocks, book: 'Siddur', siddur: { book, secs } };
+}

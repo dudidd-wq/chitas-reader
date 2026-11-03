@@ -1,6 +1,6 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurDoc } from './texts.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
@@ -629,13 +629,14 @@ async function openReader(unit, iso, sid = null) {
   currentDate = iso;
   const auto = R.autoplay; R.autoplay = false;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
-  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), a); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   R.doc = null; R.segs = []; R.ttsShown = false;
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
-  R.unit = unit; R.iso = iso; R.sid = sid; R.page = 0;
+  R.unit = unit; R.iso = iso; R.sid = sid; R.page = 0; R.sidReady = false;
+  const dayFocus = R.dayFocus; R.dayFocus = null;
   el.innerHTML = `
   <header class="r-top" id="rt">
     <a class="btn ghost" href="${sid ? '#/siddur' : '#/d/' + iso}" aria-label="${sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית'}">${ICON.back}</a>
@@ -669,7 +670,10 @@ async function openReader(unit, iso, sid = null) {
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
   bindReaderUi();
   try {
-    if (sid) { const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurDoc(bk, +n, { lang: prefs.siddurLang }); }
+    if (sid) {
+      const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang });
+      if (!R.doc.siddur.secs[n - 1]) throw new Error('siddur section not found');
+    }
     else R.doc = await buildDoc(plan, unit);
   } catch (e) {
     // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
@@ -681,11 +685,12 @@ async function openReader(unit, iso, sid = null) {
   }
   if (R.unit !== unit || R.iso !== iso || R.sid !== sid) return;
   if (sid) {
-    $('#r-t').textContent = R.doc.title; $('#r-s').textContent = R.doc.subtitle;
-    document.title = `${R.doc.title} – סידור`;
+    $('#r-t').textContent = R.doc.title;
     await renderDoc();
+    // the whole seder is one document: open at the saved place in this section, or at the section's start
     const sp = getProgress('siddur', sid);
-    if (sp?.pos && !sp.done) restore(sp);
+    if (sp?.pos && !sp.done && sp.pos.startsWith(sid.split('/')[0] + '-')) restore(sp); else goToSec(+sid.split('/')[1]);
+    R.sidReady = true; siddurTrack();
     requestWake(); if (auto) ttsToggle();
     return;
   }
@@ -695,7 +700,68 @@ async function openReader(unit, iso, sid = null) {
   const p = getProgress(iso, unit);
   if (p?.pos && !p.done) restore(p);
   requestWake();
+  if (dayFocus) dayMoved(dayFocus, plan, iso);
   if (auto) ttsToggle();
+}
+// Day navigation inside a lesson (יום קודם / היום / יום הבא): plain links to the same lesson on another date, so the
+// router reopens the reader (TTS stops, progress is kept per day) and the address keeps the date across a refresh.
+// Not offered as a swipe: a horizontal swipe already turns the page.
+function dayNavHtml(pos) {
+  const iso = R.iso, t = todayIso(), il = prefs.il, u = R.unit;
+  const when = d => `${fmtDmy(d)}, ${dayPlan(d, { il }).hebDate}`;
+  const prev = shiftIso(iso, -1), next = shiftIso(iso, 1);
+  return `<nav class="daynav daynav-${pos}" aria-label="${pos === 'top' ? 'מעבר בין ימים' : 'מעבר בין ימים – סוף השיעור'}">
+    <a class="btn" data-day="prev" href="#/r/${u}/${prev}" aria-label="יום קודם – ${esc(UNITS[u].he)} של ${esc(when(prev))}" aria-keyshortcuts="Shift+ArrowRight">${ICON.prev}<span>יום קודם</span></a>
+    ${iso === t ? '' : `<a class="btn today" data-day="today" href="#/r/${u}/${t}" aria-label="היום – ${esc(when(t))}">היום</a>`}
+    <a class="btn" data-day="next" href="#/r/${u}/${next}" aria-label="יום הבא – ${esc(UNITS[u].he)} של ${esc(when(next))}" aria-keyshortcuts="Shift+ArrowLeft"><span>יום הבא</span>${ICON.next}</a>
+  </nav>`;
+}
+function goDay(which) {
+  if (!R.unit || R.sid || !R.iso) return;
+  R.dayFocus = which;
+  location.hash = `#/r/${R.unit}/${which === 'today' ? todayIso() : shiftIso(R.iso, which === 'prev' ? -1 : 1)}`;
+}
+// after a day change: say which day is shown, and keep the keyboard on the same control when it is on screen
+function dayMoved(which, plan, iso) {
+  toast(`${UNITS[R.unit].he} – ${dayDates(plan, iso)}`);
+  const b = $(`.daynav-top [data-day="${which}"]`) || $(`.daynav-top [data-day="${which === 'today' ? 'next' : which}"]`);
+  if (b && (R.page === 0 || prefs.layout !== 'pages') && b.getClientRects().length) b.focus({ preventScroll: true });
+}
+// Siddur: the page shows the whole seder; the address, the subtitle and the per-section progress follow the section
+// being read (history.replaceState: no new history entry and no reload).
+function sectionOf(seg) { const m = seg?.dataset.id.match(/^([a-z]+)-(\d+)-/); return m ? +m[2] : 0; }
+function goToSec(n) {
+  const h = $(`#sec-${n}`);
+  if (!h || n <= 1) { if (prefs.layout === 'pages') setPage(0); else $('#vp').scrollTop = 0; return; }
+  if (prefs.layout === 'pages') setPage(pageOf(h));
+  else { const vp = $('#vp'); vp.scrollTop += h.getBoundingClientRect().top - vp.getBoundingClientRect().top - chromePad().top; }
+}
+// The section being read: a section whose name is on screen wins (the one already current if it is there, else the
+// last one shown – the page then ends in it); otherwise the section of the first paragraph on screen.
+// Pages mode compares page numbers, not screen boxes, so a page turn still sliding in does not matter.
+function markerShown(h) {
+  if (prefs.layout === 'pages') return pageOf(h) === R.page;
+  const v = $('#vp').getBoundingClientRect(), r = h.getBoundingClientRect();
+  return r.bottom > v.top + chromePad().top - 4 && r.top < v.bottom - chromePad().bottom;
+}
+function sectionOnScreen() {
+  const cur = +R.sid.split('/')[1];
+  const shown = [...document.querySelectorAll('#rc h2.sd-sec')].filter(markerShown).map(h => +h.dataset.sec);
+  if (shown.includes(cur)) return cur;
+  return shown.length ? shown.at(-1) : sectionOf(currentSeg());
+}
+function siddurTrack() {
+  if (!R.sid || !R.sidReady || !R.doc?.siddur) return;
+  const [bk, old] = R.sid.split('/'), n = sectionOnScreen();
+  if (n && n !== +old) {
+    if (n > +old) setProgress('siddur', R.sid, { done: true, frac: 1 }); // read past it
+    R.sid = `${bk}/${n}`;
+    if (location.hash.startsWith(`#/s/${bk}/`)) history.replaceState(history.state, '', `#/s/${bk}/${n}`);
+  }
+  const sec = R.doc.siddur.secs[(n || +old) - 1];
+  const sub = R.doc.siddur.secs.length > 1 && sec ? sec.he : R.doc.subtitle;
+  if ($('#r-s') && $('#r-s').textContent !== sub) $('#r-s').textContent = sub;
+  document.title = `${R.doc.title}${R.doc.siddur.secs.length > 1 && sec ? ' – ' + sec.he : ''} – סידור`;
 }
 // Simchat Torah: the Chumash shiur differs between calendars – say what we do and why, so the reader is not
 // surprised when another calendar (e.g. Chabad.org) shows something else.
@@ -722,7 +788,7 @@ async function renderDoc() {
   const showRashi = prefs.rashi && R.unit === 'chumash';
   const inline = d.tanakh && !showRashi;
   const sidd = !!d.siddur;
-  let html = `<header class="doc-head"><p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p><div class="orn" aria-hidden="true"><i></i><b></b><i></i></div></header>`;
+  let html = `<header class="doc-head"><p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p><h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p>${sidd ? '<div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>' : dayNavHtml('top')}</header>`;
   html += simchatTorahNote() + readerLocNote();
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
@@ -745,7 +811,7 @@ async function renderDoc() {
     if (mixed && voc[bi] === false && prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט אינו מנוקד</p>`;
     if (mixed && voc[bi] === true && !prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט מנוקד</p>`;
     if (voc[bi] !== null) prevVoc = voc[bi];
-    if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += `<h2>${esc(b.text)}</h2>`; continue; }
+    if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += b.sec ? `<h2 class="sd-sec" id="sec-${b.sec}" data-sec="${b.sec}">${esc(b.text)}</h2>` : `<h2>${esc(b.text)}</h2>`; continue; }
     if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += b.html != null ? (b.lang === 'he' ? `<aside class="sid-note sid-he" lang="he" dir="rtl">${divineName(b.html, prefs.divine)}</aside>` : `<aside class="sid-note" lang="en" dir="ltr">${divineName(b.html.replace(/[\u0590-\u05FF][\u0590-\u05FF\s"'״׳־,]*[\u0590-\u05FF]|[\u0590-\u05FF]/g, m => `<bdi lang="he">${m}</bdi>`), prefs.divine)}</aside>`) : `<aside class="day-note" role="note">${esc(b.text)}${(b.links || []).map(([t, u], i) => `${i ? '; ' : ''}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join('')}${esc(b.tail || '')}${b.href ? ` <a href="${esc(b.href)}" target="_blank" rel="noopener">${esc(b.hrefText || 'קישור')}</a>` : ''}</aside>`; continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
@@ -768,14 +834,15 @@ async function renderDoc() {
     html += `<p class="doc-credit" id="doc-fixes">${parts.join('. ')}. <a href="#/sources">פירוט בדף המקורות</a></p>`;
   }
   html += `<p class="doc-credit" id="doc-report">מצאת טעות בנוסח, בניקוד, בהקראה או בביאור? <a id="b-report" href="${ISSUES}" target="_blank" rel="noopener">דיווח ב-GitHub</a> (נפתח טופס עם פרטי המקום; דבר אינו נשלח עד שתאשר שם)</p>`;
-  if (sidd) { const nx = nextSid(); html += `<p class="endmark" id="endmark">— סוף הקטע —<br><button class="btn" id="b-nextunit">${nx ? `לחלק הבא: ${esc(nx.he)}` : 'חזרה לתוכן הסידור'}</button></p>`; }
-  else html += `<p class="endmark" id="endmark">— סוף השיעור —<br><button class="btn" id="b-nextunit">לשיעור הבא</button></p>`;
+  if (sidd) { const nx = nextSid(); html += `<div class="endmark" id="endmark"><p>— סוף ״${esc(d.title)}״ —</p><button class="btn" id="b-nextunit">${nx ? `לחלק הבא: ${esc(nx.bookHe)} – ${esc(nx.he)}` : 'חזרה לתוכן הסידור'}</button></div>`; }
+  else html += `<div class="endmark" id="endmark"><p>— סוף השיעור —</p><button class="btn" id="b-nextunit">לשיעור הבא</button>${dayNavHtml('end')}</div>`;
   rc.innerHTML = html;
   rc.className = 'r-content gloss-' + prefs.gloss;
   if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
   const rep = $('#b-report'); if (rep) { const upd = () => { rep.href = reportUrl(); }; rep.addEventListener('pointerdown', upd); rep.addEventListener('focus', upd); rep.addEventListener('click', upd); }
   $('#b-nextunit').onclick = () => nextUnit(false);
+  rc.querySelectorAll('.daynav a').forEach(a => a.addEventListener('click', () => { R.dayFocus = a.dataset.day; }));
   layout();
 }
 /** Round 5: the reader states the gloss coverage too (same number as the About page: glossary meta, published). */
@@ -787,10 +854,13 @@ function glossNote(rc, G, kind) {
   p.innerHTML = `ביאורי מילים בשיעור זה: ${here ? n(here) : 'אין'}. בסך הכול ${n(total)} בתורה ובתהילים ו־${n(rb)} ברמב״ם – מעט בכוונה: כל ביאור עבר שתי בדיקות ובדיקה ידנית${kind === 'tanakh' ? '; ברש״י אין' : kind ? '' : '; בתניא אין'} (<a href="#/about">פירוט</a>). `;
   end.prepend(p);
 }
-function nextSid() { if (!R.sid || !R.sorder) return null; const i = R.sorder.findIndex(x => `${x.book}/${x.n}` === R.sid); return i >= 0 ? R.sorder[i + 1] || null : null; }
+// the siddur reader shows a whole book (seder); "next" is the first section of the next book
+function nextSid() { if (!R.sid || !R.sorder) return null; const bk = R.sid.split('/')[0], i = R.sorder.findLastIndex(x => x.book === bk); return i >= 0 ? R.sorder[i + 1] || null : null; }
 function nextUnitId() { if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
   setProgress(...pk(), { done: true, frac: 1 });
+  // the end of a seder is the end of its last section
+  if (R.sid && R.doc?.siddur) setProgress('siddur', `${R.sid.split('/')[0]}/${R.doc.siddur.secs.length}`, { done: true, frac: 1 });
   if (R.sid) { const nx = nextSid(); R.autoplay = !!nx && autoplay; location.hash = nx ? `#/s/${nx.book}/${nx.n}` : '#/siddur'; return; }
   const n = nextUnitId();
   if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
@@ -902,9 +972,15 @@ function segSpan(el) {
 }
 function anchor() {
   const s = currentSeg(); if (!s) return null;
+  // siddur: the page starts with the end of the previous section but the current one begins on it – keep the
+  // place by the new section's first paragraph (its name sits right above it), not by the previous section's tail
+  if (R.sid && R.sidReady) {
+    const n = +R.sid.split('/')[1], h = $(`#sec-${n}`);
+    if (h && markerShown(h)) { const f = sectionOf(s) === n ? s : R.segs.find(x => sectionOf(x) === n) || s; return { pos: f.dataset.id, sub: 0, sec: n }; }
+  }
   return { pos: s.dataset.id, sub: prefs.layout === 'pages' ? Math.max(0, R.page - segSpan(s)[0]) : 0 };
 }
-function restore(a) { if (a?.pos) goToSeg(a.pos, false, a.sub || 0); }
+function restore(a) { if (a?.sec && R.sid && $(`#sec-${a.sec}`)) goToSec(a.sec); else if (a?.pos) goToSeg(a.pos, false, a.sub || 0); }
 // Round 5: a visible "report an error" path. It only builds a link to a new GitHub issue with the context filled in;
 // nothing is sent – the reader sees the form on GitHub and decides whether to submit it.
 const ISSUES = 'https://github.com/dudidd-wq/chitas-reader/issues/new';
@@ -944,7 +1020,9 @@ function updateProgress(save = true) {
   if (!save || !R.doc) return;
   clearTimeout(R.saveT);
   R.saveT = setTimeout(() => {
-    setProgress(...pk(), { ...anchor(), frac, done: frac >= 0.995 });
+    if (!R.doc || $('#reader').hidden) return;
+    siddurTrack();
+    setProgress(...pk(), { sec: null, ...anchor(), frac, done: frac >= 0.995 });
   }, 400);
 }
 // round 4: up to 440 px tall, so large phones on their side (390–430 px tall) also get the whole height
@@ -985,7 +1063,7 @@ function bindReaderUi() {
     if (h === lastH) return; const first = !lastH; lastH = h;
     if (first || !R.doc) return;
     cancelAnimationFrame(R.roF);
-    R.roF = requestAnimationFrame(() => { if (!$('#rc')) return; const s = (R.segs.find(x => x.classList.contains('speaking')) || currentSeg())?.dataset.id; layout(); if (s) goToSeg(s, false); });
+    R.roF = requestAnimationFrame(() => { if (!$('#rc')) return; const sp = R.segs.find(x => x.classList.contains('speaking')); if (!sp) { relayoutKeep(); return; } layout(); goToSeg(sp.dataset.id, false); });
   });
   R.ro.observe($('#rt')); R.ro.observe($('#rb'));
   $('#b-prev').onclick = $('#b-prev2').onclick = () => turn(-1);
@@ -1056,7 +1134,9 @@ document.addEventListener('keydown', e => {
   if (k !== 'Escape' && e.target.closest('input, select, textarea')) return;
   if (k === 'Escape') { R.lastEsc = readerEscape(); return; }
   if (!$('#sheet').hidden) return;
-  if (k === 'ArrowLeft' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); turn(1); }
+  // Shift+←/→: the same lesson on the next / previous day (RTL: left is forward, as for the pages)
+  if (e.shiftKey && (k === 'ArrowLeft' || k === 'ArrowRight') && !R.sid && R.unit) { e.preventDefault(); goDay(k === 'ArrowLeft' ? 'next' : 'prev'); }
+  else if (k === 'ArrowLeft' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); turn(1); }
   else if (k === 'ArrowRight' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); turn(-1); }
   else if (k === 'Home') { e.preventDefault(); prefs.layout === 'pages' ? setPage(0) : $('#vp').scrollTo({ top: 0 }); }
   else if (k === 'End') { e.preventDefault(); prefs.layout === 'pages' ? setPage(R.pages - 1) : $('#vp').scrollTo({ top: 1e9 }); }
@@ -1065,7 +1145,14 @@ document.addEventListener('keydown', e => {
 }, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
 // web fonts use font-display: swap – if one arrives after the first layout, page breaks were measured with the
 // fallback font, so measure again (keeping the reading position).
-document.fonts?.addEventListener?.('loadingdone', () => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } });
+// 1.0.55: in scroll mode a re-layout keeps the paragraph at the top of the screen where it was (it used to be centred,
+// which moved the text the reader – or a section deep link – had just placed)
+function relayoutKeep() {
+  if (prefs.layout === 'pages') { const a = anchor(); layout(); restore(a); return; }
+  const s = currentSeg(), y = s?.getBoundingClientRect().top; layout();
+  if (s && s.isConnected) $('#vp').scrollTop += s.getBoundingClientRect().top - y;
+}
+document.fonts?.addEventListener?.('loadingdone', () => { if (!$('#reader').hidden && R.doc) relayoutKeep(); });
 let resizeT; window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => { if (!$('#reader').hidden && R.doc) { const a = anchor(); layout(); restore(a); } }, 150); });
 
 function openSheet(kind, note = '') {
@@ -1079,7 +1166,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if (name === 'siddurLang' && R.sid) { const a = anchor(), [bk, n] = R.sid.split('/'); try { R.doc = await buildSiddurDoc(bk, +n, { lang: prefs.siddurLang }); $('#r-s').textContent = R.doc.subtitle; } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); }
+    if (name === 'siddurLang' && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
@@ -1126,9 +1213,10 @@ function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('
 async function ttsToggle() {
   if (!ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
   if (R.speaker) { R.speaker.toggle(); return; }
-  const unit = R.unit, iso = R.iso;
+  const unit = R.unit, iso = R.iso, doc = R.doc;
+  if (!doc) return; // still loading (e.g. right after a day change): nothing to read yet
   await waitForVoices();
-  if (R.unit !== unit || R.iso !== iso || R.speaker) return;
+  if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
   R.speaker = new Speaker({
     onSegment: (i, frac = 0) => {
       const el = R.segs[i]; if (!el) return;
@@ -1176,7 +1264,7 @@ function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
   R.ttsShown = false; clearTimeout(R.hideT);
-  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), a); }
+  if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
   R.unit = null; R.sid = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
