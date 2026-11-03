@@ -1,6 +1,6 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc } from './texts.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
@@ -415,6 +415,7 @@ function displayForm() {
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
     <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
+  ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
   ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
   ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
 }
@@ -504,6 +505,10 @@ async function renderSources() {
   ${ov.map(([n, m]) => row('רמב״ם – ' + Locale.gettext(n, 'he-x-NoNikud'), { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent('Mishneh Torah, ' + n) }, (m.vocalized ?? /Torat Emet/.test(m.versionTitle)) ? 'מנוקד' : m.partial ? `<b>מנוקד חלקית</b> – ${m.partial[0]} מתוך ${m.partial[1]} קטעים מנוקדים; לשאר אין גרסה מנוקדת ברישיון המתיר שימוש כאן` : '<b>לא מנוקד</b> – אין גרסה מנוקדת ברישיון המתיר שימוש כאן')).join('')}
   ${Object.entries(s.rambamChapterOverrides || {}).map(([k, m]) => { const [, n, c] = k.match(/^(.*) (\d+)$/); return row(`רמב״ם – ${Locale.gettext(n, 'he-x-NoNikud')}, פרק ${gem(+c)}`, { ...m, sefariaUrl: 'https://www.sefaria.org/' + encodeURIComponent(`Mishneh Torah, ${n}.${c}`) + '?vhe=' + encodeURIComponent(m.versionTitle) }, 'פרק זה חסר בגרסה הראשית והושלם מגרסה זו' + (m.vocalized ? '' : '; <b>לא מנוקד</b>')); }).join('')}
   </tbody></table>
+  <h2 id="study-notes-src">מראי מקומות וביאור קצר</h2><p>מוצגים אחרי הטקסט, בחלק נפרד ומקופל. הם אינם מוקראים, ואפשר לכבות אותם בהגדרות. שום דבר בהם לא נכתב באתר זה.</p>
+  <ul><li><b>תורה אור ולקוטי תורה:</b> ״מראי מקומות הערות וציונים״ של מהדורת קה״ת, דרך <a href="https://www.sefaria.org/texts/Chasidut" target="_blank" rel="noopener">ספריא</a> (${licenseLink('CC-BY-NC')}). הערה מוצגת רק אם מילות הכותרת שלה נמצאות בפסקה שספריא מקשרת אליה.</li>
+  <li><b>תניא:</b> ״מראי מקומות״ של <a href="${WS_TANYA}" target="_blank" rel="noopener">״תניא מנוקד״ בוויקיטקסט</a> (<a href="${WIKISOURCE_DEED}" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), מעוגנים לנוסח קה״ת לפי השוואת המילים שלפני הסימן ואחריו. יש כאלה רק בליקוטי אמרים (כולל ההקדמה) ובשער היחוד והאמונה.</li>
+  <li><b>רמב״ם:</b> קישור בלבד לביאור הרב שטיינזלץ בספריא, כי הוא מוגן בזכויות יוצרים.</li></ul>
   <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), ולכל ביאור מצורף קישור לערך המקור. ביאור מתפרסם רק אם עבר <b>שתי בדיקות בלתי תלויות</b>, ואחריהן בדיקה ידנית:</p>
   <ol><li><b>ויקימילון:</b> ההגדרה מצטטת את <b>אותו פסוק</b>, ואין עליה (או על הערך) תבנית אזהרה כמו ״פירוש לקוי״, ״משוערת״, ״הבהרה״, ״דרוש מקור״ או ״לשכתוב״.</li>
   <li><b>הצלבה אוטומטית עם שני מקורות אחרים:</b> המשמעות צריכה להתאים גם לתרגום המילה בהקשרה ב-<a href="https://github.com/STEPBible/STEPBible-Data" target="_blank" rel="noopener" dir="ltr">STEPBible TAHOT</a> (Tyndale House, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" dir="ltr">CC BY 4.0</a>) וגם לתרגום הפסוק ב-JPS 1917 (נחלת הכלל, דרך ספריא). הגישור בין עברית לאנגלית נעשה בעזרת ערכי ויקימילון האנגלי (<a href="https://kaikki.org" target="_blank" rel="noopener">kaikki.org</a>, CC BY-SA) ו-Princeton WordNet. מקורות העזר משמשים לבדיקה בלבד ואינם מוצגים באתר.</li>
@@ -577,6 +582,9 @@ function renderAbout() {
   <li><b>נבדק:</b> 19 קטעים (בהם ברוך שאמר, אשרי, ישתבח, שמונה עשרה, והוא רחום, ובא לציון, ויהי נועם) הושוו מילה במילה לסידור מצודה נוסח ספרד (ספריא, CC BY). לא נמצא קטע שאינו בנוסח חב״ד; תוקנו 5 שגיאות הקלדה ברורות ו־2 שגיאות המרה, ונקודות שאינן ודאיות סומנו ״לבדיקה״ ולא שונו – <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/SIDDUR-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">SIDDUR-VERIFICATION.md</a>.</li>
   <li><b>חסר:</b> תפילות הימים הנוראים, סליחות, פרקי אבות, קינות, וטקסט המגילה – לא נמצא להם נוסח חב״ד ברישיון חופשי. הרשימה המלאה בעמוד <a href="#/siddur">הסידור</a>.</li></ul>
   <h2>ניקוד</h2><ul><li>כל טקסטי חת״ת והרמב״ם מנוקדים (ספר המצוות שבשיעורים הנוספים אינו מנוקד; תורה אור ולקוטי תורה מנוקדים ברובם, בנוסח חסידות בהירה, ופסקה שלא אומתה מוצגת בלי ניקוד), חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
+  <h2>מראי מקומות וביאור קצר</h2><ul><li>בסוף הקטעים של תורה אור ולקוטי תורה ושל התניא יש חלק מקופל, ״מראי מקומות״: מקורות הפסוקים והמאמרים, ממהדורת קה״ת (דרך ספריא) ומוויקיטקסט. <b>אלה אינם ביאור</b>. בתניא הם קיימים רק בליקוטי אמרים ובשער היחוד והאמונה.</li>
+  <li>ברמב״ם יש בסוף כל פרק קישור לביאור הקצר של הרב שטיינזלץ בספריא. הביאור עצמו מוגן בזכויות יוצרים ולכן אינו מוצג כאן.</li>
+  <li>ביאור קצר לתניא ולתורה אור/לקוטי תורה (כמו ״שיעורים בספר התניא״) לא נמצא ברישיון פתוח, ולכן אינו מוצג. האתר אינו כותב ביאורים בעצמו. אפשר לכבות את החלק הזה בהגדרות. <a href="#/sources">פירוט במקורות</a></li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
@@ -917,6 +925,7 @@ async function renderDoc() {
     if (mixed && voc[bi] === true && !prevVoc) html += `<p class="unvoc-mark">מכאן הטקסט מנוקד</p>`;
     if (voc[bi] !== null) prevVoc = voc[bi];
     if (b.type === 'h') { if (open) { html += '</p>'; open = false; } html += b.sec ? `<h2 class="sd-sec" id="sec-${b.sec}" data-sec="${b.sec}">${esc(b.text)}</h2>` : `<h2>${esc(b.text)}</h2>`; continue; }
+    if (b.type === 'notes') { if (open) { html += '</p>'; open = false; } if (prefs.studyNotes !== false) html += notesHtml(b); continue; }
     if (b.type === 'note') { if (open) { html += '</p>'; open = false; } html += b.html != null ? (b.lang === 'he' ? `<aside class="sid-note sid-he" lang="he" dir="rtl">${divineName(b.html, prefs.divine)}</aside>` : `<aside class="sid-note" lang="en" dir="ltr">${divineName(b.html.replace(/[\u0590-\u05FF][\u0590-\u05FF\s"'״׳־,]*[\u0590-\u05FF]|[\u0590-\u05FF]/g, m => `<bdi lang="he">${m}</bdi>`), prefs.divine)}</aside>`) : `<aside class="day-note" role="note">${esc(b.text)}${(b.links || []).map(([t, u], i) => `${i ? '; ' : ''}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join('')}${esc(b.tail || '')}${b.href ? ` <a href="${esc(b.href)}" target="_blank" rel="noopener">${esc(b.hrefText || 'קישור')}</a>` : ''}</aside>`; continue; }
     // the visible number is decorative; screen readers get "פסוק יז" / "הלכה ג" (round 4)
     const num = b.num ? `<span class="sr">${b.type === 'v' ? 'פסוק' : R.unit.startsWith('rambam') ? 'הלכה' : 'סעיף'} ${b.num} </span><span class="${b.type === 'v' ? 'vn' : 'hn'}" aria-hidden="true">${b.num}</span>` : '';
@@ -942,6 +951,8 @@ async function renderDoc() {
   if (sidd) { const nx = nextSid(); html += `<div class="endmark" id="endmark"><p>— סוף ״${esc(d.title)}״ —</p><button class="btn" id="b-nextunit">${nx ? `לחלק הבא: ${esc(nx.bookHe)} – ${esc(nx.he)}` : 'חזרה לתוכן הסידור'}</button></div>`; }
   else html += `<div class="endmark" id="endmark"><p>— סוף השיעור —</p><button class="btn" id="b-nextunit">לשיעור הבא</button>${dayNavHtml('end')}</div>`;
   rc.innerHTML = html;
+  // an opened/closed notes section changes the page count in the paged layout
+  rc.querySelectorAll('details.study-notes').forEach(el => el.addEventListener('toggle', () => { const a = anchor(); layout(); restore(a); }));
   rc.className = 'r-content gloss-' + prefs.gloss;
   if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
@@ -949,6 +960,16 @@ async function renderDoc() {
   $('#b-nextunit').onclick = () => nextUnit(false);
   rc.querySelectorAll('.daynav a').forEach(a => a.addEventListener('click', () => { R.dayFocus = a.dataset.day; }));
   layout();
+}
+/** Round 8: "מראי מקומות" / short-explanation link – a separate, attributed section after the text (texts.js 'notes'
+ *  blocks). Collapsed by default; not part of the lesson's segments, so read-aloud, bookmarks and progress skip it.
+ *  Kehot's notes carry only <b>/<br> (sanitised at build time and again here). */
+const safeNote = h => esc(String(h).replace(/<br\s*\/?>/gi, '\n')).replace(/&lt;(\/?)b&gt;/g, '<$1b>').replace(/\n/g, '<br>');
+function notesHtml(b) {
+  const attr = `<p class="sn-attr">${esc(b.attr.text)}${(b.attr.links || []).map(([t, u], i) => `${i ? '; ' : ''}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join('')}${esc(b.attr.tail || '')}</p>`;
+  if (b.link) return `<aside class="study-notes sn-link" data-kind="${esc(b.kind)}" aria-label="${esc(b.title)}"><p><a href="${esc(b.link[1])}" target="_blank" rel="noopener">${esc(b.link[0])}</a></p>${attr}</aside>`;
+  const n = b.groups.reduce((a, g) => a + g.items.length, 0);
+  return `<details class="study-notes" data-kind="${esc(b.kind)}"><summary>${esc(b.title)} <span class="sn-n">(${n})</span></summary>${attr}${b.groups.map(g => `<section class="sn-g" data-target="${esc(g.target)}"><h3 class="sn-h">בקטע ״${esc(g.label)}…״</h3><ul>${g.items.map(i => `<li>${i.html != null ? safeNote(i.html) : `${i.w ? `<span class="sn-w">${divineName(esc(i.w), prefs.divine)}</span> – ` : ''}${esc(i.t)}`}</li>`).join('')}</ul></section>`).join('')}</details>`;
 }
 /** Round 5: the reader states the gloss coverage too (same number as the About page: glossary meta, published). */
 function glossNote(rc, G, kind) {
@@ -1272,7 +1293,7 @@ function openSheet(kind, note = '') {
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
     if (name === 'siddurLang' && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
-    else if (['taamim', 'rashi', 'gloss', 'font', 'divine'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
+    else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }

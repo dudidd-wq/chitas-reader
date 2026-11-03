@@ -1,0 +1,71 @@
+{
+ "perKey": {
+  "LA-title": {
+   "chapters": 1,
+   "withNotes": 0,
+   "notes": 0,
+   "placed": 0,
+   "source": "none"
+  },
+  "LA-approbation": {
+   "chapters": 3,
+   "withNotes": 0,
+   "notes": 0,
+   "placed": 0,
+   "source": "none"
+  },
+  "LA-foreword": {
+   "chapters": 1,
+   "withNotes": 1,
+   "notes": 10,
+   "placed": 8,
+   "source": "ויקיטקסט"
+  },
+  "LA": {
+   "chapters": 53,
+   "withNotes": 52,
+   "notes": 441,
+   "placed": 380,
+   "source": "ויקיטקסט"
+  },
+  "SY-chinukh": {
+   "chapters": 1,
+   "withNotes": 1,
+   "notes": 16,
+   "placed": 13,
+   "source": "ויקיטקסט"
+  },
+  "SY": {
+   "chapters": 12,
+   "withNotes": 11,
+   "notes": 44,
+   "placed": 39,
+   "source": "ויקיטקסט"
+  },
+  "IT": {
+   "chapters": 12,
+   "withNotes": 0,
+   "notes": 0,
+   "placed": 0,
+   "source": "ויקיטקסט"
+  },
+  "IK": {
+   "chapters": 32,
+   "withNotes": 0,
+   "notes": 0,
+   "placed": 0,
+   "source": "none"
+  },
+  "KA": {
+   "chapters": 9,
+   "withNotes": 0,
+   "notes": 0,
+   "placed": 0,
+   "source": "none"
+  }
+ },
+ "notes": 511,
+ "placed": 440,
+ "droppedPlace": 53,
+ "droppedEmpty": 18
+}

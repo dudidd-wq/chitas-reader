@@ -1,0 +1,21 @@
+{
+ "lessons": 378,
+ "withNotes": 362,
+ "notes": 24215,
+ "droppedNoHead": 5,
+ "droppedNotInText": 5493,
+ "unmatchedParas": 0,
+ "paras": 8148,
+ "perWork": {
+  "to": {
+   "lessons": 110,
+   "withNotes": 101,
+   "notes": 5903
+  },
+  "lt": {
+   "lessons": 268,
+   "withNotes": 261,
+   "notes": 18312
+  }
+ }
+}

@@ -18,11 +18,13 @@ version number; Wikisource itself states CC BY-SA 4.0). Per-file metadata: `sour
 | `siddur/` (prayer text) | Siddur Nusach Ha-Ari (Chabad), transcribed by Shmuel Gonzales | Open Siddur Project (Internet Archive copy) | CC0 |
 | `siddur/` (English instructions, `n` blocks) | same | Open Siddur Project | CC BY (attribution: Contributors to the Open Siddur Project, including Shmueli Gonzales) |
 | `glossary.json` | short glosses | Hebrew Wiktionary | CC BY-SA 4.0 |
+| `notes/tolt/` | "מראי מקומות הערות וציונים" (Sources and References on Torah Ohr / Likkutei Torah), Kehot Publication Society | Sefaria | **CC BY-NC – non-commercial use only** |
+| `notes/tanya/` | "מראי מקומות" of "תניא מנוקד" (source references only) | Hebrew Wikisource | CC BY-SA 4.0 |
 
 Outside this directory, `verification/siddur-ref.json` holds consonant-only word skeletons of 19 passages of the Metsudah Siddur Sefard (Sefaria, CC BY 4.0), used only to verify the siddur; it is not served by the site.
 
 **Non-commercial restriction:** a fork, a paid app-store build, an ad-supported site or any other commercial use
-must not ship `tanya/`, `tolt/` or `ravyomi/` without permission from the rights holders; remove or replace them instead.
+must not ship `tanya/`, `tolt/`, `notes/tolt/` or `ravyomi/` without permission from the rights holders; remove or replace them instead.
 The niqqud in `tolt/` (Chassidut Behirah) was permitted for this non-commercial site only; it may not be reused elsewhere
 without asking Chassidut Behirah and Kehot.
 

@@ -9,7 +9,8 @@ export const DEFAULT_PREFS = {
   ttsLockscreen: true, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
-  tehillimProfiles: [], tehillimRebbe: false, // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only
+  tehillimProfiles: [], tehillimRebbe: false,
+  studyNotes: true, // round 8: "מראי מקומות" / short-explanation link after the text (texts.js 'notes' blocks) // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only
 };
 // One speed scale for the footer menu and the settings slider.
 export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];

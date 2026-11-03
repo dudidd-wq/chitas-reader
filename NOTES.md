@@ -220,3 +220,11 @@ npm test && npm run ui && npm run shots
   - כשכותרת החלק נמצאת על המסך, `anchor` שומר `sec` כדי ששינוי פריסה או רענון יחזרו לכותרת.
   - בסוף הסדר יש כפתור לסדר הבא.
 - **בדיקות:** `tests/daynav.test.mjs` ו־`tests/siddur-flow.test.mjs`, בגדלים 320×568, 390×800/844, 568×320, 844×390 ו־1366×800.
+
+## תהילים אישי; מראי מקומות וביאור קצר (1.0.56)
+- **תהילים אישי** (`site/js/personal.js`, `#/tehillim`): הפרק = מספר השנים שמלאו + 1, לפי יום ההולדת העברי (Hebcal). מקורות וכללים: `verification/PERSONAL-TEHILLIM.md`. אפשר לשמור כמה פרופילים (`prefs.tehillimProfiles`, מנוקים ב־`cleanProfile`, עד 50), ולבחור גם את פרק הרבי (`tehillimRebbe`). הכל במכשיר בלבד. מעל 150 – מוצגת הודעה ולא נבחר פרק, כי המנהג לא אומת. `tests/personal-tehillim.test.mjs`.
+- **מראי מקומות** (`texts.js`, בלוק `notes`; `app.js` `notesHtml`): חלק נפרד אחרי הטקסט, `<details>` מקופל עם ייחוס. הוא אינו `.seg`, ולכן ההקראה, הסימניות וההתקדמות מדלגות עליו. ההגדרה `studyNotes` (ברירת מחדל: מוצג).
+  - `tools/build-notes-tolt.mjs` → `site/data/notes/tolt/<parsha>.json`. ההערות של קה״ת מספריא, עם קישור ההערה לפסקה. הערה נשמרת רק אם מילות הכותרת שלה (המודגשות) נמצאות בפסקה. מותרים רק `<b>`/`<br>`.
+  - `tools/build-notes-tanya.mjs` → `site/data/notes/tanya/<key>.json`. ״מראי מקומות״ מוויקיטקסט (״תניא מנוקד״), מעוגנים לקטע של קה״ת ביישור מילים (LCS). הערה נשמרת רק אם שתי המילים שלפני הסימן ומילה אחריו מיושרות.
+  - רמב״ם: `steinsaltzUrl` – קישור לכל פרק, בלי טקסט.
+  - `tests/study-notes.test.mjs`, `verification/STUDY-NOTES.md`.

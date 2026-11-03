@@ -388,3 +388,14 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .pt-v { margin: .3em 0; }
 .pt-n { font-weight: bold; margin-inline-end: .3em; opacity: .7; }
 .check a { padding-inline: .2em; }
+/* round 8: "מראי מקומות" / short-explanation link after the text (texts.js 'notes' blocks) */
+.study-notes { font-family: var(--ui); font-size: .62em; line-height: 1.6; background: var(--card); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 8px; padding: .35em .75em; margin: .4em 0 1em; text-align: start; }
+.study-notes > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: .4em; font-weight: 600; color: var(--accent); }
+.study-notes > summary:focus-visible, .study-notes a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.study-notes .sn-attr { font-size: .9em; opacity: .85; margin: .3em 0 .6em; }
+.study-notes .sn-h { font-size: 1em; margin: .6em 0 .2em; font-weight: 600; }
+.study-notes ul { margin: 0; padding-inline-start: 1.2em; }
+.study-notes li { margin: .2em 0; }
+.study-notes .sn-w { font-family: var(--text, inherit); }
+.study-notes.sn-link p:first-child { margin: .3em 0; }
+.study-notes.sn-link a { display: inline-flex; align-items: center; min-height: 44px; }

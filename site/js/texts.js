@@ -3,6 +3,7 @@ import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe } from './calendar.js'
 import { localizeRuns } from './siddur-lang.js';
 
 const cache = new Map();
+const NOTE_KEYS = ['LA-foreword', 'LA', 'SY-chinukh', 'SY']; // Tanya parts with Wikisource notes (site/data/notes/tanya)
 /** Licence labels exactly as the source (Sefaria version record) states them — no version is added (round-3 review).
  *  Sefaria records "CC-BY-SA"/"CC-BY-NC" without a version, so the link goes to the licence family page; texts whose
  *  original publisher is Wikisource additionally cite the version stated there (CC BY-SA 4.0, page footer). */
@@ -33,13 +34,13 @@ export async function filesFor(plan, unit) {
   const f = [];
   if (unit === 'chumash') for (const c of plan.chumash.parts) for (let i = c.from.c; i <= c.to.c; i++) f.push(`torah/${c.book}/${i}.json`);
   if (unit === 'tehillim') plan.tehillim.parts.forEach(p => f.push(`tehillim/${p.c}.json`));
-  if (unit === 'tanya') { const doc = await tanyaPositions(plan); doc.forEach(([k, c]) => f.push(`tanya/${k}/${c}.json`)); }
+  if (unit === 'tanya') { const doc = await tanyaPositions(plan); doc.forEach(([k, c]) => f.push(`tanya/${k}/${c}.json`, ...(NOTE_KEYS.includes(k) ? [`notes/tanya/${k}.json`] : []))); }
   if (unit === 'rambam1' || unit === 'rambam3') {
     const idx = await data('rambam/index.json');
     for (const it of plan[unit]) for (const [c] of rambamChaptersFull(it, idx[it.name])) f.push(`rambam/${idx[it.name].slug}/${c}.json`);
   }
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
-  if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`)); }
+  if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`, `notes/tolt/${slug}.json`)); }
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   return [...new Set(f)];
 }
@@ -105,6 +106,14 @@ async function tanyaPositions(plan) {
   }
   return out;
 }
+// ---------------- "מראי מקומות" / short-explanation links (round 8) ----------------
+// Shown as a separate, collapsed, attributed section after the text ('notes' blocks; never read aloud). Nothing in
+// them is written by this site: Tanya – Hebrew Wikisource's "מראי מקומות" (CC BY-SA 4.0); Torah Or / Likkutei Torah –
+// Kehot's "מראי מקומות הערות וציונים" (via Sefaria, CC BY-NC); Rambam – a link to the Steinsaltz commentary on
+// Sefaria (copyright – link only, nothing copied). tools/build-notes-*.mjs, verification/STUDY-NOTES.md.
+export const WS_TANYA = 'https://he.wikisource.org/wiki/%D7%AA%D7%A0%D7%99%D7%90_%D7%9E%D7%A0%D7%95%D7%A7%D7%93';
+const firstWords = (html, n = 4) => html.replace(/<span class="daf"[^>]*>[^<]*<\/span>/g, '').replace(/<[^>]+>/g, '').replace(/[()[\]]/g, '').trim().split(/\s+/).slice(0, n).join(' ');
+async function optional(path) { try { return await data(path); } catch { return null; } }
 async function tanyaDoc(plan) {
   const index = await data('tanya/index.json');
   const blocks = [];
@@ -113,10 +122,16 @@ async function tanyaDoc(plan) {
     const multi = index[k].depth === 2 && index[k].chapters.length > 1;
     blocks.push({ type: 'h', text: index[k].he + (multi ? ` – ${k === 'IK' ? 'אגרת' : 'פרק'} ${gem(c)}` : '') + (a > 1 ? ' (המשך)' : '') });
     for (let s = a; s <= Math.min(b, d.s.length); s++) blocks.push({ type: 'p', id: `${k}.${c}.${s}`, text: d.s[s - 1], src: 'tanya' });
+    const N = NOTE_KEYS.includes(k) ? (await optional(`notes/tanya/${k}.json`))?.[c] : null;
+    const groups = N ? Object.keys(N).map(Number).filter(s => s >= a && s <= Math.min(b, d.s.length)).sort((x, y) => x - y)
+      .map(s => ({ target: `${k}.${c}.${s}`, label: firstWords(d.s[s - 1]), items: N[s].map(x => ({ w: x.w, t: x.t })) })) : [];
+    if (groups.length) blocks.push({ type: 'notes', kind: 'tanya', title: 'מראי מקומות', groups,
+      attr: { text: 'מראי המקומות (מקורות הפסוקים והמאמרים) לקוחים מ״תניא מנוקד״ ב', links: [['ויקיטקסט', WS_TANYA]], tail: ' (CC BY-SA 4.0). הם מוצגים ליד הקטע בנוסח קה״ת שבו נמצא סימן ההערה, לפי השוואת המילים שלפני הסימן ואחריו. אינם ביאור, ולא נכתבו באתר זה.' } });
   }
   const first = blocks.find(b => b.type === 'h');
   return { title: 'תניא יומי', subtitle: first ? first.text.replace(' (המשך)', '') : '', blocks };
 }
+export const steinsaltzUrl = (name, c) => `https://www.sefaria.org/${encodeURIComponent(`Steinsaltz on Mishneh Torah, ${name}`.replace(/ /g, '_')).replace(/%2C/g, ',')}${c ? '.' + c : ''}?lang=he`;
 function rambamChaptersFull(it, meta) {
   if (it.c) return [[it.c, 1, Infinity]];
   if (it.range) {
@@ -177,6 +192,8 @@ async function rambamDoc(plan, unit) {
         for (const f of applied) fixes.push({ id, label: `${label}, הלכה ${gem(s)}`, ...f });
         blocks.push({ type: 'p', id, num: gem(s), text, src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}) });
       }
+      blocks.push({ type: 'notes', kind: 'rambam', title: 'ביאור קצר (קישור)', link: [`ביאור הרב שטיינזלץ ל${label} – בספריא`, steinsaltzUrl(it.name, meta.depth === 2 ? c : 0)],
+        attr: { text: 'הביאור של הרב עדין אבן־ישראל שטיינזלץ (הוצאת קורן) מוגן בזכויות יוצרים (״Copyright: Steinsaltz Center״ בספריא), ולכן אינו מוצג כאן – רק קישור אליו. הקישור נפתח באתר ספריא.' } });
     }
   }
   return { book: 'Rambam', title: UNITS[unit].full, subtitle: await rambamTitle(plan[unit]), blocks, credits, fixes }; // book: the gloss key prefix ('Rambam <slug>.<c>.<s>')
@@ -211,6 +228,9 @@ async function toltDoc(plan) {
     const nq = paras.filter(p => p.nq).length;
     if (nq) blocks.push({ type: 'note', text: `${CB_ATTR}. `, links: [['חסידות בהירה – chassidutbehirah.com', CB_URL]], tail: nq < paras.length ? `. ${paras.length - nq} מתוך ${paras.length} הפסקאות מוצגות בלי ניקוד, כי לא אומתה בהן התאמה מלאה לאותיות נוסח קה״ת.` : '.' });
     paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}) }));
+    const N = (await optional(`notes/tolt/${slug}.json`))?.[day];
+    if (N) blocks.push({ type: 'notes', kind: 'tolt', title: 'מראי מקומות הערות וציונים', attr: { text: '״מראי מקומות הערות וציונים״ של מהדורת קה״ת, דרך ', links: [['ספריא', e.sefaria]], tail: ' (CC BY-NC). כל הערה מוצגת רק אם מילות הכותרת שלה נמצאות בפסקה שאליה ספריא מקשרת אותה. אינם ביאור, ולא נכתבו באתר זה.' },
+      groups: Object.keys(N).map(Number).sort((x, y) => x - y).map(i => ({ target: `${slug}.${day}.${i}`, label: firstWords(paras[i - 1].t), items: N[i].map(h => ({ html: h })) })) });
     if (e.until) blocks.push({ type: 'note', text: `לפי הלוח השיעור מסתיים ${e.until.daf === 'תום' || e.until === 'תום' ? 'בסוף הדרוש' : e.until === 'סוף הפרשה' ? 'בסוף הפרשה' : `בדף ${gem(e.until.daf)}/${e.until.amud}`}.` });
   }
   blocks.push({ type: 'note', text: 'חלוקת השיעורים: ', links: LUACH_LINKS, tail: `. הטקסט: הוצאת קה״ת דרך ספריא (CC BY-NC). ${CB_ATTR} (chassidutbehirah.com); הניקוד נקלט רק במילים שאותיותיהן זהות לנוסח קה״ת, ופסקה שלא אומתה מוצגת בלי ניקוד. בסוגריים המרובעים – מספרי הדפים והעמודים במהדורה (א–ד).` });
