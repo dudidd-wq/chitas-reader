@@ -28,7 +28,9 @@ for (const int8 of [false, true]) test(`${int8 ? 'int8' : 'full'} model: a verse
   const rms = Math.sqrt(a.audio.reduce((s, x) => s + x * x, 0) / a.audio.length);
   assert.ok(rms > 0.01, `rms ${rms}`);
   assert.ok(a.audio.every(Number.isFinite));
-  const fast = await v.synth(text, { rate: 1.5 });
-  assert.ok(fast.audio.length < a.audio.length * 0.85, 'rate 1.5 is shorter');
+  // durations are stochastic (noise_w): compare the mean of 3 runs at each speed
+  const len = async rate => { let n = 0; for (let i = 0; i < 3; i++) n += (await v.synth(text, { rate })).audio.length; return n / 3; };
+  const n1 = await len(1), n15 = await len(1.5);
+  assert.ok(n15 < n1 * 0.85, `rate 1.5 is shorter: ${n15} vs ${n1}`);
   await v.release?.();
 });

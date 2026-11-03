@@ -257,7 +257,8 @@ npm test && npm run ui && npm run shots
   - `tests/g2p.test.mjs`: מילים נדרשות ופסוקים מוטעמים.
   - `tests/voice-node.test.mjs`: סינתוז אמיתי ב-Node, שני המודלים, hash וגודל.
   - `tests/voice.test.mjs`: Chrome. בודק שאין הורדה בלי לחיצה, נפילה ל-Web Speech (דפדפן לא נתמך, קבצים פגומים, 404), ו-e2e (התקנה, השמעה, עצירה/דילוג, טעינה מחדש בלי הורדה).
-- **ל-1.0.60 ואילך:**
+- **1.0.60 – קול גברי:** `site/js/voice-pitch.js` (קוד שלנו: YIN, סימוני מחזור, TD-PSOLA, resample sinc). ברירת מחדל `ttsGender: 'male'` = `TIMBRES.male` ‏(‎−6 st, formant 0.94); `piper-core` מסנתז מהר פי 1/0.94 כדי לשמור על הקצב, ואז `maleTimbre`. העיבוד ב-Worker, אין קובץ נוסף. 'female' = המודל כמו שהוא. מועמדים גבריים שנבדקו ונדחו ומדידות: `verification/VOICE.md#male`. בדיקות: `tests/voice-pitch.test.mjs`, וב-`tests/voice.test.mjs` (F0 של השמעה אמיתית בדפדפן, החלפה לנשי בלי הורדה).
+- **ל-1.0.61 ואילך:**
   - renikud לטקסט לא מנוקד;
   - מדידת הטעמה בלשון חכמים;
   - תמיכה ב-MediaSession בזמן השמעה ב-WebAudio;

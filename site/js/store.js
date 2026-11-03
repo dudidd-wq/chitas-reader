@@ -6,7 +6,7 @@ export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
-  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', wakeLock: true, spread: true, locationChosen: false,
+  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
   tehillimProfiles: [], tehillimRebbe: false,
@@ -26,6 +26,9 @@ function load() {
     // 1.0.59: 'web' = the browser's / device's voice (Web Speech), 'piper' = the downloaded local voice (noa)
     if (!['web', 'piper'].includes(prefs.ttsEngine)) prefs.ttsEngine = 'web';
     if (!['full', 'int8'].includes(prefs.ttsModel)) prefs.ttsModel = 'full';
+    // 1.0.60: the local voice reads with a male timbre by default (signal processing of the same noa model, no extra
+    // download); 'female' = the model's own voice
+    if (!['male', 'female'].includes(prefs.ttsGender)) prefs.ttsGender = 'male';
     return { prefs, progress: d.progress || {} };
   }
   catch { return { prefs: { ...DEFAULT_PREFS }, progress: {} }; }

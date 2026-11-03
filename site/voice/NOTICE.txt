@@ -27,4 +27,12 @@ Speech is synthesised on the device; no text is sent anywhere.
    Tehillim texts in data/ (see the site's Sources page) and a hand-checked exception list. Part of the site's code
    (GPL-2.0-or-later).
 
+6. Male timbre (site/js/voice-pitch.js, since 1.0.60) – own code of chitas-reader (GPL-2.0-or-later), no third-party
+   DSP library: YIN pitch estimation (de Cheveigné & Kawahara, 2002 – method only), TD-PSOLA pitch shift (Moulines &
+   Charpentier, 1990 – method only) and windowed-sinc resampling. It changes the audio produced by (1)/(2) on the
+   device: pitch about 6 semitones lower, formants about 6% lower. The result is a modified rendering of the noa
+   voice, not a recording or model of a male speaker; no endorsement by the original author is implied.
+   No other voice model is downloaded for it. Male Hebrew voices that were checked and NOT used (licence of the
+   weights or of the training recordings is non-commercial or undocumented): see verification/VOICE.md.
+
 No code of Piper (GPL) is used: the model is run with ONNX Runtime Web and the input is prepared by g2p.js/piper-core.js.

@@ -429,12 +429,14 @@ function displayForm() {
 function qvForm() {
   if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small></fieldset>`;
   return `<fieldset id="qv"><legend>קול איכותי (פועל במכשיר, ניסיוני)</legend>
-    ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי – noa (מקומי)']])}
+    ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי (מקומי)']])}
+    ${radio('ttsGender', prefs.ttsGender, [['male', 'קול גברי (ברירת מחדל)'], ['female', 'קול נשי']])}
+    <small id="qv-gender-note">הקול הגברי הוא אותו קול (noa) בעיבוד אות במכשיר: הורדת גובה הצליל בכ־6 חצאי טון והורדה קלה של הפורמנטים. אין הורדה נוספת. זהו גוון מלאכותי ולא קול של דובר אמיתי.</small>
     ${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
-    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); פרטים בעמוד המקורות.</small>
+    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי – עיבוד אות שלנו. פרטים בעמוד המקורות.</small>
   </fieldset>`;
 }
 async function bindQv(root) {
@@ -448,7 +450,10 @@ async function bindQv(root) {
     st.textContent = have ? `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
       : `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
   };
-  root.addEventListener('input', e => { if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh(); });
+  root.addEventListener('input', e => {
+    if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh();
+    if (e.target.name === 'ttsGender' && R.speaker instanceof PiperSpeaker) R.speaker.setGender(e.target.value);
+  });
   dl.onclick = async () => {
     const v = prefs.ttsModel; dl.disabled = true; prog.hidden = false; prog.value = 0;
     try {
@@ -572,6 +577,7 @@ async function renderSources() {
   <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> מאת Michael J. Radwin, Danny Sadinoff ושותפים, ארוזות ללא שינוי בקובץ js/vendor/hebcal.js: ‎@hebcal/core ו-‎@hebcal/hdate (GPL-2.0-or-later), ‎@hebcal/learning ו-‎@hebcal/leyning (BSD-2-Clause, ‏Copyright (c) 2020–2026 hebcal), ‎@hebcal/noaa (LGPL-2.1). נוסח הרישיונות המלא והודעות זכויות היוצרים: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>. החישוב נעשה במכשיר, ללא רשת.</p>
   <h2 id="voice-src">קול איכותי (הקראה מקומית)</h2><p>נטען רק כשבוחרים ״קול איכותי״ בהגדרות ההקראה.</p><ul>
     <li>קול: <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">Piper Hebrew – noa (medium)</a> מאת thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>. הגרסה הקלה (int8) היא שינוי שלנו: כימות המשקולות ל־int8.</li>
+    <li>הקול הגברי (ברירת המחדל מגרסה 1.0.60) הוא שינוי שלנו של הקול noa, בעיבוד אות במכשיר (קוד שלנו, בלי ספרייה חיצונית): זיהוי גובה הצליל בשיטת YIN, הורדתו בכ־6 חצאי טון בשיטת TD-PSOLA (שומרת על הפורמנטים) והורדה קלה (כ־6%) של הפורמנטים. אין זה קול של דובר גבר ואין הורדה נוספת. לא מצאנו קול עברי גברי שרישיון המשקולות <i>וגם</i> רישיון ההקלטות שעליהן אומן מתירים שימוש חופשי; הפירוט ב־<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VOICE.md#male" target="_blank" rel="noopener" dir="ltr">verification/VOICE.md</a>.</li>
     <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
@@ -651,7 +657,7 @@ function renderAbout() {
   <h2>הקראה</h2><ul>
   <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו בוחר קול מקוון כברירת מחדל כשיש קול מקומי, ואינו ממליץ עליהם.</li>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
-  <li id="qv-about"><b>קול איכותי (מקומי, ניסיוני, מגרסה 1.0.59):</b> במקום קול הדפדפן אפשר להוריד – רק בלחיצה על ״קול איכותי״ בהגדרות ההקראה – את הקול <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">noa</a> (Piper, של thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>). ההורדה חד־פעמית (כ־92 MB, או כ־38 MB בגרסה הקלה), מאתר זה בלבד; הקול נשמר במכשיר וההקראה נעשית בו, בלי רשת ובלי לשלוח טקסט. ההגייה נבנית מהניקוד: ההטעמה (מלעיל/מלרע) לפי טעמי המקרא בתורה ובתהילים; בשאר הטקסטים – לפי רשימת חריגים ומודל סיומות שנלמד מהטעמים (כ־93% נכון כשנבדק על ספר מקרא שלא נלמד – תורה מול תהילים; בלשון חכמים ובתניא הדיוק לא נמדד), שווא נע לפי כללי הדקדוק, וקמץ קטן רק במילים שאומתו (כל, חכמה, קרבן ועוד). <b>הקול לא נבדק בהאזנה אנושית</b> – רק במדידות אוטומטיות (תמלול חוזר); יש שגיאות הגייה, ובטקסט שאינו מנוקד ההגייה גרועה. אם הקול אינו נתמך או לא נטען – ההקראה חוזרת לקול הדפדפן.</li>
+  <li id="qv-about"><b>קול איכותי (מקומי, ניסיוני, מגרסה 1.0.59):</b> במקום קול הדפדפן אפשר להוריד – רק בלחיצה על ״קול איכותי״ בהגדרות ההקראה – את הקול <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">noa</a> (Piper, של thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>). ההורדה חד־פעמית (כ־92 MB, או כ־38 MB בגרסה הקלה), מאתר זה בלבד; הקול נשמר במכשיר וההקראה נעשית בו, בלי רשת ובלי לשלוח טקסט. ההגייה נבנית מהניקוד: ההטעמה (מלעיל/מלרע) לפי טעמי המקרא בתורה ובתהילים; בשאר הטקסטים – לפי רשימת חריגים ומודל סיומות שנלמד מהטעמים (כ־93% נכון כשנבדק על ספר מקרא שלא נלמד – תורה מול תהילים; בלשון חכמים ובתניא הדיוק לא נמדד), שווא נע לפי כללי הדקדוק, וקמץ קטן רק במילים שאומתו (כל, חכמה, קרבן ועוד). <b>הקול לא נבדק בהאזנה אנושית</b> – רק במדידות אוטומטיות (תמלול חוזר); יש שגיאות הגייה, ובטקסט שאינו מנוקד ההגייה גרועה. אם הקול אינו נתמך או לא נטען – ההקראה חוזרת לקול הדפדפן. <b>מגרסה 1.0.60 ברירת המחדל היא קול גברי</b>: אותו קול noa בעיבוד אות במכשיר (גובה צליל נמוך בכ־6 חצאי טון, פורמנטים נמוכים בכ־6%), בלי הורדה נוספת; הקול הנשי המקורי זמין בהגדרות. זהו גוון מלאכותי, שגם הוא לא נבדק בהאזנה אנושית; במדידה האוטומטית הבהירות (תמלול חוזר) כמעט לא השתנתה – הפירוט בקובץ האימות.</li>
   <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
   <li>לחיצה אחת על כפתור ההקראה מתחילה לקרוא מיד; ההגדרות (קול, מהירות, שם ה׳) – בלחיצה ארוכה על הכפתור או בכפתור ההגדרות שבסרגל ההקראה.</li>
   <li>מה לא מוקרא: סימני פרשה פתוחה/סתומה (פ/ס), והפניות למקורות בסוגריים, כמו ״(שמות כ׳)״ או ״(מכילתא)״ – הן נשארות על המסך. ראשי תיבות מורחבים רק כשהם חד־משמעיים (למשל ת״ל – תַּלְמוּד לוֹמַר); אחרת נקראים ככתבם.</li>
@@ -1461,7 +1467,7 @@ async function ttsToggle() {
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);

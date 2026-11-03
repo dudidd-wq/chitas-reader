@@ -93,6 +93,8 @@ test('click installs the voice (progress, size) and the lesson is read with it �
     assert.equal(r.spoken, 0, 'Web Speech not used');
     assert.ok(r.hl, 'segment highlighted');
     for (const x of r.log) { assert.ok(x.sec > 0.3, `audio ${x.sec}s for ${x.text}`); assert.match(x.ipa, /ˈ/); }
+    // 1.0.60: default = male timbre (same model, signal processing in the worker): mean F0 in the male range
+    for (const x of r.log) { assert.equal(x.gender, 'male'); assert.ok(x.f0 >= 85 && x.f0 <= 155, `male F0 ${x.f0} for ${x.text}`); }
     // pause / resume / skip keep working
     await p.click('#t-play'); await p.waitForTimeout(200);
     assert.equal(await p.getAttribute('#t-play', 'aria-label'), 'הפעל');
@@ -103,6 +105,18 @@ test('click installs the voice (progress, size) and the lesson is read with it �
     const before = voiceReqs(log).length;
     await p.goto(srv.url + '#/settings'); await p.reload(); await p.waitForFunction(() => /מותקן במכשיר/.test(document.querySelector('#qv-st')?.textContent || ''));
     assert.equal(voiceReqs(log).length, before);
+    // the female voice is a setting; choosing it downloads nothing and the audio is the model's own (F0 > 155 Hz)
+    assert.equal(await p.isChecked('input[name=ttsGender][value=male]'), true);
+    await p.click('label:has(input[name=ttsGender][value=female])');
+    assert.equal(await p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1')).prefs.ttsGender), 'female');
+    await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .seg');
+    await p.evaluate(() => { window.__piperLog.length = 0; });
+    await p.keyboard.press('p');
+    await p.waitForFunction(() => window.__piperLog.length >= 1, null, { timeout: 60000 });
+    const fl = await p.evaluate(() => window.__piperLog[0]);
+    assert.equal(fl.gender, 'female'); assert.ok(fl.f0 > 155, 'female F0 ' + fl.f0);
+    await p.click('#t-stop');
+    assert.equal(voiceReqs(log).length, before, 'switching the voice downloads nothing');
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

@@ -5,6 +5,7 @@
 import { Speaker } from './tts.js';
 import { prepareForTTS, chunkText } from './tts-prep.js';
 import { VOICE_FILES } from './voice-files.js';
+import { TIMBRES, f0Stats } from './voice-pitch.js';
 
 export const VOICE_CACHE = 'voice-v1';
 const COMMON = ['ort', 'wasm', 'config', 'stress'];
@@ -72,13 +73,17 @@ function getWorker(variant) {
   worker.postMessage({ type: 'init', variant });
   return ready;
 }
-function synth(text, accents, rate) {
+function synth(text, accents, rate, timbre) {
   const id = ++seq;
-  return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate }); });
+  return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate, timbre }); });
 }
 
+/** Timbre parameters for the chosen voice: anything but 'female' gets the male timbre (default). */
+export const timbreFor = gender => gender === 'female' ? null : TIMBRES.male;
+
 export class PiperSpeaker extends Speaker {
-  /** opts.variant: 'full' | 'int8' */
+  /** opts.variant: 'full' | 'int8'; opts.voiceGender: 'male' (default – the noa model with the male timbre of
+   *  voice-pitch.js, no extra download) | 'female' (the model's own voice) */
   load(segments, opts, meta) {
     this.stop(true);
     this.opts = opts; this.meta = meta; this.queue = [];
@@ -107,8 +112,8 @@ export class PiperSpeaker extends Speaker {
   }
   fetchChunk(i) {
     const q = this.queue[i]; if (!q) return null;
-    const key = i + '@' + (this.opts.rate || 1);
-    if (!this.audio.has(key)) { const p = synth(q.text, q.acc, this.opts.rate || 1); p.catch(() => {}); this.audio.set(key, p); }
+    const g = timbreFor(this.opts.voiceGender), key = i + '@' + (this.opts.rate || 1) + '@' + (g ? 'm' : 'f');
+    if (!this.audio.has(key)) { const p = synth(q.text, q.acc, this.opts.rate || 1, g); p.catch(() => {}); this.audio.set(key, p); }
     return this.audio.get(key);
   }
   async speakCurrent() {
@@ -127,7 +132,8 @@ export class PiperSpeaker extends Speaker {
     const src = this.src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
     src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };
     src.start();
-    globalThis.__piperLog?.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate });
+    // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
+    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: this.opts.voiceGender === 'female' ? 'female' : 'male', f0: f0Stats(m.audio, m.sampleRate).mean });
   }
   cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; }
   pause() {
@@ -143,4 +149,5 @@ export class PiperSpeaker extends Speaker {
     if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(target); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
+  setGender(g) { this.opts.voiceGender = g; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
 }
