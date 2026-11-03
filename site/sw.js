@@ -1,15 +1,16 @@
-// Service worker: app shell precache + cache-first for static text data.
+// Service worker: app shell precache + cache-first for static text data. The voice cache ('voice-v1') is the page's.
 // VERSION: bump on every deploy of the app shell. DATA_VERSION: content hash of site/data (tools/data-version.mjs).
 // When texts are rebuilt the data cache name changes. On activate the texts the user had saved are carried over
 // (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
 // re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
 // remains an offline fallback, so an update while the network is poor never loses the 30-day save.
-const VERSION = '1.0.58';
+const VERSION = '1.0.59';
 const DATA_VERSION = '71a7fc4e9f66';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
 const MANIFEST = new URL('data/manifest.json', self.registration.scope).href;
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/niqqud.js', 'js/layout.js', 'js/zmanim.js', 'js/kivun.js', 'js/kivun-ui.js', 'js/wmm.js', 'js/divine.js', 'js/personal.js', 'js/tefila.js', 'js/siddur-lang.js', 'js/vendor/hebcal.js',
+  'js/piper.js', 'js/piper-worker.js', 'js/piper-core.js', 'js/g2p.js', 'js/voice-files.js',
   'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json', 'data/rambam-errata.json'];
 self.addEventListener('install', e => {
@@ -62,6 +63,12 @@ self.addEventListener('fetch', e => {
     // cache-first; offline, a text that only an older (not yet migrated) data cache holds is still served
     e.respondWith(caches.open(DATA).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })
       .catch(async err => (await caches.match(e.request)) || Promise.reject(err))));
+    return;
+  }
+  // the local voice (site/voice/, ~38–92 MB): never precached and never put in the shell cache. The page stores it in
+  // 'voice-v1' only after the reader presses "קול איכותי" (js/piper.js installVoice); here it is served from there.
+  if (url.pathname.includes('/voice/')) {
+    e.respondWith(caches.open('voice-v1').then(c => c.match(e.request)).then(m => m || fetch(e.request)));
     return;
   }
   // shell: network-first for navigation (fresh after deploy), cache-first for the rest

@@ -236,3 +236,29 @@ npm test && npm run ui && npm run shots
 - מצפן: לחיצה על ״הפעלת המצפן״ (באייפון – `requestPermission`). מאזינים ל-`deviceorientationabsolute` ול-`deviceorientation` (רק אירוע עם `webkitCompassHeading` או `absolute:true` נחשב). אין קריאה תוך 2.5 ש׳ → מצב ״ללא חיישן״ (מעלות + חוגה עם צפון למעלה). החלקה וקטורית, פיזור מעגלי >12° → ״לא יציב״, דיוק iOS שלילי → ״לא מכויל״, beta>65° → ״החזיקו שטוח״. ההכרזה (aria-live) מוגבלת לשינוי מצב או פעם ב-4 ש׳. היציאה מהעמוד מסירה את המאזינים (`stopKivun` ב-`route`).
 - הלכה: רק ציטוטים שנבדקו בשני מקורות (רמב״ם תפילה ה, ג; שו״ע ושו״ע הרב או״ח צד, א; רמ״א צד, ב) + ״פרטים – לפי הוראת רב״. לא להוסיף הסברים בלי מקור.
 - אימות: `verification/KIVUN.md`; `tests/kivun.test.mjs`, `tests/kivun-ui.test.mjs`. לא נבדק על מכשיר פיזי.
+
+## קול איכותי מקומי – Piper noa בדפדפן (1.0.59)
+- **קבצים:**
+  - `site/voice/`: המודל המלא, int8, json, `stress-he.json`, `ort/` (onnxruntime-web 1.31.1 + LICENSE + ThirdPartyNotices) ו-`NOTICE.txt`.
+  - `site/js/voice-files.js` נבנה ב-`tools/build-voice-stress.mjs`. הוא מכיל גודל ו-`?v=<sha256>` לכל קובץ.
+- **קוד:** `g2p.js` (Phonikud ב-JS, הטעמה, שווא, קמץ קטן), `piper-core.js` (קלט למודל, משותף ל-Node ולדפדפן), `piper-worker.js` (Worker) ו-`piper.js` (התקנה, מטמון, `PiperSpeaker`).
+- **הורדה:** רק בלחיצה על #qv-dl בהגדרות ההקראה, ל-Cache Storage `voice-v1`.
+  - ה-SW לא שומר מראש את `/voice/` ולא מוחק את `voice-v1` בעדכון גרסה.
+  - ה-Worker קורא רק מהמטמון. אם קובץ חסר: `not-installed`, ואז חוזרים ל-Web Speech.
+  - קובץ שהשתנה (hash אחר) נחשב "לא מותקן", וצריך להוריד אותו מחדש.
+- **השמעה:** משפט אחרי משפט, ב-WebAudio, עם סינתוז מראש של שני הקטעים הבאים. עצירה, המשך, דילוג, מהירות (length_scale) והדגשה עובדים כמו ב-Web Speech.
+  - כל כשל `piper-*` מפעיל מחדש את Web Speech עם הודעה.
+- **החלטות:**
+  - **כללי השווא הנע** מופעלים לפי מדידת Whisper (0.076 לעומת 0.103 בלעדיהם).
+  - **ברירת המחדל היא המודל המלא.** int8 מוצע כ"קל", ובמדידה הוא פחות ברור (0.095).
+  - **תהליכון אחד:** אין COOP/COEP ב-Pages.
+- **מדידות ומגבלות:** `verification/VOICE.md`.
+- **בדיקות:**
+  - `tests/g2p.test.mjs`: מילים נדרשות ופסוקים מוטעמים.
+  - `tests/voice-node.test.mjs`: סינתוז אמיתי ב-Node, שני המודלים, hash וגודל.
+  - `tests/voice.test.mjs`: Chrome. בודק שאין הורדה בלי לחיצה, נפילה ל-Web Speech (דפדפן לא נתמך, קבצים פגומים, 404), ו-e2e (התקנה, השמעה, עצירה/דילוג, טעינה מחדש בלי הורדה).
+- **ל-1.0.60 ואילך:**
+  - renikud לטקסט לא מנוקד;
+  - מדידת הטעמה בלשון חכמים;
+  - תמיכה ב-MediaSession בזמן השמעה ב-WebAudio;
+  - בדיקה במכשירים.

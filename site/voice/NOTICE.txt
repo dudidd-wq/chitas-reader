@@ -1,0 +1,30 @@
+LOCAL VOICE – licences and attribution (chitas-reader, site/voice/)
+===================================================================
+These files are downloaded to the reader's device only when the "קול איכותי" (quality voice) button is pressed.
+Speech is synthesised on the device; no text is sent anywhere.
+
+1. he_IL-noa-medium.onnx, he_IL-noa-medium.onnx.json
+   "Piper Hebrew – noa (medium)" by thewh1teagle – https://huggingface.co/thewh1teagle/piper-he-noa
+   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) – https://creativecommons.org/licenses/by/4.0/
+   Unmodified copy (sha256 of the .onnx identical to the Hugging Face file).
+
+2. he_IL-noa-medium-int8.onnx
+   Adapted from (1): weights quantised to int8 (ONNX Runtime dynamic quantisation) by the chitas-reader project, for
+   weak devices. This is a modified version of the original. Licence: CC BY 4.0, as (1). No endorsement by the original
+   author is implied.
+
+3. ort/ort.wasm.bundle.min.mjs, ort/ort-wasm-simd-threaded.wasm
+   ONNX Runtime Web 1.31.1 – Copyright (c) Microsoft Corporation – MIT License (ort/LICENSE).
+   The WebAssembly binary includes third-party components; their notices: ort/ThirdPartyNotices.txt
+   (from https://github.com/microsoft/onnxruntime/blob/v1.31.1/ThirdPartyNotices.txt).
+
+4. Hebrew grapheme-to-phoneme rules (site/js/g2p.js) – JavaScript port of the rules of Phonikud 0.4.1
+   by thewh1teagle – https://github.com/thewh1teagle/phonikud – CC BY 4.0. Changed: ported to JavaScript; added stress
+   from cantillation marks, a stress dictionary/suffix model, vocal-shva and qamatz-katan rules (chitas-reader).
+   The phoneme convention follows renikud (https://renikud.github.io), which the voice was trained on.
+
+5. stress-he.json – built by chitas-reader (tools/build-voice-stress.mjs) from the cantillation marks of the Torah and
+   Tehillim texts in data/ (see the site's Sources page) and a hand-checked exception list. Part of the site's code
+   (GPL-2.0-or-later).
+
+No code of Piper (GPL) is used: the model is run with ONNX Runtime Web and the input is prepared by g2p.js/piper-core.js.

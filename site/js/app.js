@@ -6,6 +6,7 @@ import { suggest, insertionLines } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
+import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, mb } from './piper.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
 import { fixNiqqud } from './niqqud.js';
@@ -424,8 +425,51 @@ function displayForm() {
   ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
   ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
 }
+// 1.0.59: the local "quality voice". Nothing is downloaded until the reader presses #qv-dl.
+function qvForm() {
+  if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small></fieldset>`;
+  return `<fieldset id="qv"><legend>קול איכותי (פועל במכשיר, ניסיוני)</legend>
+    ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי – noa (מקומי)']])}
+    ${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}
+    <p id="qv-st" role="status" aria-live="polite">בודק…</p>
+    <progress id="qv-prog" max="1" value="0" hidden></progress>
+    <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
+    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); פרטים בעמוד המקורות.</small>
+  </fieldset>`;
+}
+async function bindQv(root) {
+  const st = root.querySelector('#qv-st'); if (!st) return;
+  const dl = root.querySelector('#qv-dl'), del = root.querySelector('#qv-del'), prog = root.querySelector('#qv-prog');
+  const refresh = async () => {
+    const s = await voiceStatus(), v = prefs.ttsModel, have = s[v];
+    if (!st.isConnected) return;
+    dl.hidden = have; del.hidden = !(s.full || s.int8);
+    dl.textContent = `קול איכותי – הורדה חד-פעמית (${mb(voiceBytes(v))} MB)`;
+    st.textContent = have ? `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
+      : `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
+  };
+  root.addEventListener('input', e => { if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh(); });
+  dl.onclick = async () => {
+    const v = prefs.ttsModel; dl.disabled = true; prog.hidden = false; prog.value = 0;
+    try {
+      await installVoice(v, (d, t) => { prog.value = d / t; st.textContent = `מוריד… ${mb(d)} מתוך ${mb(t)} MB`; });
+      setPref('ttsEngine', 'piper'); root.querySelectorAll('input[name=ttsEngine]').forEach(r => { r.checked = r.value === 'piper'; });
+      R.piperBroken = false;
+      if (R.speaker) { const was = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (was === 'playing') ttsToggle(); }
+      await refresh(); toast('הקול האיכותי הותקן');
+    } catch (e) { st.textContent = `ההורדה נכשלה (${e.message}). ההקראה תמשיך בקול הדפדפן; אפשר לנסות שוב.`; }
+    finally { dl.disabled = false; prog.hidden = true; }
+  };
+  del.onclick = async () => {
+    if (R.speaker instanceof PiperSpeaker) { R.speaker.stop(); R.speaker = null; }
+    await removeVoice(); setPref('ttsEngine', 'web'); root.querySelectorAll('input[name=ttsEngine]').forEach(r => { r.checked = r.value === 'web'; });
+    await refresh(); toast('הקול האיכותי נמחק מהמכשיר');
+  };
+  refresh();
+}
 function ttsForm() {
   return `
+  ${qvForm()}
   <div id="voice-warn"></div>
   <label class="field"><span>קול</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
   <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). ברירת המחדל היא תמיד קול מקומי, כשיש כזה.</small>
@@ -454,6 +498,7 @@ function bindForm(root, onChange) {
     warn.innerHTML = vs.length ? '' : voiceHelp();
     const net = root.querySelector('#voice-net'); if (net) net.hidden = !vs.some(isNetworkVoice);
   });
+  bindQv(root);
 }
 function voiceHelp() {
   if (!ttsSupported()) return '<p class="warn">הדפדפן הזה אינו תומך בהקראה (Web Speech API). נסו Chrome, Edge או Safari עדכניים.</p>';
@@ -525,6 +570,11 @@ async function renderSources() {
   <p id="rambam-errata-counts"></p>
   <p>השיטה, הסריקות והרשימות המלאות: <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/RAMBAM-ERRATA.md" target="_blank" rel="noopener" dir="ltr">verification/RAMBAM-ERRATA.md</a>.</p>
   <h2>לוח השיעורים</h2><p>חישוב התאריך העברי, פרשת השבוע, חלוקת התהילים, תניא יומי ורמב״ם יומי: ספריות <a href="https://github.com/hebcal" target="_blank" rel="noopener">Hebcal</a> מאת Michael J. Radwin, Danny Sadinoff ושותפים, ארוזות ללא שינוי בקובץ js/vendor/hebcal.js: ‎@hebcal/core ו-‎@hebcal/hdate (GPL-2.0-or-later), ‎@hebcal/learning ו-‎@hebcal/leyning (BSD-2-Clause, ‏Copyright (c) 2020–2026 hebcal), ‎@hebcal/noaa (LGPL-2.1). נוסח הרישיונות המלא והודעות זכויות היוצרים: <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>. החישוב נעשה במכשיר, ללא רשת.</p>
+  <h2 id="voice-src">קול איכותי (הקראה מקומית)</h2><p>נטען רק כשבוחרים ״קול איכותי״ בהגדרות ההקראה.</p><ul>
+    <li>קול: <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">Piper Hebrew – noa (medium)</a> מאת thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>. הגרסה הקלה (int8) היא שינוי שלנו: כימות המשקולות ל־int8.</li>
+    <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
+    <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
+    <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
   <h2>גופנים</h2><p>Noto Serif Hebrew, Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>).</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
   glossCounts().then(t => { const el = $('#gloss-counts'); if (el && t) el.textContent = t; });
@@ -601,6 +651,7 @@ function renderAbout() {
   <h2>הקראה</h2><ul>
   <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו בוחר קול מקוון כברירת מחדל כשיש קול מקומי, ואינו ממליץ עליהם.</li>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
+  <li id="qv-about"><b>קול איכותי (מקומי, ניסיוני, מגרסה 1.0.59):</b> במקום קול הדפדפן אפשר להוריד – רק בלחיצה על ״קול איכותי״ בהגדרות ההקראה – את הקול <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">noa</a> (Piper, של thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>). ההורדה חד־פעמית (כ־92 MB, או כ־38 MB בגרסה הקלה), מאתר זה בלבד; הקול נשמר במכשיר וההקראה נעשית בו, בלי רשת ובלי לשלוח טקסט. ההגייה נבנית מהניקוד: ההטעמה (מלעיל/מלרע) לפי טעמי המקרא בתורה ובתהילים; בשאר הטקסטים – לפי רשימת חריגים ומודל סיומות שנלמד מהטעמים (כ־93% נכון כשנבדק על ספר מקרא שלא נלמד – תורה מול תהילים; בלשון חכמים ובתניא הדיוק לא נמדד), שווא נע לפי כללי הדקדוק, וקמץ קטן רק במילים שאומתו (כל, חכמה, קרבן ועוד). <b>הקול לא נבדק בהאזנה אנושית</b> – רק במדידות אוטומטיות (תמלול חוזר); יש שגיאות הגייה, ובטקסט שאינו מנוקד ההגייה גרועה. אם הקול אינו נתמך או לא נטען – ההקראה חוזרת לקול הדפדפן.</li>
   <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
   <li>לחיצה אחת על כפתור ההקראה מתחילה לקרוא מיד; ההגדרות (קול, מהירות, שם ה׳) – בלחיצה ארוכה על הכפתור או בכפתור ההגדרות שבסרגל ההקראה.</li>
   <li>מה לא מוקרא: סימני פרשה פתוחה/סתומה (פ/ס), והפניות למקורות בסוגריים, כמו ״(שמות כ׳)״ או ״(מכילתא)״ – הן נשארות על המסך. ראשי תיבות מורחבים רק כשהם חד־משמעיים (למשל ת״ל – תַּלְמוּד לוֹמַר); אחרת נקראים ככתבם.</li>
@@ -1338,13 +1389,16 @@ document.addEventListener('keydown', e => {
 
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
+  const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
   return R.segs.map(s => {
     const parts = [unAbbr(s.querySelector('.t').innerHTML).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
     const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
-    return { el: s, parts, chol: CHOL[s.dataset.ref], cites };
+    // the accented verse (Torah, Tehillim): its cantillation marks give the stressed syllable to the local voice
+    const acc = byId?.get(s.dataset.id)?.text || null;
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc };
   });
 }
 const TTS_ERR = {
@@ -1354,14 +1408,26 @@ const TTS_ERR = {
 // The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
 // follows the pages by itself). The text area is re-laid out for the bar's real height (ResizeObserver in bindReaderUi).
 function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('tts-on', on); }
+// Which engine reads: the local voice when chosen, supported and installed – otherwise Web Speech (fallback).
+async function ttsEngine() {
+  if (prefs.ttsEngine !== 'piper' || R.piperBroken || !piperSupported()) return 'web';
+  if ((await voiceStatus())[prefs.ttsModel]) return 'piper';
+  toast('הקול האיכותי אינו מותקן במכשיר – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.');
+  return 'web';
+}
 async function ttsToggle() {
-  if (!ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
   if (R.speaker) { R.speaker.toggle(); return; }
   const unit = R.unit, iso = R.iso, doc = R.doc;
   if (!doc) return; // still loading (e.g. right after a day change): nothing to read yet
-  await waitForVoices();
+  const engine = prefs.ttsEngine === 'piper' && !R.piperBroken && piperSupported() ? 'piper?' : 'web';
+  if (engine === 'web' && !ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
+  // the AudioContext must start inside the click: make it now, before anything is awaited
+  if (engine === 'piper?') try { PiperSpeaker.prototype.ctx.call({}); } catch { /* checked again on play */ }
+  const eng = engine === 'web' ? 'web' : await ttsEngine();
+  if (eng === 'web' && !ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
+  if (eng === 'web') await waitForVoices();
   if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
-  R.speaker = new Speaker({
+  R.speaker = new (eng === 'piper' ? PiperSpeaker : Speaker)({
     onSegment: (i, frac = 0) => {
       const el = R.segs[i]; if (!el) return;
       if (!el.classList.contains('speaking')) { R.segs.forEach(s => s.classList.remove('speaking')); el.classList.add('speaking'); }
@@ -1383,12 +1449,19 @@ async function ttsToggle() {
     },
     onError: code => {
       R.speaker = null; R.ttsShown = false; showTtsBar(false);
+      // the local voice failed (not installed, out of memory, unsupported WASM…): fall back to the browser's voice
+      if (String(code).startsWith('piper')) {
+        R.piperBroken = true;
+        toast(`הקול האיכותי לא נטען (${code.slice(6)}) – ממשיכים בקול הדפדפן.`);
+        if (ttsSupported()) ttsToggle();
+        return;
+      }
       // round 6: the no-voice message is written inside the sheet, above the install steps – a toast covered them
       if (code === 'no-voice') { openSheet('tts', TTS_ERR[code]); return; }
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);

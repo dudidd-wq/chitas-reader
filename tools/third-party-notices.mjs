@@ -11,6 +11,13 @@ Their source code is available at https://github.com/hebcal and on https://www.n
 The site's own code is GPL-2.0-or-later (see LICENSE in the repository). Fonts: SIL OFL 1.1, see fonts/licenses/.
 site/js/wmm.js embeds the World Magnetic Model WMM2025 coefficients (NOAA NCEI / British Geological Survey) –
 a work of the U.S. Government, public domain: https://www.ncei.noaa.gov/products/world-magnetic-model
+Local voice (site/voice/, downloaded only on request): Piper "noa" voice by thewh1teagle (CC BY 4.0), ONNX Runtime Web
+(MIT, Microsoft), G2P rules ported from Phonikud (CC BY 4.0) – details at the end of this file and in voice/NOTICE.txt.
+
+Texts are licensed by their sources (see data/LICENSE-DATA.md and the Sources page). Torah Or / Likkutei Torah:
+  text – Kehot Publication Society via Sefaria, CC BY-NC (non-commercial use only);
+  נוסח מנוקד: חסידות בהירה, על פי מהדורת קה״ת ה׳תשע״ה; באישור, לשימוש לא מסחרי בלבד
+  – https://chassidutbehirah.com/ . לפי דיווח בעל האתר, אושר ע״י חסידות בהירה וקה״ת, לשימוש לא מסחרי בלבד. (Non-commercial use only; no written licence document is held.)
 
 `;
 const sum = P.map(p => { const j = JSON.parse(fs.readFileSync(new URL(`${p}/package.json`, NM))); return { p, j }; });
@@ -25,6 +32,9 @@ for (const n of ['temporal-polyfill', 'temporal-utils']) {   // temporal-spec (A
   const j = JSON.parse(fs.readFileSync(new URL(`../node_modules/${n}/package.json`, import.meta.url)));
   out += `\n\n======== ${n} ${j.version} (${j.license}) – ${j.author?.name || ''} – https://github.com/fullcalendar/temporal-polyfill ========\n\n` + fs.readFileSync(new URL(`../node_modules/${n}/LICENSE`, import.meta.url), 'utf8');
 }
+// 1.0.59: the local voice (downloaded only on request) – its own notice file, repeated here
+out += `\n\n======== Local voice (site/voice/) ========\n\n` + fs.readFileSync(new URL('../site/voice/NOTICE.txt', import.meta.url), 'utf8') +
+  `\n\n======== ONNX Runtime Web (MIT) ========\n\n` + fs.readFileSync(new URL('../site/voice/ort/LICENSE', import.meta.url), 'utf8');
 fs.writeFileSync(new URL('../site/THIRD-PARTY-NOTICES.txt', import.meta.url), out);
 console.log('wrote THIRD-PARTY-NOTICES.txt', out.length);
 // licence header at the top of the bundle (idempotent)
