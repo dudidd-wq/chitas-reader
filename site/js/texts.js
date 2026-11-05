@@ -332,13 +332,69 @@ function siddurTable(id, rows, cls, runs, lang) {
   const R = rows.map(r => r.map(cell));
   return { type: 'table', id, cls: /^[a-z]+$/.test(cls) ? cls : 'plain', rows: R, text: R.flat().filter(c => c.k === 'p').map(c => c.html).join(' ') };
 }
+/** Occasional/seasonal prayer insertions (יעלה ויבוא, על הניסים, עננו, משיב הרוח, …) – spoken paragraphs, not the
+ *  instruction notes. Flags are computed from the raw siddur rows so the reader can style them distinctly. */
+const stripTags = s => String(s || '').replace(/<[^>]*>/g, '');
+const skelHe = s => stripTags(s).replace(/[\u0591-\u05C7]/g, '').replace(/^\s+/, '');
+const ADD_EN_RE = /adds? the following|one adds\b|(?:^|[.\s>])add:|substitutes? the following|omit the following/i;
+const SIT_LABEL_RE = /^(Summer|Winter|On |From Rosh HaShanah to Yom Kippur, during the Ten Days of Penitence, (?:add|one substitutes)|During |בקיץ|בחורף|בראש|בפסח|בסוכות|בשבועות|בפורים|בחנוכה|בשבת|ביום טוב|בחול המועד|מראש השנה)/i;
+const OPEN_RE = /^(ו?על הנסים|יעלה ויבא|עננו|זכרנו לחיים|וכתוב לחיים|וכתוב|מי כמוך|משיב הרוח|מוריד הטל|ותן טל|ותן ברכה|רצה והחליצנו)/;
+const CONT_RE = /^(בימי |הזה[.׃]?)/;
+const RESUME_RE = /^(ועל כל[םו]|ותחזינה|יהיו לרצון|מודים|מלך,? עוזר|מכלכל חיים|על פני האדמה|ברך עלינו|אתה קדוש|אלהינו ואלהי אבותינו, ברכנו)/;
+function isAddNote(en, he) {
+  const e = stripTags(en).trim(), h = stripTags(he).trim();
+  // Inline word-swap notes ("substitute X with Y") are not a following prayer block.
+  if (/substitut\w* the words|אומרים במקום המילים/i.test(e + ' ' + h) && !/the following/i.test(e)) return false;
+  if (ADD_EN_RE.test(e)) return true;
+  // Hebrew: a short cue that ends with מוסיפים / מוסיפים: (the next paragraph is the addition).
+  if (h.length <= 120 && /מוסיפים:?\s*$/.test(h)) return true;
+  if (/משמיטים את/.test(h)) return true;
+  if (/אומרים במקום/.test(h) && /the following/i.test(e)) return true;
+  return false;
+}
+function isSituationalLabel(en, he) {
+  const e = stripTags(en).trim(), h = stripTags(he).trim();
+  if (Math.max(e.length, h.length) > 110) return false;
+  return SIT_LABEL_RE.test(e) || SIT_LABEL_RE.test(h);
+}
+function isSectionTitle(en, he) {
+  const e = stripTags(en).trim(), h = stripTags(he).trim();
+  return (e.length < 70 && /[–—-]/.test(e) && /[\u05D0-\u05EA]/.test(e))
+    || (h.length < 40 && /[–—-]/.test(h));
+}
+/** @param {Array} rows raw siddur section.b rows [type, en/html, he?]
+ *  @returns {boolean[]} parallel flags: true = spoken insertion paragraph */
+export function specialPrayerFlags(rows) {
+  const flags = Array(rows.length).fill(false);
+  let expect = false, inRun = false;
+  for (let i = 0; i < rows.length; i++) {
+    const [t, h, he] = rows[i];
+    if (t === 'h') { expect = false; inRun = false; continue; }
+    if (t === 'n') {
+      if (isAddNote(h, he)) { expect = true; inRun = true; }
+      else if (isSituationalLabel(h, he)) { expect = true; }
+      else if (isSectionTitle(h, he)) { expect = false; inRun = false; }
+      else expect = false;
+      continue;
+    }
+    if (t !== 'p') { expect = false; continue; }
+    const sk = skelHe(h);
+    let special = expect || OPEN_RE.test(sk) || (inRun && CONT_RE.test(sk));
+    if (RESUME_RE.test(sk)) special = false;
+    flags[i] = special;
+    expect = false;
+    inRun = special ? true : false;
+  }
+  return flags;
+}
+
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
 export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
-  const runs = idx.heRuns, blocks = [];
+  const runs = idx.heRuns, blocks = [], special = specialPrayerFlags(sec.b);
   sec.b.forEach(([t, h, he], i) => {
     const id = `${book}-${n}-${i}`;
     if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
@@ -347,7 +403,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
     else if (t === 't') blocks.push(siddurTable(id, h, he, runs, lang));
-    else blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang) });
+    else blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang), ...(special[i] ? { special: true } : {}) });
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
 }

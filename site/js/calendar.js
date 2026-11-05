@@ -33,6 +33,19 @@ export function isoDate(hd) {
   return `${g.getFullYear()}-${String(g.getMonth() + 1).padStart(2, '0')}-${String(g.getDate()).padStart(2, '0')}`;
 }
 
+/** Does the location hash explicitly pin a civil date (#/d/…, #/zmanim/…, #/r/<unit>/…)? */
+export function hashPinsDate(hash) {
+  const h = String(hash || '').replace(/^#\/?/, '').split('?')[0];
+  const m = h.match(/^(?:d|zmanim)\/(\d{4}-\d\d-\d\d)(?:\/|$)/) || h.match(/^r\/[^/]+\/(\d{4}-\d\d-\d\d)(?:\/|$)/);
+  return m ? m[1] : null;
+}
+/** Date for day-dependent views: keep a pinned URL day; otherwise use today (refresh / soft nav snap). */
+export function resolveViewDate(hash, today, current) {
+  const pin = hashPinsDate(hash);
+  if (pin) return pin;
+  return today || current;
+}
+
 export const parshaHe = names => names.map(n => Locale.gettext(n, 'he-x-NoNikud')).join('-');
 
 /** The parsha whose aliyah is learnt on this day (Chabad Chumash-with-Rashi custom). */

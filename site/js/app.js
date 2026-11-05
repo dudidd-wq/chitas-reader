@@ -1,5 +1,5 @@
 import { CHOL } from './chol.js';
-import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe } from './calendar.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines } from './tefila.js';
@@ -138,9 +138,18 @@ function renderZmanim() {
 
 // ---------------- Router ----------------
 let currentDate = todayIso();
+/** Overnight / soft resume: if the civil day moved on and the URL does not pin a date, snap and re-render. */
+function snapDateOnResume() {
+  const today = todayIso();
+  if (hashPinsDate(location.hash) || currentDate === today) return false;
+  currentDate = today;
+  return true;
+}
 function route() {
   const [h, qs = ''] = location.hash.replace(/^#\/?/, '').split('?');
   const [view, a, b] = h.split('/'), params = new URLSearchParams(qs);
+  // Unpinned views always use today's civil date (refresh / soft nav must not keep yesterday).
+  if (!hashPinsDate(location.hash)) currentDate = todayIso();
   libSeq++; // a pending library lookup is stale once the address changes
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
@@ -162,6 +171,8 @@ function route() {
   renderHome();
 }
 window.addEventListener('hashchange', route);
+window.addEventListener('pageshow', e => { if (e.persisted && snapDateOnResume()) route(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && snapDateOnResume()) route(); });
 // #/lib → the list of books; #/lib/<node> → its list; #/lib/<chapter>[?s=<segment>] → the reader (same as the lessons)
 let libSeq = 0;
 async function libRoute(path, seek) {
@@ -346,6 +357,7 @@ function tefilaCard() {
     return `<section class="tefila" aria-labelledby="tf-h">
       <div class="dayhead"><h2 id="tf-h">${isToday ? 'תפילה עכשיו' : 'תפילות היום'}</h2><span class="daysum">${esc(isToday ? s.he : 'נוסח חב״ד')}</span></div>
       <ul class="tf-list">${items.map(i => `<li><a href="#/s/${i.book}/${i.n}">${esc(i.he)}</a></li>`).join('')}</ul>
+      <p class="tf-always"><span class="tf-always-lab">זמין תמיד</span> <a href="#/s/brachot/4">ברכת המזון</a></p>
       ${lines.length ? `<p class="tf-ins"><b>${s.period === 'night' ? 'בתפילת הערב' : 'היום'} אומרים:</b> ${lines.map(esc).join(' · ')}</p>` : ''}
       ${s.notes.map(n => `<p class="note">${esc(n)}</p>`).join('')}
       <p class="tf-more"><a class="btn" href="#/siddur">הסידור המלא – תוכן וחיפוש</a> <a class="btn" href="#/kivun">${COMPASS}<span>כיוון התפילה</span></a></p>
@@ -669,7 +681,9 @@ function renderAbout() {
   <li><b>נוסח:</b> נוסח האריז״ל כמנהג חב״ד, מתעתיק Open Siddur (שמואל גונזלס, CC0; ההוראות באנגלית – CC BY). התעתיק נערך ״בהתאם לתהלת ה׳״ אך <b>אינו</b> סידור תהלת ה׳ עצמו (שמוגן בזכויות יוצרים, וכך גם הנוסח של Chabad.org – ולכן לא נלקח משם דבר). ייתכנו הבדלים קטנים מהסידור המודפס.</li>
   <li id="siddur-he-about"><b>ההנחיות בעברית:</b> ההוראות שבתעתיק (מתי עומדים, מה מוסיפים בשבת וביום טוב, מה עונה הקהל וכו׳) כתובות במקור באנגלית. לאתר זה תורגמו כולן לעברית (922 הנחיות ו־77 צירופים קצרים בתוך שורות התפילה), בנאמנות למקור ובלי להוסיף הלכה. הפניות למקורות הומרו לצורה העברית (״תהלים כג״). במקומות שבהם האנגלית שגויה בעליל (למשל ימין ושמאל שהתחלפו), התרגום נאמן למקור ומסומן ״(כך בתעתיק)״. התרגום הוא יצירה נגזרת מהוראות Open Siddur (CC BY; ״Contributors to the Open Siddur Project״, שמואל גונזלס), שתורגמו ושונו. אפשר לבחור בהגדרות התצוגה ״שפת ההנחיות בסידור״: עברית (ברירת מחדל), אנגלית או שתיהן. פירוט – <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/SIDDUR-HEBREW-INSTRUCTIONS.md" target="_blank" rel="noopener" dir="ltr">SIDDUR-HEBREW-INSTRUCTIONS.md</a>.</li>
   <li><b>שם ה׳</b> מוצג במלואו כבמקור. בהגדרות אפשר לבחור להציג ״ה׳״ במקומו (בתצוגה בלבד).</li>
-  <li><b>התפילה עכשיו:</b> ההצעה בבית נקבעת לפי זמני היום של העיר שנבחרה (שחרית עד חצות, מנחה עד השקיעה, אחר כך מעריב), עם תזכורת להוספות: יעלה ויבוא, על הניסים, משיב הרוח/מוריד הטל, ותן טל ומטר (ארץ ישראל – מז׳ במרחשוון; חו״ל – מ־4 או 5 בדצמבר). אחרי השקיעה ההוספות הן של התאריך העברי הבא. זו תזכורת, לא פסק הלכה.</li>
+  <li><b>התפילה עכשיו:</b> ההצעה בבית נקבעת לפי זמני היום של העיר שנבחרה (שחרית עד חצות, מנחה עד השקיעה, אחר כך מעריב), עם תזכורת להוספות: יעלה ויבוא, על הניסים, משיב הרוח/מוריד הטל, ותן טל ומטר (ארץ ישראל – מז׳ במרחשוון; חו״ל – מ־4 או 5 בדצמבר). אחרי השקיעה ההוספות הן של התאריך העברי הבא. <b>ברכת המזון</b> מופיעה תמיד בשורה ״זמין תמיד״ (לא לפי שעה). זו תזכורת, לא פסק הלכה.</li>
+  <li><b>תאריך היום:</b> ברענון או בחזרה לאפליקציה, אם הכתובת אינה נוקבת תאריך מפורש (<bdi dir="ltr">#/d/…</bdi>, <bdi dir="ltr">#/zmanim/…</bdi>, <bdi dir="ltr">#/r/…/…</bdi>), התאריך חוזר להיום האזרחי – לסידור, ל״תפילה עכשיו״, לזמנים ולתהילים אישי. קישור ששומר יום מסוים נשאר עליו.</li>
+  <li><b>הוספות מיוחדות בסידור:</b> פסקאות כמו יעלה ויבוא, על הניסים, עננו וכדומה מוצגות בגופן מעט שונה (ועם סימון עדין) כדי להבדיל בינן לבין סדר התפילה הרגיל. ההוראות עצמן (״מוסיפים״ וכו׳) נשארות בסגנון הרגיל שלהן.</li>
   <li><b>נבדק:</b> 19 קטעים (בהם ברוך שאמר, אשרי, ישתבח, שמונה עשרה, והוא רחום, ובא לציון, ויהי נועם) הושוו מילה במילה לסידור מצודה נוסח ספרד (ספריא, CC BY). לא נמצא קטע שאינו בנוסח חב״ד; תוקנו 5 שגיאות הקלדה ברורות ו־2 שגיאות המרה, ונקודות שאינן ודאיות סומנו ״לבדיקה״ ולא שונו – <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/SIDDUR-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">SIDDUR-VERIFICATION.md</a>.</li>
   <li><b>חסר:</b> תפילות הימים הנוראים, סליחות, פרקי אבות, קינות, וטקסט המגילה – לא נמצא להם נוסח חב״ד ברישיון חופשי. הרשימה המלאה בעמוד <a href="#/siddur">הסידור</a>.</li></ul>
   <h2>ניקוד</h2><ul><li>כל טקסטי חת״ת והרמב״ם מנוקדים (ספר המצוות שבשיעורים הנוספים אינו מנוקד; תורה אור ולקוטי תורה מנוקדים ברובם, בנוסח חסידות בהירה, ופסקה שלא אומתה מוצגת בלי ניקוד), חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
@@ -1088,7 +1102,7 @@ async function renderDoc() {
       html += `<span class="seg inline" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${num}<span class="t">${fmt(b.text, true)}</span></span> `;
     } else {
       const rashi = showRashi && b.sub?.length ? `<div class="rashi">${b.sub.map((r, i) => `<p>${i ? '' : '<span class="lbl">רש״י </span>'}${fmt(r, false)}</p>`).join('')}</div>` : '';
-      html += `<div class="seg" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}><div class="t">${num}${fmt(b.text, !!d.tanakh, sidd || !!d.raw)}</div>${rashi}</div>`;
+      html += `<div class="seg${b.special ? ' sid-special' : ''}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}><div class="t">${num}${fmt(b.text, !!d.tanakh, sidd || !!d.raw)}</div>${rashi}</div>`;
     }
   }
   if (open) html += '</p>';

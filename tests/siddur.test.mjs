@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { serve, launch, pageWith, progressOf } from './helpers.mjs';
 import { insertions, insertionLines, suggest, chanukahDay, omerDay } from '../site/js/tefila.js';
+import { specialPrayerFlags } from '../site/js/texts.js';
 import { computeZmanim, cityById } from '../site/js/zmanim.js';
 
 const idx = JSON.parse(fs.readFileSync(new URL('../site/data/siddur/index.json', import.meta.url)));
@@ -43,6 +44,26 @@ test('the suggestion follows the time of day and the kind of day', () => {
   assert.ok(at('2026-12-04', '18').items.some(i => i.book === 'chanukah'));
   assert.ok(at('2026-09-12', '08').notes.some(n => /ראש השנה/.test(n)));
   for (const s of [at('2026-11-02', '08'), at('2026-11-06', '18'), at('2026-12-11', '08')]) for (const i of s.items) assert.ok(idx.books.find(b => b.id === i.book)?.secs[i.n - 1], `${i.book}/${i.n}`);
+});
+
+
+test('specialPrayerFlags marks Yaaleh Veyavo and Al Hanisim, not the resume lines', () => {
+  const sk = h => String(h).replace(/<[^>]*>/g, '').replace(/[\u0591-\u05C7]/g, '');
+  const amidah = JSON.parse(fs.readFileSync(new URL('../site/data/siddur/shacharit/3.json', import.meta.url))).b;
+  const flags = specialPrayerFlags(amidah);
+  const yaaleh = amidah.findIndex(([t, h]) => t === 'p' && /יעלה ויבא/.test(sk(h)));
+  assert.ok(yaaleh >= 0);
+  assert.equal(flags[yaaleh], true, 'יעלה ויבוא is special');
+  const al = amidah.findIndex(([t, h]) => t === 'p' && /על הנסים/.test(sk(h)));
+  assert.ok(al >= 0);
+  assert.equal(flags[al], true);
+  const resume = amidah.findIndex(([t, h]) => t === 'p' && /^ועל כל/.test(sk(h)));
+  assert.ok(resume > al);
+  assert.equal(flags[resume], false, 'ועל כולם resumes the ordinary Modim');
+  const birkat = JSON.parse(fs.readFileSync(new URL('../site/data/siddur/brachot/4.json', import.meta.url))).b;
+  const bf = specialPrayerFlags(birkat);
+  const by = birkat.findIndex(([t, h]) => t === 'p' && /יעלה ויבא/.test(sk(h)));
+  assert.ok(by >= 0 && bf[by], 'Birkat Hamazon Yaaleh is special');
 });
 
 let srv, browser;
@@ -97,7 +118,19 @@ test('home: the prayer card links into the siddur', async () => {
   await p.waitForSelector('.tefila .tf-list a');
   const href = await p.locator('.tefila .tf-list a').first().getAttribute('href');
   assert.match(href, /^#\/s\/[a-z]+\/\d+$/);
+  assert.equal(await p.locator('.tf-always a').getAttribute('href'), '#/s/brachot/4');
+  assert.match(await p.locator('.tf-always').innerText(), /זמין תמיד.*ברכת המזון/s);
   assert.ok(await p.locator('.home-foot a[href="#/siddur"]').count());
+  assert.deepEqual(p.errors, []);
+  await p.context().close();
+});
+test('reader: Yaaleh Veyavo paragraph gets sid-special', async () => {
+  const p = await pageWith(browser, srv.url);
+  await p.goto(srv.url + '#/s/shacharit/3');
+  await p.waitForSelector('#rc .seg.sid-special');
+  const hit = await p.$$eval('#rc .seg.sid-special .t', els => els.map(e => e.textContent.replace(/[\u0591-\u05C7]/g, '')).find(t => /יעלה ויבא/.test(t)));
+  assert.ok(hit, 'a sid-special segment contains יעלה ויבוא');
+  assert.ok(await p.locator('#rc .sid-note').count() > 0, 'instruction notes still present');
   assert.deepEqual(p.errors, []);
   await p.context().close();
 });

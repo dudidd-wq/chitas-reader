@@ -72,7 +72,12 @@ test('UI: add family profiles (date + age), chapter text, Rebbe option, delete, 
       assert.equal(await p.locator('#pt-teaser').count(), 0, 'no teaser before any profile');
       await p.click('.home-foot a[href="#/tehillim"]'); await p.waitForSelector('#pt-form');
       assert.match(await p.textContent('.pt-privacy'), /במכשיר הזה בלבד.*אינו נשלח/s);
-      assert.match(await p.textContent('.pt-day'), /כ״ג במרחשוון תשפ״ז.*03\/11\/2026/s);
+      // 1.0.65: #/tehillim does not pin a date, so the day line snaps to today (not the previously browsed #/d/…).
+      const todayLine = await p.evaluate(() => {
+        const d = new Date(), pad = n => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+      });
+      assert.match(await p.textContent('.pt-day'), new RegExp(todayLine.replace(/\//g, '\\/')));
       await p.click('#pt-add'); assert.match(await p.textContent('#pt-err'), /שם/);
       await p.fill('#pt-name', 'יוסי'); await p.fill('#pt-greg', '2013-05-01'); await p.click('#pt-add');
       assert.match(await p.textContent('#pt-err'), /תאריך לא תקין/);

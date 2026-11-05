@@ -340,6 +340,10 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .tf-ins { margin: .7rem 0 0; line-height: 1.6; overflow-wrap: anywhere; }
 .tefila .note { margin: .4rem 0 0; color: var(--muted); font-size: .9rem; }
 .tf-more { margin: .7rem 0 0; }
+.tf-always { margin: .55rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .55rem; }
+.tf-always-lab { color: var(--muted); font-size: .9rem; font-weight: 600; }
+.tf-always a { display: inline-flex; align-items: center; min-height: 44px; padding: .3rem .9rem; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--rule)); background: color-mix(in srgb, var(--accent) 12%, var(--card)); color: var(--ink); text-decoration: none; font-weight: 600; }
+.tf-always a:hover { border-color: var(--accent); }
 .sd-search { margin: 1rem 0; }
 .sd-search label { display: block; font-weight: 600; margin-bottom: .3rem; }
 .sd-search input { width: 100%; box-sizing: border-box; min-height: 44px; padding: .3rem .7rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
@@ -358,6 +362,17 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sid-note.sid-he { text-align: right; font-size: .82em; overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
 .sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
 .sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
+/* Special insertions (יעלה ויבוא, על הניסים, …): spoken paragraphs, not .sid-note.
+   Same family with distinct weight/style/colour – avoids late webfont reflow that would break paged goToSec. */
+.r-content .seg.sid-special .t {
+  font-weight: 600;
+  font-style: italic;
+  color: color-mix(in srgb, var(--ink) 80%, var(--accent));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+@media print {
+  .r-content .seg.sid-special .t { color: #222; background: #eee; font-style: italic; }
+}
 /* 1.0.61: siddur tables – a real grid instead of "prayer · Names" lines. RTL: the first cell (the prayer) on the right.
    Every cell is isolated in its own direction; nothing may be wider than the column (no overflow at 320px). */
 .r-content .sd-tab-seg .t { overflow-wrap: anywhere; }
