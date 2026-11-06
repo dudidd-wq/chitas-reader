@@ -410,6 +410,141 @@ export function markSectionLabels(html) {
     '<span class="sid-mark" data-nr aria-hidden="true">($1)</span>');
 }
 
+/** Notes that mention omit/אין אומרים but do not mark a following spoken block (procedure, word-level, navigation). */
+function isOmitBlockNote(en, he) {
+  if (!isOmitNote(en, he)) return false;
+  const e = stripTags(en).trim(), h = stripTags(he).trim(), t = e + ' ' + h;
+  if (/omit the word|משמיטים את המילה|המילים ״/i.test(t)) return false;
+  if (/mistakenly omitted|שכח לאומרו|אם נזכר/i.test(t)) return false;
+  if (/only once each day|רק פעם אחת|while on the ground|בישיבה על הארץ|Kaddish is not said after|אחרי סיום קריאת התורה אין אומרים קדיש/i.test(t)) return false;
+  if (/It is appropriate to recite ones daily Tehillim|ראוי לומר בשלב זה את השיעור היומי/i.test(t)) return false;
+  if (/Upon completion of the Amidah one is to say Tachanun|בסיום תפילת העמידה אומרים/i.test(t) && /on days that Ta/i.test(t)) return false;
+  // Pure navigation ("continue on at X") without "omit the following …"
+  if (/continue on at|ממשיכים ב/i.test(t) && !/omit the following|משמיטים את|אין אומרים את/i.test(t)) return false;
+  return /the following|את הפסק|את המזמור|את הברכ|את השור|את הפסוק|ברכה זו|omit this blessing|From the second night|שתי הפסק|הפסקאות הבאות|המזמור הבא|אמרים בימי שני|except when Techanun|חוץ מימים שאין|On weekdays the following two Psalms/i.test(t)
+    || (/Psalm|מזמור|תהל/i.test(t) && /omit|אין אומרים|משמיט/i.test(t));
+}
+
+/** How many spoken paragraphs the omit instruction covers. */
+function omitSpan(en, he) {
+  const t = stripTags(en).trim() + ' ' + stripTags(he).trim();
+  const mTwo = t.match(/following two paragraphs|שתי הפסקאות/i);
+  if (mTwo) return { mode: 'count', n: 2 };
+  if (/following two Psalms|שני המזמורים/i.test(t)) return { mode: 'psalms', n: 2 };
+  // plural: paragraphs OR Psalms until the next instructional note
+  if (/following paragraphs|הפסקאות הבאות|following Psalms|omit the following Psalms|את המזמורים|המזמורים הבאים/i.test(t)) return { mode: 'until-note', n: null };
+  if (/Psalm|המזמור הבא|מזמור הבא|את המזמור|את תהלים/i.test(t)) return { mode: 'psalm', n: null };
+  // singular paragraph / blessing / line / verse / "this blessing"
+  return { mode: 'count', n: 1 };
+}
+
+const CITE_NOTE_RE = /^(Psalm|Psalms|תהל)/i;
+/** Short Hebrew cue for the omit-start marker (shown, not spoken). */
+function omitStartLabel(en, he) {
+  const h = stripTags(he).trim(), e = stripTags(en).trim();
+  if (/בשבת.*יום טוב|ביום טוב.*שבת|On Shabbat and Festivals/i.test(h + ' ' + e)) return 'בשבת ויו״ט אין אומרים';
+  if (/תחנון|Tachanun|Techanun/i.test(h + ' ' + e)) return 'בימים שאין אומרים תחנון';
+  if (/תשעה באב|Tisha/i.test(h + ' ' + e) && /כיפור|Kippur/i.test(h + ' ' + e)) return 'בתשעה באב וביום הכיפורים אין אומרים';
+  if (/חנוכה|Chanukah/i.test(h + ' ' + e)) return 'מהלילה השני אין אומרים';
+  if (/יחיד|alone|ביחידות/i.test(h + ' ' + e)) return 'ביחידות אין אומרים';
+  if (/שני וחמישי|Mondays and Thursdays/i.test(h + ' ' + e)) return 'רק בימי שני וחמישי (כשיש תחנון)';
+  if (/Hallel|הלל|Psalms? 1[15]/i.test(h + ' ' + e)) return 'בחצי הלל אין אומרים';
+  if (/שבת ראש חודש|Shabbat Rosh Chodesh/i.test(h + ' ' + e)) return 'בשבת ראש חודש משמיטים';
+  if (/Festival or Chol haMoed|יום טוב או חול המועד/i.test(h + ' ' + e)) return 'ביו״ט/חוה״מ שחל בשבת משמיטים';
+  if (/weekdays.*Psalms|בימות החול אומרים את שני המזמורים/i.test(h + ' ' + e)) return 'בשבת ויו״ט אין אומרים';
+  if (h.length && h.length <= 48) return h.replace(/:$/, '');
+  return 'אין אומרים';
+}
+
+/**
+ * 1.0.67: paragraphs omitted on Shabbat/Yom Tov / no-Tachanun / etc.
+ * @returns {{ omit: boolean[], isStart: boolean[], isEnd: boolean[], label: (string|null)[] }}
+ */
+export function omitPrayerFlags(rows) {
+  const n = rows.length;
+  const omit = Array(n).fill(false), isStart = Array(n).fill(false), isEnd = Array(n).fill(false), label = Array(n).fill(null);
+  const isCite = (t, h) => t === 'n' && CITE_NOTE_RE.test(stripTags(h).trim());
+  for (let i = 0; i < n; i++) {
+    const [t, h, he] = rows[i];
+    if (t !== 'n' || !isOmitBlockNote(h, he)) continue;
+    const span = omitSpan(h, he);
+    const lab = omitStartLabel(h, he);
+    const idxs = [];
+    let j = i + 1;
+    while (j < n && isCite(rows[j][0], rows[j][1])) j++;
+    if (span.mode === 'count') {
+      let left = span.n;
+      while (j < n && left > 0) {
+        if (rows[j][0] === 'p') { idxs.push(j); left--; j++; }
+        else if (isCite(rows[j][0], rows[j][1])) j++;
+        else break;
+      }
+    } else if (span.mode === 'psalms') {
+      // N distinct psalms (cite + body), e.g. Birkat haMazon weekday pair
+      let left = span.n;
+      while (j < n && left > 0) {
+        while (j < n && isCite(rows[j][0], rows[j][1])) j++;
+        if (j >= n || rows[j][0] !== 'p') break;
+        while (j < n && rows[j][0] === 'p') { idxs.push(j); j++; }
+        left--;
+      }
+    } else if (span.mode === 'psalm') {
+      // one psalm: take p-rows until the next non-cite note/heading (or a new Psalm cite after ≥1 p)
+      let got = 0;
+      while (j < n) {
+        const [tj, hj] = rows[j];
+        if (tj === 'h') break;
+        if (tj === 'n') {
+          if (isCite(tj, hj)) {
+            if (got > 0) break; // next psalm citation ends this omit
+            j++; continue;
+          }
+          break;
+        }
+        if (tj === 'p') {
+          // stop before a known resume opener once we already have a psalm paragraph
+          const sk = skelHe(hj);
+          if (got > 0 && /^(יהי כבוד|אשרי יושבי|בית יעקב|השכיבנו אבינו|לעולם יהא אדם|רבון כל העולמים)/.test(sk)) break;
+          idxs.push(j); got++; j++;
+          continue;
+        }
+        break;
+      }
+    } else { // until-note: consecutive p (and inner cites) until a non-cite note/heading
+      while (j < n) {
+        const [tj, hj] = rows[j];
+        if (tj === 'h') break;
+        if (tj === 'n') {
+          if (isCite(tj, hj)) { j++; continue; }
+          break;
+        }
+        if (tj === 'p') { idxs.push(j); j++; continue; }
+        break;
+      }
+    }
+    if (!idxs.length) continue;
+    for (const k of idxs) omit[k] = true;
+    isStart[idxs[0]] = true;
+    label[idxs[0]] = lab;
+    isEnd[idxs[idxs.length - 1]] = true;
+  }
+  return { omit, isStart, isEnd, label };
+}
+
+/** Mark the last paragraph of each contiguous special run longer than one paragraph. */
+export function specialBlockEnds(specialFlags) {
+  const ends = Array(specialFlags.length).fill(false);
+  let run = 0, start = -1;
+  const close = (i) => { if (run > 1) ends[i - 1] = true; run = 0; start = -1; };
+  for (let i = 0; i <= specialFlags.length; i++) {
+    if (i < specialFlags.length && specialFlags[i]) {
+      if (run === 0) start = i;
+      run++;
+    } else if (run) close(i);
+  }
+  return ends;
+}
+
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
 export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
@@ -417,6 +552,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
   const runs = idx.heRuns, blocks = [], special = specialPrayerFlags(sec.b);
+  const specialEnd = specialBlockEnds(special), om = omitPrayerFlags(sec.b);
   sec.b.forEach(([t, h, he], i) => {
     const id = `${book}-${n}-${i}`;
     if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
@@ -425,7 +561,16 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
     else if (t === 't') blocks.push(siddurTable(id, h, he, runs, lang));
-    else blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang), ...(special[i] ? { special: true } : {}) });
+    else {
+      const extra = {};
+      if (special[i]) { extra.special = true; if (specialEnd[i]) extra.specialEnd = true; }
+      if (om.omit[i]) {
+        extra.omit = true;
+        if (om.isStart[i]) { extra.omitStart = true; extra.omitLabel = om.label[i]; }
+        if (om.isEnd[i]) extra.omitEnd = true;
+      }
+      blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang), ...extra });
+    }
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };
 }

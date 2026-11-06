@@ -374,6 +374,28 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 @media print {
   .r-content .seg.sid-special .t { color: #222; background: #eee; font-style: italic; }
 }
+/* 1.0.67: weekday / conditional-omit blocks – oblique, normal weight, thin side rule (distinct from .sid-special). */
+.r-content .seg.sid-omit .t {
+  font-weight: 400;
+  font-style: oblique;
+  font-synthesis: style;
+  color: color-mix(in srgb, var(--ink) 86%, var(--muted));
+  border-inline-start: 2px solid color-mix(in srgb, var(--muted) 55%, transparent);
+  padding-inline-start: .4em;
+}
+.sid-bound {
+  font-family: var(--ui);
+  font-size: .55em;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: .02em;
+  line-height: 1.35;
+}
+.sid-omit-start { margin: .15em 0 .05em; }
+.sid-end { margin: .05em 0 .25em; }
+@media print {
+  .r-content .seg.sid-omit .t { font-style: oblique; border-inline-start: 2px solid #999; }
+}
 /* 1.0.61: siddur tables – a real grid instead of "prayer · Names" lines. RTL: the first cell (the prayer) on the right.
    Every cell is isolated in its own direction; nothing may be wider than the column (no overflow at 320px). */
 .r-content .sd-tab-seg .t { overflow-wrap: anywhere; }
