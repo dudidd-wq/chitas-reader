@@ -1,6 +1,6 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc } from './texts.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
@@ -524,7 +524,7 @@ function bindForm(root, onChange) {
     if (typeof DEFAULT_PREFS[el.name] === 'number') v = Number(v);
     if (el.name === 'il') { v = v === 'true' || v === true; setPref('locationChosen', true); }
     setPref(el.name, v);
-    if (el.name === 'font' && v === 'frank') setPref('taamim', false);
+    if (el.name === 'font' && (v === 'frank' || v === 'ezra')) setPref('taamim', false);
     const o = root.querySelector('#o-' + ({ size: 'size', lineHeight: 'lh', ttsRate: 'rate' })[el.name]); if (o) o.textContent = v;
     applyPrefs(); onChange?.(el.name);
   });
@@ -613,7 +613,7 @@ async function renderSources() {
     <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
-  <h2>גופנים</h2><p>Noto Serif Hebrew, Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>).</p>
+  <h2>גופנים</h2><p>Noto Serif Hebrew (ברירת מחדל; כולל טעמי מקרא), Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>). בגופני פרנק ועזרא טעמי המקרא מוסתרים, כי בגופנים האלה אין גליפים לטעמים.</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
   glossCounts().then(t => { const el = $('#gloss-counts'); if (el && t) el.textContent = t; });
   errataCounts().then(t => { const el = $('#rambam-errata-counts'); if (el && t) el.textContent = t; });
@@ -827,13 +827,15 @@ function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 // a library chapter (#/lib/…) once, under its own key – free browsing never marks a daily lesson as done
 const pk = () => (R.lib ? ['lib', R.lib] : R.sid ? ['siddur', R.sid] : [R.iso, R.unit]);
 function fmt(html, isTanakh, siddur = false) {
-  if (siddur) return divineName(html, prefs.divine); // the siddur keeps its own markup: no ketiv/qere or parasha marks
+  if (siddur) return divineName(markSectionLabels(html), prefs.divine); // siddur markup kept; (א)(ב) markers muted+data-nr
   let s = html.replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '<span class="ketiv" title="כתיב">($1)</span> <span title="קרי">$2</span>')
     .replace(/\{([פס])\}/g, (m, k) => `<span class="pe pe-${k === 'פ' ? 'p' : 's'}" aria-hidden="true" title="${k === 'פ' ? 'פרשה פתוחה' : 'פרשה סתומה'}"></span>`) // a gap, as in a Torah scroll (round 5: a bare ס puzzled readers)
     .replace(/<i class="fn">/g, '<i class="fn" role="note" title="הערת המהדורה">')
     .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
+  s = markSectionLabels(s); // 1.0.66: (א)(ב) section labels – muted, not spoken (siddur/rambam/…)
   if (!isTanakh && !siddur) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
-  if (isTanakh && (!prefs.taamim || prefs.font === 'frank')) s = stripTaamim(s);
+  // Frank/Ezra subsets lack taamim glyphs – strip so a word never mixes fonts mid-glyph
+  if (isTanakh && (!prefs.taamim || prefs.font === 'frank' || prefs.font === 'ezra')) s = stripTaamim(s);
   return divineName(s, prefs.divine); // the divine name: in full (default) or ה׳ – one setting for every text
 }
 // 1.0.61: a siddur table (texts.js siddurTable) – one segment; each cell isolated in its own direction. Cells that are

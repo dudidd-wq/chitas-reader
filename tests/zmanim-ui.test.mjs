@@ -13,7 +13,8 @@ test('zmanim page: home + footer links, Jerusalem Friday times, axe in 4 themes,
       const p = await pageWith(b, srv.url, { prefs: { theme }, viewport: { width, height: 760 } });
       const foreign = []; p.on('request', r => { if (!r.url().startsWith(srv.url)) foreign.push(r.url()); });
       await p.goto(srv.url + '#/d/2026-11-06'); await p.waitForSelector('#zm-teaser');
-      assert.match(await p.textContent('#zm-teaser'), /זמני היום.*ירושלים.*הדלקת נרות שבת.*16:05/s);
+      // Teaser shows the next upcoming zman (time-of-day dependent); candles are asserted on the full page below.
+      assert.match(await p.textContent('#zm-teaser'), /זמני היום.*ירושלים/s);
       assert.equal(await p.locator('.home-foot a[href="#/zmanim/2026-11-06"]').count(), 1, 'footer link');
       await p.click('#zm-teaser'); await p.waitForSelector('.zm-list');
       assert.equal(await p.locator('.zm-row').count(), 12);

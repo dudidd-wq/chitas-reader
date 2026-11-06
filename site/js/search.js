@@ -20,6 +20,7 @@ export function indexText(html) {
     .replace(/<\/?(?:b|i|u|big|small|em|strong)\b[^>]*>/g, '')         // inline formatting: <big>ע</big> in שְׁמַע stays one word
     .replace(/<[^>]+>/g, ' ')
     .replace(/\{[פס]\}/g, ' ')
+    .replace(/\(([א-י]|י[א-ד])\)(?=\s*[\u05D0-\u05EA])/g, ' ')     // 1.0.66: (א)(ב) section labels
     .replace(/[\u05BE]/g, ' ')                                       // maqaf
     .replace(/[\u0591-\u05C7]/g, '')                                 // taamim, niqqud, paseq, sof pasuq (→ removed)
     .replace(/[׳`']/g, "'").replace(/[״”“"]/g, '"')

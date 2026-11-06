@@ -333,34 +333,50 @@ function siddurTable(id, rows, cls, runs, lang) {
   return { type: 'table', id, cls: /^[a-z]+$/.test(cls) ? cls : 'plain', rows: R, text: R.flat().filter(c => c.k === 'p').map(c => c.html).join(' ') };
 }
 /** Occasional/seasonal prayer insertions (יעלה ויבוא, על הניסים, עננו, משיב הרוח, …) – spoken paragraphs, not the
- *  instruction notes. Flags are computed from the raw siddur rows so the reader can style them distinctly. */
+ *  instruction notes. Flags are computed from the raw siddur rows so the reader can style them distinctly.
+ *  1.0.66: only true conditional insertions. Daily passages that are sometimes *omitted* (פרשת העקדה etc.)
+ *  must not be flagged; biblical citations like בראשית must not match בראש חודש. */
 const stripTags = s => String(s || '').replace(/<[^>]*>/g, '');
 const skelHe = s => stripTags(s).replace(/[\u0591-\u05C7]/g, '').replace(/^\s+/, '');
-const ADD_EN_RE = /adds? the following|one adds\b|(?:^|[.\s>])add:|substitutes? the following|omit the following/i;
-const SIT_LABEL_RE = /^(Summer|Winter|On |From Rosh HaShanah to Yom Kippur, during the Ten Days of Penitence, (?:add|one substitutes)|During |בקיץ|בחורף|בראש|בפסח|בסוכות|בשבועות|בפורים|בחנוכה|בשבת|ביום טוב|בחול המועד|מראש השנה)/i;
-const OPEN_RE = /^(ו?על הנסים|יעלה ויבא|עננו|זכרנו לחיים|וכתוב לחיים|וכתוב|מי כמוך|משיב הרוח|מוריד הטל|ותן טל|ותן ברכה|רצה והחליצנו)/;
+const ADD_EN_RE = /adds? the following|one adds\b|(?:^|[.\s>])add:|substitutes? the following|continue with:/i;
+const OMIT_RE = /omit(?:s|ted|ting)?(?: the following)?|is omitted|are omitted|אין אומרים|משמיטים|לא אומרים/i;
+// Day/season labels for true insertions. Not bare "On " (that caught omit-notes) and not בראש alone (that caught בראשית).
+const SIT_LABEL_RE = /^(Summer|Winter|From Rosh HaShanah to Yom Kippur, during the Ten Days of Penitence, (?:add|one substitutes)|During |On (?:Chanukah|Purim|Rosh|Pesach|Sukkot|Shavuot|Shabbat|weekdays|Festivals|Yom Kippur|Shemini|Chol|a Public|wine|the First|the Second|the Third|the Fourth|the Fifth|the Sixth|Hosha)|בקיץ|בחורף|בראש חודש|בפסח|בסוכות|בשבועות|בפורים|בחנוכה|בשבת|ביום טוב|בחול המועד|מראש השנה)/i;
+const OPEN_RE = /^(ו?על הנסים|יעלה ויבא|עננו|זכרנו לחיים|וכתוב לחיים|וכתוב|מי כמוך|משיב הרוח|מוריד הטל|ותן טל|ותן ברכה|רצה והחליצנו|נחם)/; // הרחמן: only via situational labels (On Shabbat / RC / …), not every daily line
 const CONT_RE = /^(בימי |הזה[.׃]?)/;
 const RESUME_RE = /^(ועל כל[םו]|ותחזינה|יהיו לרצון|מודים|מלך,? עוזר|מכלכל חיים|על פני האדמה|ברך עלינו|אתה קדוש|אלהינו ואלהי אבותינו, ברכנו)/;
+const CITE_RE = /^(Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Samuel|Kings|Isaiah|Jeremiah|Ezekiel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Psalms?|Proverbs|Job|Song|Ruth|Lamentations|Ecclesiastes|Esther|Daniel|Ezra|Nehemiah|Chronicles|\d\s*(Chronicles|Samuel|Kings)|בראשית|שמות|ויקרא|במדבר|דברים|תהל[יי]ם|תהלים|משלי|איוב)/i;
+function isOmitNote(en, he) {
+  const e = stripTags(en).trim(), h = stripTags(he).trim();
+  return OMIT_RE.test(e) || OMIT_RE.test(h);
+}
 function isAddNote(en, he) {
   const e = stripTags(en).trim(), h = stripTags(he).trim();
   // Inline word-swap notes ("substitute X with Y") are not a following prayer block.
   if (/substitut\w* the words|אומרים במקום המילים/i.test(e + ' ' + h) && !/the following/i.test(e)) return false;
+  if (isOmitNote(en, he)) return false;
   if (ADD_EN_RE.test(e)) return true;
   // Hebrew: a short cue that ends with מוסיפים / מוסיפים: (the next paragraph is the addition).
   if (h.length <= 120 && /מוסיפים:?\s*$/.test(h)) return true;
-  if (/משמיטים את/.test(h)) return true;
   if (/אומרים במקום/.test(h) && /the following/i.test(e)) return true;
   return false;
 }
 function isSituationalLabel(en, he) {
   const e = stripTags(en).trim(), h = stripTags(he).trim();
   if (Math.max(e.length, h.length) > 110) return false;
+  if (isOmitNote(en, he)) return false;
+  // "continue below" / ordinary flow / "blessings end here" are not insertions.
+  if (/continue below|ordinary|end here|blessings end|רגילה|ממשיכים|מסתיימות/i.test(e + ' ' + h)) return false;
   return SIT_LABEL_RE.test(e) || SIT_LABEL_RE.test(h);
 }
 function isSectionTitle(en, he) {
   const e = stripTags(en).trim(), h = stripTags(he).trim();
   return (e.length < 70 && /[–—-]/.test(e) && /[\u05D0-\u05EA]/.test(e))
     || (h.length < 40 && /[–—-]/.test(h));
+}
+function isCitationNote(en, he) {
+  const e = stripTags(en).trim(), h = stripTags(he).trim();
+  return CITE_RE.test(e) || CITE_RE.test(h);
 }
 /** @param {Array} rows raw siddur section.b rows [type, en/html, he?]
  *  @returns {boolean[]} parallel flags: true = spoken insertion paragraph */
@@ -371,9 +387,10 @@ export function specialPrayerFlags(rows) {
     const [t, h, he] = rows[i];
     if (t === 'h') { expect = false; inRun = false; continue; }
     if (t === 'n') {
-      if (isAddNote(h, he)) { expect = true; inRun = true; }
+      if (isOmitNote(h, he)) { expect = false; inRun = false; }
+      else if (isAddNote(h, he)) { expect = true; inRun = true; }
       else if (isSituationalLabel(h, he)) { expect = true; }
-      else if (isSectionTitle(h, he)) { expect = false; inRun = false; }
+      else if (isSectionTitle(h, he) || isCitationNote(h, he)) { expect = false; inRun = false; }
       else expect = false;
       continue;
     }
@@ -386,6 +403,11 @@ export function specialPrayerFlags(rows) {
     inRun = special ? true : false;
   }
   return flags;
+}
+/** Wrap (א)(ב)…(יד) list/section markers so they render muted and are dropped from TTS (data-nr). */
+export function markSectionLabels(html) {
+  return String(html || '').replace(/\(([א-י]|י[א-ד])\)(?=\s*[\u05D0-\u05EA])/g,
+    '<span class="sid-mark" data-nr aria-hidden="true">($1)</span>');
 }
 
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
