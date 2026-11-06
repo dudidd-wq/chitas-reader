@@ -416,6 +416,11 @@ function isOmitBlockNote(en, he) {
   const e = stripTags(en).trim(), h = stripTags(he).trim(), t = e + ' ' + h;
   if (/omit the word|משמיטים את המילה|המילים ״/i.test(t)) return false;
   if (/mistakenly omitted|שכח לאומרו|אם נזכר/i.test(t)) return false;
+  // 1.0.68 rule: omit-style only a block that is simply dropped with nothing in its place.
+  // Alternatives ("say X instead", "במקומם") are a choice, not an omission (e.g. על נהרות בבל / שיר המעלות).
+  if (/substitute|instead|in (?:its|their) place|במקומ[םןה]|במקומו|אומרים במקום/i.test(t)) return false;
+  // Verse/word-level omissions inside a paragraph (shaded verse) must not style the whole paragraph.
+  if (/shaded verse|הפסוק המוצלל|the following line|השורה הבאה/i.test(t)) return false;
   if (/only once each day|רק פעם אחת|while on the ground|בישיבה על הארץ|Kaddish is not said after|אחרי סיום קריאת התורה אין אומרים קדיש/i.test(t)) return false;
   if (/It is appropriate to recite ones daily Tehillim|ראוי לומר בשלב זה את השיעור היומי/i.test(t)) return false;
   if (/Upon completion of the Amidah one is to say Tachanun|בסיום תפילת העמידה אומרים/i.test(t) && /on days that Ta/i.test(t)) return false;
@@ -443,11 +448,11 @@ const CITE_NOTE_RE = /^(Psalm|Psalms|תהל)/i;
 function omitStartLabel(en, he) {
   const h = stripTags(he).trim(), e = stripTags(en).trim();
   if (/בשבת.*יום טוב|ביום טוב.*שבת|On Shabbat and Festivals/i.test(h + ' ' + e)) return 'בשבת ויו״ט אין אומרים';
+  if (/שני וחמישי|Mondays and Thursdays/i.test(h + ' ' + e)) return 'רק בימי שני וחמישי (כשיש תחנון)';
   if (/תחנון|Tachanun|Techanun/i.test(h + ' ' + e)) return 'בימים שאין אומרים תחנון';
   if (/תשעה באב|Tisha/i.test(h + ' ' + e) && /כיפור|Kippur/i.test(h + ' ' + e)) return 'בתשעה באב וביום הכיפורים אין אומרים';
   if (/חנוכה|Chanukah/i.test(h + ' ' + e)) return 'מהלילה השני אין אומרים';
   if (/יחיד|alone|ביחידות/i.test(h + ' ' + e)) return 'ביחידות אין אומרים';
-  if (/שני וחמישי|Mondays and Thursdays/i.test(h + ' ' + e)) return 'רק בימי שני וחמישי (כשיש תחנון)';
   if (/Hallel|הלל|Psalms? 1[15]/i.test(h + ' ' + e)) return 'בחצי הלל אין אומרים';
   if (/שבת ראש חודש|Shabbat Rosh Chodesh/i.test(h + ' ' + e)) return 'בשבת ראש חודש משמיטים';
   if (/Festival or Chol haMoed|יום טוב או חול המועד/i.test(h + ' ' + e)) return 'ביו״ט/חוה״מ שחל בשבת משמיטים';
@@ -460,8 +465,10 @@ function omitStartLabel(en, he) {
  * 1.0.67: paragraphs omitted on Shabbat/Yom Tov / no-Tachanun / etc.
  * @returns {{ omit: boolean[], isStart: boolean[], isEnd: boolean[], label: (string|null)[] }}
  */
-export function omitPrayerFlags(rows) {
+export function omitPrayerFlags(rows, { book, n: secN } = {}) {
   const n = rows.length;
+  // Birkat haMazon is an always-available prayer: its variants are never omit-styled.
+  if (book === 'brachot' && secN === 4) return { omit: Array(n).fill(false), isStart: Array(n).fill(false), isEnd: Array(n).fill(false), label: Array(n).fill(null) };
   const omit = Array(n).fill(false), isStart = Array(n).fill(false), isEnd = Array(n).fill(false), label = Array(n).fill(null);
   const isCite = (t, h) => t === 'n' && CITE_NOTE_RE.test(stripTags(h).trim());
   for (let i = 0; i < n; i++) {
@@ -504,7 +511,7 @@ export function omitPrayerFlags(rows) {
         if (tj === 'p') {
           // stop before a known resume opener once we already have a psalm paragraph
           const sk = skelHe(hj);
-          if (got > 0 && /^(יהי כבוד|אשרי יושבי|בית יעקב|השכיבנו אבינו|לעולם יהא אדם|רבון כל העולמים)/.test(sk)) break;
+          if (got > 0 && /^(יהי כבוד|אשרי יושבי|בית יעקב|השכיבנו אבינו|לעולם יהא אדם|רבון כל העולמים|עד אנה בכיה)/.test(sk)) break;
           idxs.push(j); got++; j++;
           continue;
         }
@@ -545,6 +552,30 @@ export function specialBlockEnds(specialFlags) {
   return ends;
 }
 
+
+/** 1.0.68: lines the siddur says to repeat N times are printed N times, so reader and read-aloud say them N times.
+ *  key `${book}/${section}` → { noteRow: [count, [paragraph rows…]] }. Audited list: verification/SIDDUR-REPEATS-168.md */
+export const SIDDUR_REPEATS = {
+  'boker/5': { 8: [3, [9]], 10: [3, [11]], 12: [3, [13]] },
+  'mincha/1': { 13: [3, [14]], 15: [3, [16]], 17: [3, [18]] },
+  'maariv/1': { 3: [3, [4]], 5: [3, [6]], 7: [3, [8]] },
+  'kabbalat/3': { 1: [3, [2]], 3: [3, [4]], 5: [3, [6]] },
+  'minchashabbat/1': { 13: [3, [14]], 15: [3, [16]], 17: [3, [18]] },
+  'shema/1': { 20: [3, [21]], 22: [3, [23]], 48: [3, [49]], 50: [3, [51]], 52: [3, [53]], 54: [3, [55]], 56: [3, [57]], 58: [3, [59]] },
+  'derech/1': { 6: [3, [7]], 8: [3, [9]], 10: [3, [11]], 12: [3, [13]] },
+  'shabbatbook/2': { 0: [3, [1, 2, 3, 4]] },
+  'rc/1': { 27: [2, [28]], 29: [2, [30]], 31: [2, [32]], 33: [2, [34]], 41: [2, [42]], 43: [2, [44]], 45: [2, [46]], 47: [2, [48]], 54: [3, [55]] },
+  'sukkot/2': { 64: [3, [65]] },
+  'levana/1': { 6: [3, [7]], 8: [3, [9]], 14: [3, [15]] },
+};
+const TIMES_HE = { 2: 'פעמיים', 3: 'שלוש פעמים' };
+/** row index → repeat count for one section (paragraph rows only). */
+export function repeatCounts(book, n) {
+  const m = SIDDUR_REPEATS[`${book}/${n}`] || {}, out = new Map();
+  for (const [cnt, rows] of Object.values(m)) for (const r of rows) out.set(r, cnt);
+  return out;
+}
+
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
 export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
@@ -552,12 +583,14 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
   const runs = idx.heRuns, blocks = [], special = specialPrayerFlags(sec.b);
-  const specialEnd = specialBlockEnds(special), om = omitPrayerFlags(sec.b);
+  const specialEnd = specialBlockEnds(special), om = omitPrayerFlags(sec.b, { book, n });
+  const reps = repeatCounts(book, n), repNotes = SIDDUR_REPEATS[`${book}/${n}`] || {};
   sec.b.forEach(([t, h, he], i) => {
     const id = `${book}-${n}-${i}`;
     if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
     else if (t === 'n') {
-      if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, ''), lang: 'he' });
+      const rn = repNotes[i] ? ` (כתוב כאן ${TIMES_HE[repNotes[i][0]] || repNotes[i][0] + ' פעמים'})` : '';
+      if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, '') + rn, lang: 'he' });
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
     else if (t === 't') blocks.push(siddurTable(id, h, he, runs, lang));
@@ -569,7 +602,9 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
         if (om.isStart[i]) { extra.omitStart = true; extra.omitLabel = om.label[i]; }
         if (om.isEnd[i]) extra.omitEnd = true;
       }
-      blocks.push({ type: 'p', id, text: localizeRuns(inlineOnly(h), runs, lang), ...extra });
+      const text = localizeRuns(inlineOnly(h), runs, lang), cnt = reps.get(i) || 1;
+      blocks.push({ type: 'p', id, text, ...extra, ...(cnt > 1 ? { rep: 1, repOf: cnt } : {}) });
+      for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, rep: k, repOf: cnt });
     }
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };

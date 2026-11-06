@@ -1109,7 +1109,7 @@ async function renderDoc() {
       const cls = `seg${b.special ? ' sid-special' : ''}${b.omit ? ' sid-omit' : ''}`;
       const startM = b.omitStart ? `<div class="sid-bound sid-omit-start" data-nr aria-hidden="true">${esc(b.omitLabel || 'אין אומרים')}</div>` : '';
       const endM = (b.omitEnd || b.specialEnd) ? `<div class="sid-bound sid-end" data-nr aria-hidden="true">עד כאן</div>` : '';
-      html += `<div class="${cls}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${fmt(b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}</div>`;
+      html += `<div class="${cls}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${b.repOf ? `<span class="sid-rep" data-nr aria-hidden="true">${b.rep}/${b.repOf}</span>` : ''}${fmt(b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}</div>`;
     }
   }
   if (open) html += '</p>';

@@ -363,6 +363,7 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
 .sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
 .sid-mark { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .15em; vertical-align: .15em; } /* (א)(ב) section labels – shown, not spoken */
+.sid-rep { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .3em; vertical-align: .15em; } /* 2/3 repeat counter – shown, not spoken */
 /* Special insertions (יעלה ויבוא, על הניסים, …): spoken paragraphs, not .sid-note.
    Same family with distinct weight/style/colour – avoids late webfont reflow that would break paged goToSec. */
 .r-content .seg.sid-special .t {

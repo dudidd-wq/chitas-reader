@@ -23,16 +23,10 @@ test('omitPrayerFlags: מזמור לתודה single para; יהי כבוד not om
   assert.equal(om.omit[yehi], false);
 });
 
-test('omitPrayerFlags: Birkat haMazon weekday two Psalms both marked; end on second', () => {
+test('omitPrayerFlags: Birkat haMazon psalms are an alternative pair, not omit-styled (1.0.68)', () => {
   const rows = load('site/data/siddur/brachot/4.json').b;
-  const om = omitPrayerFlags(rows);
-  const a = rows.findIndex(([t, h]) => t === 'p' && /על נהרות בבל/.test(sk(h)));
-  const b = rows.findIndex(([t, h]) => t === 'p' && /למנצח בנגינת/.test(sk(h)));
-  assert.ok(a >= 0 && b > a);
-  assert.equal(om.omit[a], true);
-  assert.equal(om.omit[b], true);
-  assert.equal(om.isStart[a], true);
-  assert.equal(om.isEnd[b], true);
+  const om = omitPrayerFlags(rows, { book: 'brachot', n: 4 });
+  assert.equal(om.omit.some(Boolean), false);
 });
 
 test('omitPrayerFlags: Kabbalat Shabbat Festival omits Psalms 95–99', () => {
