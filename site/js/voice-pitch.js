@@ -83,7 +83,8 @@ export function pitchMarks(x, sr, track = estimateF0(x, sr)) {
 
 /** TD-PSOLA. ratio < 1 lowers the pitch; time > 1 lengthens. Unvoiced parts are only re-timed. */
 export function psola(x, sr, ratio, { time = 1, track } = {}) {
-  const marks = pitchMarks(x, sr, track || estimateF0(x, sr));
+  track ||= estimateF0(x, sr);
+  const marks = pitchMarks(x, sr, track);
   const outLen = Math.round(x.length * time), y = new Float32Array(outLen), wsum = new Float32Array(outLen);
   if (!marks.length) return y;
   let to = marks[0].t * time, j = 0;
@@ -99,8 +100,19 @@ export function psola(x, sr, ratio, { time = 1, track } = {}) {
     }
     to += mk.v ? mk.p / ratio : mk.p;
   }
-  // light normalisation by the window sum (only where grains overlap more than once; gaps between grains stay as they are)
-  for (let i = 0; i < outLen; i++) if (wsum[i] > 1) y[i] /= wsum[i];
+  // Keep unvoiced consonants/noise on the original time axis; PSOLA's nearest-grain selection otherwise
+  // repeats/skips their waveform even though their pitch must not change. Interpolated voicing gives
+  // a 10 ms crossfade at voiced boundaries, with an original-signal fallback at uncovered edges.
+  const { f0, hop, offset } = track;
+  for (let i = 0; i < outLen; i++) {
+    const t = Math.min(x.length - 1, i / time), j = Math.floor(t), frac = t - j;
+    const original = x[j] * (1 - frac) + x[Math.min(x.length - 1, j + 1)] * frac;
+    const f = Math.max(0, Math.min(f0.length - 1, (t - offset) / hop));
+    const k = Math.floor(f), u = f - k;
+    const voiced = (f0[k] > 0 ? 1 - u : 0) + (f0[Math.min(f0.length - 1, k + 1)] > 0 ? u : 0);
+    const mix = voiced * Math.min(1, wsum[i] / 0.1);
+    y[i] = mix * (wsum[i] > 1 ? y[i] / wsum[i] : y[i]) + (1 - mix) * original;
+  }
   return y;
 }
 
@@ -139,6 +151,6 @@ export function maleTimbre(x, sr, { semitones = -6, formant = 1 } = {}) {
 
 /** The two voices offered in the settings. 'male' = the noa model shifted down (no extra download). */
 export const TIMBRES = {
-  male: { semitones: -6, formant: 0.94 },   // chosen by measurement – verification/VOICE.md#male
+  male: { semitones: -6, formant: 0.88 },   // fuller vocal tract, same F0/intonation – verification/VOICE-169.md
   female: null,
 };

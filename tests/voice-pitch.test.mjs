@@ -82,3 +82,15 @@ test('real model (noa, Node): male timbre puts mean F0 in 85–155 Hz, female st
   assert.ok(Math.abs(m.audio.length / f.audio.length - 1) < 0.35, `length ${f.audio.length} → ${m.audio.length}`);
   assert.deepEqual(m.ipa, f.ipa);
 });
+
+// 1.0.69: unvoiced speech must not be granulated.
+test('PSOLA preserves unvoiced consonant/noise samples exactly at unchanged tempo', () => {
+  let seed = 17;
+  const x = Float32Array.from({ length: SR }, () => { seed = (1664525 * seed + 1013904223) >>> 0; return (seed / 2 ** 32 - 0.5) * 0.2; });
+  const track = { f0: new Float32Array(100), hop: 220, offset: 300 };
+  assert.deepEqual(psola(x, SR, 0.7, { track }), x);
+});
+test('male register deepens formants without lowering pitch further', () => {
+  assert.equal(TIMBRES.male.semitones, -6);
+  assert.equal(TIMBRES.male.formant, 0.88);
+});
