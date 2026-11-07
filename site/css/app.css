@@ -3,6 +3,9 @@
 @font-face { font-family: 'Noto Serif Hebrew'; src: url(../fonts/NotoSerifHebrew.woff2) format('woff2'); font-weight: 100 900; font-display: swap; }
 @font-face { font-family: 'Frank Ruhl Libre'; src: url(../fonts/FrankRuhlLibre.woff2) format('woff2'); font-weight: 300 900; font-display: swap; }
 @font-face { font-family: 'Ezra SIL'; src: url(../fonts/EzraSIL.woff2) format('woff2'); font-display: swap; }
+/* Original Culmus Taamey Ashkenaz: lossless WOFF2 packaging, no outline edits. */
+@font-face { font-family: 'Taamey Ashkenaz'; src: url(../fonts/taamey-ashkenaz-medium.woff2) format('woff2'); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: 'Taamey Ashkenaz'; src: url(../fonts/taamey-ashkenaz-bold.woff2) format('woff2'); font-weight: 600 900; font-display: swap; }
 
 :root {
   --paper: #f6f1e3; --paper2: #efe7d3; --ink: #2a251f; --muted: #6a5f50; --accent: #7a4e1d; --accent-ink: #fff;
@@ -19,6 +22,7 @@
 [data-theme="night"] { --paper: #000; --paper2: #0d0b08; --ink: #d4b886; --muted: #9c8660; --accent: #d4a14a; --accent-ink: #000; --card: #110e0a; --rule: #3a2f1e; --hl: rgba(212, 161, 74, .22); --gloss: #d4a14a; --texture: 0; --shadow: none; color-scheme: dark; }
 [data-font="frank"] { --text-font: 'Frank Ruhl Libre', 'Noto Serif Hebrew', serif; }
 [data-font="ezra"] { --text-font: 'Ezra SIL', 'Noto Serif Hebrew', serif; }
+[data-font="ashkenaz"] { --text-font: 'Taamey Ashkenaz', 'Noto Serif Hebrew', serif; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }

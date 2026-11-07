@@ -439,8 +439,8 @@ const check = (name, value, label) => `<label class="check"><input type="checkbo
 function displayForm() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
-  <fieldset><legend>גופן</legend>${radio('font', prefs.font, [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל']])}
-    <small>פרנק־רוהל אינו כולל טעמי מקרא; בבחירתו הטעמים מוסתרים.</small></fieldset>
+  <fieldset><legend>גופן</legend>${radio('font', prefs.font, [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז']])}
+    <small>בפרנק־רוהל ובעזרא הטעמים מוסתרים. נוטו וטעמי אשכנז כוללים ניקוד וטעמי מקרא.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
   <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}
@@ -614,6 +614,7 @@ async function renderSources() {
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
   <h2>גופנים</h2><p>Noto Serif Hebrew (ברירת מחדל; כולל טעמי מקרא), Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>). בגופני פרנק ועזרא טעמי המקרא מוסתרים, כי בגופנים האלה אין גליפים לטעמים.</p>
+  <p>טעמי אשכנז (Taamey Ashkenaz) מאת Yoram Gnat, ‏© 2012–2014, מ<a href="https://culmus.sourceforge.net/" target="_blank" rel="noopener">פרויקט Culmus</a>: הגופן המקורי ללא שינוי בצורות האותיות, במשקלים Medium ו־Bold, כולל ניקוד וטעמי מקרא. אריזה ל־WOFF2 בלבד. רישיון <a href="fonts/GPL-2.0.txt" dir="ltr">GPLv2</a> עם <a href="fonts/TaameyAshkenaz-LICENSE.txt">חריגת הטמעת גופן</a>. <a href="https://culmus.sourceforge.net/taamim/index.html" target="_blank" rel="noopener">המקור וקובצי הגופן</a>. סימני §, ¯, – , — ו־… מוצגים בנוטו כגופן גיבוי; האותיות, הניקוד והטעמים בטעמי אשכנז.</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
   glossCounts().then(t => { const el = $('#gloss-counts'); if (el && t) el.textContent = t; });
   errataCounts().then(t => { const el = $('#rambam-errata-counts'); if (el && t) el.textContent = t; });

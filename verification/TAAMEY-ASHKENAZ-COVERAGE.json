@@ -1,0 +1,56 @@
+{
+  "corpora": [
+    "torah",
+    "tehillim",
+    "tanya",
+    "siddur"
+  ],
+  "unique_codepoints": 186,
+  "missing_from_taamey": [
+    {
+      "codepoint": "U+00A7",
+      "name": "SECTION SIGN",
+      "count": 2,
+      "fallback": "Noto Serif Hebrew"
+    },
+    {
+      "codepoint": "U+00AF",
+      "name": "MACRON",
+      "count": 7,
+      "fallback": "Noto Serif Hebrew"
+    },
+    {
+      "codepoint": "U+2013",
+      "name": "EN DASH",
+      "count": 2641,
+      "fallback": "Noto Serif Hebrew"
+    },
+    {
+      "codepoint": "U+2014",
+      "name": "EM DASH",
+      "count": 812,
+      "fallback": "Noto Serif Hebrew"
+    },
+    {
+      "codepoint": "U+2026",
+      "name": "HORIZONTAL ELLIPSIS",
+      "count": 50,
+      "fallback": "Noto Serif Hebrew"
+    },
+    {
+      "codepoint": "U+202A",
+      "name": "LEFT-TO-RIGHT EMBEDDING",
+      "count": 1,
+      "fallback": "non-rendering bidi control"
+    },
+    {
+      "codepoint": "U+202C",
+      "name": "POP DIRECTIONAL FORMATTING",
+      "count": 72,
+      "fallback": "non-rendering bidi control"
+    }
+  ],
+  "unexpected_missing": [],
+  "all_niqqud_and_taamim": true,
+  "GPOS_mark_and_mark_to_mark": true
+}
