@@ -588,6 +588,22 @@ export const SIDDUR_REPEATS = {
   'sukkot/2': { 64: [3, [65]] },
   'levana/1': { 6: [3, [7]], 8: [3, [9]], 14: [3, [15]] },
 };
+/** 1.0.72: a title stored twice (as a spoken paragraph + a smaller note): the paragraph becomes a heading (not read
+ *  aloud), the smaller duplicate note is removed. Row indexes are kept so progress/ids don't shift. */
+export const SIDDUR_DUP_TITLES = { 'shema/1': { 38: 'h' }, 'shacharit/5': { 28: 'h' }, 'shabbat/5': { 55: 'h' } };
+const titleKey = s => stripTags(String(s || '')).replace(/[\u0591-\u05C7]/g, '').replace(/[:.,–\-()]/g, '').replace(/\s+/g, ' ').trim();
+/** Rows to drop: a note right after a heading that only repeats that heading (Hebrew translation of the title). */
+export function dupTitleDrops(rows, book, n) {
+  const asH = SIDDUR_DUP_TITLES[`${book}/${n}`] || {}, out = new Set();
+  for (let i = 1; i < rows.length; i++) {
+    const [pt, ph] = rows[i - 1], [t, , he] = rows[i];
+    if (t !== 'n' || !(pt === 'h' || asH[i - 1] === 'h')) continue;
+    const k = titleKey(ph);
+    if (k && titleKey(he) === k) out.add(i);
+  }
+  return out;
+}
+export const TACHANUN_LABELS = ['בימים שאין אומרים תחנון', 'רק בימי שני וחמישי (כשיש תחנון)'];
 const TIMES_HE = { 2: 'פעמיים', 3: 'שלוש פעמים' };
 /** row index → repeat count for one section (paragraph rows only). */
 export function repeatCounts(book, n) {
@@ -598,15 +614,33 @@ export function repeatCounts(book, n) {
 
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
-export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
+export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
   const runs = idx.heRuns, blocks = [], special = specialPrayerFlags(sec.b);
   const specialEnd = specialBlockEnds(special), om = omitPrayerFlags(sec.b, { book, n });
   const reps = repeatCounts(book, n), repNotes = SIDDUR_REPEATS[`${book}/${n}`] || {};
-  sec.b.forEach(([t, h, he], i) => {
+  const dupT = SIDDUR_DUP_TITLES[`${book}/${n}`] || {}, drops = dupTitleDrops(sec.b, book, n);
+  // 1.0.72: hide no-Tachanun spans (incl. notes inside them) when today is a no-Tachanun day and the setting is on
+  const hid = new Set();
+  if (hideNoTachanun) {
+    let open = false, lab = null;
+    sec.b.forEach((_, i) => {
+      if (om.isStart[i]) { lab = om.label[i]; open = TACHANUN_LABELS.includes(lab); }
+      if (open && (om.omit[i] || sec.b[i][0] === 'n')) hid.add(i);
+      if (om.isEnd[i]) open = false;
+    });
+  }
+  sec.b.forEach(([t0, h, he], i) => {
+    if (hid.has(i)) {
+      if (!hid.has(i - 1)) blocks.push({ type: 'note', id: `${book}-${n}-${i}h`, html: 'כאן הושמטו קטעים שאין אומרים היום (אין אומרים תחנון) – לפי ההגדרה', lang: 'he', hiddenNote: true });
+      return;
+    }
+    let t = t0;
     const id = `${book}-${n}-${i}`;
+    if (drops.has(i)) return;
+    if (dupT[i] === 'h') t = 'h';
     if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
     else if (t === 'n') {
       const rn = repNotes[i] ? ` (כתוב כאן ${TIMES_HE[repNotes[i][0]] || repNotes[i][0] + ' פעמים'})` : '';
@@ -631,10 +665,10 @@ export async function buildSiddurDoc(book, n, { lang = 'he' } = {}) {
 }
 /** The whole prayer sequence of one book (e.g. Shacharit) as one continuous document: the sections follow one another
  *  with a light marker (type 'h', `sec`) instead of a break, so paging flows from one section into the next. */
-export async function buildSiddurBookDoc(book, { lang = 'he' } = {}) {
+export async function buildSiddurBookDoc(book, { lang = 'he', hideNoTachanun = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b) throw new Error('siddur book not found');
-  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang })));
+  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang, hideNoTachanun })));
   const blocks = [], secs = [];
   parts.forEach((d, i) => {
     secs.push({ n: i + 1, he: d.title });

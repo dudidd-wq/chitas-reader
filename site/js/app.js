@@ -2,7 +2,7 @@ import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
-import { suggest, insertionLines } from './tefila.js';
+import { suggest, insertionLines, noTachanun, siddurDay } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
@@ -59,6 +59,14 @@ const shiftIso = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); ret
 // The place for "זמני היום": a built-in city, or the device position (only when the user taps "המיקום שלי"; kept in
 // localStorage, never sent anywhere). Before a choice: a city in the device's time zone, else Jerusalem.
 const deviceTz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jerusalem'; } catch { return 'Asia/Jerusalem'; } };
+// 1.0.72: hide the no-Tachanun spans only when the setting is on and the siddur's "today" is a no-Tachanun day
+function sidHideTach() {
+  if (!prefs.hideNoTachanun) return false;
+  try {
+    const now = new Date(), pl = zmanPlace(), z = computeZmanim(todayIso(), pl, { candleMins: prefs.candleMins });
+    return noTachanun(siddurDay(now, z.sunset instanceof Date ? z.sunset : null), prefs.il);
+  } catch { return noTachanun(siddurDay(new Date(), null), prefs.il); }
+}
 function zmanPlace() {
   if (prefs.zmanPlace === 'geo' && prefs.zmanGeo) return { id: 'geo', he: 'המיקום שלי', ...prefs.zmanGeo, il: guessIsrael(), candles: 18 };
   return cityById(prefs.zmanPlace) || (guessIsrael() ? cityById('jerusalem') : CITIES.find(c => c.tz === deviceTz()) || cityById('jerusalem'));
@@ -450,6 +458,8 @@ function displayForm() {
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
+    ${check('hideNoTachanun', prefs.hideNoTachanun, 'להסתיר קטעים שלא אומרים ביום שאין תחנון')}
+    <small>כשהאפשרות פעילה, ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים. בשאר הימים הם מוצגים כרגיל.</small>
     <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
   ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
@@ -919,7 +929,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   bindReaderUi();
   try {
     if (sid) {
-      const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang });
+      const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang, hideNoTachanun: sidHideTach() });
       if (!R.doc.siddur.secs[n - 1]) throw new Error('siddur section not found');
     }
     else if (lpath) R.doc = (await libDoc(lpath)).doc;
@@ -1479,7 +1489,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if (name === 'siddurLang' && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
+    if ((name === 'siddurLang' || name === 'hideNoTachanun') && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang, hideNoTachanun: sidHideTach() }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();

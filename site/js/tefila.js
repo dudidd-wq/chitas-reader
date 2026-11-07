@@ -118,3 +118,36 @@ export function insertionLines(ins, il) {
   if (ins.fast) L.push('תענית – עננו');
   return L;
 }
+
+/**
+ * 1.0.72: is Tachanun omitted on Hebrew date hd (Chabad custom, Siddur Tehillat Hashem / Sefer HaMinhagim)?
+ * Shabbat, Yom Tov, Chol haMoed, Rosh Chodesh, all of Nisan, Pesach Sheni (14 Iyar), Lag baOmer (18 Iyar),
+ * 1–12 Sivan, Tisha b'Av, 15 Av, Erev Rosh haShanah, 9 Tishrei – end of Tishrei, 10 and 19 Kislev, Chanukah,
+ * 15 Shevat, 14–15 Adar I (Purim Katan) and 14–15 Adar (Purim, Shushan Purim), 12–13 Tammuz.
+ */
+export function noTachanun(hd, il = true) {
+  const m = hd.getMonth(), d = hd.getDate(), leap = HDate.isLeapYear(hd.getFullYear());
+  if (hd.getDay() === 6) return true;
+  if (has(hd, il, flags.CHAG) || has(hd, il, flags.CHOL_HAMOED) || has(hd, il, flags.ROSH_CHODESH)) return true;
+  if (chanukahDay(hd)) return true;
+  const adar = leap ? months.ADAR_II : months.ADAR_I;
+  const L = {
+    [months.NISAN]: () => true,
+    [months.IYYAR]: () => d === 14 || d === 18,
+    [months.SIVAN]: () => d <= 12,
+    [months.TAMUZ]: () => d === 12 || d === 13,
+    [months.AV]: () => d === 9 || d === 15 || (d === 10 && hd.getDay() === 0), // 10 Av: deferred fast
+    [months.ELUL]: () => d === 29,
+    [months.TISHREI]: () => d >= 9,
+    [months.KISLEV]: () => d === 10 || d === 19,
+    [months.SHVAT]: () => d === 15,
+  };
+  if (L[m] && L[m]()) return true;
+  if ((m === adar || (leap && m === months.ADAR_I)) && (d === 14 || d === 15)) return true;
+  return false;
+}
+/** The siddur's "today": the Hebrew date of `now`, moving to the next date after sunset (Maariv/bedtime Shema). */
+export function siddurDay(now, sunset) {
+  const hd = new HDate(now);
+  return sunset && now >= sunset ? hd.next() : hd;
+}

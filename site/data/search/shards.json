@@ -1,8 +1,8 @@
 {
  "v": 1,
- "source": "158989e265839baf",
- "bytes": 12929127,
- "segs": 47009,
+ "source": "2565f707f21f6036",
+ "bytes": 12929049,
+ "segs": 47006,
  "shards": [
   {
    "id": "torah-Genesis",
@@ -211,8 +211,8 @@
    "id": "siddur",
    "fam": "siddur",
    "he": "סידור",
-   "bytes": 343087,
-   "segs": 2069
+   "bytes": 343009,
+   "segs": 2066
   }
  ]
 }
