@@ -443,6 +443,13 @@ function omitSpan(en, he) {
   return { mode: 'count', n: 1 };
 }
 
+/** Resume point of a multi-paragraph omit note ("continue on at X" / וממשיכים ב״X״), as a letter skeleton. */
+function resumeAt(en, he) {
+  const m = stripTags(he || '').match(/וממשיכים ב[״"]([^״"]+)[״"]/);
+  if (!m || !/הפסקאות הבאות|following paragraphs/i.test(stripTags(en) + ' ' + stripTags(he))) return null;
+  return skelHe(m[1]);
+}
+
 const CITE_NOTE_RE = /^(Psalm|Psalms|תהל)/i;
 /** Short Hebrew cue for the omit-start marker (shown, not spoken). */
 function omitStartLabel(en, he) {
@@ -517,6 +524,19 @@ export function omitPrayerFlags(rows, { book, n: secN } = {}) {
         }
         break;
       }
+    } else if (resumeAt(h, he)) {
+      // 1.0.71: "omit the following paragraphs, continue on at X" — the span runs through inner
+      // procedural notes (strike the chest, may sit) up to the resume point X, not the first note.
+      const key = resumeAt(h, he);
+      while (j < n) {
+        const [tj, hj, hej] = rows[j];
+        if (tj === 'h') break;
+        const sk = skelHe(stripTags(tj === 'n' ? (hej || '') : (typeof hj === 'string' ? hj : '')));
+        if (sk.startsWith(key)) break;
+        if (tj === 'p') idxs.push(j);
+        j++;
+      }
+      if (j >= n) idxs.length = 0; // resume point not found: don't guess
     } else { // until-note: consecutive p (and inner cites) until a non-cite note/heading
       while (j < n) {
         const [tj, hj] = rows[j];
