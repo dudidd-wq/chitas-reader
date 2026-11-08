@@ -1,0 +1,68 @@
+{
+  "_notes": [
+    "Exact vocalized forms only; no replacing ambiguous bare words by guesswork.",
+    "HATAMA U+05AB marks primary stress for the existing local IPA path; it is stripped before Web Speech.",
+    "Phrase corrections are specific to their context. No Yiddish is deleted."
+  ],
+  "words": {
+    "לָנוּ": {
+      "text": "לָנוּ",
+      "stress": 1
+    },
+    "אֵלָּא": {
+      "text": "אֵלָּא",
+      "stress": 1
+    },
+    "אֶלָּא": {
+      "text": "אֶלָּא",
+      "stress": 1
+    },
+    "כַּמָּה": {
+      "text": "כַּמָּה",
+      "stress": 1
+    },
+    "וְכַמָּה": {
+      "text": "וְכַמָּה",
+      "stress": 1
+    },
+    "עֵדֶן": {
+      "text": "עֵדֶן",
+      "stress": 1
+    },
+    "לַיְלָה": {
+      "text": "לַיְלָה",
+      "stress": 1
+    },
+    "מֶלֶךְ": {
+      "text": "מֶלֶךְ",
+      "stress": 1
+    },
+    "סֵפֶר": {
+      "text": "סֵפֶר",
+      "stress": 1
+    },
+    "רַבֵּינוּ": {
+      "text": "רַבֵּינוּ",
+      "stress": 1
+    },
+    "וְאַיִּחוּד": {
+      "text": "וְאִיחוּד",
+      "stress": 0
+    }
+  },
+  "phrases": [
+    {
+      "from": "מין המדבר",
+      "to": "מִין הַמְדַבֵּר"
+    },
+    {
+      "from": "הפעולות הפרטיות",
+      "to": "הַפְּרָטִיּוֹת",
+      "keepWords": 1
+    },
+    {
+      "from": "ראש אייל",
+      "to": "רֹאשׁ אַ֫יִל"
+    }
+  ]
+}

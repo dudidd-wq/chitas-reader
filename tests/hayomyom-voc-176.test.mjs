@@ -7,12 +7,12 @@ import { buildDoc } from '../site/js/texts.js';
 import { ABBREVIATIONS } from '../site/js/tts-prep.js';
 const D = JSON.parse(fs.readFileSync(new URL('../site/data/hayomyom/days.json', import.meta.url)));
 const ratio = t => (t.match(/[\u05B0-\u05BC\u05C7]/g) || []).length / Math.max(1, (t.match(/[\u05D0-\u05EA]/g) || []).length);
-test('every paragraph has a vocalized reading text with the same letters (abbreviations kept)', () => {
+test('every paragraph has a vocalized reading text with source spelling preserved except the documented אייל respelling', () => {
   let low = 0, n = 0;
   for (const [k, e] of Object.entries(D)) for (const [t, , v] of e.p) {
     n++; assert.ok(v, k);
-    const sk = s => s.replace(/<[^>]+>/g, '').replace(/[\u0591-\u05C7|]/g, '');
-    assert.equal(sk(v), sk(t), k);
+    const sk = s => s.replace(/<[^>]+>/g, '').replace(/[\u0591-\u05C7|]/g, '').replace(/\s+/g, ' ').trim();
+    assert.equal(sk(v), k === 'tishrei-1' ? sk(t).replace('ראש אייל', 'ראש איל') : sk(t), k);
     if (ratio(v) < 0.3) low++;
   }
   assert.ok(low / n < 0.01, `low-niqqud paragraphs ${low}/${n}`);
