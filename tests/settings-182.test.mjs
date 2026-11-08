@@ -29,7 +29,7 @@ test('1.0.82: fonts preview their own real family, emphasis updates live and per
  const p=await pageWith(browser,srv.url,{prefs:{layout:'scroll',siddurLang:'both'}});await p.goto(srv.url+'#/s/shacharit/3');await p.waitForSelector('#rc .sid-note');
  const before=await p.locator('#rc .seg').count(),ends=await p.locator('#rc .sid-end').count();assert.ok(ends>0);
  await p.click('#b-aa');assert.equal(await p.locator('input[name=hideSiddurInstructions]').isChecked(),false);assert.equal(await p.locator('input[name=readingBold]').isChecked(),false);
- const previews=await p.locator('.font-sample').evaluateAll(a=>a.map(e=>[e.textContent,getComputedStyle(e).fontFamily]));assert.equal(previews.length,5);assert.equal(new Set(previews.map(x=>x[1])).size,5);
+ const previews=await p.locator('.font-sample').evaluateAll(a=>a.map(e=>[e.textContent,getComputedStyle(e).fontFamily]));assert.equal(previews.length,11);assert.equal(new Set(previews.map(x=>x[1])).size,11);
  await p.locator('input[name=readingBold]').check();await p.waitForFunction(()=>getComputedStyle(document.querySelector('#rc .seg .t')).fontWeight==='700');assert.ok(await p.locator('.font-sample').evaluateAll(a=>a.every(e=>getComputedStyle(e).fontWeight==='700')));
  await p.locator('label:has(input[name=font][value=ashkenaz])').click();await p.locator('input[name=hideSiddurInstructions]').check();await p.waitForFunction(()=>!document.querySelector('#rc .sid-note'));assert.equal(await p.locator('#rc .sid-in, #rc .sd-n').count(),0);assert.equal(await p.locator('#rc .seg').count(),before);assert.equal(await p.locator('#rc .sid-end').count(),ends);assert.ok(await p.locator('#rc .sd-sec').count()>0);
  await p.click('#sh-x');

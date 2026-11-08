@@ -560,3 +560,22 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 
 [data-font="sbl"] { --text-font: 'SBL Hebrew', 'Noto Serif Hebrew', serif; }
 [data-font="sbl"] .r-content, [data-font="sbl"] .font-sample { font-synthesis: weight style; }
+
+/* Optional 1.0.86 families; OFL compression only, GPL originals unmodified. */
+@font-face { font-family: 'Noto Rashi Hebrew'; src: url(../fonts/noto-rashi/NotoRashiHebrew.woff2) format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Taamey D'; src: url(../fonts/taamey-d/Taamey_D.ttf) format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Keter YG'; src: url(../fonts/keter-yg/KeterYG-Medium.ttf) format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Cardo'; src: url(../fonts/cardo/Cardo-Regular.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Cardo'; src: url(../fonts/cardo/Cardo-Bold.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'David Libre'; src: url(../fonts/david-libre/DavidLibre-Regular.woff2) format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'David Libre'; src: url(../fonts/david-libre/DavidLibre-Bold.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Assistant'; src: url(../fonts/assistant/Assistant.woff2) format('woff2'); font-weight: 200 800; font-display: swap; }
+[data-font="noto-rashi"] { --text-font: 'Noto Rashi Hebrew', 'Noto Serif Hebrew', serif; }
+[data-font="taamey-d"] { --text-font: 'Taamey D', 'Noto Serif Hebrew', serif; }
+[data-font="keter-yg"] { --text-font: 'Keter YG', 'Noto Serif Hebrew', serif; }
+[data-font="cardo"] { --text-font: 'Cardo', 'Noto Serif Hebrew', serif; }
+[data-font="david"] { --text-font: 'David Libre', 'Noto Serif Hebrew', serif; }
+[data-font="assistant"] { --text-font: 'Assistant', 'Noto Serif Hebrew', sans-serif; }
+[data-font="taamey-d"] .r-content, [data-font="keter-yg"] .r-content,
+[data-font="taamey-d"] .font-sample, [data-font="keter-yg"] .font-sample { font-synthesis: weight style; }
+.font-options .font-hint { font-family: var(--ui); font-size: .75rem; line-height: 1.35; }

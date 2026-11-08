@@ -37,20 +37,32 @@ const ICON = {
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
-let sblFontCachePromise;
-function cacheSblFont() {
-  if (!('caches' in window)) return;
-  sblFontCachePromise ||= (async () => {
+// Optional reading fonts are never install-preloaded. Real previews request their faces;
+// selecting a family also retains its bold face and license for future offline use.
+const FONT_OPTIONS = [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew'], ['noto-rashi', 'Noto Rashi Hebrew', 'כתב רש״י · כולל טעמים'], ['taamey-d', 'Taamey D', 'כולל טעמים · הדגשה מלאכותית'], ['keter-yg', 'Keter YG', 'כולל טעמים · הדגשה מלאכותית'], ['cardo', 'Cardo', 'כולל טעמים'], ['david', 'David Libre', 'ללא טעמים'], ['assistant', 'Assistant', 'ללא טעמים']];
+const OPTIONAL_FONTS = {
+  sbl: ['SBL_Hbrw.ttf', 'SBL-LICENSE.txt'],
+  'noto-rashi': ['noto-rashi/NotoRashiHebrew.woff2', 'noto-rashi/OFL.txt'],
+  'taamey-d': ['taamey-d/Taamey_D.ttf', 'taamey-d/LICENSE.txt', 'taamey-d/GPL-2.0.txt'],
+  'keter-yg': ['keter-yg/KeterYG-Medium.ttf', 'keter-yg/LICENSE.txt', 'keter-yg/GPL-2.0.txt'],
+  cardo: ['cardo/Cardo-Regular.woff2', 'cardo/Cardo-Bold.woff2', 'cardo/OFL.txt'],
+  david: ['david-libre/DavidLibre-Regular.woff2', 'david-libre/DavidLibre-Bold.woff2', 'david-libre/OFL.txt'],
+  assistant: ['assistant/Assistant.woff2', 'assistant/OFL.txt'],
+};
+const optionalFontPromises = new Map();
+function cacheOptionalFont(font) {
+  if (!('caches' in window) || !OPTIONAL_FONTS[font] || optionalFontPromises.has(font)) return;
+  optionalFontPromises.set(font, (async () => {
     const c = await caches.open('optional-fonts-v1');
-    for (const path of ['fonts/SBL_Hbrw.ttf', 'fonts/SBL-LICENSE.txt']) {
-      const url = new URL(path, document.baseURI).href;
-      if (!await c.match(url)) { const r = await fetch(url); if (!r.ok) throw new Error('SBL download'); await c.put(url, r); }
+    for (const path of OPTIONAL_FONTS[font]) {
+      const url = new URL('fonts/' + path, document.baseURI).href;
+      if (!await c.match(url)) { const r = await fetch(url); if (!r.ok) throw new Error('Font download'); await c.put(url, r); }
     }
-  })().catch(() => { sblFontCachePromise = null; });
+  })().catch(() => { optionalFontPromises.delete(font); }));
 }
 function applyPrefs() {
   const r = document.documentElement;
-  if (prefs.font === 'sbl') cacheSblFont();
+  cacheOptionalFont(prefs.font);
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
@@ -472,9 +484,9 @@ const check = (name, value, label) => `<label class="check"><input type="checkbo
 function displayForm() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
-  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${[['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew']].map(([v,l]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span></label>`).join('')}</div>
+  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
     ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
-    <small>ב־SBL Hebrew ההדגשה וההטיה מלאכותיות (קיים משקל רגיל בלבד); לשימוש לא מסחרי. הגופן נטען בעת בחירה או תצוגה מקדימה. בפרנק־רוהל ובעזרא הטעמים מוסתרים. נוטו וטעמי אשכנז כוללים ניקוד וטעמי מקרא.</small></fieldset>
+    <small>ב־SBL Hebrew ההדגשה וההטיה מלאכותיות (קיים משקל רגיל בלבד); לשימוש לא מסחרי. הגופן נטען בעת בחירה או תצוגה מקדימה. בפרנק־רוהל ובעזרא הטעמים מוסתרים. David Libre ו־Assistant כוללים ניקוד אך ללא טעמים; הטעמים מוסתרים בהם בלי לשנות את ההעדפה לשאר הגופנים. ב־Taamey D וב־Keter YG ההדגשה מלאכותית כדי לשמור על הטעמים. הגופנים החדשים נטענים בבחירה או בדוגמית, ונשמרים ללא רשת לאחר בחירה.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
   <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}
@@ -656,6 +668,14 @@ async function renderSources() {
   <h2>גופנים</h2><p>Noto Serif Hebrew (ברירת מחדל; כולל טעמי מקרא), Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>). בגופני פרנק ועזרא טעמי המקרא מוסתרים, כי בגופנים האלה אין גליפים לטעמים.</p>
   <p>טעמי אשכנז (Taamey Ashkenaz) מאת Yoram Gnat, ‏© 2012–2014, מ<a href="https://culmus.sourceforge.net/" target="_blank" rel="noopener">פרויקט Culmus</a>: הגופן המקורי ללא שינוי בצורות האותיות, במשקלים Medium ו־Bold, כולל ניקוד וטעמי מקרא. אריזה ל־WOFF2 בלבד. רישיון <a href="fonts/GPL-2.0.txt" dir="ltr">GPLv2</a> עם <a href="fonts/TaameyAshkenaz-LICENSE.txt">חריגת הטמעת גופן</a>. <a href="https://culmus.sourceforge.net/taamim/index.html" target="_blank" rel="noopener">המקור וקובצי הגופן</a>. סימני §, ¯, – , — ו־… מוצגים בנוטו כגופן גיבוי; האותיות, הניקוד והטעמים בטעמי אשכנז.</p>
   <h3 id="sbl-font-src">SBL Hebrew</h3><p>עיצוב: John Hudson / Tiro Typeworks, עבור Society of Biblical Literature (SBL). קובץ TrueType מקורי ללא שינוי, ללא חיתוך או המרה. © John Hudson / Tiro Typeworks; SBL Hebrew הוא סימן מסחר של SBL. <a href="https://www.sbl-site.org/resources/fonts/" target="_blank" rel="noopener">מקור רשמי</a> · <a href="fonts/SBL_Font_End_User_License_Agreement.pdf" target="_blank" rel="noopener">רישיון SBL המקורי</a> · <a href="fonts/SBL-LICENSE.txt" target="_blank" rel="noopener">זכויות ורישיון הקובץ</a>. חינם לשימוש לא מסחרי בלבד, ואינו כלול ברישיון קוד האפליקציה. קיים משקל רגיל בלבד; ההדגשה וההטיה באפליקציה מלאכותיות. הגופן נשמר לשימוש ללא רשת לאחר בחירה בו.</p>
+  <h3>גופנים נוספים</h3><ul>
+    <li>Noto Rashi Hebrew — Google / Noto Project; כתב רש״י, כולל ניקוד וטעמים. משקל משתנה 100–900. <a href="https://github.com/notofonts/hebrew" target="_blank" rel="noopener">מקור</a> · <a href="fonts/noto-rashi/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
+    <li>Taamey D 1.2 — Ben Denckla, על בסיס אותיות Yoram Gnat; ‏GPLv2 עם חריגת הטמעת גופן. קובץ TTF מקורי ללא שינוי; הדגשה מלאכותית. <a href="https://bdenckla.github.io/MAM-basics/taamey-d/downloads/" target="_blank" rel="noopener">מקור ומהדורה</a> · <a href="fonts/taamey-d/LICENSE.txt">רישיון והודעות זכויות</a> · <a href="fonts/taamey-d/GPL-2.0.txt">GPLv2</a>.</li>
+    <li>Keter YG — Yoram Gnat / Culmus; ‏GPLv2 עם חריגת הטמעה. קובץ Medium TTF מקורי ללא שינוי; משתמשים בהדגשה מלאכותית במקום Bold המקורי, שבו הטעמים שקופים. <a href="https://culmus.sourceforge.io/taamim/index.html" target="_blank" rel="noopener">מקור</a> · <a href="fonts/keter-yg/LICENSE.txt">רישיון והודעות זכויות</a> · <a href="fonts/keter-yg/GPL-2.0.txt">GPLv2</a>.</li>
+    <li>Cardo — David J. Perry; רגיל ומודגש אמיתיים, ניקוד וטעמים. <a href="https://github.com/googlefonts/CardoFont" target="_blank" rel="noopener">מקור</a> · <a href="fonts/cardo/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
+    <li>David Libre — Monotype Imaging, SIL International, Meir Sadan; רגיל ומודגש אמיתיים, ניקוד ללא טעמים. <a href="https://github.com/meirsadan/david-libre" target="_blank" rel="noopener">מקור</a> · <a href="fonts/david-libre/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
+    <li>Assistant — Adobe Systems, Ben Nathan / הפרויקט; משקל משתנה 200–800, ניקוד ללא טעמים. <a href="https://github.com/TypeNetwork/Assistant" target="_blank" rel="noopener">מקור</a> · <a href="fonts/assistant/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
+  </ul><p>גופני OFL נארזו כ־WOFF2 ללא חיתוך גליפים או שינוי צורות האותיות. קובצי המקור המלאים והוראות הבנייה של גופני GPL זמינים <a href="https://github.com/dudidd-wq/chitas-reader/tree/main/font-sources" target="_blank" rel="noopener">לצד הקבצים הבינאריים במאגר הציבורי</a>. רישיונות הגופנים נפרדים מקוד האפליקציה.</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
   glossCounts().then(t => { const el = $('#gloss-counts'); if (el && t) el.textContent = t; });
   errataCounts().then(t => { const el = $('#rambam-errata-counts'); if (el && t) el.textContent = t; });
@@ -879,8 +899,8 @@ function fmt(html, isTanakh, siddur = false) {
     .replace(/([\u0591-\u05C7])\1+/g, '$1');  // inherited source defect: the same mark repeated (e.g. Rashi Gen 1:1 "לֹֹֹֹֹא")
   s = markSectionLabels(s); // 1.0.66: (א)(ב) section labels – muted, not spoken (siddur/rambam/…)
   if (!isTanakh && !siddur) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
-  // Frank/Ezra subsets lack taamim glyphs – strip so a word never mixes fonts mid-glyph
-  if (isTanakh && (!prefs.taamim || prefs.font === 'frank' || prefs.font === 'ezra')) s = stripTaamim(s);
+  // These reading families lack taamim glyphs – strip so a word never mixes fonts mid-glyph
+  if (isTanakh && (!prefs.taamim || ['frank', 'ezra', 'david', 'assistant'].includes(prefs.font))) s = stripTaamim(s);
   return divineName(s, prefs.divine); // the divine name: in full (default) or ה׳ – one setting for every text
 }
 // 1.0.61: a siddur table (texts.js siddurTable) – one segment; each cell isolated in its own direction. Cells that are
