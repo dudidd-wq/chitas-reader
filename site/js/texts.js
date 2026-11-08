@@ -350,16 +350,17 @@ const inlineOnly = h => String(h).replace(/<(?!\/?(?:b|i)>)[^>]*>/g, '');
  *  {type:'table', cls, rows:[[{k, html, lang}]]}. k: 'p' prayer text (spoken), 'x' shown only (the Names, the chart's
  *  Sefirah / words / letter – never read aloud), 'n' an instruction (translated like a note), '' an empty cell.
  *  text = the spoken cells, for the vocalisation check and search. */
-function siddurTable(id, rows, cls, runs, lang) {
+function siddurTable(id, rows, cls, runs, lang, hideInstructions = false) {
   const cell = ([k, h, he]) => {
     if (!k) return { k: '', html: '' };
     if (k === 'n') {
+      if (hideInstructions) return { k: '', html: '' };
       if (lang === 'en' || !he) return { k, html: inlineOnly(h), lang: 'en' };
       return { k, html: inlineOnly(he).replace(/<\/?i>/g, '') + (lang === 'both' ? ` <span lang="en" dir="ltr">${inlineOnly(h)}</span>` : ''), lang: 'he' };
     }
-    return { k, html: localizeRuns(inlineOnly(h), runs, lang) };
+    return { k, html: localizeRuns(inlineOnly(h), runs, lang, { hideInstructions }) };
   };
-  const R = rows.map(r => r.map(cell));
+  const R = rows.map(r => r.map(cell)).filter(r => !hideInstructions || r.some(c => c.html));
   return { type: 'table', id, cls: /^[a-z]+$/.test(cls) ? cls : 'plain', rows: R, text: R.flat().filter(c => c.k === 'p').map(c => c.html).join(' ') };
 }
 /** Occasional/seasonal prayer insertions (יעלה ויבוא, על הניסים, עננו, משיב הרוח, …) – spoken paragraphs, not the
@@ -658,7 +659,7 @@ export function repeatCounts(book, n) {
 
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
-export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = false, hideShabbat = false } = {}) {
+export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = false, hideShabbat = false, hideInstructions = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
@@ -686,11 +687,12 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
     if (dupT[i] === 'h') t = 'h';
     if (t === 'h') { const x = localizeRuns(inlineOnly(h).replace(/<[^>]*>/g, ''), runs, lang, { heading: true }); if (x) blocks.push({ type: 'h', id, text: x }); }
     else if (t === 'n') {
+      if (hideInstructions) return;
       const rn = repNotes[i] ? ` (כתוב כאן ${TIMES_HE[repNotes[i][0]] || repNotes[i][0] + ' פעמים'})` : '';
       if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, '') + rn, lang: 'he' });
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
-    else if (t === 't') blocks.push({ ...siddurTable(id, h, he, runs, lang), say: sec.say?.[i] });
+    else if (t === 't') blocks.push({ ...siddurTable(id, h, he, runs, lang, hideInstructions), say: sec.say?.[i] });
     else {
       const extra = {};
       if (special[i]) { extra.special = true; if (specialEnd[i]) extra.specialEnd = true; }
@@ -699,7 +701,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
         if (om.isStart[i]) { extra.omitStart = true; extra.omitLabel = om.label[i]; }
         if (om.isEnd[i]) extra.omitEnd = true;
       }
-      const text = localizeRuns(inlineOnly(h), runs, lang), cnt = reps.get(i) || 1;
+      const text = localizeRuns(inlineOnly(h), runs, lang, { hideInstructions }), cnt = reps.get(i) || 1;
       blocks.push({ type: 'p', id, text, say: sec.say?.[i], ...extra, ...(cnt > 1 ? { rep: 1, repOf: cnt } : {}) });
       for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, say: sec.say?.[i], rep: k, repOf: cnt });
     }
@@ -708,10 +710,10 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
 }
 /** The whole prayer sequence of one book (e.g. Shacharit) as one continuous document: the sections follow one another
  *  with a light marker (type 'h', `sec`) instead of a break, so paging flows from one section into the next. */
-export async function buildSiddurBookDoc(book, { lang = 'he', hideNoTachanun = false, hideShabbat = false } = {}) {
+export async function buildSiddurBookDoc(book, { lang = 'he', hideNoTachanun = false, hideShabbat = false, hideInstructions = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b) throw new Error('siddur book not found');
-  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang, hideNoTachanun, hideShabbat })));
+  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang, hideNoTachanun, hideShabbat, hideInstructions })));
   const blocks = [], secs = [];
   parts.forEach((d, i) => {
     secs.push({ n: i + 1, he: d.title });

@@ -38,7 +38,8 @@ const ICON = {
 
 function applyPrefs() {
   const r = document.documentElement;
-  r.dataset.theme = prefs.theme; r.dataset.font = prefs.font;
+  r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
+  r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = getComputedStyle(r).getPropertyValue('--paper').trim() || '#f6f1e3';
@@ -77,7 +78,7 @@ function sidHideShabbat() {
   if (prefs.shabbatMode !== 'date') return false;
   return shabbatOrYomTov(siddurDay(new Date(), sidTimes().sunset), prefs.il);
 }
-const sidOpts = () => ({ lang: prefs.siddurLang, hideNoTachanun: sidHideTach(), hideShabbat: sidHideShabbat() });
+const sidOpts = () => ({ lang: prefs.siddurLang, hideNoTachanun: sidHideTach(), hideShabbat: sidHideShabbat(), hideInstructions: prefs.hideSiddurInstructions });
 function zmanPlace() {
   if (prefs.zmanPlace === 'geo' && prefs.zmanGeo) return { id: 'geo', he: 'המיקום שלי', ...prefs.zmanGeo, il: guessIsrael(), candles: 18 };
   return cityById(prefs.zmanPlace) || (guessIsrael() ? cityById('jerusalem') : CITIES.find(c => c.tz === deviceTz()) || cityById('jerusalem'));
@@ -458,7 +459,8 @@ const check = (name, value, label) => `<label class="check"><input type="checkbo
 function displayForm() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
-  <fieldset><legend>גופן</legend>${radio('font', prefs.font, [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז']])}
+  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${[['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז']].map(([v,l]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span></label>`).join('')}</div>
+    ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
     <small>בפרנק־רוהל ובעזרא הטעמים מוסתרים. נוטו וטעמי אשכנז כוללים ניקוד וטעמי מקרא.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
@@ -468,6 +470,7 @@ function displayForm() {
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
+  <fieldset><legend>הנחיות בסידור</legend>${check('hideSiddurInstructions', prefs.hideSiddurInstructions, 'הסתר הנחיות בסידור')}<small>הסרת הוראות התפילה מהתצוגה ומההקראה בלבד. נוסח התפילה, כותרות הניווט וסימוני הדילוג נשמרים.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
     </fieldset><fieldset><legend>קטעים שלא אומרים ביום שאין תחנון</legend>${radio('tachanunMode', prefs.tachanunMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
     <small>״כבוי״ – הכול מוצג. ״לפי התאריך״ – ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא, ואחרי חצות היום גם לפני יום כזה, כמו שאין אומרים תחנון במנחה שלפניו) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים; בשאר הימים מוצגים כרגיל. ״תמיד״ – מוסתרים בכל יום.</small></fieldset>
@@ -1503,9 +1506,9 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if ((name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
+    if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
-    else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
+    else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }

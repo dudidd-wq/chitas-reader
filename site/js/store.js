@@ -3,7 +3,7 @@ import { dayPlan } from './calendar.js';
 import { cleanProfile } from './personal.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
-  theme: 'paper', font: 'noto', size: 24, lineHeight: 1.9, layout: 'pages',
+  theme: 'paper', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', wakeLock: true, spread: true, locationChosen: false,
@@ -20,6 +20,7 @@ export const snapRate = r => TTS_RATES.reduce((a, b) => (Math.abs(b - r) < Math.
 function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
+    for (const k of ['readingBold', 'hideSiddurInstructions']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
     if ('hideNoTachanun' in prefs) { if (prefs.hideNoTachanun === true && !(d.prefs || {}).tachanunMode) prefs.tachanunMode = 'date'; delete prefs.hideNoTachanun; }
     for (const k of ['tachanunMode', 'shabbatMode']) if (!['off', 'date', 'always'].includes(prefs[k])) prefs[k] = 'off';

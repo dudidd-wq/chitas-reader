@@ -1,6 +1,6 @@
 [hidden] { display: none !important; }
 /* Self-hosted fonts (SIL Open Font License – see fonts/licenses) */
-@font-face { font-family: 'Noto Serif Hebrew'; src: url(../fonts/NotoSerifHebrew.woff2) format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'Noto Serif Hebrew'; src: url(../fonts/NotoSerifHebrew.woff2) format('woff2'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Frank Ruhl Libre'; src: url(../fonts/FrankRuhlLibre.woff2) format('woff2'); font-weight: 300 900; font-display: swap; }
 @font-face { font-family: 'Ezra SIL'; src: url(../fonts/EzraSIL.woff2) format('woff2'); font-display: swap; }
 /* Original Culmus Taamey Ashkenaz: lossless WOFF2 packaging, no outline edits. */
@@ -545,3 +545,13 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .gs-more { min-height: 44px; margin: .2rem 0 .6rem; }
 .r-content .seg.seek-hit { background: var(--hl); border-radius: 4px; box-shadow: 0 0 0 .2em var(--hl); }
 @media (max-width: 420px) { .lib-sbar .btn span { display: none; } }
+
+/* 1.0.82: per-option real-font previews and optional reading weight (no source/text change). */
+[data-font="noto"] { --text-font: 'Noto Serif Hebrew', 'Ezra SIL', serif; }
+.font-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.font-options label { display: flex; flex-direction: column; align-items: stretch; gap: .4rem; min-width: 0; padding: .6rem; }
+.font-options label > span:first-child { font-family: var(--ui); }
+.font-sample { font-family: var(--text-font); font-size: 1.25rem; line-height: 1.8; font-weight: var(--reading-weight, 400); overflow-wrap: anywhere; }
+.r-content, .pt-verses { font-weight: var(--reading-weight, 400); }
+[data-reading-bold="true"] .r-content .seg.sid-special .t,
+[data-reading-bold="true"] .r-content .seg.sid-omit .t { font-weight: 700; font-synthesis: weight style; }

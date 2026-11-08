@@ -11,7 +11,8 @@ export const RUN = /(?:[0-9] )?[A-Za-z][A-Za-z0-9'’ ,:;.\-–]*[A-Za-z0-9]|[A-
 const escH = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** replace the English runs of a prayer line / heading (text outside tags only). mode 'en' leaves the line as it is. */
-export function localizeRuns(html, runs, mode, { heading = false } = {}) {
+export function localizeRuns(html, runs, mode, { heading = false, hideInstructions = false } = {}) {
+  if (hideInstructions && !heading) return String(html).replace(/(^|>)([^<]*)/g, (m, gt, txt) => gt + txt.replace(RUN, '')).replace(/\(\s*:\s*/g, '(').replace(/\(\s*\)/g, '').replace(/\s{2,}/g, ' ').trim();
   if (mode === 'en' || !runs) return html;
   let out = String(html).replace(/(^|>)([^<]*)/g, (m, gt, txt) => gt + txt.replace(RUN, r => {
     if (!Object.hasOwn(runs, r)) return r;
