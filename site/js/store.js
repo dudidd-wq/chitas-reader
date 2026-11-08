@@ -4,7 +4,7 @@ import { cleanProfile } from './personal.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
-  taamim: true, rashi: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
+  taamim: true, rashi: true, hayomNiqqud: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
@@ -21,6 +21,7 @@ function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
     for (const k of ['readingBold', 'hideSiddurInstructions']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
+    if (typeof prefs.hayomNiqqud !== 'boolean') prefs.hayomNiqqud = true;
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
     if ('hideNoTachanun' in prefs) { if (prefs.hideNoTachanun === true && !(d.prefs || {}).tachanunMode) prefs.tachanunMode = 'date'; delete prefs.hideNoTachanun; }
     for (const k of ['tachanunMode', 'shabbatMode']) if (!['off', 'date', 'always'].includes(prefs[k])) prefs[k] = 'off';
