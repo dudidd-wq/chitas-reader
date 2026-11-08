@@ -14,12 +14,12 @@ export async function createVoice(ort, { wasm, model, config, stress }) {
   const inf = config.inference || {}, idMap = config.phoneme_id_map, sampleRate = config.audio?.sample_rate || 22050;
   return {
     sampleRate,
-    /** text: one prepared chunk (tts-prep output); opt.accents: the raw accented verse (or a Map from accentStressMap);
+    /** text: one prepared chunk (tts-prep output); opt.accents: the raw accented verse (or a Map from accentStressMap), or {primary: markedPreparedChunk};
      *  opt.rate: speed (1 = normal); opt.timbre: null (the model's own female voice) or {semitones, formant} for the
      *  male timbre (voice-pitch.js). With formant < 1 the model speaks 1/formant faster, so the tempo stays the same.
      *  Returns {audio: Float32Array, ipa, ids}. */
     async synth(text, opt = {}) {
-      const accents = opt.accents instanceof Map ? opt.accents : opt.accents ? accentStressMap(opt.accents) : null;
+      const accents = opt.accents instanceof Map || opt.accents?.primary ? opt.accents : opt.accents ? accentStressMap(opt.accents) : null;
       const ipa = opt.ipa || textToIPA(text, { data: stress, accents, noShvaNa: opt.noShvaNa });
       const ids = ipaToIds(ipa, idMap);
       if (ids.length <= 3) return { audio: new Float32Array(0), ipa, ids };

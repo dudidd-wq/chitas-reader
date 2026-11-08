@@ -1535,14 +1535,19 @@ function ttsSegments() {
   const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), b.say])); // 1.0.76: vocalized reading text (Hayom Yom)
   return R.segs.map(s => {
     const parts = [say.has(s.dataset.id) ? say.get(s.dataset.id) : unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
-    // Rashi headwords are unvocalised in the edition: read them with the verse's vowels when they are the verse's words
-    if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach(p => parts.push(vowelHeadword(p.innerHTML, parts[0])));
+    // Speech-only Rashi keeps the display edition intact and supplies its own primary-stress metadata.
+    const block = byId?.get(s.dataset.id), accParts = [block?.text || say.get(s.dataset.id) || null], primaryParts = [say.has(s.dataset.id)];
+    if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach((p, i) => {
+      const raw = block?.subSay?.[i];
+      parts.push(raw || vowelHeadword(p.innerHTML, parts[0]));
+      accParts.push(raw || null); primaryParts.push(!!raw);
+    });
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
     const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
     // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.
     // prepareForTTS strips these before Web Speech; Piper must receive the original in parallel.
     const acc = byId?.get(s.dataset.id)?.text || say.get(s.dataset.id) || null;
-    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc };
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts };
   });
 }
 const TTS_ERR = {

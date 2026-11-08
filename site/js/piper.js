@@ -90,7 +90,13 @@ export class PiperSpeaker extends Speaker {
     segments.forEach((s, si) => {
       const chunks = [];
       // the voice needs the vowels: niqqud is always kept for it (the "stress" setting concerns the browser's engine)
-      s.parts.forEach((html, pi) => { for (const c of chunkText(prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi] }))) chunks.push({ c, acc: pi === 0 ? s.acc : null }); });
+      s.parts.forEach((html, pi) => {
+        const primary = !!s.primaryParts?.[pi];
+        const prepared = prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary });
+        for (const c of chunkText(prepared)) chunks.push(primary
+          ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c } }
+          : { c, acc: s.accParts?.[pi] ?? (pi === 0 ? s.acc : null) });
+      });
       const total = chunks.reduce((a, x) => a + x.c.length, 0) || 1; let done = 0;
       for (const { c, acc } of chunks) { this.queue.push({ si, text: c, acc, frac: done / total }); done += c.length; }
     });

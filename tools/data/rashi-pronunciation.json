@@ -1,0 +1,19 @@
+{
+  "note": "Speech-only, pointed word keys. Preserve the edition's vowels; k=0 milra, k=1 milel. Dicta incorrectly supplies Acc0 for כמה, so the human-verified exception wins. Do not change היה/היתה or אינו to milel.",
+  "words": {
+    "כַּמָּה": 1,
+    "שֶׁכָּתַב": 0,
+    "כַמָּה": 1,
+    "וְכַמָּה": 1,
+    "בְּכַמָּה": 1,
+    "לְכַמָּה": 1,
+    "מִכַּמָּה": 1,
+    "וּבְכַמָּה": 1,
+    "אֶלָּא": 1,
+    "אֲפִלּוּ": 1,
+    "אֲפִילוּ": 1,
+    "דַּוְקָא": 1,
+    "דַּוְקָה": 1
+  },
+  "phrases": []
+}

@@ -6,19 +6,22 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { stressFromAccents, stressKey, nuclei, normalize, QAMATZ, QAMATZ_KATAN, predictStress } from '../site/js/g2p.js';
+import { stressFromAccents, stressKey, nuclei, normalize, QAMATZ, QAMATZ_KATAN, predictStress, accentWords } from '../site/js/g2p.js';
 
 const ROOT = new URL('..', import.meta.url).pathname, MAXN = 6, MINC = 2;
 const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 function cleanVerse(v) {
-  v = v.replace(/<[^>]+>/g, '').replace(/\{[^}]*\}/g, '').replace(/\u034F/g, '').replace(/[\u05BE\u05C0|]/g, ' ').replace(/\u05C3/g, '.');
+  v = v.replace(/<[^>]+>/g, '').replace(/\{[^}]*\}/g, '').replace(/\u034F/g, '').replace(/[\u05C0|]/g, ' ');
   return v.replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim();
 }
 export function corpus(books = ['torah', 'tehillim']) {
   const rows = [];
   for (const book of books) for (const f of walk(path.join(ROOT, 'site/data', book)).filter(f => f.endsWith('.json') && !f.endsWith('index.json')).sort()) {
     const d = JSON.parse(fs.readFileSync(f, 'utf8'));
-    for (const v of d.v || []) if (typeof v === 'string') rows.push({ book, words: cleanVerse(v).split(' ').map(t => t.replace(/[^\u05D0-\u05EA\u0591-\u05C7]/g, '')).filter(w => /[\u05D0-\u05EA]/.test(w)) });
+    for (const v of d.v || []) if (typeof v === 'string') {
+      const tokens = accentWords(cleanVerse(v));
+      rows.push({ book, words: tokens.map(t => t.word), stresses: tokens.map(t => t.joined ? null : stressFromAccents(t.word, { allowOle: false })) });
+    }
   }
   return rows;
 }
@@ -94,10 +97,10 @@ export function writeVoiceFiles() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const rows = corpus();
-  const pairs = rows.flatMap(r => r.words.map(w => [w, stressFromAccents(w)]).filter(p => p[1] !== null));
+  const pairs = rows.flatMap(r => r.words.map((w, i) => [w, r.stresses[i]]).filter(p => p[1] !== null));
   if (process.argv.includes('--eval')) {   // held-out check: learn from one book, test on the other
     for (const [tr, te] of [['torah', 'tehillim'], ['tehillim', 'torah']]) {
-      const P = b => rows.filter(r => r.book === b).flatMap(r => r.words.map(w => [w, stressFromAccents(w)]).filter(p => p[1] !== null));
+      const P = b => rows.filter(r => r.book === b).flatMap(r => r.words.map((w, i) => [w, r.stresses[i]]).filter(p => p[1] !== null));
       const m = fit(P(tr)), test = P(te);
       const ok = test.filter(([w, g]) => predictStress(w, m)[0] === g).length, okNoLex = test.filter(([w, g]) => predictStress(w, { suf: m.suf, maxn: m.maxn })[0] === g).length;
       console.log(`learn ${tr} → test ${te}: ${(ok / test.length * 100).toFixed(1)}% (suffixes only ${(okNoLex / test.length * 100).toFixed(1)}%), milra baseline ${(test.filter(p => p[1] === 0).length / test.length * 100).toFixed(1)}%, n=${test.length}`);

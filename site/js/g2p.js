@@ -19,7 +19,7 @@ const HASER = '\u05AF';           // Phonikud's nikud-haser mark (letter not rea
 export const FULLV = new Set([...'\u05B1\u05B2\u05B3\u05B4\u05B5\u05B6\u05B7\u05B8\u05B9\u05BA\u05BB\u05C7']);
 export const ACCENTS = /[\u0591-\u05AF]/;
 // accents that stand before/after the word, not on its stressed syllable (prepositive / postpositive)
-export const NONSTRESS = new Set([...'\u05A0\u059A\u05AD\u0599\u05A9\u05AE\u0592']);
+export const NONSTRESS = new Set([...'\u05A0\u059A\u05AD\u0599\u05A9\u05AE\u0592\u0598\u059D']);
 const RE_ACC_METEG = /[\u0591-\u05AF\u05BD]/g;
 
 const STRESS = 'ˈ';
@@ -72,21 +72,57 @@ export function nuclei(word) {
   });
   return out;
 }
-/** Stress from the cantillation accents: index from the end of the stressed nucleus, or null (no accent, a
- *  prepositive/postpositive accent, or accents on more than one letter). */
-export function stressFromAccents(word) {
-  const cs = letters(word), acc = [];
-  cs.forEach((c, i) => { for (const m of c.all) if (ACCENTS.test(m) && m !== HASER && m !== HATAMA) acc.push([i, m]); else if (m === HATAMA || m === HASER) acc.push([i, m]); });
-  if (!acc.length || acc.some(([, m]) => NONSTRESS.has(m))) return null;
-  if (new Set(acc.map(a => a[0])).size !== 1) return null;
-  const ai = acc[0][0], nu = nuclei(cs);
+/** Primary stress, not a musical/secondary accent. Dehi, tsinnorit and the geresh of revia-mugrash
+ *  do not locate it. Ole is auxiliary when paired with yored (merkha); a lone ole is also our explicit
+ *  speech-only stress tag (Hayom Yom/Rashi). Duplicated pashta/telisha locate stress with their non-edge copy.
+ *  The final meteg-shaped mark before sof-pasuq is silluq, not an ordinary meteg. */
+export function stressFromAccents(word, { allowOle = true } = {}) {
+  const cs = letters(word), nu = nuclei(cs);
   if (!nu.length) return null;
-  let k = null; nu.forEach((n, j) => { if (n.at === ai || n.own === ai) k = j; });
-  return k === null ? null : nu.length - 1 - k;
+  const marks = [];
+  cs.forEach((c, i) => { for (const m of c.all) if (ACCENTS.test(m) && m !== HASER) marks.push([i, m]); });
+  const toK = i => {
+    const j = nu.findIndex(n => n.at === i || n.own === i);
+    return j < 0 ? null : nu.length - 1 - j;
+  };
+  // A pre/postpositive PRIMARY sign makes a coincident munach only auxiliary (e.g. שֶׁ֣֭עֹמְדִים).
+  // Do not promote that munach to primary. Revia-mugrash/tsinnorit are different: their positional partner is usable.
+  const edgePrimary = marks.some(([, m]) => '\u05AD\u0599\u05A0\u05A9\u05AE\u0592\u059A'.includes(m));
+  const primary = marks.filter(([, m]) => !NONSTRESS.has(m) && m !== HATAMA);
+  if (primary.length && !edgePrimary) {
+    // A disjunctive outranks a preceding conjunctive/secondary musical accent (וְאָ֣הַבְתָּ֔).
+    const disj = primary.filter(([, m]) => '\u0591\u0593\u0594\u0595\u0596\u0597\u059B\u059C\u059E\u059F\u05A1\u05A2'.includes(m));
+    const ks = new Set((disj.length ? disj : primary).map(([i]) => toK(i)));
+    return ks.size === 1 && !ks.has(null) ? [...ks][0] : null;
+  }
+  // Modern MAM encodes a second, stress-locating copy of these edge-positioned signs.
+  for (const [mark, prepositive] of [['\u0599', false], ['\u05A9', false], ['\u05A0', true]]) {
+    const pos = [...new Set(marks.filter(([, m]) => m === mark).map(([i]) => i))].sort((a, b) => a - b);
+    if (pos.length === 2) return toK(pos[prepositive ? 1 : 0]);
+  }
+  const ole = marks.filter(([, m]) => m === HATAMA);
+  if (allowOle && ole.length === 1 && marks.length === 1) return toK(ole[0][0]);
+  if (/\u05C3[^א-ת]*$/.test(word)) {
+    const at = cs.map((c, i) => c.all.includes(VSHVA) ? i : -1).filter(i => i >= 0);
+    if (at.length) return toK(at.at(-1));
+  }
+  return null;
+}
+/** Keep maqaf boundaries until after primary-stress extraction. The first component may carry
+ *  a secondary musical mark (הַ֥לְלוּ־יָ֨הּ); it is not that component's lexical stress. */
+export function accentWords(text) {
+  return String(text).replace(/<i class="fn"[^>]*>[\s\S]*?<\/i>/g, '')
+    .replace(/<span class="ketiv"[^>]*>[\s\S]*?<\/span>/g, '')
+    .replace(/<\/?(?:big|small)>/g, '').replace(/<[^>]+>/g, ' ')
+    .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '$2').replace(/\u05BE/g, '\u05BE ')
+    .replace(/[\u05C0|]/g, ' ').split(/\s+/).map(w => ({
+      word: w.replace(/[^\u05D0-\u05EA\u0591-\u05C7]/g, '').replace(/\u05BE/g, ''),
+      joined: w.includes('\u05BE'),
+    })).filter(x => /[א-ת]/.test(x.word));
 }
 /** Lookup key of a word: no accents or meteg, marks sorted, qamatz katan as qamatz (as the suffix model's norm). */
 export const stressKey = w => normalize(String(w).replace(RE_ACC_METEG, '')).replace(/\u05C7/g, QAMATZ)
-  .replace(/[^\u05D0-\u05EA\u05B0-\u05C7]/g, '');
+  .replace(/[^\u05D0-\u05EA\u05B0-\u05BC\u05BF\u05C1\u05C2\u05C7]/g, '');
 /** clusters (letter + marks) of a key */
 const clusters = k => k.match(/[\u05D0-\u05EA][^\u05D0-\u05EA]*/g) || [];
 
@@ -105,16 +141,18 @@ export function predictStress(word, data = {}) {
   return [0, 'default'];
 }
 
-/** Accent stress of each distinct word of an accented text (a verse): Map(stressKey → k). Words read in two ways in one
- *  verse keep the first reading. Words joined by maqaf are separate words (as in tts-prep). */
+/** A verse's unambiguous primary stresses. Conflicting occurrences deliberately fall back to the
+ *  lexicon instead of forcing the first reading onto every later occurrence. */
 export function accentStressMap(text) {
   const map = new Map();
-  const words = String(text).replace(/<[^>]+>/g, ' ').replace(/[\u05BE\u05C0\u05C3|]/g, ' ').split(/\s+/);
-  for (const w of words) {
-    const core = w.replace(/[^\u05D0-\u05EA\u0591-\u05C7]/g, '');
-    if (!/[\u05D0-\u05EA]/.test(core) || !ACCENTS.test(core)) continue;
-    const k = stressFromAccents(core), key = stressKey(core);
-    if (k !== null && !map.has(key)) map.set(key, k);
+  // Build-time explicit speech tags use only ole. Real Tanakh has other accents: a lone ole there is auxiliary.
+  const allowOle = !/[\u0591-\u05AA\u05AC-\u05AE]/.test(text);
+  for (const { word, joined } of accentWords(text)) {
+    if (joined) continue;
+    const k = stressFromAccents(word, { allowOle }), key = stressKey(word);
+    if (k === null) continue;
+    if (!map.has(key)) map.set(key, k);
+    else if (map.get(key) !== k) map.set(key, null);
   }
   return map;
 }
@@ -262,17 +300,23 @@ export function wordToIPA(word, k = null, data = {}, opt = {}) {
 export const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };
 
 /** Prepared TTS text (vocalised Hebrew, accents removed, divine names and numbers already expanded by tts-prep) → IPA.
- *  opt.accents: Map from accentStressMap() for the verse; opt.data: stress data (exc, lex, suf, qk).
+ *  opt.accents: raw Tanakh string / Map, or {primary: preparedChunkWithOleTags} for compiled speech;
+ *  opt.data: stress data (exc, lex, suf, qk). Compiled tags are occurrence-specific, not a distinct-word lookup.
  *  opt.trace: array that receives {word, ipa, k, src} per word (for tests). */
 export function textToIPA(text, opt = {}) {
-  const data = opt.data || {}, acc = typeof opt.accents === 'string' ? accentStressMap(opt.accents) : opt.accents;
-  const t = normalize(String(text).replace(/[\u0591-\u05AF\u05BD]/g, '').replace(/\u05C3/g, '.')).replace(/[\u05BE]/g, ' ').replace(/[–—]/g, ',').replace(/;/g, ',').replace(/:/g, '.');
-  return t.replace(/[\u05D0-\u05EA\u05B0-\u05C7'"|]+/g, w => {
-    const core = w.replace(/^['"]+|['"]+$/g, '');
+  const data = opt.data || {}, acc = typeof opt.accents === 'string' ? accentStressMap(opt.accents) : opt.accents instanceof Map ? opt.accents : null;
+  // Compiled speech has per-occurrence tags. Chunk them with the text, not a paragraph-wide word map:
+  // the same pointed spelling can occur twice with different stress. Reject any text/metadata mismatch.
+  const marked = opt.accents?.primary;
+  const inline = typeof marked === 'string' && normalize(marked.replace(/\u05AB/g, '')) === normalize(String(text));
+  const input = inline ? marked : String(text);
+  const t = normalize(input.replace(inline ? /[\u0591-\u05AA\u05AC-\u05AF\u05BD]/g : /[\u0591-\u05AF\u05BD]/g, '').replace(/\u05C3/g, '.')).replace(/[\u05BE]/g, ' ').replace(/[–—]/g, ',').replace(/;/g, ',').replace(/:/g, '.');
+  return t.replace(/[\u05D0-\u05EA\u05AB\u05B0-\u05C7'"|]+/g, w => {
+    const tagged = w.replace(/^['"]+|['"]+$/g, ''), core = tagged.replace(/\u05AB/g, '');
     if (!/[\u05D0-\u05EA]/.test(core)) return ' ';
     const key = stressKey(core);
-    let k = null, src = 'acc';
-    if (acc && acc.has(key)) k = acc.get(key);
+    let k = inline ? stressFromAccents(tagged) : null, src = k === null ? 'acc' : 'primary';
+    if (k === null && acc && acc.has(key)) k = acc.get(key);
     if (k === null) [k, src] = predictStress(core, data);
     let ipa = wordToIPA(core.replace(/"/g, ''), k, data, opt);
     // 1.0.64 safety net: an abbreviation / numeral that reached here unexpanded (ד׳, י״ב) has no vowel and was not heard –

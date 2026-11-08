@@ -1,0 +1,17 @@
+{
+  "batches": 444,
+  "paragraphs": 7816,
+  "words": 164369,
+  "dicta": 120250,
+  "curated": 1290,
+  "exceptions": 5011,
+  "lexicon": 56,
+  "fallback": 15584,
+  "context": 72,
+  "filled": 1862,
+  "headwords": 14932,
+  "explicit": 106827,
+  "polysyllables": 114595,
+  "splitWords": 12,
+  "mismatchedBatches": 0
+}
