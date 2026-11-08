@@ -1,0 +1,21 @@
+{
+  "files": 54,
+  "paragraphs": 8148,
+  "contextBatches": 568,
+  "contextWindows": 39628,
+  "expansions": 918,
+  "waterExpansions": 503,
+  "lateExpansions": 60,
+  "reviewedFills": 61,
+  "words": 937090,
+  "filled": 2809,
+  "explicit": 498732,
+  "polysyllables": 573813,
+  "curated": 18507,
+  "exceptions": 20039,
+  "biblical": 289454,
+  "reused": 321434,
+  "lexicon": 0,
+  "contextStress": 41,
+  "fallback": 99542
+}

@@ -1,0 +1,197 @@
+{
+  "version": "1.0.81",
+  "word": "שֶׁהֶחֱזַרְתָּ",
+  "unchangedIPA": "ʃeheχezˈaʁta",
+  "phonology": {
+    "chatafSegol": "e retained",
+    "reshShva": "silent: ʁt, no vowel between resh and tav",
+    "tavDagesh": "t, not a fricative",
+    "stress": "penultimate ZAR, k=1"
+  },
+  "diagnosis": "Input niqqud and IPA were already correct. Controlled renders exposed unreliable acoustic realization of the repeated he/che sequence in the longer utterance. A speech-only natural clause boundary before שהחזרת preserves the five vowels and improves exact target recognition; this is not an ASR-derived vowel rewrite.",
+  "experiment": {
+    "baselineExact": [
+      {
+        "file": "shehe-baselineExact-0.wav",
+        "recognized": "שהחזרת",
+        "exactTarget": true,
+        "probabilities": [
+          0.8896322995424271
+        ],
+        "durationSeconds": [
+          1.2400000000000002
+        ]
+      },
+      {
+        "file": "shehe-baselineExact-1.wav",
+        "recognized": "שחזרת",
+        "exactTarget": false,
+        "probabilities": [
+          0.9810240268707275
+        ],
+        "durationSeconds": [
+          0.9199999999999999
+        ]
+      },
+      {
+        "file": "shehe-baselineExact-2.wav",
+        "recognized": "שחזרת",
+        "exactTarget": false,
+        "probabilities": [
+          0.8898895382881165
+        ],
+        "durationSeconds": [
+          0.8799999999999999
+        ]
+      }
+    ],
+    "boundary": [
+      {
+        "file": "shehe-boundary-0.wav",
+        "recognized": "שהחזרת",
+        "exactTarget": true,
+        "probabilities": [
+          0.9959858506917953
+        ],
+        "durationSeconds": [
+          0.7400000000000002
+        ]
+      },
+      {
+        "file": "shehe-boundary-1.wav",
+        "recognized": "שהחזרת",
+        "exactTarget": true,
+        "probabilities": [
+          0.9045086652040482
+        ],
+        "durationSeconds": [
+          0.5800000000000001
+        ]
+      },
+      {
+        "file": "shehe-boundary-2.wav",
+        "recognized": "שהחזרת",
+        "exactTarget": true,
+        "probabilities": [
+          0.9928063601255417
+        ],
+        "durationSeconds": [
+          0.7399999999999998
+        ]
+      }
+    ]
+  },
+  "isolatedOriginalASR": "שהחזרתי (a cut segment is not conclusive evidence of a vowel error)",
+  "rejected": [
+    "Changing chataf to full segol produces identical IPA, so cannot be an acoustic fix",
+    "Deleting chataf vowel violates the requested five-syllable reading",
+    "Onset-stress relocation, splitting syllables, epsilon/x/r substitutions, doubled stressed vowel did not consistently improve target recognition"
+  ],
+  "deliveredAfter": {
+    "/workspace/chitas-stage4/shehe-after.wav": [
+      {
+        "text": " מודה אני לפניך, מלך חי וקיים, שהחזרת בי נשמתי בחמלה.",
+        "start": 0.0,
+        "end": 4.44,
+        "words": [
+          {
+            "word": " מודה",
+            "start": 0.0,
+            "end": 0.22,
+            "probability": 0.736998438835144
+          },
+          {
+            "word": " אני",
+            "start": 0.22,
+            "end": 0.4,
+            "probability": 0.991549015045166
+          },
+          {
+            "word": " לפניך,",
+            "start": 0.4,
+            "end": 0.94,
+            "probability": 0.9986334641774496
+          },
+          {
+            "word": " מלך",
+            "start": 1.08,
+            "end": 1.48,
+            "probability": 0.8924036423365275
+          },
+          {
+            "word": " חי",
+            "start": 1.48,
+            "end": 1.7,
+            "probability": 0.9957679808139801
+          },
+          {
+            "word": " וקיים,",
+            "start": 1.7,
+            "end": 2.3,
+            "probability": 0.9893530011177063
+          },
+          {
+            "word": " שהחזרת",
+            "start": 2.5,
+            "end": 3.26,
+            "probability": 0.9727835655212402
+          },
+          {
+            "word": " בי",
+            "start": 3.26,
+            "end": 3.48,
+            "probability": 0.9601791799068451
+          },
+          {
+            "word": " נשמתי",
+            "start": 3.48,
+            "end": 3.98,
+            "probability": 0.9980461955070495
+          },
+          {
+            "word": " בחמלה.",
+            "start": 3.98,
+            "end": 4.44,
+            "probability": 0.9870806137720743
+          }
+        ]
+      }
+    ],
+    "/workspace/chitas-stage4/shehe-after-word-clause.wav": [
+      {
+        "text": " שהחזרת בי נשמתי בחמלה.",
+        "start": 0.0,
+        "end": 1.94,
+        "words": [
+          {
+            "word": " שהחזרת",
+            "start": 0.0,
+            "end": 0.72,
+            "probability": 0.9627626538276672
+          },
+          {
+            "word": " בי",
+            "start": 0.72,
+            "end": 0.98,
+            "probability": 0.9494245648384094
+          },
+          {
+            "word": " נשמתי",
+            "start": 0.98,
+            "end": 1.48,
+            "probability": 0.9922844052314759
+          },
+          {
+            "word": " בחמלה.",
+            "start": 1.48,
+            "end": 1.94,
+            "probability": 0.965174674987793
+          }
+        ]
+      }
+    ]
+  },
+  "sample": "/workspace/chitas-shehechezarta-fix.mp3",
+  "sampleOrder": "original sentence, 0.8 second gap, current repaired sentence",
+  "caveat": "Whisper recognition is not a stress or human-listening score. No broad chataf/shva rewrite was justified or applied."
+}

@@ -229,7 +229,7 @@ async function toltDoc(plan) {
     // (tools/cb-niqqud, verification/CHASSIDUT-BEHIRAH.md); the rest stay the unvocalised Kehot/Sefaria text
     const nq = paras.filter(p => p.nq).length;
     if (nq) blocks.push({ type: 'note', text: `${CB_ATTR}. `, links: [['חסידות בהירה – chassidutbehirah.com', CB_URL]], tail: nq < paras.length ? `. ${paras.length - nq} מתוך ${paras.length} הפסקאות מוצגות בלי ניקוד, כי לא אומתה בהן התאמה מלאה לאותיות נוסח קה״ת.` : '.' });
-    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}) }));
+    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, say: p.say, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}) }));
     const N = (await optional(`notes/tolt/${slug}.json`))?.[day];
     if (N) blocks.push({ type: 'notes', kind: 'tolt', title: 'מראי מקומות הערות וציונים', attr: { text: '״מראי מקומות הערות וציונים״ של מהדורת קה״ת, דרך ', links: [['ספריא', e.sefaria]], tail: ' (CC BY-NC). כל הערה מוצגת רק אם מילות הכותרת שלה נמצאות בפסקה שאליה ספריא מקשרת אותה. אינם ביאור, ולא נכתבו באתר זה.' },
       groups: Object.keys(N).map(Number).sort((x, y) => x - y).map(i => ({ target: `${slug}.${day}.${i}`, label: firstWords(paras[i - 1].t), items: N[i].map(h => ({ html: h })) })) });

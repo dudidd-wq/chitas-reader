@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import crypto from 'node:crypto';
-import{alignSiddurTokens,siddurSpeechHtml,siddurRepairs,compatibleVowels,fillMissingVowels,siddurStress}from'../tools/siddur-pronunciation.mjs';
+import{siddurProsody,alignSiddurTokens,siddurSpeechHtml,siddurRepairs,compatibleVowels,fillMissingVowels,siddurStress}from'../tools/siddur-pronunciation.mjs';
 import{prepareForTTS}from'../site/js/tts-prep.js';import{textToIPA,normalize,letters}from'../site/js/g2p.js';
 const ROOT=new URL('../',import.meta.url).pathname,walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(d+'/'+e.name):[d+'/'+e.name]);
 const files=walk('site/data/siddur').filter(f=>f.endsWith('.json')&&!f.endsWith('/index.json')).sort(),data=JSON.parse(fs.readFileSync(ROOT+'site/voice/stress-he.json'));
@@ -45,4 +45,9 @@ test('1.0.80: compiled prayer speech is stable across instruction languages, rep
  const he=await buildSiddurDoc('boker',5),en=await buildSiddurDoc('boker',5,{lang:'en'}),both=await buildSiddurDoc('boker',5,{lang:'both'});
  const says=d=>d.blocks.filter(b=>b.type==='p').map(b=>[b.id,b.say]);assert.deepEqual(says(he),says(en));assert.deepEqual(says(he),says(both));assert.ok(he.blocks.some(b=>b.rep&&b.say),'repeated prayers keep the same speech layer');
  const normal=await buildSiddurDoc('shacharit',4),hidden=await buildSiddurDoc('shacharit',4,{hideNoTachanun:true}),hiddenIds=new Set(hidden.blocks.map(b=>b.id));assert.ok(hidden.blocks.length<normal.blocks.length);assert.ok(normal.blocks.some(b=>b.type==='p'&&b.say&&!hiddenIds.has(b.id)));for(const b of hidden.blocks.filter(b=>b.say))assert.equal(b.say,normal.blocks.find(x=>x.id===b.id).say);
+});
+
+test('1.0.81: Modeh Ani acoustic clause repair keeps chataf/shva/dagesh and exact primary stress',()=>{
+ const d=JSON.parse(fs.readFileSync(ROOT+'site/data/siddur/boker/1.json')),s=d.say[1];assert.match(s,/ם\. ש/);const m=prepareForTTS(s,{primaryStress:true});assert.ok(m.includes('. '));assert.ok(trace(s).some(t=>normalize(t.word)===normalize('שֶׁהֶחֱזַרְתָּ')&&t.ipa==='ʃeheχezˈaʁta'&&t.src==='primary'));
+ assert.equal(siddurProsody('וְקַיָּם, שֶׁהֶחֱזַרְתָּ'),'וְקַיָּם. שֶׁהֶחֱזַרְתָּ');assert.equal(siddurProsody('וְקַיָּם, כָּל הָעוֹלָם'),'וְקַיָּם, כָּל הָעוֹלָם');
 });

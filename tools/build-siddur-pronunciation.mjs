@@ -1,6 +1,6 @@
 // 1.0.80: exact-source Siddur speech layer. --prepare; fetch-siddur-rich.py; build; npm run search.
 import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import zlib from 'node:zlib';
-import {alignSiddurTokens,siddurSpeechHtml,siddurRepairs,siddurStress,wordRE,skeleton,compatibleVowels,fillMissingVowels,stampStress}from './siddur-pronunciation.mjs';
+import {siddurProsody,alignSiddurTokens,siddurSpeechHtml,siddurRepairs,siddurStress,wordRE,skeleton,compatibleVowels,fillMissingVowels,stampStress}from './siddur-pronunciation.mjs';
 import {stressKey,nuclei,predictStress,accentWords,stressFromAccents,HATAMA}from '../site/js/g2p.js';
 const ROOT=new URL('../',import.meta.url).pathname,CACHE=process.env.SIDDUR_RICH_CACHE||'/workspace/siddur-pronunciation/rich-cache';
 const D=JSON.parse(fs.readFileSync(ROOT+'site/voice/stress-he.json'));
@@ -44,7 +44,7 @@ else{
     if(chosen||ks.size===1){k=chosen?+chosen.acc.slice(-1):[...ks][0];stats.dicta++;}else{const[g,src]=predictStress(w,D);if(src==='lex')k=g;else stats.fallback++;}}
    if(nuclei(w).length>1)stats.polysyllables++;const marked=stampStress(w,k);if(marked.includes(HATAMA))stats.explicit++;return marked+trail;
   });
-  for(const{f,i}of p.jobs){chapters.get(f).say[i]=say;stats.blocks++;}
+  for(const{f,i}of p.jobs){chapters.get(f).say[i]=siddurProsody(say);stats.blocks++;}
  }
  }
  for(const[f,d]of chapters)fs.writeFileSync(f,JSON.stringify(d));fs.writeFileSync(ROOT+'verification/SIDDUR-180-metrics.json',JSON.stringify(stats,null,2)+'\n');console.log(JSON.stringify(stats,null,2));

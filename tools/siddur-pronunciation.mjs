@@ -43,3 +43,12 @@ export function alignSiddurTokens(expected,tokens){
  }
  return i===expected.length&&j===tokens.length?{tokens:aligned,splits,merges}:null;
 }
+
+/** Piper's repeated ה/ח sequence is less reliable inside a long utterance.
+ * Preserve the five correct vowels/stress; synthesize the natural Modeh-Ani clause separately. Display stays comma. */
+export function siddurProsody(s){
+ const words=[...s.matchAll(wordRE)];let out=s;
+ for(let i=words.length-1;i>0;i--){const a=words[i-1],b=words[i];if(['וקים','וקיים'].includes(skeleton(a[0]))&&skeleton(b[0])==='שהחזרת'){
+  const at=a.index+a[0].length,between=s.slice(at,b.index);if(/^,\s+$/.test(between))out=out.slice(0,at)+'.'+out.slice(at+1);
+ }}return out;
+}
