@@ -1,0 +1,20 @@
+{
+  "files": 1023,
+  "paragraphs": 15937,
+  "contextBatches": 498,
+  "contextWindows": 30965,
+  "expansions": 22,
+  "qatanRepairs": 37,
+  "selectedBareFills": 14043,
+  "words": 784928,
+  "filled": 47298,
+  "explicit": 542799,
+  "polysyllables": 575516,
+  "curated": 17582,
+  "exceptions": 24297,
+  "biblical": 334126,
+  "reused": 348940,
+  "lexicon": 1,
+  "contextStress": 2446,
+  "fallback": 49431
+}

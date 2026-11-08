@@ -192,7 +192,7 @@ async function rambamDoc(plan, unit) {
         const id = `${meta.slug}.${c}.${s}`;
         const { text, applied } = applyErrata(d.s[s - 1], errata[id]);
         for (const f of applied) fixes.push({ id, label: `${label}, הלכה ${gem(s)}`, ...f });
-        blocks.push({ type: 'p', id, num: gem(s), text, src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}) });
+        blocks.push({ type: 'p', id, num: gem(s), text, say: d.say?.[s - 1], src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}) });
       }
       blocks.push({ type: 'notes', kind: 'rambam', title: 'ביאור קצר (קישור)', link: [`ביאור הרב שטיינזלץ ל${label} – בספריא`, steinsaltzUrl(it.name, meta.depth === 2 ? c : 0)],
         attr: { text: 'הביאור של הרב עדין אבן־ישראל שטיינזלץ (הוצאת קורן) מוגן בזכויות יוצרים (״Copyright: Steinsaltz Center״ בספריא), ולכן אינו מוצג כאן – רק קישור אליו. הקישור נפתח באתר ספריא.' } });
