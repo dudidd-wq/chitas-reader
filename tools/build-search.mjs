@@ -11,7 +11,7 @@ const { indexText } = await import(SITE + 'js/search.js');
 const { siddurOrder, buildSiddurDoc } = await import(SITE + 'js/texts.js');
 const { BOOK_HE } = await import(SITE + 'js/calendar.js');
 
-export const INPUT_DIRS = ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'siddur'];
+export const INPUT_DIRS = ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'hayomyom', 'siddur'];
 /** hash of the text data the index is built from (tests/search.test.mjs checks the index is not stale) */
 export function sourceHash() {
   const h = crypto.createHash('sha256');
@@ -54,6 +54,7 @@ async function main() {
   await add('mitzvot', 'mitzvot', 'ספר המצוות', T.mitzvot.leaves);
   const toltBooks = T.tolt.root.kids;
   for (const [i, g] of toltBooks.entries()) await add(`tolt-${i + 1}`, 'tolt', `תורה אור ולקוטי תורה – ${g.he}`, g.kids.flatMap(w => w.kids));
+  await add('hayomyom', 'hayomyom', 'היום יום', T.hayomyom.leaves);
   await add('rav', 'rav', 'שולחן ערוך אדמו״ר הזקן', T.rav.leaves);
   await add('siddur', 'siddur', 'סידור', (await siddurOrder()).map(s => ({ siddur: true, book: s.book, n: s.n, label: `${s.bookHe} – ${s.he}` })));
   const meta = { v: 1, source: sourceHash(), bytes: shards.reduce((a, s) => a + s.bytes, 0), segs: shards.reduce((a, s) => a + s.segs, 0), shards };

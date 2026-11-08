@@ -68,10 +68,10 @@ test('Rav Yomi: opt-in, reader, honest notes, outside the luach year, About', { 
   try {
     const p = await pageWith(b, srv.url);
     await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
-    assert.equal(await p.$$eval('.card', x => x.length), 5);
+    assert.equal(await p.$$eval('.card', x => x.length), 6);
     await p.goto(srv.url + '#/settings'); await p.waitForSelector('[name="lessonRavYomi"]'); await p.check('[name="lessonRavYomi"]');
     await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
-    assert.equal(await p.$$eval('.card', x => x.length), 6);
+    assert.equal(await p.$$eval('.card', x => x.length), 7);
     await p.waitForFunction(() => /סימן רסג סעיף כה – סימן רסד סעיף ב/.test(document.body.textContent));
     for (const theme of ['paper', 'night']) for (const [iso, re] of [
       ['2026-11-02', /סימן רסג.*כה.*סימן רסד.*חלוקת השיעורים: לוח ״רב יומי״/s],

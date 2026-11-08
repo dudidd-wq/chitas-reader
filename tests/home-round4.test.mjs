@@ -12,7 +12,7 @@ test('first visit: equal choices, no lessons until one is chosen', { skip }, asy
     assert.equal(await p.$$eval('#locq .btn.primary', x => x.length), 0, 'nothing pre-selected');
     assert.equal(await p.$$eval('.card', x => x.length), 0, 'no lessons listed before choosing');
     await p.click('#locq [data-il="false"]'); await p.waitForSelector('.card');
-    assert.equal(await p.$$eval('.card', x => x.length), 5);
+    assert.equal(await p.$$eval('.card', x => x.length), 6);
     assert.match(await p.textContent('#loc'), /חוץ לארץ/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }

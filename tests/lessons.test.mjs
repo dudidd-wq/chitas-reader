@@ -58,7 +58,7 @@ test('lessons are opt-in; reader: Hebrew labels, honest notes, credits, axe in 4
     await p0.goto(srv.url + '#/settings'); await p0.waitForSelector('[name="lessonMitzvot"]');
     await p0.check('[name="lessonMitzvot"]');
     await p0.goto(srv.url + '#/d/2026-11-02'); await p0.waitForSelector('.card');
-    assert.equal(await p0.$$eval('.card', x => x.length), 6);
+    assert.equal(await p0.$$eval('.card', x => x.length), 7);
     await p0.waitForFunction(() => /מצות עשה רמה/.test(document.body.textContent));
     assert.deepEqual(p0.errors, []);
     for (const theme of ['paper', 'sepia', 'dark', 'night']) for (const [unit, iso, re] of [
@@ -126,12 +126,12 @@ test('Torah Or / Likkutei Torah: opt-in, honest About, no bundled luach or other
   try {
     const p = await pageWith(b, srv.url, { prefs: { lessonChassidus: true } }); // an old stored pref is ignored
     await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
-    assert.equal(await p.$$eval('.card', x => x.length), 5);
+    assert.equal(await p.$$eval('.card', x => x.length), 6);
     assert.doesNotMatch(await p.textContent('main'), /תורה אור/);
     await p.goto(srv.url + '#/settings'); await p.waitForSelector('[name="lessonTolt"]');
     await p.check('[name="lessonTolt"]');
     await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
-    assert.equal(await p.$$eval('.card', x => x.length), 6);
+    assert.equal(await p.$$eval('.card', x => x.length), 7);
     await p.waitForFunction(() => /מדלג על ההרים/.test(document.body.textContent));
     await p.goto(srv.url + '#/about'); await p.waitForSelector('#tolt-about');
     assert.match(await p.textContent('#tolt-about'), /המורה שיעור.*לפי שבוע הפרשה.*מחוברות.*בלי ניקוד.*עבר לתוכנית שנתית מחושבת/s);

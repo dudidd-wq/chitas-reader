@@ -1,5 +1,5 @@
 // Loads prebuilt static JSON (site/data) and assembles a day's portion into a document of blocks.
-import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe } from './calendar.js';
+import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe, toHDate, HDate } from './calendar.js';
 import { localizeRuns } from './siddur-lang.js';
 
 const cache = new Map();
@@ -25,6 +25,7 @@ export const UNITS = {
   mitzvot: { he: 'ספר המצוות', full: 'ספר המצוות היומי' },
   tolt: { he: 'תורה אור ולקוטי תורה', full: 'תורה אור ולקוטי תורה – שיעור יומי' },
   ravyomi: { he: 'שולחן ערוך אדמו״ר הזקן', full: 'שולחן ערוך אדמו״ר הזקן – רב יומי' },
+  hayomyom: { he: 'היום יום', full: 'היום יום – לוח הרבי' },
   siddur: { he: 'סידור', full: 'סידור – נוסח חב״ד' }, // not a daily lesson: opened from #/siddur, never listed in the day's cards
 };
 const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
@@ -41,6 +42,7 @@ export async function filesFor(plan, unit) {
   }
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
   if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`, `notes/tolt/${slug}.json`)); }
+  if (unit === 'hayomyom') f.push('hayomyom/days.json');
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   return [...new Set(f)];
 }
@@ -284,7 +286,33 @@ export async function ravSimanDoc(n) {
   blocks.push({ type: 'note', text: 'הטקסט: שולחן ערוך הרב, אורח חיים, המהדורה המנוקדת של הוצאת קה״ת, דרך ספריא (CC BY-NC). הערות השוליים וקונטרס אחרון אינם מוצגים.' });
   return { title: UNITS.ravyomi.he, subtitle: `סימן ${gem(n)}`, blocks, raw: true };
 }
+// ---------------- Hayom Yom (1.0.75; ChabadText typed text, © Kehot – see tools/build-hayomyom.py) ----------------
+// The 5703 luach is a leap year: Adar I / Adar II have their own entries. In an ordinary year Adar reads the Adar II
+// entries (chabad.org / luach.day practice). 5703 had 29-day Cheshvan and Kislev: on 30 Cheshvan / 30 Kislev the
+// entry of the 29th is shown again, with a note.
+export const HAYOM_MONTHS = [['tishrei', 'תשרי', 30], ['cheshvan', 'חשון', 29], ['kislev', 'כסלו', 29], ['tevet', 'טבת', 29], ['shvat', 'שבט', 30],
+  ['adar1', 'אדר א׳', 30], ['adar2', 'אדר ב׳', 29], ['nisan', 'ניסן', 30], ['iyyar', 'אייר', 29], ['sivan', 'סיון', 30], ['tamuz', 'תמוז', 29], ['av', 'מנחם אב', 30], ['elul', 'אלול', 29]];
+const HM = { 7: 'tishrei', 8: 'cheshvan', 9: 'kislev', 10: 'tevet', 11: 'shvat', 1: 'nisan', 2: 'iyyar', 3: 'sivan', 4: 'tamuz', 5: 'av', 6: 'elul' };
+/** Hebrew date (iso or HDate) → { key, repeat } in days.json */
+export function hayomKey(date) {
+  const hd = toHDate(date), m = hd.getMonth(), d = hd.getDate(), leap = HDate.isLeapYear(hd.getFullYear());
+  const mk = m === 12 ? (leap ? 'adar1' : 'adar2') : m === 13 ? 'adar2' : HM[m];
+  const max = HAYOM_MONTHS.find(x => x[0] === mk)[2];
+  return { key: `${mk}-${Math.min(d, max)}`, repeat: d > max };
+}
+const HAYOM_CREDIT = 'היום יום — © קה״ת, בהיתר הכללי של קה״ת לאתרים ואפליקציות ללימוד ללא תשלום; הקלדה: חב״דפדיה-טקסט (GFDL 1.3).';
+async function hayomDoc(plan) {
+  const D = await data('hayomyom/days.json');
+  const { key, repeat } = plan.hayom ? { key: plan.hayom, repeat: false } : hayomKey(plan.iso);
+  const e = D[key], blocks = [];
+  if (repeat) blocks.push({ type: 'note', text: 'בשנת תש״ג, שלפיה נערך הלוח, היה בחודש זה 29 יום, ולכן אין בלוח רשומה ליום ל׳. מוצגת הרשומה של כ״ט.' });
+  blocks.push({ type: 'h', text: e.ref });
+  e.p.forEach(([t, it], i) => blocks.push({ type: 'p', id: `${key}.${i + 1}`, text: it ? `<i>${t}</i>` : t, src: 'hayomyom' }));
+  blocks.push({ type: 'note', text: HAYOM_CREDIT + ' ', href: 'https://text.chabadpedia.com/index.php/' + encodeURIComponent('היום יום ' + e.ref), hrefText: 'המקור' });
+  return { title: UNITS.hayomyom.full, subtitle: e.ref, blocks, raw: true };
+}
 export function buildDoc(plan, unit) {
+  if (unit === 'hayomyom') return hayomDoc(plan);
   if (unit === 'chumash') return chumashDoc(plan);
   if (unit === 'tehillim') return tehillimDoc(plan);
   if (unit === 'tanya') return tanyaDoc(plan);
@@ -301,6 +329,7 @@ export async function describe(plan, unit) {
   if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');
   if (unit === 'tolt') return (await toltLessons(plan)).map(({ e }) => toltLabel(e)).join(' · ');
   if (unit === 'ravyomi') { const { d } = await ravLesson(plan); return d ? ravLabel(d) : 'אין שיעור בלוח לתאריך זה'; }
+  if (unit === 'hayomyom') { const D = await data('hayomyom/days.json'); return D[hayomKey(plan.iso).key].ref; }
   return rambamTitle(plan[unit]);
 }
 

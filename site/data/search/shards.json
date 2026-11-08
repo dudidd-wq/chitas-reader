@@ -1,8 +1,8 @@
 {
  "v": 1,
- "source": "da741d703379fe0c",
- "bytes": 12929049,
- "segs": 47006,
+ "source": "ebf500db0559be9e",
+ "bytes": 13117848,
+ "segs": 47666,
  "shards": [
   {
    "id": "torah-Genesis",
@@ -199,6 +199,13 @@
    "he": "תורה אור ולקוטי תורה – חומש דברים",
    "bytes": 1252820,
    "segs": 1569
+  },
+  {
+   "id": "hayomyom",
+   "fam": "hayomyom",
+   "he": "היום יום",
+   "bytes": 188799,
+   "segs": 660
   },
   {
    "id": "rav",

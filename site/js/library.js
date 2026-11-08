@@ -4,7 +4,7 @@
 // the daily reader (and to the search index, tools/build-search.mjs, which uses this module too).
 // Pure module (no DOM): also imported by Node (tools/build-search.mjs, tests).
 import { gem, BOOK_HE, TANYA_ORDER, TOLT_SLUGS, mitzvotLabel, tehillim as tehillimOfDay, HDate } from './calendar.js';
-import { data, buildDoc, ravSimanDoc, toltLabel, UNITS } from './texts.js';
+import { data, buildDoc, ravSimanDoc, toltLabel, UNITS, HAYOM_MONTHS } from './texts.js';
 
 export const FAMILIES = [
   { id: 'torah', he: 'חומש', desc: 'חמשת חומשי תורה עם פירוש רש״י, לפי פרקים', unit: 'chumash' },
@@ -13,6 +13,7 @@ export const FAMILIES = [
   { id: 'rambam', he: 'רמב״ם – משנה תורה', desc: 'ארבעה עשר הספרים, לפי הלכות ופרקים', unit: 'rambam3' },
   { id: 'mitzvot', he: 'ספר המצוות', desc: 'הקדמה, שורשים, מצוות עשה ולא תעשה', unit: 'mitzvot' },
   { id: 'tolt', he: 'תורה אור ולקוטי תורה', desc: 'לפי פרשות השבוע ושיעורי היום של לוח ״מורה שיעור״', unit: 'tolt' },
+  { id: 'hayomyom', he: 'היום יום', desc: 'לוח הרבי – רשומה לכל יום בשנה (לפי לוח תש״ג)', unit: 'hayomyom' },
   { id: 'rav', he: 'שולחן ערוך אדמו״ר הזקן', desc: 'אורח חיים – הסימנים שבלוח ״רב יומי״', unit: 'ravyomi' },
   { id: 'siddur', he: 'סידור', desc: 'נוסח האריז״ל כמנהג חב״ד – תוכן הסידור והחיפוש בו', href: '#/siddur' },
 ];
@@ -74,6 +75,10 @@ async function build(fam) {
       return { id: `tolt/${slug}`, he, kids: w.days.map((e, i) => leaf(`tolt/${slug}/${i + 1}`, `יום ${DAYS[i]} – ${toltLabel(e)}`, `${he}, יום ${DAYS[i]}`, 'tolt', { tolt: { parts: [[slug, i + 1]] } })) }; };
     return { kids: TOLT_BOOKS.map(([he, a, b]) => ({ group: true, he: `חומש ${he}`, kids: TOLT_SLUGS.slice(a, b + 1).filter(s => S.weeks[s]).map(week) })) };
   }
+  if (fam === 'hayomyom') {
+    const D = await data('hayomyom/days.json');
+    return { kids: HAYOM_MONTHS.map(([mk, he, n]) => ({ id: `hayomyom/${mk}`, he, kids: Array.from({ length: n }, (_, i) => `${mk}-${i + 1}`).filter(k => D[k]).map(k => leaf(`hayomyom/${k}`, D[k].ref, `היום יום ${D[k].ref}`, 'hayomyom', { hayom: k })) })) };
+  }
   if (fam === 'rav') {
     const S = await data('ravyomi/schedule.json');
     return { kids: S.simanim.map(n => leaf(`rav/${n}`, `סימן ${gem(n)}`, `שולחן ערוך הרב, אורח חיים סימן ${gem(n)}`, 'ravyomi', null, 'rav', { siman: n })) };
@@ -129,6 +134,7 @@ export async function libFiles(path) {
     if (l.unit === 'mitzvot') { const it = p.mitzvot.items[0]; f.add(it.k === 'intro' ? 'mitzvot/intro.json' : `mitzvot/${it.k}/${it.n || it.from}.json`); }
     if (l.unit === 'tolt') { const [s] = p.tolt.parts[0]; f.add('tolt/schedule.json'); f.add(`tolt/w/${s}.json`); f.add(`notes/tolt/${s}.json`); }
     if (l.siman) f.add(`ravyomi/s/${l.siman}.json`);
+    if (l.unit === 'hayomyom') f.add('hayomyom/days.json');
   }
   return [...f];
 }
