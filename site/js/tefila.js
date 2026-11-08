@@ -122,7 +122,7 @@ export function insertionLines(ins, il) {
 /**
  * 1.0.72: is Tachanun omitted on Hebrew date hd (Chabad custom, Siddur Tehillat Hashem / Sefer HaMinhagim)?
  * Shabbat, Yom Tov, Chol haMoed, Rosh Chodesh, all of Nisan, Pesach Sheni (14 Iyar), Lag baOmer (18 Iyar),
- * 1–12 Sivan, Tisha b'Av, 15 Av, Erev Rosh haShanah, 9 Tishrei – end of Tishrei, 10 and 19 Kislev, Chanukah,
+ * 1–12 Sivan, Tisha b'Av, 15 Av, Erev Rosh haShanah, 9 Tishrei – end of Tishrei, 10, 19 and 20 Kislev, Chanukah,
  * 15 Shevat, 14–15 Adar I (Purim Katan) and 14–15 Adar (Purim, Shushan Purim), 12–13 Tammuz.
  */
 export function noTachanun(hd, il = true) {
@@ -139,7 +139,7 @@ export function noTachanun(hd, il = true) {
     [months.AV]: () => d === 9 || d === 15 || (d === 10 && hd.getDay() === 0), // 10 Av: deferred fast
     [months.ELUL]: () => d === 29,
     [months.TISHREI]: () => d >= 9,
-    [months.KISLEV]: () => d === 10 || d === 19,
+    [months.KISLEV]: () => d === 10 || d === 19 || d === 20,
     [months.SHVAT]: () => d === 15,
   };
   if (L[m] && L[m]()) return true;
@@ -150,4 +150,22 @@ export function noTachanun(hd, il = true) {
 export function siddurDay(now, sunset) {
   const hd = new HDate(now);
   return sunset && now >= sunset ? hd.next() : hd;
+}
+
+/** 1.0.74: Shabbat or Yom Tov (incl. Rosh haShanah and Yom Kippur; not Chol haMoed). */
+export function shabbatOrYomTov(hd, il = true) {
+  return hd.getDay() === 6 || has(hd, il, flags.CHAG) || hol(hd, il).some(e => /Yom Kippur$/.test(e.getDesc()));
+}
+/** Days whose no-Tachanun does NOT reach back to the preceding Minchah (chabad.org aid 4153543): Erev RH (29 Elul),
+ *  Erev YK (9 Tishrei), Pesach Sheni (14 Iyar). */
+const noMinchaBefore = hd => { const m = hd.getMonth(), d = hd.getDate(); return (m === months.ELUL && d === 29) || (m === months.TISHREI && d === 9) || (m === months.IYYAR && d === 14); };
+/**
+ * 1.0.74: is Tachanun omitted at the moment `now`? After sunset → the next Hebrew date; after midday (Minchah time)
+ * → also when the next date is a no-Tachanun day whose omission starts with the preceding Minchah.
+ */
+export function noTachanunAt(now, { sunset = null, chatzot = null, il = true } = {}) {
+  const day = siddurDay(now, sunset);
+  if (noTachanun(day, il)) return true;
+  if (chatzot && now >= chatzot && !(sunset && now >= sunset)) { const nx = day.next(); return noTachanun(nx, il) && !noMinchaBefore(nx); }
+  return false;
 }

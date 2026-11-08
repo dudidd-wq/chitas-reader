@@ -555,8 +555,21 @@ export function omitPrayerFlags(rows, { book, n: secN } = {}) {
     label[idxs[0]] = lab;
     isEnd[idxs[idxs.length - 1]] = true;
   }
+  // 1.0.74: whole passages whose instruction is a section heading, not an "omit the following" note
+  for (const [a, z, lab] of SIDDUR_EXTRA_OMIT[`${book}/${secN}`] || []) {
+    if (z >= n) continue;
+    for (let k = a; k <= z; k++) { isStart[k] = false; isEnd[k] = false; label[k] = null; if (rows[k][0] === 'p') omit[k] = true; }
+    isStart[a] = true; label[a] = lab; isEnd[z] = true;
+  }
   return { omit, isStart, isEnd, label };
 }
+/** 1.0.74 audit: [first, last, label] row spans. Tachanun itself (Vidui → ואנחנו לא נדע) at Shacharit and Mincha,
+ *  and Tikkun Rachel ("only said on days in which Tachanun is said", chatzot/1#10). */
+export const SIDDUR_EXTRA_OMIT = {
+  'shacharit/4': [[2, 45, 'בימים שאין אומרים תחנון']],
+  'mincha/3': [[2, 18, 'בימים שאין אומרים תחנון']],
+  'chatzot/1': [[15, 31, 'בימים שאין אומרים תחנון']],
+};
 
 /** Mark the last paragraph of each contiguous special run longer than one paragraph. */
 export function specialBlockEnds(specialFlags) {
@@ -603,6 +616,7 @@ export function dupTitleDrops(rows, book, n) {
   }
   return out;
 }
+export const SHABBAT_LABELS = ['בשבת ויו״ט אין אומרים'];
 export const TACHANUN_LABELS = ['בימים שאין אומרים תחנון', 'רק בימי שני וחמישי (כשיש תחנון)'];
 const TIMES_HE = { 2: 'פעמיים', 3: 'שלוש פעמים' };
 /** row index → repeat count for one section (paragraph rows only). */
@@ -614,7 +628,7 @@ export function repeatCounts(book, n) {
 
 /** lang: language of the instructions – 'he' (default; the translation in the data), 'en' (the transcription's own
  *  English) or 'both' (Hebrew, then the English). A block without a translation falls back to the English. */
-export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = false } = {}) {
+export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = false, hideShabbat = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b || !b.secs[n - 1]) throw new Error('siddur section not found');
   const sec = await data(`siddur/${book}/${n}.json`);
@@ -624,10 +638,10 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
   const dupT = SIDDUR_DUP_TITLES[`${book}/${n}`] || {}, drops = dupTitleDrops(sec.b, book, n);
   // 1.0.72: hide no-Tachanun spans (incl. notes inside them) when today is a no-Tachanun day and the setting is on
   const hid = new Set();
-  if (hideNoTachanun) {
+  if (hideNoTachanun || hideShabbat) {
     let open = false, lab = null;
     sec.b.forEach((_, i) => {
-      if (om.isStart[i]) { lab = om.label[i]; open = TACHANUN_LABELS.includes(lab); }
+      if (om.isStart[i]) { lab = om.label[i]; open = (hideNoTachanun && TACHANUN_LABELS.includes(lab)) || (hideShabbat && SHABBAT_LABELS.includes(lab)); }
       if (open && (om.omit[i] || sec.b[i][0] === 'n')) hid.add(i);
       if (om.isEnd[i]) open = false;
     });
@@ -664,10 +678,10 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
 }
 /** The whole prayer sequence of one book (e.g. Shacharit) as one continuous document: the sections follow one another
  *  with a light marker (type 'h', `sec`) instead of a break, so paging flows from one section into the next. */
-export async function buildSiddurBookDoc(book, { lang = 'he', hideNoTachanun = false } = {}) {
+export async function buildSiddurBookDoc(book, { lang = 'he', hideNoTachanun = false, hideShabbat = false } = {}) {
   const idx = await siddurIndex(), b = idx.books.find(x => x.id === book);
   if (!b) throw new Error('siddur book not found');
-  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang, hideNoTachanun })));
+  const parts = await Promise.all(b.secs.map((_, i) => buildSiddurDoc(book, i + 1, { lang, hideNoTachanun, hideShabbat })));
   const blocks = [], secs = [];
   parts.forEach((d, i) => {
     secs.push({ n: i + 1, he: d.title });
