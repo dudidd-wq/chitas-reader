@@ -15,3 +15,5 @@ App version **1.0.85**. DATA_VERSION remains **55357ccfc01e** (corpus unchanged)
 The older blanket no-PDF tests for copyrighted lesson calendars now allow exactly the official SBL EULA PDF path; the new test pins its exact official SHA-256. No lesson/source PDF prohibition was otherwise relaxed.
 
 Full `npm test`: **402 passed, 0 failed, 0 skipped** (including actual Chromium rendering and real SW-controlled offline SBL reload).
+
+CI portability: screenshots are local verification artifacts, not absolute-path writes in regression tests. The initial Pages job exposed a `/workspace` output-path assumption (401/402); those screenshot writes were removed. Hash navigation also explicitly waits for the new Chumash text, rather than accepting stale Siddur DOM; font/cache assertions and app assets are unchanged.
