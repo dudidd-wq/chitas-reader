@@ -121,7 +121,7 @@ test('Torah Or / Likkutei Torah: date -> luach day (both calendars, joined weeks
 test('Torah Or / Likkutei Torah: opt-in, honest About, no bundled luach or other sites\' texts', { skip }, async () => {
   assert.ok(!fs.existsSync(site + 'data/chassidus'));
   const src = json('sources.json').tolt; assert.equal(src.license, 'CC-BY-NC'); assert.equal(src.versionTitle, 'Kehot Publication Society');
-  for (const f of fs.readdirSync(site, { recursive: true })) assert.doesNotMatch(String(f), /\.pdf$|morah|torahor/i);
+  for (const f of fs.readdirSync(site, { recursive: true })) if (String(f) !== 'fonts/SBL_Font_End_User_License_Agreement.pdf') assert.doesNotMatch(String(f), /\.pdf$|morah|torahor/i);
   const srv = await serve(), b = await launch();
   try {
     const p = await pageWith(b, srv.url, { prefs: { lessonChassidus: true } }); // an old stored pref is ignored

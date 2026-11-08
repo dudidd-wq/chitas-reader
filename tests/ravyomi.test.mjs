@@ -59,7 +59,7 @@ test('Rav Yomi: vocalized Kehot text, licence, only allowed markup, nothing else
     all++; if (/[\u05B0-\u05BC]/.test(p)) voc++;
   }
   assert.ok(voc / all > 0.99, `${voc}/${all} vocalized`); // the rest are short printer's remarks in brackets
-  for (const f of fs.readdirSync(site, { recursive: true })) assert.doesNotMatch(String(f), /\.pdf$|rav-?yomi-luach/i);
+  for (const f of fs.readdirSync(site, { recursive: true })) if (String(f) !== 'fonts/SBL_Font_End_User_License_Agreement.pdf') assert.doesNotMatch(String(f), /\.pdf$|rav-?yomi-luach/i);
 });
 
 test('Rav Yomi: opt-in, reader, honest notes, outside the luach year, About', { skip }, async () => {

@@ -37,8 +37,20 @@ const ICON = {
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
+let sblFontCachePromise;
+function cacheSblFont() {
+  if (!('caches' in window)) return;
+  sblFontCachePromise ||= (async () => {
+    const c = await caches.open('optional-fonts-v1');
+    for (const path of ['fonts/SBL_Hbrw.ttf', 'fonts/SBL-LICENSE.txt']) {
+      const url = new URL(path, document.baseURI).href;
+      if (!await c.match(url)) { const r = await fetch(url); if (!r.ok) throw new Error('SBL download'); await c.put(url, r); }
+    }
+  })().catch(() => { sblFontCachePromise = null; });
+}
 function applyPrefs() {
   const r = document.documentElement;
+  if (prefs.font === 'sbl') cacheSblFont();
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
@@ -460,9 +472,9 @@ const check = (name, value, label) => `<label class="check"><input type="checkbo
 function displayForm() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
-  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${[['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז']].map(([v,l]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span></label>`).join('')}</div>
+  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${[['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew']].map(([v,l]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span></label>`).join('')}</div>
     ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
-    <small>בפרנק־רוהל ובעזרא הטעמים מוסתרים. נוטו וטעמי אשכנז כוללים ניקוד וטעמי מקרא.</small></fieldset>
+    <small>ב־SBL Hebrew ההדגשה וההטיה מלאכותיות (קיים משקל רגיל בלבד); לשימוש לא מסחרי. הגופן נטען בעת בחירה או תצוגה מקדימה. בפרנק־רוהל ובעזרא הטעמים מוסתרים. נוטו וטעמי אשכנז כוללים ניקוד וטעמי מקרא.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
   <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}
@@ -643,6 +655,7 @@ async function renderSources() {
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
   <h2>גופנים</h2><p>Noto Serif Hebrew (ברירת מחדל; כולל טעמי מקרא), Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>). בגופני פרנק ועזרא טעמי המקרא מוסתרים, כי בגופנים האלה אין גליפים לטעמים.</p>
   <p>טעמי אשכנז (Taamey Ashkenaz) מאת Yoram Gnat, ‏© 2012–2014, מ<a href="https://culmus.sourceforge.net/" target="_blank" rel="noopener">פרויקט Culmus</a>: הגופן המקורי ללא שינוי בצורות האותיות, במשקלים Medium ו־Bold, כולל ניקוד וטעמי מקרא. אריזה ל־WOFF2 בלבד. רישיון <a href="fonts/GPL-2.0.txt" dir="ltr">GPLv2</a> עם <a href="fonts/TaameyAshkenaz-LICENSE.txt">חריגת הטמעת גופן</a>. <a href="https://culmus.sourceforge.net/taamim/index.html" target="_blank" rel="noopener">המקור וקובצי הגופן</a>. סימני §, ¯, – , — ו־… מוצגים בנוטו כגופן גיבוי; האותיות, הניקוד והטעמים בטעמי אשכנז.</p>
+  <h3 id="sbl-font-src">SBL Hebrew</h3><p>עיצוב: John Hudson / Tiro Typeworks, עבור Society of Biblical Literature (SBL). קובץ TrueType מקורי ללא שינוי, ללא חיתוך או המרה. © John Hudson / Tiro Typeworks; SBL Hebrew הוא סימן מסחר של SBL. <a href="https://www.sbl-site.org/resources/fonts/" target="_blank" rel="noopener">מקור רשמי</a> · <a href="fonts/SBL_Font_End_User_License_Agreement.pdf" target="_blank" rel="noopener">רישיון SBL המקורי</a> · <a href="fonts/SBL-LICENSE.txt" target="_blank" rel="noopener">זכויות ורישיון הקובץ</a>. חינם לשימוש לא מסחרי בלבד, ואינו כלול ברישיון קוד האפליקציה. קיים משקל רגיל בלבד; ההדגשה וההטיה באפליקציה מלאכותיות. הגופן נשמר לשימוש ללא רשת לאחר בחירה בו.</p>
   <h2>קוד</h2><p>קוד האתר פתוח ברישיון GPL-2.0-or-later: <a href="https://github.com/dudidd-wq/chitas-reader" target="_blank" rel="noopener">github.com/dudidd-wq/chitas-reader</a>.</p>`;
   glossCounts().then(t => { const el = $('#gloss-counts'); if (el && t) el.textContent = t; });
   errataCounts().then(t => { const el = $('#rambam-errata-counts'); if (el && t) el.textContent = t; });

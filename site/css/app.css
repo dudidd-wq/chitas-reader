@@ -1,3 +1,5 @@
+/* SBL: original unmodified TTF, non-commercial SBL EULA; requested only when used by reading/preview. */
+@font-face { font-family: 'SBL Hebrew'; src: url(../fonts/SBL_Hbrw.ttf) format('truetype'); font-weight: 400; font-display: swap; }
 [hidden] { display: none !important; }
 /* Self-hosted fonts (SIL Open Font License – see fonts/licenses) */
 @font-face { font-family: 'Noto Serif Hebrew'; src: url(../fonts/NotoSerifHebrew.woff2) format('woff2'); font-weight: 400; font-display: swap; }
@@ -555,3 +557,6 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .r-content, .pt-verses { font-weight: var(--reading-weight, 400); }
 [data-reading-bold="true"] .r-content .seg.sid-special .t,
 [data-reading-bold="true"] .r-content .seg.sid-omit .t { font-weight: 700; font-synthesis: weight style; }
+
+[data-font="sbl"] { --text-font: 'SBL Hebrew', 'Noto Serif Hebrew', serif; }
+[data-font="sbl"] .r-content, [data-font="sbl"] .font-sample { font-synthesis: weight style; }

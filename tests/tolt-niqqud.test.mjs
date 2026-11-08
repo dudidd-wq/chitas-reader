@@ -65,7 +65,7 @@ test('attribution and permission wording: Sources data, README, LICENSE-DATA, TH
     if (f !== 'site/js/texts.js') assert.ok(s.includes(PERM), `${f}: permission wording`);
     assert.doesNotMatch(s, /רישיון בכתב שהתקבל|written licen[cs]e (was )?(granted|received)/i, f);
   }
-  for (const f of fs.readdirSync(new URL('../site/', import.meta.url), { recursive: true })) assert.doesNotMatch(String(f), /\.pdf$/i);
+  for (const f of fs.readdirSync(new URL('../site/', import.meta.url), { recursive: true })) if (String(f) !== 'fonts/SBL_Font_End_User_License_Agreement.pdf') assert.doesNotMatch(String(f), /\.pdf$/i);
 });
 
 test('reader: a Torah Or lesson is shown vocalised with the attribution and link', { skip }, async () => {

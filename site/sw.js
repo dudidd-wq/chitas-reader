@@ -4,7 +4,7 @@
 // (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
 // re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
 // remains an offline fallback, so an update while the network is poor never loses the 30-day save.
-const VERSION = '1.0.84';
+const VERSION = '1.0.85';
 const DATA_VERSION = '55357ccfc01e';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
@@ -58,6 +58,11 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
   if (url.href.split('?')[0] === MANIFEST) return;
+  // Original SBL font/license are optional, fetched on use and retained across shell updates.
+  if (/\/fonts\/(SBL_Hbrw\.ttf|SBL-LICENSE\.txt)$/.test(url.pathname)) {
+    e.respondWith(caches.open('optional-fonts-v1').then(async c => (await c.match(e.request)) || fetch(e.request).then(async r => { if (r.ok) await c.put(e.request, r.clone()); return r; })));
+    return;
+  }
   const isData = url.pathname.includes('/data/') && !/index\.json$|sources\.json$|glossary\.json$|rambam-errata\.json$/.test(url.pathname);
   if (isData) {
     // cache-first; offline, a text that only an older (not yet migrated) data cache holds is still served
