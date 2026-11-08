@@ -26,7 +26,7 @@ for f in sorted(os.listdir(RAW)):
         if not x: continue
         it = x.startswith('<i>') and x.rstrip().endswith('</i>')
         c = clean(x[3:-4] if it else x)
-        if c: P.append([c, it])
+        if c and re.search('[\u05d0-\u05ea]', re.sub('<[^>]+>', '', c)): P.append([c, it])
     assert P, t
     out[k] = {'ref': t, 'rev': d.get('revid'), 'p': P}
 os.makedirs(os.path.dirname(OUT), exist_ok=True)

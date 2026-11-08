@@ -307,7 +307,8 @@ async function hayomDoc(plan) {
   const e = D[key], blocks = [];
   if (repeat) blocks.push({ type: 'note', text: 'בשנת תש״ג, שלפיה נערך הלוח, היה בחודש זה 29 יום, ולכן אין בלוח רשומה ליום ל׳. מוצגת הרשומה של כ״ט.' });
   blocks.push({ type: 'h', text: e.ref });
-  e.p.forEach(([t, it], i) => blocks.push({ type: 'p', id: `${key}.${i + 1}`, text: it ? `<i>${t}</i>` : t, src: 'hayomyom' }));
+  // 1.0.76: `say` – Dicta-vocalized reading text for read-aloud; the display keeps the book's unvocalized text
+  e.p.forEach(([t, it, v], i) => blocks.push({ type: 'p', id: `${key}.${i + 1}`, text: it ? `<i>${t}</i>` : t, src: 'hayomyom', ...(v ? { say: v } : {}) }));
   blocks.push({ type: 'note', text: HAYOM_CREDIT + ' ', href: 'https://text.chabadpedia.com/index.php/' + encodeURIComponent('היום יום ' + e.ref), hrefText: 'המקור' });
   return { title: UNITS.hayomyom.full, subtitle: e.ref, blocks, raw: true };
 }
