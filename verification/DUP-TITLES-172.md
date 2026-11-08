@@ -57,3 +57,6 @@ Rule: a note right after a heading whose Hebrew only repeats the heading is drop
 
 # Hide no-Tachanun spans (1.0.72)
 Setting hideNoTachanun (off by default). Spans labelled 'בימים שאין אומרים תחנון' or 'רק בימי שני וחמישי' (and notes inside them) are removed from the document (so not read aloud) when the device's Hebrew date - next date after local sunset - is a Chabad no-Tachanun day (list in tefila.js noTachanun). A one-line placeholder note marks the gap.
+
+# 1.0.73
+Placeholder note removed. Setting is now tachanunMode: off (default) / date / always; old hideNoTachanun=true migrates to date. Hidden blocks are removed from the document, so read-aloud skips them in both modes.

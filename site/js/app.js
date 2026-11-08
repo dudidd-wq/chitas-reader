@@ -61,7 +61,8 @@ const shiftIso = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); ret
 const deviceTz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Jerusalem'; } catch { return 'Asia/Jerusalem'; } };
 // 1.0.72: hide the no-Tachanun spans only when the setting is on and the siddur's "today" is a no-Tachanun day
 function sidHideTach() {
-  if (!prefs.hideNoTachanun) return false;
+  if (prefs.tachanunMode === 'always') return true;
+  if (prefs.tachanunMode !== 'date') return false;
   try {
     const now = new Date(), pl = zmanPlace(), z = computeZmanim(todayIso(), pl, { candleMins: prefs.candleMins });
     return noTachanun(siddurDay(now, z.sunset instanceof Date ? z.sunset : null), prefs.il);
@@ -458,8 +459,8 @@ function displayForm() {
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
-    ${check('hideNoTachanun', prefs.hideNoTachanun, 'להסתיר קטעים שלא אומרים ביום שאין תחנון')}
-    <small>כשהאפשרות פעילה, ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים. בשאר הימים הם מוצגים כרגיל.</small>
+    </fieldset><fieldset><legend>קטעים שלא אומרים ביום שאין תחנון</legend>${radio('tachanunMode', prefs.tachanunMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
+    <small>״כבוי״ – הכול מוצג. ״לפי התאריך״ – ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים; בשאר הימים מוצגים כרגיל. ״תמיד״ – מוסתרים בכל יום.</small></fieldset><fieldset><legend>הנחיות</legend>
     <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
   ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
@@ -1489,7 +1490,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
-    if ((name === 'siddurLang' || name === 'hideNoTachanun') && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang, hideNoTachanun: sidHideTach() }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
+    if ((name === 'siddurLang' || name === 'tachanunMode') && R.sid) { const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, { lang: prefs.siddurLang, hideNoTachanun: sidHideTach() }); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();

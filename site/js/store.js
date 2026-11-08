@@ -8,7 +8,7 @@ export const DEFAULT_PREFS = {
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
-  divine: 'full', siddurLang: 'he', hideNoTachanun: false, // 1.0.72
+  divine: 'full', siddurLang: 'he', tachanunMode: 'off', // 1.0.73: 'off' | 'date' | 'always' (1.0.72 boolean hideNoTachanun true → 'date')
   // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
   tehillimProfiles: [], tehillimRebbe: false,
   studyNotes: true, // round 8: "מראי מקומות" / short-explanation link after the text (texts.js 'notes' blocks) // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only
@@ -20,6 +20,8 @@ function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
+    if ('hideNoTachanun' in prefs) { if (prefs.hideNoTachanun === true && !(d.prefs || {}).tachanunMode) prefs.tachanunMode = 'date'; delete prefs.hideNoTachanun; }
+    if (!['off', 'date', 'always'].includes(prefs.tachanunMode)) prefs.tachanunMode = 'off';
     // round 7: the old on/off switch for the English instructions became a language choice. Both old values move to
     // the new default (Hebrew): those who hid the English did so because it was English.
     delete prefs.siddurEn;

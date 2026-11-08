@@ -26,5 +26,5 @@ test('KSHM: confession hidden, Shabbat-only blocks kept, a placeholder note show
   assert.ok(has(off, /^אשמנו/) && !has(on, /^אשמנו/) && !has(on, /ואם חטאתי עויתי/));
   assert.ok(!has(on, /מכים קלות באגרוף/));
   assert.ok(has(on, /^רבונו של עולם הריני מוחל/) && has(on, /^אנא בכח/));
-  assert.equal(on.blocks.filter(b => b.hiddenNote).length, 1);
+  assert.ok(!has(on, /הושמטו/)); // 1.0.73: no placeholder note
 });

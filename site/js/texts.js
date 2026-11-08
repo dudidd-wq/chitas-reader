@@ -634,7 +634,6 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
   }
   sec.b.forEach(([t0, h, he], i) => {
     if (hid.has(i)) {
-      if (!hid.has(i - 1)) blocks.push({ type: 'note', id: `${book}-${n}-${i}h`, html: 'כאן הושמטו קטעים שאין אומרים היום (אין אומרים תחנון) – לפי ההגדרה', lang: 'he', hiddenNote: true });
       return;
     }
     let t = t0;
