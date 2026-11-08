@@ -690,7 +690,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
       if (lang !== 'en' && he) blocks.push({ type: 'note', id, html: inlineOnly(he).replace(/<\/?i>/g, '') + rn, lang: 'he' });
       if (lang !== 'he' || !he) blocks.push({ type: 'note', id: lang === 'both' && he ? id + 'e' : id, html: inlineOnly(h), lang: 'en' });
     }
-    else if (t === 't') blocks.push(siddurTable(id, h, he, runs, lang));
+    else if (t === 't') blocks.push({ ...siddurTable(id, h, he, runs, lang), say: sec.say?.[i] });
     else {
       const extra = {};
       if (special[i]) { extra.special = true; if (specialEnd[i]) extra.specialEnd = true; }
@@ -700,8 +700,8 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
         if (om.isEnd[i]) extra.omitEnd = true;
       }
       const text = localizeRuns(inlineOnly(h), runs, lang), cnt = reps.get(i) || 1;
-      blocks.push({ type: 'p', id, text, ...extra, ...(cnt > 1 ? { rep: 1, repOf: cnt } : {}) });
-      for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, rep: k, repOf: cnt });
+      blocks.push({ type: 'p', id, text, say: sec.say?.[i], ...extra, ...(cnt > 1 ? { rep: 1, repOf: cnt } : {}) });
+      for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, say: sec.say?.[i], rep: k, repOf: cnt });
     }
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };

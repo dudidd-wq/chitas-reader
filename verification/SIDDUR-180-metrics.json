@@ -1,0 +1,17 @@
+{
+  "files": 73,
+  "batches": 93,
+  "uniquePrayers": 1150,
+  "blocks": 1994,
+  "words": 37681,
+  "curated": 526,
+  "exceptions": 1662,
+  "dicta": 21641,
+  "quoteWords": 9389,
+  "filledWords": 396,
+  "fallback": 4420,
+  "explicit": 26249,
+  "polysyllables": 29838,
+  "splits": 0,
+  "merges": 1
+}

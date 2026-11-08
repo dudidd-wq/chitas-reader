@@ -1,0 +1,148 @@
+{
+  "version": "1.0.80",
+  "dataVersion": "c79a1481c734",
+  "unchangedSourceSHA256": "f11cb7682c5dc614b9b6e12b404e332016d032d07181f11bcf0f9580f99efc28",
+  "examples": [
+    {
+      "block": "boker-1-1",
+      "before": {
+        "word": "שֶׁהֶחֱזַרְתָּ",
+        "ipa": "ʃeheχezaʁtˈa",
+        "k": 0,
+        "src": "default"
+      },
+      "after": {
+        "word": "שֶׁהֶחֱזַרְתָּ",
+        "ipa": "ʃeheχezˈaʁta",
+        "k": 1,
+        "src": "primary"
+      }
+    },
+    {
+      "block": "boker-1-5",
+      "before": {
+        "word": "יָדָים",
+        "ipa": "jadˈam",
+        "k": 0,
+        "src": "default"
+      },
+      "after": {
+        "word": "יָדַיִם",
+        "ipa": "jadˈajim",
+        "k": 1,
+        "src": "primary"
+      }
+    },
+    {
+      "block": "boker-1-62",
+      "before": {
+        "word": "לְידְעֶיךָ",
+        "ipa": "ledʔˈeχa",
+        "k": 1,
+        "src": "suf1"
+      },
+      "after": {
+        "word": "לְיֹדְעֶיךָ",
+        "ipa": "lejodʔˈeχa",
+        "k": 1,
+        "src": "primary"
+      }
+    },
+    {
+      "block": "boker-5-9",
+      "before": {
+        "word": "מִשגָּב",
+        "ipa": "miʃɡˈav",
+        "k": 0,
+        "src": "default"
+      },
+      "after": {
+        "word": "מִשְׂגָּב",
+        "ipa": "misɡˈav",
+        "k": 0,
+        "src": "primary"
+      }
+    },
+    {
+      "block": "boker-1-39",
+      "before": {
+        "word": "בְּפִינוּ",
+        "ipa": "befˈinu",
+        "k": 1,
+        "src": "suf1"
+      },
+      "after": {
+        "word": "בְּפִינוּ",
+        "ipa": "befˈinu",
+        "k": 1,
+        "src": "primary"
+      }
+    },
+    {
+      "block": "shema-1-2",
+      "before": {
+        "word": "אָבִינוּ",
+        "ipa": "ʔavˈinu",
+        "k": 1,
+        "src": "suf1"
+      },
+      "after": {
+        "word": "אָבִינוּ",
+        "ipa": "ʔavˈinu",
+        "k": 1,
+        "src": "primary"
+      }
+    }
+  ],
+  "measurement": "Actual local G2P IPA, not ASR guesses; before uses the original prayer source, after uses compiled say plus primary metadata. Last two are guards against observed Dicta Acc0 regressions, not baseline improvements.",
+  "reviewedRawDictaStress": {
+    "אבינו": {
+      "requestSHA256": "06e2f8e9a9a6ff43999465c4812a5899312ecca65408fec8a414d01f5505671d",
+      "word": "אבינו",
+      "confident": false,
+      "firstChoice": [
+        {
+          "w": "אָבִינוּ",
+          "acc": "Acc0",
+          "level": 1
+        }
+      ]
+    },
+    "רגלים": {
+      "requestSHA256": "1a67bb1ee9e9538147b8273fecb8936abd5425848add6f57df79846d859c2285",
+      "word": "רגלים",
+      "confident": true,
+      "firstChoice": [
+        {
+          "w": "רַגְלַיִם",
+          "acc": "Acc0",
+          "level": 1
+        }
+      ]
+    },
+    "בפינו": {
+      "requestSHA256": "654172d8b41786a7ac5254dcfcfbb21fa2404b66453b7e755d862a39f0e82927",
+      "word": "בפינו",
+      "confident": true,
+      "firstChoice": [
+        {
+          "w": "בְּ|פִינוּ",
+          "acc": "Acc0",
+          "level": 1
+        }
+      ]
+    }
+  },
+  "compiledProtectedForms": [
+    {
+      "word": "הָיְתָה",
+      "ipa": "hajtˈa",
+      "occurrences": 12
+    },
+    {
+      "word": "אֵינוֹ",
+      "ipa": "ʔejnˈo",
+      "occurrences": 6
+    }
+  ]
+}
