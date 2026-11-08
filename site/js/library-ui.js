@@ -93,7 +93,10 @@ export async function renderSearch(q, scope, ctx) {
     <p id="gs-st" role="status" aria-live="polite"></p><div id="gs-res"></div>
     <p class="note"><a href="#/lib">לספרייה</a> · <a href="#/sources">מקורות ורישיונות</a></p>`);
   const inp = $('#gs-q'), sc = $('#gs-scope');
+  let t;
   const go = () => {
+    clearTimeout(t); // submitting/changing scope supersedes a pending input debounce
+    if (!inp.isConnected) return; // a previous search form must never navigate after leaving it
     const v = inp.value.trim(), s = sc.value;
     const h = '#/search' + (v ? `?q=${encodeURIComponent(v)}${s ? '&in=' + s : ''}` : '');
     if (location.hash !== h) history.replaceState(history.state, '', h);
@@ -101,7 +104,7 @@ export async function renderSearch(q, scope, ctx) {
   };
   $('#gs-form').addEventListener('submit', e => { e.preventDefault(); go(); });
   sc.addEventListener('change', go);
-  let t; inp.addEventListener('input', () => { clearTimeout(t); t = setTimeout(go, 450); });
+  inp.addEventListener('input', () => { clearTimeout(t); t = setTimeout(go, 450); });
   if (q) run(q, scope, ctx); else inp.focus();
 }
 async function run(q, scope, { $, prefs }) {
