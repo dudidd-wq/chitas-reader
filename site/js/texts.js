@@ -123,7 +123,7 @@ async function tanyaDoc(plan) {
     const d = await data(`tanya/${k}/${c}.json`);
     const multi = index[k].depth === 2 && index[k].chapters.length > 1;
     blocks.push({ type: 'h', text: index[k].he + (multi ? ` – ${k === 'IK' ? 'אגרת' : 'פרק'} ${gem(c)}` : '') + (a > 1 ? ' (המשך)' : '') });
-    for (let s = a; s <= Math.min(b, d.s.length); s++) blocks.push({ type: 'p', id: `${k}.${c}.${s}`, text: d.s[s - 1], src: 'tanya' });
+    for (let s = a; s <= Math.min(b, d.s.length); s++) blocks.push({ type: 'p', id: `${k}.${c}.${s}`, text: d.s[s - 1], say: d.say?.[s - 1], src: 'tanya' });
     const N = NOTE_KEYS.includes(k) ? (await optional(`notes/tanya/${k}.json`))?.[c] : null;
     const groups = N ? Object.keys(N).map(Number).filter(s => s >= a && s <= Math.min(b, d.s.length)).sort((x, y) => x - y)
       .map(s => ({ target: `${k}.${c}.${s}`, label: firstWords(d.s[s - 1]), items: N[s].map(x => ({ w: x.w, t: x.t })) })) : [];
@@ -272,7 +272,7 @@ async function ravDoc(plan) {
     const sm = await data(`ravyomi/s/${n}.json`);
     const a = n === d.f[0] ? d.f[1] : 1, b = n === d.t[0] ? d.t[1] : sm.s.length;
     blocks.push({ type: 'h', text: `סימן ${gem(n)}${sm.title ? ' – ' + sm.title.replace(/[,:]?\s*וּ?בוֹ\s.*$/, '') : ''}` });
-    for (let se = a; se <= b; se++) sm.s[se - 1].forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${se}.${k + 1}`, text: k ? t : `<b>${gem(se)}</b> ${t}`, src: 'ravyomi' }));
+    for (let se = a; se <= b; se++) sm.s[se - 1].forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${se}.${k + 1}`, text: k ? t : `<b>${gem(se)}</b> ${t}`, say: sm.say?.[se - 1]?.[k], src: 'ravyomi' }));
   }
   if (word(d.t) && d.t[3] !== 1) blocks.push({ type: 'note', text: `לפי הלוח, השיעור מסתיים באמצע סעיף ${gem(d.t[1])}, במילים ״${d.t[2]}״. ההמשך נלמד מחר.` });
   blocks.push(credit);
@@ -282,7 +282,7 @@ async function ravDoc(plan) {
 export async function ravSimanDoc(n) {
   const sm = await data(`ravyomi/s/${n}.json`), blocks = [];
   blocks.push({ type: 'h', text: `סימן ${gem(n)}${sm.title ? ' – ' + sm.title.replace(/[,:]?\s*וּ?בוֹ\s.*$/, '') : ''}` });
-  sm.s.forEach((parts, i) => parts.forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${i + 1}.${k + 1}`, text: k ? t : `<b>${gem(i + 1)}</b> ${t}`, src: 'ravyomi' })));
+  sm.s.forEach((parts, i) => parts.forEach((t, k) => blocks.push({ type: 'p', id: `${n}.${i + 1}.${k + 1}`, text: k ? t : `<b>${gem(i + 1)}</b> ${t}`, say: sm.say?.[i]?.[k], src: 'ravyomi' })));
   blocks.push({ type: 'note', text: 'הטקסט: שולחן ערוך הרב, אורח חיים, המהדורה המנוקדת של הוצאת קה״ת, דרך ספריא (CC BY-NC). הערות השוליים וקונטרס אחרון אינם מוצגים.' });
   return { title: UNITS.ravyomi.he, subtitle: `סימן ${gem(n)}`, blocks, raw: true };
 }

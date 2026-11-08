@@ -1,0 +1,30 @@
+{
+  "batches": 499,
+  "files": 210,
+  "tanya": {
+    "paragraphs": 1623,
+    "words": 76217,
+    "curated": 563,
+    "exceptions": 2809,
+    "dicta": 63496,
+    "lexicon": 9,
+    "fallback": 6429,
+    "polysyllables": 55775,
+    "explicit": 50170,
+    "context": 3,
+    "splits": 544
+  },
+  "halacha": {
+    "paragraphs": 2363,
+    "words": 106595,
+    "curated": 2159,
+    "exceptions": 3615,
+    "dicta": 95769,
+    "lexicon": 0,
+    "fallback": 3824,
+    "polysyllables": 77711,
+    "explicit": 74734,
+    "context": 0,
+    "splits": 79
+  }
+}
