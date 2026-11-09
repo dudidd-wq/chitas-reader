@@ -522,6 +522,11 @@ const voiceNote = g => ({
   natural: `קול של דובר גבר אמיתי – מודל נפרד (<bdi dir="ltr">notmax123/piper-medium-heb</bdi>, רישיון <bdi dir="ltr">CC BY-NC 4.0</bdi>, לשימוש לא מסחרי בלבד). דורש הורדה חד־פעמית של כ־${mb(VOICE_FILES.natural.size)} MB (ועוד כ־${mb(VOICE_FILES.wasm.size + VOICE_FILES.ort.size)} MB של מנוע ההקראה, אם הקול האיכותי עוד לא הותקן), רק בלחיצה על הכפתור; אחר כך נשמר במכשיר ופועל בלי רשת.`,
   female: 'הקול המקורי של noa, בלי עיבוד.',
 })[g] || '';
+// 1.0.91: pronunciation tradition of the local voice (g2p.js HAVAROT; verification/HAVARA-CHABAD-191.md)
+const HAVARA_CHOICES = [['israeli', 'ישראלית (ברירת מחדל)'], ['chabad', 'אשכנזית־חב״דית']];
+const havaraNote = h => h === 'chabad'
+  ? 'קמץ – כמו חולם (״בּוֹרוּך״), חולם וצירה – ״אֵיי״ (תורה ← ״טֵיירוֹ״), ת׳ רפויה – ס (שבת ← ״שַׁבּוֹס״), א׳ וע׳ בלי עצירה, והטעמה מלעיל (בתורה ובתהילים – לפי הטעמים). פועל בקול האיכותי בלבד; הטקסט המוצג אינו משתנה.'
+  : 'ההגייה העברית הרגילה (ספרדית־ישראלית).';
 const voiceName = v => v === 'natural' ? 'הקול הגברי הטבעי' : v === 'int8' ? 'הקול הקל' : 'הקול הרגיל';
 // 1.0.59: the local "quality voice". Nothing is downloaded until the reader presses #qv-dl.
 function qvForm() {
@@ -532,6 +537,10 @@ function qvForm() {
     ${radio('ttsGender', prefs.ttsGender, VOICE_CHOICES)}
     <small id="qv-gender-note">${voiceNote(prefs.ttsGender)}</small>
     <p class="row" id="qv-prev-row"><span>שמע דוגמה:</span> ${VOICE_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="${v}" aria-label="שמע דוגמה – ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
+    <p class="qv-sub" id="qv-havara-label">הגייה:</p>
+    ${radio('ttsHavara', prefs.ttsHavara, HAVARA_CHOICES)}
+    <small id="qv-havara-note">${havaraNote(prefs.ttsHavara)}</small>
+    <p class="row" id="qv-havara-prev"><span>שמע דוגמה:</span> ${HAVARA_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="havara-${v}" aria-label="שמע דוגמה – הגייה ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
     <div id="qv-model"${prefs.ttsGender === 'natural' ? ' hidden' : ''}>${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}</div>
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
@@ -557,6 +566,10 @@ async function bindQv(root) {
   }; });
   root.addEventListener('input', async e => {
     if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh();
+    if (e.target.name === 'ttsHavara') {
+      const note = root.querySelector('#qv-havara-note'); if (note) note.textContent = havaraNote(e.target.value);
+      if (R.speaker instanceof PiperSpeaker) R.speaker.setHavara(e.target.value);
+    }
     if (e.target.name === 'ttsGender') {
       const g = e.target.value, note = root.querySelector('#qv-gender-note'), mdl = root.querySelector('#qv-model');
       if (note) note.innerHTML = voiceNote(g);   // fixed strings of this file only
@@ -1689,7 +1702,7 @@ async function ttsToggle() {
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: R.lib ? 'ספרייה' : dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);

@@ -16,11 +16,11 @@ export async function createVoice(ort, { wasm, model, config, stress }) {
     sampleRate,
     /** text: one prepared chunk (tts-prep output); opt.accents: the raw accented verse (or a Map from accentStressMap), or {primary: markedPreparedChunk};
      *  opt.rate: speed (1 = normal); opt.timbre: null (the model's own female voice) or {semitones, formant} for the
-     *  male timbre (voice-pitch.js). With formant < 1 the model speaks 1/formant faster, so the tempo stays the same.
+     *  male timbre (voice-pitch.js); opt.havara (1.0.91): 'israeli' (default) | 'chabad' – g2p.js HAVAROT. With formant < 1 the model speaks 1/formant faster, so the tempo stays the same.
      *  Returns {audio: Float32Array, ipa, ids}. */
     async synth(text, opt = {}) {
       const accents = opt.accents instanceof Map || opt.accents?.primary ? opt.accents : opt.accents ? accentStressMap(opt.accents) : null;
-      const ipa = opt.ipa || textToIPA(text, { data: stress, accents, noShvaNa: opt.noShvaNa });
+      const ipa = opt.ipa || textToIPA(text, { data: stress, accents, noShvaNa: opt.noShvaNa, havara: opt.havara });
       const ids = ipaToIds(ipa, idMap, pad);
       if (ids.length <= 3) return { audio: new Float32Array(0), ipa, ids };
       const tim = opt.timbre && (opt.timbre.semitones || (opt.timbre.formant && opt.timbre.formant !== 1)) ? opt.timbre : null;

@@ -30,6 +30,16 @@ const NIKUD_PHONEMES = {
   '\u05B4': 'i', '\u05B1': 'e', '\u05B5': 'e', '\u05B6': 'e', '\u05B2': 'a', '\u05B7': 'a', '\u05C7': 'o', '\u05B9': 'o',
   '\u05BA': 'o', '\u05BB': 'u', '\u05B3': 'o', '\u05B8': 'a', [HATAMA]: STRESS, [VSHVA]: 'e',
 };
+// 1.0.91: pronunciation traditions (havara) of the speech layer. 'israeli' = the original tables (unchanged output);
+// 'chabad' = Ashkenazi as used in Chabad (Lithuanian / White-Russian base): qamatz o, holam ey, tsere ey, tav rafe s, silent
+// alef/ayin, penultimate stress outside cantillated / liturgical text. Sources and every choice: verification/HAVARA-CHABAD-191.md.
+// The output is plain IPA in the same inventory, so any IPA consumer (Piper voices, a future pre-generated pipeline) can use it.
+export const HAVAROT = {
+  israeli: { id: 'israeli', qamatz: 'a', holam: 'o', tsere: 'e', tavRafe: 't', glottal: 'ʔ', milel: false },
+  chabad: { id: 'chabad', qamatz: 'o', holam: 'ej', tsere: 'ej', tavRafe: 's', glottal: '', milel: true },
+};
+let D = HAVAROT.israeli;   // the tradition of the word being converted (set by wordToIPA; all functions here are synchronous)
+const havaraOf = h => (typeof h === 'string' ? HAVAROT[h] : h) || HAVAROT.israeli;
 const LETTERS = {
   'א': 'ʔ', 'ב': 'v', 'ג': 'g', 'ד': 'd', 'ה': 'h', 'ו': 'v', 'ז': 'z', 'ח': 'x', 'ט': 't', 'י': 'j', 'ך': 'x', 'כ': 'x',
   'ל': 'l', 'ם': 'm', 'מ': 'm', 'ן': 'n', 'נ': 'n', 'ס': 's', 'ע': 'ʔ', 'פ': 'f', 'ף': 'f', 'ץ': 'ts', 'צ': 'ts', 'ק': 'k',
@@ -245,7 +255,8 @@ const n2 = L => L.length;
 
 // ---------------- Phonikud letter rules (port) ----------------
 const clean = out => out.filter(p => p && [...p].every(c => PHONEME_CHARS.has(c)));
-const vowelsOf = cur => [...cur.all].map(n => NIKUD_PHONEMES[n] || '');
+const vowelOf = n => n === QAMATZ ? D.qamatz : n === HOLAM || n === HOLAM_HASER ? D.holam : n === TSERE ? D.tsere : NIKUD_PHONEMES[n] || '';
+const vowelsOf = cur => [...cur.all].map(vowelOf);
 const stressOf = cur => (cur.all.includes(HATAMA) ? [STRESS] : []);
 function sortStress(syl) {
   const text = syl.join('');
@@ -256,10 +267,12 @@ function sortStress(syl) {
 }
 const out = (cur, con, vow = null, skip = 0) => [clean(sortStress([...(con ? [con] : []), ...(vow ?? vowelsOf(cur))])), skip];
 function vavVowel(d) {
-  if (/[\u05B7\u05B8]/.test(d)) return 'va';
-  if (d.includes(TSERE) || d.includes(SEGOL) || d.includes(VSHVA)) return 've';
-  if (d.includes(HOLAM_HASER)) return 'vo';                   // 1.0.87: וֺ (MAM) is always a consonant vav + holam: מִצְוֺת, עֲוֺן
-  if (d.includes(HOLAM)) return 'o';
+  if (d.includes(PATAH)) return 'va';
+  if (d.includes(QAMATZ)) return 'v' + D.qamatz;
+  if (d.includes(TSERE)) return 'v' + D.tsere;
+  if (d.includes(SEGOL) || d.includes(VSHVA)) return 've';
+  if (d.includes(HOLAM_HASER)) return 'v' + D.holam;          // 1.0.87: וֺ (MAM) is always a consonant vav + holam: מִצְוֺת, עֲוֺן
+  if (d.includes(HOLAM)) return D.holam;
   // 1.0.87: a dagesh in a vav that has its own vowel is a doubled consonant (צִוִּיתִי, קַוִּין, מְצֻוֻּ…), not a shuruq
   if (d.includes(DAGESH) && d.includes(HIRIQ)) return 'vi';
   if (d.includes(DAGESH) && d.includes(QUBUTS)) return 'vu';
@@ -269,14 +282,15 @@ function vavVowel(d) {
 }
 function vav(cur, prev, nxt, pp) {
   const d = cur.diac, s = stressOf(cur);
-  if (prev && prev.diac.includes(SHVA) && d.includes(HOLAM)) return out(cur, 'vo', s);
+  const vo = 'v' + D.holam;
+  if (prev && prev.diac.includes(SHVA) && d.includes(HOLAM)) return out(cur, vo, s);
   // 1.0.87: וֹ after a letter with its own vowel is a consonant + holam (עָוֹן, עֲוֹנוֹת, תַּאֲוֹת), not a holam male
-  if (prev && d.includes(HOLAM) && !d.includes(DAGESH) && hasFull(prev) && !has(prev, HOLAM)) return out(cur, 'vo', s);
+  if (prev && d.includes(HOLAM) && !d.includes(DAGESH) && hasFull(prev) && !has(prev, HOLAM)) return out(cur, vo, s);
   // 1.0.87: וְּ (dagesh forte + shva, מְצַוְּךָ, נִתְכַּוְּנוּ): a doubled v whose shva is vocal after a vowel
   if (prev && d.includes(DAGESH) && d.includes(SHVA) && !(nxt && nxt.ch === 'ו')) return out(cur, hasFull(prev) ? 've' : 'v', s);
   if (nxt && nxt.ch === 'ו') {
     const dd = d + nxt.diac;
-    if (dd.includes(HOLAM)) return out(cur, 'vo', s, 1);
+    if (dd.includes(HOLAM)) return out(cur, vo, s, 1);
     if (d === nxt.diac) return out(cur, 'vu', s, 1);
     // 1.0.87: וּו after a vowel (כַּוּונָה, written for כַּוָּנָה): the dagesh doubles a consonant vav, it is not a shuruq
     if (prev && hasFull(prev) && d === DAGESH && !nxt.diac) return out(cur, 'v', s);
@@ -290,13 +304,13 @@ function vav(cur, prev, nxt, pp) {
   // holam male / shuruq, never silent. Most such words get their exact form from SHIN_VAV_LEX; otherwise holam (the more common).
   // A bare א after a holam (חַטֹּאותָי, לִקְרֹאותָם, צֹאונֵנוּ) is quiescent: the holam was already said, the vav is silent.
   if (nxt && !d && prev && prev.ch !== 'ו' && !hasFull(prev) && !has(prev, SHVA) && /[\u05B0-\u05BB\u05C7]/.test(nxt.diac) && nxt.ch !== 'ו'
-    && !(prev.ch === 'א' && !prev.diac && pp && has(pp, HOLAM))) return out(cur, 'o', s);
+    && !(prev.ch === 'א' && !prev.diac && pp && has(pp, HOLAM))) return out(cur, D.holam, s);
   if (nxt && !d) return out(cur, '', s);
   return out(cur, 'v', s);
 }
 function shin(cur, prev, nxt) {
   if (cur.diac.includes(SIN)) {
-    if (nxt && nxt.ch === 'ש' && !nxt.diac && /[\u05B7\u05B8]/.test(cur.diac)) return out(cur, 'sa', stressOf(cur), 1);
+    if (nxt && nxt.ch === 'ש' && !nxt.diac && /[\u05B7\u05B8]/.test(cur.diac)) return out(cur, 's' + (cur.diac.includes(QAMATZ) ? D.qamatz : 'a'), stressOf(cur), 1);
     return out(cur, 's');
   }
   if (!cur.diac && prev && prev.diac.includes(SIN)) return out(cur, 's');
@@ -313,6 +327,8 @@ function letter(cur, prev, nxt, pp) {
   if (d.includes(QAMATZ) && nxt && nxt.diac.includes(HATAF_QAMATZ)) return out(cur, LETTERS[ch] || '', ['o', ...s]);
   if (ch === 'א' && !d && prev && nxt && nxt.ch !== 'ו') return out(cur, '');
   if (ch === 'י' && !d && prev && nxt && prev.ch + prev.diac !== 'א\u05B5' && !(nxt.ch === 'ו' && nxt.diac && !nxt.diac.includes(SHVA))) return out(cur, '');
+  if (ch === 'ת' && D.tavRafe !== 't' && !d.includes(DAGESH)) return out(cur, D.tavRafe);              // tav without dagesh (vocalised words only, see wordToIPA)
+  if ((ch === 'א' || ch === 'ע') && D.glottal !== 'ʔ') return out(cur, D.glottal);
   return out(cur, LETTERS[ch] || '');
 }
 export function phonemizeLetters(L) {
@@ -324,14 +340,22 @@ export function phonemizeLetters(L) {
   return ph.join('');
 }
 function postNormalize(w) {
-  return w.replace(/ʔ$/, '').replace(/ˈh$/, '').replace(/h$/, '').replace(/ij$/, 'i');
+  w = w.replace(/ʔ$/, '').replace(/ˈh$/, '').replace(/h$/, '').replace(/ij$/, 'i');
+  // a diphthong before a yud (שְׁנֵי, גּוֹי, אֱלֹהֵינוּ when the yud is read): one j
+  return D.id === 'israeli' ? w : w.replace(/jˈ?j/g, m => m.includes('ˈ') ? 'jˈ' : 'j');
 }
 const modern = p => MODERN.reduce((s, [a, b]) => s.replace(a, b), p);
 
 /** One Hebrew word (letters + niqqud, no accents) → IPA. k = stressed nucleus from the end (null: milra). */
 export function wordToIPA(word, k = null, data = {}, opt = {}) {
+  const prevD = D; D = havaraOf(opt.havara);
+  try { return wordToIPA1(word, k, data, opt); } finally { D = prevD; }
+}
+function wordToIPA1(word, k, data, opt) {
   let L = letters(opt.raw ? word : fixShinVav(String(word).replace(RE_ACC_METEG, '')));
   if (!L.length) return '';
+  // tav rafe and the vowels need a vocalised word: an unvocalised one keeps the Israeli consonants (we cannot tell ת from תּ)
+  if (D.tavRafe !== 't' && !L.some(l => /[\u05B0-\u05BC\u05C7]/.test(l.diac))) D = { ...D, tavRafe: 't' };
   if (opt.raw) return modern(postNormalize(phonemizeLetters(L)));   // word already carries its marks (tests)
   if (!opt.noShvaNa) markShvaNa(L);
   markQamatzKatan(L, data);
@@ -348,11 +372,33 @@ export function wordToIPA(word, k = null, data = {}, opt = {}) {
 /** Names of the letters (the same table as tts-prep.js – a test keeps them equal), for spelling an unexpanded token. */
 export const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };
 
+/** 1.0.91: Ashkenazi penultimate (milel) stress for a word whose stress (k, from the end) is final. Kept final:
+ *  one-syllable words; a penult that is a hataf (אֲנִי, חֲסָדִים are not stressed on the hataf); a penult that is a prefix –
+ *  the article (ה, or ב כ ל with the article's vowel) before the dagesh forte of a one-syllable
+ *  stem (הַשֵּׁם, בַּיּוֹם, לַיּוֹם), or a conjunction וּ (וּמָה). A stress already on the penult or earlier
+ *  is never moved further back. Cantillated text (Torah, Tehillim – opt.accents is the accented verse) never reaches here: Ashkenazi
+ *  Torah reading follows the accents, and so do the words of that verse the accents cannot locate (divine names). */
+export function milelStress(word, k) {
+  if (k !== 0) return k;
+  const L = letters(word), nu = nuclei(L);
+  if (nu.length < 2) return k;
+  const pen = nu[nu.length - 2], P = L[pen.own];
+  if (/[\u05B1-\u05B3]/.test(P.diac)) return k;
+  if (pen.own === 0 && nu.length === 2) {
+    if (/[הבכל]/.test(P.ch) && /[\u05B7\u05B8]/.test(P.diac) && L[1] && L[1].diac.includes(DAGESH) && !/[בגדכפת]/.test(L[1].ch)) return k;   // article + dagesh forte: הַשֵּׁם, בַּיּוֹם
+    if (P.ch === 'ו') return k;                                                                         // וּ conjunction
+  }
+  if (pen.own === 0 && P.ch === 'ו' && P.diac.includes(DAGESH)) return k;
+  return 1;
+}
+
 /** Prepared TTS text (vocalised Hebrew, accents removed, divine names and numbers already expanded by tts-prep) → IPA.
  *  opt.accents: raw Tanakh string / Map, or {primary: preparedChunkWithOleTags} for compiled speech;
  *  opt.data: stress data (exc, lex, suf, qk). Compiled tags are occurrence-specific, not a distinct-word lookup.
  *  opt.trace: array that receives {word, ipa, k, src} per word (for tests). */
 export function textToIPA(text, opt = {}) {
+  const H = havaraOf(opt.havara), milel = H.milel && opt.milel !== false;
+  if (H !== HAVAROT.israeli) opt = { ...opt, havara: H };
   const data = opt.data || {}, acc = typeof opt.accents === 'string' ? accentStressMap(opt.accents) : opt.accents instanceof Map ? opt.accents : null;
   // Compiled speech has per-occurrence tags. Chunk them with the text, not a paragraph-wide word map:
   // the same pointed spelling can occur twice with different stress. Reject any text/metadata mismatch.
@@ -367,6 +413,8 @@ export function textToIPA(text, opt = {}) {
     let k = inline ? stressFromAccents(tagged) : null, src = k === null ? 'acc' : 'primary';
     if (k === null && acc && acc.has(key)) k = acc.get(key);
     if (k === null) [k, src] = predictStress(core, data);
+    // 1.0.91 Ashkenazi milel; cantillated text (Torah, Tehillim) keeps its accent / grammatical stress for every word
+    if (milel && !acc) { const m = milelStress(core, k); if (m !== k) { k = m; src += '+milel'; } }
     let ipa = wordToIPA(core.replace(/"/g, ''), k, data, opt);
     // 1.0.64 safety net: an abbreviation / numeral that reached here unexpanded (ד׳, י״ב) has no vowel and was not heard –
     // spell it with the names of its letters instead (tts-prep normally does this already; verification/VOICE-NUMERALS.md)

@@ -1,5 +1,5 @@
 // Voice worker: loads the installed local voice from Cache Storage (never from the network) and synthesises chunks.
-// Messages in: {type:'init', variant:'full'|'int8'|'natural'} · {type:'synth', id, text, accents, rate, timbre}
+// Messages in: {type:'init', variant:'full'|'int8'|'natural'} · {type:'synth', id, text, accents, rate, timbre, havara}
 // Messages out: {type:'ready', ms} · {type:'audio', id, audio, sampleRate, ipa, ms} · {type:'error', id?, code, message}
 import { VOICE_FILES } from './voice-files.js';
 import { createVoice } from './piper-core.js';
@@ -32,7 +32,7 @@ self.onmessage = async ({ data: m }) => {
   if (m.type === 'synth') {
     try {
       if (!voice) await loading;
-      const t = performance.now(), r = await voice.synth(m.text, { accents: m.accents, rate: m.rate, timbre: m.timbre || null });
+      const t = performance.now(), r = await voice.synth(m.text, { accents: m.accents, rate: m.rate, timbre: m.timbre || null, havara: m.havara || 'israeli' });
       self.postMessage({ type: 'audio', id: m.id, audio: r.audio, sampleRate: voice.sampleRate, ipa: r.ipa, ms: Math.round(performance.now() - t) }, [r.audio.buffer]);
     } catch (e) { self.postMessage({ type: 'error', id: m.id, code: 'synth-failed', message: String(e?.message || e) }); }
   }

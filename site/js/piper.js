@@ -83,9 +83,9 @@ function getWorker(variant) {
   worker.postMessage({ type: 'init', variant });
   return ready;
 }
-function synth(text, accents, rate, timbre) {
+function synth(text, accents, rate, timbre, havara) {
   const id = ++seq;
-  return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate, timbre }); });
+  return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate, timbre, havara }); });
 }
 
 export { timbreFor };
@@ -127,8 +127,8 @@ export class PiperSpeaker extends Speaker {
   }
   fetchChunk(i) {
     const q = this.queue[i]; if (!q) return null;
-    const g = timbreFor(this.opts.voiceGender), key = i + '@' + (this.opts.rate || 1) + '@' + (this.opts.voiceGender || 'male');
-    if (!this.audio.has(key)) { const p = synth(q.text, q.acc, this.opts.rate || 1, g); p.catch(() => {}); this.audio.set(key, p); }
+    const g = timbreFor(this.opts.voiceGender), key = i + '@' + (this.opts.rate || 1) + '@' + (this.opts.voiceGender || 'male') + '@' + (this.opts.havara || 'israeli');
+    if (!this.audio.has(key)) { const p = synth(q.text, q.acc, this.opts.rate || 1, g, this.opts.havara || 'israeli'); p.catch(() => {}); this.audio.set(key, p); }
     return this.audio.get(key);
   }
   async speakCurrent() {
@@ -148,7 +148,7 @@ export class PiperSpeaker extends Speaker {
     src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };
     src.start();
     // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
-    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', f0: f0Stats(m.audio, m.sampleRate).mean });
+    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', havara: this.opts.havara || 'israeli', f0: f0Stats(m.audio, m.sampleRate).mean });
   }
   cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; }
   pause() {
@@ -164,6 +164,8 @@ export class PiperSpeaker extends Speaker {
     if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
+  /** 1.0.91: pronunciation tradition ('israeli' | 'chabad'); the current chunk is said again in the new one */
+  setHavara(h) { this.opts.havara = h; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
   setGender(g) {
     const m0 = modelFor(this.opts.voiceGender, this.opts.variant); this.opts.voiceGender = g;
     const m1 = modelFor(g, this.opts.variant);
