@@ -4,13 +4,13 @@
 // (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
 // re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
 // remains an offline fallback, so an update while the network is poor never loses the 30-day save.
-const VERSION = '1.0.86';
+const VERSION = '1.0.87';
 const DATA_VERSION = '55357ccfc01e';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
 const MANIFEST = new URL('data/manifest.json', self.registration.scope).href;
 const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/niqqud.js', 'js/hayomyom-display.js', 'js/layout.js', 'js/zmanim.js', 'js/kivun.js', 'js/kivun-ui.js', 'js/wmm.js', 'js/divine.js', 'js/personal.js', 'js/tefila.js', 'js/siddur-lang.js', 'js/library.js', 'js/library-ui.js', 'js/search.js', 'js/vendor/hebcal.js',
-  'js/piper.js', 'js/piper-worker.js', 'js/piper-core.js', 'js/g2p.js', 'js/voice-files.js', 'js/voice-pitch.js',
+  'js/piper.js', 'js/piper-worker.js', 'js/piper-core.js', 'js/g2p.js', 'js/shin-vav-lex.js', 'js/voice-files.js', 'js/voice-pitch.js',
   'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'fonts/taamey-ashkenaz-medium.woff2', 'fonts/taamey-ashkenaz-bold.woff2', 'fonts/TaameyAshkenaz-LICENSE.txt', 'fonts/GPL-2.0.txt', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
   'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json', 'data/rambam-errata.json', 'data/torah/index.json', 'data/mitzvot/index.json', 'data/siddur/index.json'];
 self.addEventListener('install', e => {

@@ -11,6 +11,8 @@
 //
 // Pure functions, no DOM: used in the voice worker and in Node tests (tests/g2p.test.mjs).
 
+import { SHIN_VAV_LEX } from './shin-vav-lex.js';
+
 export const SHVA = '\u05B0', DAGESH = '\u05BC', HOLAM = '\u05B9', HIRIQ = '\u05B4', QAMATZ = '\u05B8', PATAH = '\u05B7';
 export const TSERE = '\u05B5', SEGOL = '\u05B6', QUBUTS = '\u05BB', SIN = '\u05C2', HATAF_QAMATZ = '\u05B3', QAMATZ_KATAN = '\u05C7';
 export const HATAMA = '\u05AB';   // Phonikud's stress diacritic (ole)
@@ -52,6 +54,38 @@ const mk = (ch, all) => ({ ch, all, diac: [...all].filter(c => c !== HATAMA && c
 const setAll = (L, all) => { L.all = SORT(all); L.diac = [...L.all].filter(c => c !== HATAMA && c !== '|').join(''); };
 const has = (L, c) => !!L && L.diac.includes(c);
 const hasFull = L => !!L && [...L.diac].some(c => FULLV.has(c));
+
+// ---------------- 1.0.87: shin/sin dots and vav marks in the speech text (display never changes) ----------------
+const SHIN_DOT = '\u05C1', HOLAM_HASER = '\u05BA';
+const OTHER_VOWEL = /[\u05B0-\u05B8\u05BB\u05C7]/;
+const KEEP = /[\u0591-\u05AF\u05BD'|]/g;   // accents, our stress tag, meteg, geresh: carried over by position
+const clustersOf = w => [...normalize(w).matchAll(/([\u05D0-\u05EA])([\u0591-\u05C7'|]*)/g)].map(m => ({ ch: m[1], m: m[2] }));
+const core = m => m.replace(KEEP, '');
+/** Exact key of a word for SHIN_VAV_LEX: letters + sorted niqqud, no accents/stress tags. */
+export const shinVavKey = w => clustersOf(w).map(c => c.ch + core(c.m)).join('');
+/** One vocalised word as the voice should read it:
+ *  1. legacy encoding (the Siddur source): the sin dot typed as a holam on ש (יִשְֹרָאֵל, לְשָֹשֹוֹן, לַכֶּבֶשֹ) → sin dot.
+ *     A ש with a shin or sin dot already is left alone; so is every word without niqqud.
+ *  2. a ש with no dot, or a vav with no mark where a vowel is needed (לְעולָם, בָּרוךְ), whose correct form occurs
+ *     elsewhere in the app's own vocalised texts: that form (SHIN_VAV_LEX, built by tools/build-shin-vav-lex.mjs).
+ *  Letters never change; accents/stress tags stay on their letters. */
+export function fixShinVav(word, table = SHIN_VAV_LEX) {
+  const w = String(word);
+  if (!/[\u05B0-\u05BB\u05C7]/.test(w) || !/[שו]/.test(w)) return w;
+  let C = clustersOf(w), changed = false;
+  C.forEach(c => {
+    if (c.ch !== 'ש' || c.m.includes(SHIN_DOT) || c.m.includes(SIN) || !c.m.includes(HOLAM)) return;
+    // in this encoding a holam on an undotted ש is the sin dot (it could stand for holam + sin only when no other vowel and
+    // no וֹ follows; even then the app's texts have only sin readings: עָשֹׂה, תַּעֲשׂוּ)
+    c.m = c.m.replace(HOLAM, SIN); changed = true;
+  });
+  const lex = table[C.map(c => c.ch + core(c.m)).join('')];
+  if (lex) {
+    const R = clustersOf(lex);
+    if (R.length === C.length && R.every((r, i) => r.ch === C[i].ch)) { C = R.map((r, i) => ({ ch: r.ch, m: core(r.m) + (C[i].m.match(KEEP) || []).join('') })); changed = true; }
+  }
+  return changed ? C.map(c => c.ch + SORT(c.m)).join('') : w;
+}
 
 // ---------------- vowel nuclei and stress (index from the end, 0 = milra) ----------------
 /** Pronounced vowel nuclei of a word: [{at, own}] – `own` is the letter that carries the vowel (a vav for shuruq/holam
@@ -224,24 +258,39 @@ const out = (cur, con, vow = null, skip = 0) => [clean(sortStress([...(con ? [co
 function vavVowel(d) {
   if (/[\u05B7\u05B8]/.test(d)) return 'va';
   if (d.includes(TSERE) || d.includes(SEGOL) || d.includes(VSHVA)) return 've';
+  if (d.includes(HOLAM_HASER)) return 'vo';                   // 1.0.87: וֺ (MAM) is always a consonant vav + holam: מִצְוֺת, עֲוֺן
   if (d.includes(HOLAM)) return 'o';
+  // 1.0.87: a dagesh in a vav that has its own vowel is a doubled consonant (צִוִּיתִי, קַוִּין, מְצֻוֻּ…), not a shuruq
+  if (d.includes(DAGESH) && d.includes(HIRIQ)) return 'vi';
+  if (d.includes(DAGESH) && d.includes(QUBUTS)) return 'vu';
   if (d.includes(QUBUTS) || d.includes(DAGESH)) return 'u';
   if (d.includes(HIRIQ)) return 'vi';
   return null;
 }
-function vav(cur, prev, nxt) {
+function vav(cur, prev, nxt, pp) {
   const d = cur.diac, s = stressOf(cur);
   if (prev && prev.diac.includes(SHVA) && d.includes(HOLAM)) return out(cur, 'vo', s);
+  // 1.0.87: וֹ after a letter with its own vowel is a consonant + holam (עָוֹן, עֲוֹנוֹת, תַּאֲוֹת), not a holam male
+  if (prev && d.includes(HOLAM) && !d.includes(DAGESH) && hasFull(prev) && !has(prev, HOLAM)) return out(cur, 'vo', s);
+  // 1.0.87: וְּ (dagesh forte + shva, מְצַוְּךָ, נִתְכַּוְּנוּ): a doubled v whose shva is vocal after a vowel
+  if (prev && d.includes(DAGESH) && d.includes(SHVA) && !(nxt && nxt.ch === 'ו')) return out(cur, hasFull(prev) ? 've' : 'v', s);
   if (nxt && nxt.ch === 'ו') {
     const dd = d + nxt.diac;
     if (dd.includes(HOLAM)) return out(cur, 'vo', s, 1);
     if (d === nxt.diac) return out(cur, 'vu', s, 1);
+    // 1.0.87: וּו after a vowel (כַּוּונָה, written for כַּוָּנָה): the dagesh doubles a consonant vav, it is not a shuruq
+    if (prev && hasFull(prev) && d === DAGESH && !nxt.diac) return out(cur, 'v', s);
     const v = vavVowel(d); if (v) return out(cur, v, s);
     if (d.includes(SHVA) && !nxt.diac) return out(cur, 'v', s);
     return out(cur, '', s);
   }
   const v = vavVowel(d); if (v) return out(cur, v, s);
   if (d.includes(SHVA) && !prev) return out(cur, 've', s);
+  // 1.0.87: a vav with no mark between a consonant without a vowel and a vowelled letter (לְעולָם, הושִׁיעֵנוּ) is a lost
+  // holam male / shuruq, never silent. Most such words get their exact form from SHIN_VAV_LEX; otherwise holam (the more common).
+  // A bare א after a holam (חַטֹּאותָי, לִקְרֹאותָם, צֹאונֵנוּ) is quiescent: the holam was already said, the vav is silent.
+  if (nxt && !d && prev && prev.ch !== 'ו' && !hasFull(prev) && !has(prev, SHVA) && /[\u05B0-\u05BB\u05C7]/.test(nxt.diac) && nxt.ch !== 'ו'
+    && !(prev.ch === 'א' && !prev.diac && pp && has(pp, HOLAM))) return out(cur, 'o', s);
   if (nxt && !d) return out(cur, '', s);
   return out(cur, 'v', s);
 }
@@ -253,12 +302,12 @@ function shin(cur, prev, nxt) {
   if (!cur.diac && prev && prev.diac.includes(SIN)) return out(cur, 's');
   return out(cur, LETTERS['ש']);
 }
-function letter(cur, prev, nxt) {
+function letter(cur, prev, nxt, pp) {
   const d = cur.diac, ch = cur.ch, s = stressOf(cur);
   if (cur.all.includes(HASER)) return [[], 0];
   if (d.includes("'") && GERESH[ch]) return out(cur, GERESH[ch], ch === 'ת' ? [] : null);
   if (d.includes(DAGESH) && LETTERS[ch + DAGESH]) return out(cur, LETTERS[ch + DAGESH]);
-  if (ch === 'ו') return vav(cur, prev, nxt);
+  if (ch === 'ו') return vav(cur, prev, nxt, pp);
   if (ch === 'ש') return shin(cur, prev, nxt);
   if (!nxt && d.includes(PATAH) && GNUVA[ch]) return out(cur, GNUVA[ch], s);
   if (d.includes(QAMATZ) && nxt && nxt.diac.includes(HATAF_QAMATZ)) return out(cur, LETTERS[ch] || '', ['o', ...s]);
@@ -269,7 +318,7 @@ function letter(cur, prev, nxt) {
 export function phonemizeLetters(L) {
   const ph = [];
   for (let i = 0; i < L.length;) {
-    const [p, skip] = letter(L[i], L[i - 1] || null, L[i + 1] || null);
+    const [p, skip] = letter(L[i], L[i - 1] || null, L[i + 1] || null, L[i - 2] || null);
     ph.push(...p); i += skip + 1;
   }
   return ph.join('');
@@ -281,7 +330,7 @@ const modern = p => MODERN.reduce((s, [a, b]) => s.replace(a, b), p);
 
 /** One Hebrew word (letters + niqqud, no accents) → IPA. k = stressed nucleus from the end (null: milra). */
 export function wordToIPA(word, k = null, data = {}, opt = {}) {
-  let L = letters(opt.raw ? word : String(word).replace(RE_ACC_METEG, ''));
+  let L = letters(opt.raw ? word : fixShinVav(String(word).replace(RE_ACC_METEG, '')));
   if (!L.length) return '';
   if (opt.raw) return modern(postNormalize(phonemizeLetters(L)));   // word already carries its marks (tests)
   if (!opt.noShvaNa) markShvaNa(L);
@@ -312,7 +361,7 @@ export function textToIPA(text, opt = {}) {
   const input = inline ? marked : String(text);
   const t = normalize(input.replace(inline ? /[\u0591-\u05AA\u05AC-\u05AF\u05BD]/g : /[\u0591-\u05AF\u05BD]/g, '').replace(/\u05C3/g, '.')).replace(/[\u05BE]/g, ' ').replace(/[–—]/g, ',').replace(/;/g, ',').replace(/:/g, '.');
   return t.replace(/[\u05D0-\u05EA\u05AB\u05B0-\u05C7'"|]+/g, w => {
-    const tagged = w.replace(/^['"]+|['"]+$/g, ''), core = tagged.replace(/\u05AB/g, '');
+    const tagged = fixShinVav(w.replace(/^['"]+|['"]+$/g, '')), core = tagged.replace(/\u05AB/g, '');
     if (!/[\u05D0-\u05EA]/.test(core)) return ' ';
     const key = stressKey(core);
     let k = inline ? stressFromAccents(tagged) : null, src = k === null ? 'acc' : 'primary';
