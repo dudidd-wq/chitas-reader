@@ -56,7 +56,7 @@ test('1.0.87: display untouched – data hash unchanged, no display module uses 
   for (const f of ['app.js', 'texts.js', 'niqqud.js', 'hayomyom-display.js', 'tefila.js', 'layout.js'])
     assert.doesNotMatch(fs.readFileSync(root + 'site/js/' + f, 'utf8'), /fixShinVav|shin-vav-lex/, f);
   const sw = fs.readFileSync(root + 'site/sw.js', 'utf8');
-  assert.match(sw, /VERSION = '1\.0\.87'/); assert.match(sw, /'js\/shin-vav-lex\.js'/);
+  assert.match(sw, /VERSION = '1\.0\.(8[7-9]|9\d)'/); assert.match(sw, /'js\/shin-vav-lex\.js'/);
 });
 test('1.0.87: corpus audit – undotted ש in vocalised words before/after', async () => {
   const b = audit(), a = await auditAfter();

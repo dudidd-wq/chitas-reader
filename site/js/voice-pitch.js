@@ -152,5 +152,10 @@ export function maleTimbre(x, sr, { semitones = -6, formant = 1 } = {}) {
 /** The two voices offered in the settings. 'male' = the noa model shifted down (no extra download). */
 export const TIMBRES = {
   male: { semitones: -6, formant: 0.88 },   // fuller vocal tract, same F0/intonation – verification/VOICE-169.md
+  deep: { semitones: -8, formant: 0.82 },   // 1.0.88 "קול גברי עמוק": lower still – verification/VOICE-188.md
   female: null,
 };
+
+/** Timbre parameters for a voice choice (1.0.88): 'female' and 'natural' (a real male model) are not processed, 'deep'
+ *  is the lower noa timbre, anything else the default male timbre. */
+export const timbreFor = gender => gender === 'female' || gender === 'natural' ? null : gender === 'deep' ? TIMBRES.deep : TIMBRES.male;

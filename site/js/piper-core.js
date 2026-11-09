@@ -11,7 +11,7 @@ export async function createVoice(ort, { wasm, model, config, stress }) {
   ort.env.wasm.proxy = false;
   if (wasm) ort.env.wasm.wasmBinary = wasm;
   const session = await ort.InferenceSession.create(model, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
-  const inf = config.inference || {}, idMap = config.phoneme_id_map, sampleRate = config.audio?.sample_rate || 22050;
+  const inf = config.inference || {}, idMap = config.phoneme_id_map, pad = config.chitas_pad !== false, sampleRate = config.audio?.sample_rate || 22050;
   return {
     sampleRate,
     /** text: one prepared chunk (tts-prep output); opt.accents: the raw accented verse (or a Map from accentStressMap), or {primary: markedPreparedChunk};
@@ -21,7 +21,7 @@ export async function createVoice(ort, { wasm, model, config, stress }) {
     async synth(text, opt = {}) {
       const accents = opt.accents instanceof Map || opt.accents?.primary ? opt.accents : opt.accents ? accentStressMap(opt.accents) : null;
       const ipa = opt.ipa || textToIPA(text, { data: stress, accents, noShvaNa: opt.noShvaNa });
-      const ids = ipaToIds(ipa, idMap);
+      const ids = ipaToIds(ipa, idMap, pad);
       if (ids.length <= 3) return { audio: new Float32Array(0), ipa, ids };
       const tim = opt.timbre && (opt.timbre.semitones || (opt.timbre.formant && opt.timbre.formant !== 1)) ? opt.timbre : null;
       const rate = (opt.rate || 1) / (tim?.formant > 0 && tim.formant < 1 ? tim.formant : 1);

@@ -5,11 +5,14 @@
 import { Speaker } from './tts.js';
 import { prepareForTTS, chunkText } from './tts-prep.js';
 import { VOICE_FILES } from './voice-files.js';
-import { TIMBRES, f0Stats } from './voice-pitch.js';
+import { timbreFor, f0Stats } from './voice-pitch.js';
 
 export const VOICE_CACHE = 'voice-v1';
-const COMMON = ['ort', 'wasm', 'config', 'stress'];
-export const voiceKeys = variant => [...COMMON, variant === 'int8' ? 'int8' : 'full'];
+const COMMON = ['ort', 'wasm', 'stress'];
+// 1.0.88: 'natural' = the real male voice (its own model and config, ~63 MB); 'full' / 'int8' = noa
+export const voiceKeys = variant => [...COMMON, ...(variant === 'natural' ? ['naturalConfig', 'natural'] : ['config', variant === 'int8' ? 'int8' : 'full'])];
+/** Which installed model a voice choice reads with: the natural male voice has its own model, the others use noa. */
+export const modelFor = (gender, variant) => gender === 'natural' ? 'natural' : variant === 'int8' ? 'int8' : 'full';
 export const voiceBytes = variant => voiceKeys(variant).reduce((a, k) => a + VOICE_FILES[k].size, 0);
 export const mb = n => Math.round(n / 1e6);
 const abs = u => new URL(u, document.baseURI).href;
@@ -21,15 +24,22 @@ export function piperSupported() {
 }
 /** Which variants are fully installed: {full:bool, int8:bool}. Reads the cache only – never downloads. */
 export async function voiceStatus() {
-  const st = { full: false, int8: false };
+  const st = { full: false, int8: false, natural: false };
   if (typeof caches !== 'object') return st;
   try {
     const c = await caches.open(VOICE_CACHE);
     const ok = async k => !!(await c.match(abs(VOICE_FILES[k].url)));
-    const common = (await Promise.all(COMMON.map(ok))).every(Boolean);
-    st.full = common && await ok('full'); st.int8 = common && await ok('int8');
+    const all = async keys => (await Promise.all(keys.map(ok))).every(Boolean);
+    for (const v of ['full', 'int8', 'natural']) st[v] = await all(voiceKeys(v));
   } catch { /* storage blocked */ }
   return st;
+}
+/** Bytes still to download for a model (files already in the cache are not fetched again). */
+export async function voiceMissingBytes(variant) {
+  let n = 0;
+  try { const c = await caches.open(VOICE_CACHE); for (const k of voiceKeys(variant)) if (!(await c.match(abs(VOICE_FILES[k].url)))) n += VOICE_FILES[k].size; }
+  catch { n = voiceBytes(variant); }
+  return n;
 }
 /** Download (once) and store the voice. onProgress(doneBytes, totalBytes). Only call from a user's click. */
 export async function installVoice(variant, onProgress = () => {}, signal) {
@@ -78,8 +88,7 @@ function synth(text, accents, rate, timbre) {
   return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate, timbre }); });
 }
 
-/** Timbre parameters for the chosen voice: anything but 'female' gets the male timbre (default). */
-export const timbreFor = gender => gender === 'female' ? null : TIMBRES.male;
+export { timbreFor };
 
 export class PiperSpeaker extends Speaker {
   /** opts.variant: 'full' | 'int8'; opts.voiceGender: 'male' (default – the noa model with the male timbre of
@@ -113,12 +122,12 @@ export class PiperSpeaker extends Speaker {
     this.ctx();                                 // created/resumed inside the user's click
     this.state = 'playing'; this.onState?.('playing');
     this.mediaSession(true);
-    getWorker(this.opts.variant).then(() => this.speakCurrent(), e => this.fail('piper-' + (e.code || 'load-failed')));
+    getWorker(modelFor(this.opts.voiceGender, this.opts.variant)).then(() => this.speakCurrent(), e => this.fail('piper-' + (e.code || 'load-failed')));
     return true;
   }
   fetchChunk(i) {
     const q = this.queue[i]; if (!q) return null;
-    const g = timbreFor(this.opts.voiceGender), key = i + '@' + (this.opts.rate || 1) + '@' + (g ? 'm' : 'f');
+    const g = timbreFor(this.opts.voiceGender), key = i + '@' + (this.opts.rate || 1) + '@' + (this.opts.voiceGender || 'male');
     if (!this.audio.has(key)) { const p = synth(q.text, q.acc, this.opts.rate || 1, g); p.catch(() => {}); this.audio.set(key, p); }
     return this.audio.get(key);
   }
@@ -139,7 +148,7 @@ export class PiperSpeaker extends Speaker {
     src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };
     src.start();
     // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
-    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: this.opts.voiceGender === 'female' ? 'female' : 'male', f0: f0Stats(m.audio, m.sampleRate).mean });
+    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', f0: f0Stats(m.audio, m.sampleRate).mean });
   }
   cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; }
   pause() {
@@ -155,5 +164,13 @@ export class PiperSpeaker extends Speaker {
     if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(target); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
-  setGender(g) { this.opts.voiceGender = g; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
+  setGender(g) {
+    const m0 = modelFor(this.opts.voiceGender, this.opts.variant); this.opts.voiceGender = g;
+    const m1 = modelFor(g, this.opts.variant);
+    if (this.state !== 'playing') return;
+    this.cut();
+    if (m1 === m0) { this.speakCurrent(); return; }
+    // another model (natural ↔ noa): load it in the worker first; the caller checked that it is installed
+    getWorker(m1).then(() => this.speakCurrent(), e => this.fail('piper-' + (e.code || 'load-failed')));
+  }
 }

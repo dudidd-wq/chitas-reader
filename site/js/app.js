@@ -6,7 +6,8 @@ import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } fro
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
-import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, mb } from './piper.js';
+import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
+import { VOICE_FILES } from './voice-files.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
 import { fixNiqqud } from './niqqud.js';
@@ -508,43 +509,67 @@ function displayForm() {
   ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
   ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
 }
+// 1.0.88: the four voice choices of the local voice. 'natural' is a separate model, downloaded only when chosen.
+const VOICE_CHOICES = [['male', 'קול גברי (ברירת מחדל)'], ['deep', 'קול גברי עמוק'], ['natural', 'קול גברי טבעי'], ['female', 'קול נשי']];
+const voiceNote = g => ({
+  male: 'הקול noa בעיבוד אות במכשיר: גובה הצליל נמוך בכ־6 חצאי טון והפורמנטים בכ־12%. אין הורדה נוספת. גוון מלאכותי, לא דובר אמיתי.',
+  deep: 'אותו קול noa, מונמך יותר: כ־8 חצאי טון והפורמנטים בכ־18%. אין הורדה נוספת. גוון מלאכותי, לא דובר אמיתי.',
+  natural: `קול של דובר גבר אמיתי – מודל נפרד (notmax123/piper-medium-heb, רישיון CC BY-NC 4.0, לשימוש לא מסחרי בלבד). דורש הורדה חד־פעמית של כ־${mb(VOICE_FILES.natural.size)} MB, רק בלחיצה על הכפתור; אחר כך נשמר במכשיר ופועל בלי רשת.`,
+  female: 'הקול המקורי של noa, בלי עיבוד.',
+})[g] || '';
+const voiceName = v => v === 'natural' ? 'הקול הגברי הטבעי' : v === 'int8' ? 'הקול הקל' : 'הקול הרגיל';
 // 1.0.59: the local "quality voice". Nothing is downloaded until the reader presses #qv-dl.
 function qvForm() {
   if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small></fieldset>`;
   return `<fieldset id="qv"><legend>קול איכותי (פועל במכשיר, ניסיוני)</legend>
     ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי (מקומי)']])}
-    ${radio('ttsGender', prefs.ttsGender, [['male', 'קול גברי (ברירת מחדל)'], ['female', 'קול נשי']])}
-    <small id="qv-gender-note">הקול הגברי הוא אותו קול (noa) בעיבוד אות במכשיר: הורדת גובה הצליל בכ־6 חצאי טון והורדת הפורמנטים בכ־12%, תוך שמירת העיצורים הלא־קוליים. אין הורדה נוספת. זהו גוון מלאכותי ולא קול של דובר אמיתי.</small>
-    ${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}
+    ${radio('ttsGender', prefs.ttsGender, VOICE_CHOICES)}
+    <small id="qv-gender-note">${voiceNote(prefs.ttsGender)}</small>
+    <p class="row" id="qv-prev-row"><span>שמע דוגמה:</span> ${VOICE_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="${v}" aria-label="שמע דוגמה – ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
+    <div id="qv-model"${prefs.ttsGender === 'natural' ? ' hidden' : ''}>${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}</div>
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
-    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי – עיבוד אות שלנו. פרטים בעמוד המקורות.</small>
+    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – notmax123/piper-medium-heb (CC BY-NC 4.0). הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small>
   </fieldset>`;
 }
 async function bindQv(root) {
   const st = root.querySelector('#qv-st'); if (!st) return;
   const dl = root.querySelector('#qv-dl'), del = root.querySelector('#qv-del'), prog = root.querySelector('#qv-prog');
   const refresh = async () => {
-    const s = await voiceStatus(), v = prefs.ttsModel, have = s[v];
+    const s = await voiceStatus(), v = modelFor(prefs.ttsGender, prefs.ttsModel), have = s[v], miss = have ? 0 : await voiceMissingBytes(v);
     if (!st.isConnected) return;
-    dl.hidden = have; del.hidden = !(s.full || s.int8);
-    dl.textContent = `קול איכותי – הורדה חד-פעמית (${mb(voiceBytes(v))} MB)`;
-    st.textContent = have ? `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
-      : `הקול ${v === 'int8' ? 'הקל' : 'הרגיל'} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
+    dl.hidden = have; del.hidden = !(s.full || s.int8 || s.natural);
+    dl.textContent = v === 'natural' ? `קול גברי טבעי – הורדה חד-פעמית (${mb(miss)} MB)` : `קול איכותי – הורדה חד-פעמית (${mb(voiceBytes(v))} MB)`;
+    st.textContent = have ? `${voiceName(v)} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
+      : `${voiceName(v)} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
   };
-  root.addEventListener('input', e => {
+  let sample = null;
+  root.querySelectorAll('.qv-prev').forEach(b => { b.onclick = () => {
+    // a short pre-recorded sample of each voice (site/voice-samples/, ~50KB, fetched only on this click)
+    sample?.pause(); sample = new Audio(`voice-samples/${b.dataset.v}.mp3`); sample.play().catch(() => toast('לא ניתן להשמיע את הדוגמה (אין חיבור?)'));
+  }; });
+  root.addEventListener('input', async e => {
     if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh();
-    if (e.target.name === 'ttsGender' && R.speaker instanceof PiperSpeaker) R.speaker.setGender(e.target.value);
+    if (e.target.name === 'ttsGender') {
+      const g = e.target.value, note = root.querySelector('#qv-gender-note'), mdl = root.querySelector('#qv-model');
+      if (note) note.textContent = voiceNote(g);
+      if (mdl) mdl.hidden = g === 'natural';
+      refresh();
+      if (R.speaker instanceof PiperSpeaker) {
+        if ((await voiceStatus())[modelFor(g, prefs.ttsModel)]) R.speaker.setGender(g);
+        else { R.speaker.stop(); R.speaker = null; toast('הקול שנבחר עדיין לא הורד – ההקראה נעצרה. להורדה: הכפתור למטה.'); }
+      }
+    }
   });
   dl.onclick = async () => {
-    const v = prefs.ttsModel; dl.disabled = true; prog.hidden = false; prog.value = 0;
+    const v = modelFor(prefs.ttsGender, prefs.ttsModel); dl.disabled = true; prog.hidden = false; prog.value = 0;
     try {
       await installVoice(v, (d, t) => { prog.value = d / t; st.textContent = `מוריד… ${mb(d)} מתוך ${mb(t)} MB`; });
       setPref('ttsEngine', 'piper'); root.querySelectorAll('input[name=ttsEngine]').forEach(r => { r.checked = r.value === 'piper'; });
       R.piperBroken = false;
       if (R.speaker) { const was = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (was === 'playing') ttsToggle(); }
-      await refresh(); toast('הקול האיכותי הותקן');
+      await refresh(); toast(v === 'natural' ? 'הקול הגברי הטבעי הותקן' : 'הקול האיכותי הותקן');
     } catch (e) { st.textContent = `ההורדה נכשלה (${e.message}). ההקראה תמשיך בקול הדפדפן; אפשר לנסות שוב.`; }
     finally { dl.disabled = false; prog.hidden = true; }
   };
@@ -662,6 +687,8 @@ async function renderSources() {
   <h2 id="voice-src">קול איכותי (הקראה מקומית)</h2><p>נטען רק כשבוחרים ״קול איכותי״ בהגדרות ההקראה.</p><ul>
     <li>קול: <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">Piper Hebrew – noa (medium)</a> מאת thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>. הגרסה הקלה (int8) היא שינוי שלנו: כימות המשקולות ל־int8.</li>
     <li>הקול הגברי (ברירת המחדל מגרסה 1.0.60) הוא שינוי שלנו של הקול noa, בעיבוד אות במכשיר (קוד שלנו, בלי ספרייה חיצונית): זיהוי גובה הצליל בשיטת YIN, הורדתו בכ־6 חצאי טון בשיטת TD-PSOLA (שומרת על הפורמנטים) והורדת הפורמנטים בכ־12% (מגרסה 1.0.69, במקום 6%). עיצורים לא־קוליים נשמרים ללא פירוק לגרגרי צליל, עם מעבר הדרגתי בגבולות הקטעים הקוליים. אין זה קול של דובר גבר ואין הורדה נוספת. לא מצאנו קול עברי גברי שרישיון המשקולות <i>וגם</i> רישיון ההקלטות שעליהן אומן מתירים שימוש חופשי; הפירוט ב־<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VOICE.md#male" target="_blank" rel="noopener" dir="ltr">verification/VOICE.md</a>.</li>
+    <li>הקול הגברי העמוק (מגרסה 1.0.88): אותו עיבוד אות שלנו של noa, בהורדה של כ־8 חצאי טון ופורמנטים ×0.82. גם הוא אינו קול של דובר גבר.</li>
+    <li id="credit-natural">הקול הגברי הטבעי (מגרסה 1.0.88, מורד רק כשבוחרים בו): המודל <span dir="ltr">piper_medium_male.onnx</span> מתוך <a href="https://huggingface.co/notmax123/piper-medium-heb" target="_blank" rel="noopener" dir="ltr">notmax123/piper-medium-heb</a> מאת notmax123, רישיון <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.he" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ייחוס, שימוש לא מסחרי בלבד). המודל אומן על הקלטות ILSpeech של פרויקט <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (CC BY-NC 4.0). המשקולות לא שונו; לקובץ ההגדרות הוספנו שדה אחד (<span dir="ltr">chitas_pad</span>) שמציין שהמודל מקבל את הצלילים בלי מפריד ביניהם. האפליקציה חינמית ולא מסחרית.</li>
     <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
@@ -1600,8 +1627,8 @@ function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('
 // Which engine reads: the local voice when chosen, supported and installed – otherwise Web Speech (fallback).
 async function ttsEngine() {
   if (prefs.ttsEngine !== 'piper' || R.piperBroken || !piperSupported()) return 'web';
-  if ((await voiceStatus())[prefs.ttsModel]) return 'piper';
-  toast('הקול האיכותי אינו מותקן במכשיר – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.');
+  if ((await voiceStatus())[modelFor(prefs.ttsGender, prefs.ttsModel)]) return 'piper';
+  toast(prefs.ttsGender === 'natural' ? 'הקול הגברי הטבעי עדיין לא הורד – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.' : 'הקול האיכותי אינו מותקן במכשיר – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.');
   return 'web';
 }
 async function ttsToggle() {

@@ -7,7 +7,8 @@ The site's own code is GPL-2.0-or-later (see LICENSE in the repository). Fonts: 
 site/js/wmm.js embeds the World Magnetic Model WMM2025 coefficients (NOAA NCEI / British Geological Survey) –
 a work of the U.S. Government, public domain: https://www.ncei.noaa.gov/products/world-magnetic-model
 Local voice (site/voice/, downloaded only on request): Piper "noa" voice by thewh1teagle (CC BY 4.0), ONNX Runtime Web
-(MIT, Microsoft), G2P rules ported from Phonikud (CC BY 4.0) – details at the end of this file and in voice/NOTICE.txt.
+(MIT, Microsoft), G2P rules ported from Phonikud (CC BY 4.0); optional natural male voice (since 1.0.88, only when
+chosen): notmax123/piper-medium-heb by notmax123 (CC BY-NC 4.0, non-commercial) – details at the end of this file and in voice/NOTICE.txt.
 
 Texts are licensed by their sources (see data/LICENSE-DATA.md and the Sources page). Torah Or / Likkutei Torah:
   text – Kehot Publication Society via Sefaria, CC BY-NC (non-commercial use only);

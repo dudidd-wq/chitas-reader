@@ -1,5 +1,5 @@
 // Voice worker: loads the installed local voice from Cache Storage (never from the network) and synthesises chunks.
-// Messages in: {type:'init', variant:'full'|'int8'} · {type:'synth', id, text, accents, rate, timbre}
+// Messages in: {type:'init', variant:'full'|'int8'|'natural'} · {type:'synth', id, text, accents, rate, timbre}
 // Messages out: {type:'ready', ms} · {type:'audio', id, audio, sampleRate, ipa, ms} · {type:'error', id?, code, message}
 import { VOICE_FILES } from './voice-files.js';
 import { createVoice } from './piper-core.js';
@@ -18,8 +18,8 @@ async function init(variant) {
   const url = URL.createObjectURL(new Blob([ortSrc], { type: 'text/javascript' }));
   const ort = await import(url);
   const [wasm, model, config, stress] = await Promise.all([
-    cached('wasm').then(r => r.arrayBuffer()), cached(variant === 'int8' ? 'int8' : 'full').then(r => r.arrayBuffer()),
-    cached('config').then(r => r.json()), cached('stress').then(r => r.json())]);
+    cached('wasm').then(r => r.arrayBuffer()), cached(variant === 'natural' ? 'natural' : variant === 'int8' ? 'int8' : 'full').then(r => r.arrayBuffer()),
+    cached(variant === 'natural' ? 'naturalConfig' : 'config').then(r => r.json()), cached('stress').then(r => r.json())]);
   voice = await createVoice(ort, { wasm, model: new Uint8Array(model), config, stress });
   return Math.round(performance.now() - t);
 }

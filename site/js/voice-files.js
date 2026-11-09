@@ -24,5 +24,13 @@ export const VOICE_FILES = {
   "int8": {
     "url": "voice/he_IL-noa-medium-int8.onnx?v=69ed89ff4bba",
     "size": 22750921
+  },
+  "naturalConfig": {
+    "url": "voice/he_IL-ilspeech-male-medium.onnx.json?v=bf60aa6cf8f7",
+    "size": 5647
+  },
+  "natural": {
+    "url": "voice/he_IL-ilspeech-male-medium.onnx?v=9971617aaa87",
+    "size": 63461522
   }
 };

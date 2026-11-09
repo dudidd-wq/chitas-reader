@@ -34,7 +34,8 @@ function load() {
     if (!['full', 'int8'].includes(prefs.ttsModel)) prefs.ttsModel = 'full';
     // 1.0.60: the local voice reads with a male timbre by default (signal processing of the same noa model, no extra
     // download); 'female' = the model's own voice
-    if (!['male', 'female'].includes(prefs.ttsGender)) prefs.ttsGender = 'male';
+    // 1.0.88: 'deep' = noa lowered further (no download); 'natural' = a real male voice (separate model, downloaded on choice)
+    if (!['male', 'deep', 'natural', 'female'].includes(prefs.ttsGender)) prefs.ttsGender = 'male';
     return { prefs, progress: d.progress || {} };
   }
   catch { return { prefs: { ...DEFAULT_PREFS }, progress: {} }; }

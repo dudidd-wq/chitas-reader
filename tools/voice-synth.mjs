@@ -6,13 +6,15 @@ import { prepareForTTS, chunkText } from '../site/js/tts-prep.js';
 import { createVoice } from '../site/js/piper-core.js';
 
 const SITE = new URL('../site/', import.meta.url).pathname;
-export async function nodeVoice({ int8 = false } = {}) {
+/** natural (1.0.88): the real male voice (he_IL-ilspeech-male-medium) instead of noa. */
+export async function nodeVoice({ int8 = false, natural = false } = {}) {
   const ort = await import(SITE + 'voice/ort/ort.wasm.bundle.min.mjs');
   const file = n => new Uint8Array(fs.readFileSync(SITE + 'voice/' + n));
+  const name = natural ? 'he_IL-ilspeech-male-medium' : 'he_IL-noa-medium';
   return createVoice(ort, {
     wasm: file('ort/ort-wasm-simd-threaded.wasm').buffer,
-    model: file(int8 ? 'he_IL-noa-medium-int8.onnx' : 'he_IL-noa-medium.onnx'),
-    config: JSON.parse(fs.readFileSync(SITE + 'voice/he_IL-noa-medium.onnx.json', 'utf8')),
+    model: file(natural ? name + '.onnx' : int8 ? 'he_IL-noa-medium-int8.onnx' : 'he_IL-noa-medium.onnx'),
+    config: JSON.parse(fs.readFileSync(SITE + 'voice/' + name + '.onnx.json', 'utf8')),
     stress: JSON.parse(fs.readFileSync(SITE + 'voice/stress-he.json', 'utf8')),
   });
 }

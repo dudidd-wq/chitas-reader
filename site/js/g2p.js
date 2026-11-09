@@ -381,9 +381,10 @@ export function textToIPA(text, opt = {}) {
 }
 
 /** IPA → Piper phoneme ids (BOS, pad after each phoneme, EOS), as piper's phonemes_to_ids. Unknown characters are dropped. */
-export function ipaToIds(ipa, idMap) {
-  const ids = [...idMap['^'], ...idMap['_']];
-  for (const ch of ipa) { const v = idMap[ch]; if (!v) continue; ids.push(...v, ...idMap['_']); }
+/** pad = false (1.0.88): for a model trained without the '_' pad id between symbols (the natural male voice). */
+export function ipaToIds(ipa, idMap, pad = true) {
+  const P = pad ? idMap['_'] : [], ids = [...idMap['^'], ...P];
+  for (const ch of ipa) { const v = idMap[ch]; if (!v) continue; ids.push(...v, ...P); }
   ids.push(...idMap['$']);
   return ids;
 }
