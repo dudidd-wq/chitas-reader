@@ -602,6 +602,39 @@ export const SIDDUR_EXTRA_OMIT = {
   'chatzot/1': [[15, 31, 'בימים שאין אומרים תחנון']],
 };
 
+/** 1.0.90: Kaddish blocks (חצי קדיש, קדיש שלם/תתקבל, קדיש יתום, קדיש דרבנן, אחר הקבורה) – rows to skip in the read-aloud
+ *  when the reader chooses so (prefs.siddurKaddish = 'skip'); the text stays on screen. A block starts at a paragraph
+ *  that opens with "יתגדל ויתקדש שמה רבא" and continues over the Kaddish's own paragraphs (the congregation's
+ *  response, יהא שמה רבא, על ישראל, תתקבל, יהא שלמא, עושה שלום) and the steps-back instruction between them.
+ *  Its title and the "in the presence of a minyan … recites Kaddish" note just before it belong to it too. Audit: verification/SIDDUR-KADDISH-190.md (tools/kaddish-audit.mjs). */
+const kdPlain = s => stripTags(typeof s === 'string' ? s : JSON.stringify(s ?? '')).replace(/[\u0591-\u05C7]/g, '').replace(/\s+/g, ' ').trim();
+export const KADDISH_START = /^יתגדל ויתקדש שמה רבא/;
+export const KADDISH_CONT = /^(\(Cong: אמן\. יהא שמה רבא|יהא שמה רבא מברך|על ישראל ועל רבנן|תתקבל צלותהון|יהא שלמה רבא|יהא שלמא רבא|עשה שלום( \([^)]*\))? במרומיו|עושה שלום( \([^)]*\))? במרומיו)/;
+// instructions that belong to the Kaddish itself: its title, "in the presence of a minyan … recites Kaddish", the steps
+// back. Other instructions inside or before a Kaddish (where to continue on Chanukah, "the chazzan says a psalm, then…")
+// are kept in the read-aloud.
+const kdHe = row => kdPlain(row[2] || row[1]);
+const kdNoteBefore = row => { const t = kdHe(row); return /קדיש/.test(t) && (t.length <= 20 || /^בנוכחות מניין/.test(t)); };
+const kdNoteInside = row => /^פוסעים שלוש פסיעות|^Take three steps/.test(kdHe(row));
+export function kaddishFlags(rows) {
+  const f = Array(rows.length).fill(false), starts = [];
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i][0] !== 'p' || !KADDISH_START.test(kdPlain(rows[i][1]))) continue;
+    starts.push(i); f[i] = true;
+    // announcing instructions / the Kaddish's title right before it (notes only, up to 3, each mentioning Kaddish)
+    for (let k = i - 1; k >= 0 && k >= i - 3 && rows[k][0] === 'n' && kdNoteBefore(rows[k]); k--) f[k] = true;
+    // continuation: Kaddish paragraphs, and notes only when another Kaddish paragraph follows them
+    let j = i + 1;
+    for (;;) {
+      let k = j; while (k < rows.length && rows[k][0] === 'n') k++;
+      if (k < rows.length && rows[k][0] === 'p' && KADDISH_CONT.test(kdPlain(rows[k][1]))) { for (let m = j; m <= k; m++) f[m] = rows[m][0] === 'p' || kdNoteInside(rows[m]); j = k + 1; }
+      else break;
+    }
+    i = j - 1;
+  }
+  return { flags: f, starts };
+}
+
 /** Mark the last paragraph of each contiguous special run longer than one paragraph. */
 export function specialBlockEnds(specialFlags) {
   const ends = Array(specialFlags.length).fill(false);
@@ -667,6 +700,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
   const specialEnd = specialBlockEnds(special), om = omitPrayerFlags(sec.b, { book, n });
   const reps = repeatCounts(book, n), repNotes = SIDDUR_REPEATS[`${book}/${n}`] || {};
   const dupT = SIDDUR_DUP_TITLES[`${book}/${n}`] || {}, drops = dupTitleDrops(sec.b, book, n);
+  const kd = kaddishFlags(sec.b).flags;   // 1.0.90: Kaddish paragraphs (read aloud or skipped – prefs.siddurKaddish)
   // 1.0.72: hide no-Tachanun spans (incl. notes inside them) when today is a no-Tachanun day and the setting is on
   const hid = new Set();
   if (hideNoTachanun || hideShabbat) {
@@ -696,6 +730,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
     else {
       const extra = {};
       if (special[i]) { extra.special = true; if (specialEnd[i]) extra.specialEnd = true; }
+      if (kd[i]) extra.kaddish = true;
       if (om.omit[i]) {
         extra.omit = true;
         if (om.isStart[i]) { extra.omitStart = true; extra.omitLabel = om.label[i]; }
@@ -703,7 +738,7 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
       }
       const text = localizeRuns(inlineOnly(h), runs, lang, { hideInstructions }), cnt = reps.get(i) || 1;
       blocks.push({ type: 'p', id, text, say: sec.say?.[i], ...extra, ...(cnt > 1 ? { rep: 1, repOf: cnt } : {}) });
-      for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, say: sec.say?.[i], rep: k, repOf: cnt });
+      for (let k = 2; k <= cnt; k++) blocks.push({ type: 'p', id: `${id}x${k}`, text, say: sec.say?.[i], rep: k, repOf: cnt, ...(kd[i] ? { kaddish: true } : {}) });
     }
   });
   return { title: sec.he, subtitle: b.he + (sec.en && lang !== 'he' ? ` · ${sec.en}` : ''), blocks, book: 'Siddur', siddur: { book, n } };

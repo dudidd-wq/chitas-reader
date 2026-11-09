@@ -127,8 +127,17 @@ export class Speaker {
   skip(delta) {
     const cur = this.queue[this.i]?.si ?? 0;
     const target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
-    const k = this.queue.findIndex(q => q.si === target);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } else this.onSegment?.(target); }
+    const k = this.queueIndexFor(target, delta);
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
+  }
+  /** First chunk of segment `target`; a segment with nothing to say (e.g. a skipped Kaddish, 1.0.90) gives the nearest
+   *  spoken one in the direction of the skip. -1 if there is none. */
+  queueIndexFor(target, dir = 1) {
+    let k = this.queue.findIndex(q => q.si === target);
+    if (k >= 0) return k;
+    if (dir >= 0) return this.queue.findIndex(q => q.si > target);
+    for (let j = this.queue.length - 1; j >= 0; j--) if (this.queue[j].si < target) { const si = this.queue[j].si; return this.queue.findIndex(q => q.si === si); }
+    return -1;
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
   finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.({ complete: this.bad === 0 }); }

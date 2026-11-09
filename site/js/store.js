@@ -9,6 +9,7 @@ export const DEFAULT_PREFS = {
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
+  siddurKaddish: 'read', // 1.0.90: 'read' | 'skip' (Kaddish in the siddur read-aloud)
   // 1.0.73: 'off' | 'date' | 'always' (1.0.72 boolean hideNoTachanun true → 'date')
   // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
   tehillimProfiles: [], tehillimRebbe: false,
@@ -25,6 +26,7 @@ function load() {
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
     if ('hideNoTachanun' in prefs) { if (prefs.hideNoTachanun === true && !(d.prefs || {}).tachanunMode) prefs.tachanunMode = 'date'; delete prefs.hideNoTachanun; }
     for (const k of ['tachanunMode', 'shabbatMode']) if (!['off', 'date', 'always'].includes(prefs[k])) prefs[k] = 'off';
+    if (!['read', 'skip'].includes(prefs.siddurKaddish)) prefs.siddurKaddish = 'read';
     // round 7: the old on/off switch for the English instructions became a language choice. Both old values move to
     // the new default (Hebrew): those who hid the English did so because it was English.
     delete prefs.siddurEn;

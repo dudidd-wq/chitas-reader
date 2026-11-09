@@ -482,6 +482,10 @@ function shell(title, body) {
 const radio = (name, value, opts) => `<div class="seg-ctl" role="radiogroup">${opts.map(([v, l]) => `<label><input type="radio" name="${name}" value="${v}" ${String(value) === String(v) ? 'checked' : ''}>${l}</label>`).join('')}</div>`;
 const check = (name, value, label) => `<label class="check"><input type="checkbox" name="${name}" ${value ? 'checked' : ''}>${label}</label>`;
 
+// 1.0.90: Kaddish in the siddur read-aloud – in the display sheet (with the other siddur settings) and, while reading the
+// siddur, in the read-aloud sheet too
+const kaddishField = () => `<fieldset class="kaddish-set"><legend>הקראת קדישים</legend>${radio('siddurKaddish', prefs.siddurKaddish, [['read', 'להקריא'], ['skip', 'לדלג']])}
+    <small>״לדלג״ – ההקראה בסידור עוברת על כל קדיש (חצי קדיש, קדיש שלם, קדיש יתום, קדיש דרבנן, כולל ״אמן, יהא שמיה רבא״ ו״עושה שלום״ שבתוכו) בלי להקריא אותו. הקדיש נשאר מוצג במסך. ברכו, קדושה ושאר התפילה מוקראים כרגיל.</small></fieldset>`;
 function displayForm() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
@@ -497,6 +501,7 @@ function displayForm() {
   <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
+  ${kaddishField()}
   <fieldset><legend>הנחיות בסידור</legend>${check('hideSiddurInstructions', prefs.hideSiddurInstructions, 'הסתר הנחיות בסידור')}<small>הסרת הוראות התפילה מהתצוגה ומההקראה בלבד. נוסח התפילה, כותרות הניווט וסימוני הדילוג נשמרים.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
     </fieldset><fieldset><legend>קטעים שלא אומרים ביום שאין תחנון</legend>${radio('tachanunMode', prefs.tachanunMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
@@ -590,6 +595,7 @@ function ttsForm() {
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
+  ${R.sid ? kaddishField() : ''}
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
   ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
@@ -1571,6 +1577,8 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   bindForm(sh.querySelector('form'), async name => {
+    // 1.0.90: the Kaddish choice changes only what is read: a running read-aloud restarts from the current paragraph
+    if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
     if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'hayomNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
@@ -1601,7 +1609,10 @@ document.addEventListener('keydown', e => {
 function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
   const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), b.say])); // 1.0.76: vocalized reading text (Hayom Yom)
+  // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen
+  const skipK = R.doc.siddur && prefs.siddurKaddish === 'skip' ? new Set(R.doc.blocks.filter(b => b.kaddish).map(b => String(b.id))) : null;
   return R.segs.map(s => {
+    if (skipK?.has(s.dataset.id)) return { el: s, parts: [], cites: [], acc: null, accParts: [], primaryParts: [], kaddish: true };
     const parts = [say.has(s.dataset.id) ? say.get(s.dataset.id) : unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Speech-only Rashi keeps the display edition intact and supplies its own primary-stress metadata.
     const block = byId?.get(s.dataset.id), accParts = [block?.text || say.get(s.dataset.id) || null], primaryParts = [say.has(s.dataset.id)];

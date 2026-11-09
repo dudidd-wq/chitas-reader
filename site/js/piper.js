@@ -160,8 +160,8 @@ export class PiperSpeaker extends Speaker {
   stop(silent) { this.cut(); this.state = 'stopped'; this.mediaSession(false); if (!silent) this.onState?.('stopped'); }
   skip(delta) {
     const cur = this.queue[this.i]?.si ?? 0, target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
-    const k = this.queue.findIndex(q => q.si === target);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(target); }
+    const k = this.queueIndexFor(target, delta);
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
   setGender(g) {
