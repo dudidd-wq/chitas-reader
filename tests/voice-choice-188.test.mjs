@@ -42,7 +42,7 @@ test('1.0.88: natural model files listed with real sizes, never precached, versi
   }
   assert.ok(VOICE_FILES.natural.size > 60e6 && VOICE_FILES.natural.size < 70e6);
   const sw = read('site/sw.js');
-  assert.match(sw, /VERSION = '1\.0\.88'/);
+  assert.match(sw, /VERSION = '1\.0\.(8[89]|9\d)'/);
   assert.doesNotMatch(sw.match(/const ASSETS = \[[\s\S]*?\];/)[0], /voice\/|\.onnx|voice-samples/);
 });
 test('1.0.88: the natural male voice synthesises in Node with the fixed niqqud/shin-sin/vav G2P, in the male range', { timeout: 120000 }, async () => {
@@ -83,6 +83,7 @@ test('1.0.88 browser: four choices, default unchanged; natural downloads only on
     assert.match(await p.textContent('#qv-gender-note'), /8 חצאי טון/);
     await p.click('label:has(input[name=ttsGender][value=natural])');
     assert.match(await p.textContent('#qv-gender-note'), /CC BY-NC 4\.0/);
+    assert.match(await p.textContent('#qv-gender-label'), /בחירת קול/);
     assert.equal(await p.isHidden('#qv-model'), true);
     await p.waitForFunction(() => /קול גברי טבעי – הורדה חד-פעמית \(\d+ MB\)/.test(document.querySelector('#qv-dl').textContent) && !document.querySelector('#qv-dl').hidden);
     assert.match(await p.textContent('#qv-st'), /הקול הגברי הטבעי אינו מותקן/);

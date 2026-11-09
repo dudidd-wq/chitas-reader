@@ -579,3 +579,8 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 [data-font="taamey-d"] .r-content, [data-font="keter-yg"] .r-content,
 [data-font="taamey-d"] .font-sample, [data-font="keter-yg"] .font-sample { font-synthesis: weight style; }
 .font-options .font-hint { font-family: var(--ui); font-size: .75rem; line-height: 1.35; }
+
+/* 1.0.89: the voice choice is its own group, set apart from the engine choice above it */
+#qv .qv-sub { margin: .9rem 0 .3rem; font-weight: 600; }
+#qv-prev-row .qv-prev { min-height: 44px; }
+#qv bdi { white-space: nowrap; }

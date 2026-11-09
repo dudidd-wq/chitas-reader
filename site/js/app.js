@@ -514,7 +514,7 @@ const VOICE_CHOICES = [['male', 'קול גברי (ברירת מחדל)'], ['deep
 const voiceNote = g => ({
   male: 'הקול noa בעיבוד אות במכשיר: גובה הצליל נמוך בכ־6 חצאי טון והפורמנטים בכ־12%. אין הורדה נוספת. גוון מלאכותי, לא דובר אמיתי.',
   deep: 'אותו קול noa, מונמך יותר: כ־8 חצאי טון והפורמנטים בכ־18%. אין הורדה נוספת. גוון מלאכותי, לא דובר אמיתי.',
-  natural: `קול של דובר גבר אמיתי – מודל נפרד (notmax123/piper-medium-heb, רישיון CC BY-NC 4.0, לשימוש לא מסחרי בלבד). דורש הורדה חד־פעמית של כ־${mb(VOICE_FILES.natural.size)} MB, רק בלחיצה על הכפתור; אחר כך נשמר במכשיר ופועל בלי רשת.`,
+  natural: `קול של דובר גבר אמיתי – מודל נפרד (<bdi dir="ltr">notmax123/piper-medium-heb</bdi>, רישיון <bdi dir="ltr">CC BY-NC 4.0</bdi>, לשימוש לא מסחרי בלבד). דורש הורדה חד־פעמית של כ־${mb(VOICE_FILES.natural.size)} MB (ועוד כ־${mb(VOICE_FILES.wasm.size + VOICE_FILES.ort.size)} MB של מנוע ההקראה, אם הקול האיכותי עוד לא הותקן), רק בלחיצה על הכפתור; אחר כך נשמר במכשיר ופועל בלי רשת.`,
   female: 'הקול המקורי של noa, בלי עיבוד.',
 })[g] || '';
 const voiceName = v => v === 'natural' ? 'הקול הגברי הטבעי' : v === 'int8' ? 'הקול הקל' : 'הקול הרגיל';
@@ -523,6 +523,7 @@ function qvForm() {
   if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small></fieldset>`;
   return `<fieldset id="qv"><legend>קול איכותי (פועל במכשיר, ניסיוני)</legend>
     ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי (מקומי)']])}
+    <p class="qv-sub" id="qv-gender-label">בחירת קול:</p>
     ${radio('ttsGender', prefs.ttsGender, VOICE_CHOICES)}
     <small id="qv-gender-note">${voiceNote(prefs.ttsGender)}</small>
     <p class="row" id="qv-prev-row"><span>שמע דוגמה:</span> ${VOICE_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="${v}" aria-label="שמע דוגמה – ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
@@ -530,7 +531,7 @@ function qvForm() {
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
-    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – notmax123/piper-medium-heb (CC BY-NC 4.0). הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small>
+    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – <bdi dir="ltr">notmax123/piper-medium-heb (CC BY-NC 4.0)</bdi>. הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small>
   </fieldset>`;
 }
 async function bindQv(root) {
@@ -553,7 +554,7 @@ async function bindQv(root) {
     if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh();
     if (e.target.name === 'ttsGender') {
       const g = e.target.value, note = root.querySelector('#qv-gender-note'), mdl = root.querySelector('#qv-model');
-      if (note) note.textContent = voiceNote(g);
+      if (note) note.innerHTML = voiceNote(g);   // fixed strings of this file only
       if (mdl) mdl.hidden = g === 'natural';
       refresh();
       if (R.speaker instanceof PiperSpeaker) {
