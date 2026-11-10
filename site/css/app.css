@@ -584,3 +584,7 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 #qv .qv-sub { margin: .9rem 0 .3rem; font-weight: 600; }
 #qv-prev-row .qv-prev { min-height: 44px; }
 #qv bdi { white-space: nowrap; }
+/* 1.0.92: manual pitch slider – "עמוק יותר" at the low (right, RTL) end, "גבוה יותר" at the high end */
+.pitch-row { display: flex; align-items: center; gap: .5rem; }
+.pitch-row input[type=range] { flex: 1; min-width: 0; min-height: 44px; }
+.pitch-end { font-size: .85em; white-space: nowrap; color: var(--muted, inherit); }

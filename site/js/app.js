@@ -6,6 +6,7 @@ import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } fro
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
+import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
 import { VOICE_FILES } from './voice-files.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
@@ -527,16 +528,25 @@ const HAVARA_CHOICES = [['israeli', 'ישראלית (ברירת מחדל)'], ['c
 const havaraNote = h => h === 'chabad'
   ? 'קמץ – כמו חולם (״בּוֹרוּך״), חולם וצירה – ״אֵיי״ (תורה ← ״טֵיירוֹ״), ת׳ רפויה – ס (שבת ← ״שַׁבּוֹס״), א׳ וע׳ בלי עצירה, והטעמה מלעיל (בתורה ובתהילים – לפי הטעמים). פועל בקול האיכותי בלבד; הטקסט המוצג אינו משתנה.'
   : 'ההגייה העברית הרגילה (ספרדית־ישראלית).';
+// 1.0.92: manual pitch of the narrator, semitones relative to the chosen voice (voice-pitch.js clampPitch; 0 = unchanged)
+const pitchText = v => v ? `${v > 0 ? '+' : '−'}${Math.abs(v)} חצאי טון` : '0 (ללא שינוי)';
+const pitchField = () => `<div id="qv-pitch">
+    <p class="qv-sub" id="qv-pitch-label">גובה קול: <output id="o-pitch">${pitchText(prefs.ttsPitch)}</output></p>
+    <div class="pitch-row"><span class="pitch-end">עמוק יותר</span><input type="range" name="ttsPitch" id="qv-pitch-in" min="${PITCH_MIN}" max="${PITCH_MAX}" step="${PITCH_STEP}" value="${prefs.ttsPitch}" aria-label="גובה קול, בחצאי טון" aria-valuetext="${pitchText(prefs.ttsPitch)}"><span class="pitch-end">גבוה יותר</span></div>
+    <p class="row"><button type="button" class="btn ghost" id="qv-pitch-reset"${prefs.ttsPitch ? '' : ' disabled'}>איפוס לברירת המחדל</button></p>
+    <small id="qv-pitch-note">בחצאי טון ביחס לקול שנבחר; 0 = הקול כפי שהוא. בקול האיכותי – עיבוד במכשיר ששומר על המהירות והגוון (חלה על ״שמע דוגמה״); בקול הדפדפן – הגובה של מנוע הדיבור, ויש קולות שמתעלמים ממנו.</small>
+  </div>`;
 const voiceName = v => v === 'natural' ? 'הקול הגברי הטבעי' : v === 'int8' ? 'הקול הקל' : 'הקול הרגיל';
 // 1.0.59: the local "quality voice". Nothing is downloaded until the reader presses #qv-dl.
 function qvForm() {
-  if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small></fieldset>`;
+  if (!piperSupported()) return `<fieldset id="qv"><legend>קול איכותי</legend><small>הדפדפן הזה אינו תומך בקול המקומי (WebAssembly / Web Audio); ההקראה משתמשת בקול הדפדפן.</small>${pitchField()}</fieldset>`;
   return `<fieldset id="qv"><legend>קול איכותי (פועל במכשיר, ניסיוני)</legend>
     ${radio('ttsEngine', prefs.ttsEngine, [['web', 'קול הדפדפן / המכשיר'], ['piper', 'קול איכותי (מקומי)']])}
     <p class="qv-sub" id="qv-gender-label">בחירת קול:</p>
     ${radio('ttsGender', prefs.ttsGender, VOICE_CHOICES)}
     <small id="qv-gender-note">${voiceNote(prefs.ttsGender)}</small>
     <p class="row" id="qv-prev-row"><span>שמע דוגמה:</span> ${VOICE_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="${v}" aria-label="שמע דוגמה – ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
+    ${pitchField()}
     <p class="qv-sub" id="qv-havara-label">הגייה:</p>
     ${radio('ttsHavara', prefs.ttsHavara, HAVARA_CHOICES)}
     <small id="qv-havara-note">${havaraNote(prefs.ttsHavara)}</small>
@@ -547,6 +557,21 @@ function qvForm() {
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
     <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – <bdi dir="ltr">notmax123/piper-medium-heb (CC BY-NC 4.0)</bdi>. הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small>
   </fieldset>`;
+}
+// a short pre-recorded sample (site/voice-samples/, ~40KB, fetched only on the click); 1.0.92: with the manual pitch applied
+let sample = null, sampleCtx = null;
+async function playSample(url) {
+  try { sample?.pause?.(); sample?.stop?.(); } catch { /* ended */ }
+  const p = clampPitch(prefs.ttsPitch), fail = () => toast('לא ניתן להשמיע את הדוגמה (אין חיבור?)');
+  if (!p) { sample = new Audio(url); sample.play().catch(fail); return; }
+  try {
+    const AC = globalThis.AudioContext || globalThis.webkitAudioContext; sampleCtx ||= new AC();
+    if (sampleCtx.state === 'suspended') sampleCtx.resume().catch(() => {});
+    const buf = await sampleCtx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+    const y = maleTimbre(buf.getChannelData(0).slice(), buf.sampleRate, { semitones: p, formant: 1 });
+    const out = sampleCtx.createBuffer(1, y.length, buf.sampleRate); out.getChannelData(0).set(y);
+    const src = sampleCtx.createBufferSource(); src.buffer = out; src.connect(sampleCtx.destination); src.start(); sample = src;
+  } catch { fail(); }
 }
 async function bindQv(root) {
   const st = root.querySelector('#qv-st'); if (!st) return;
@@ -559,13 +584,14 @@ async function bindQv(root) {
     st.textContent = have ? `${voiceName(v)} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
       : `${voiceName(v)} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
   };
-  let sample = null;
-  root.querySelectorAll('.qv-prev').forEach(b => { b.onclick = () => {
-    // a short pre-recorded sample of each voice (site/voice-samples/, ~50KB, fetched only on this click)
-    sample?.pause(); sample = new Audio(`voice-samples/${b.dataset.v}.mp3`); sample.play().catch(() => toast('לא ניתן להשמיע את הדוגמה (אין חיבור?)'));
-  }; });
+  root.querySelectorAll('.qv-prev').forEach(b => { b.onclick = () => playSample(`voice-samples/${b.dataset.v}.mp3`); });
+  const pin = root.querySelector('#qv-pitch-in'), pout = root.querySelector('#o-pitch'), preset = root.querySelector('#qv-pitch-reset');
+  const showPitch = v => { if (pout) pout.textContent = pitchText(v); pin?.setAttribute('aria-valuetext', pitchText(v)); if (preset) preset.disabled = !v; };
+  if (pin) pin.addEventListener('change', () => R.speaker?.setPitch?.(prefs.ttsPitch));   // on release: the running chunk is said again
+  if (preset) preset.onclick = () => { setPref('ttsPitch', 0); pin.value = '0'; showPitch(0); R.speaker?.setPitch?.(0); };
   root.addEventListener('input', async e => {
     if (e.target.name === 'ttsModel' || e.target.name === 'ttsEngine') refresh();
+    if (e.target.name === 'ttsPitch') { const v = clampPitch(e.target.value); if (v !== prefs.ttsPitch) setPref('ttsPitch', v); showPitch(v); }
     if (e.target.name === 'ttsHavara') {
       const note = root.querySelector('#qv-havara-note'); if (note) note.textContent = havaraNote(e.target.value);
       if (R.speaker instanceof PiperSpeaker) R.speaker.setHavara(e.target.value);
@@ -1596,7 +1622,7 @@ function openSheet(kind, note = '') {
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'hayomNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
-    else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
+    else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
   });
 }
@@ -1702,7 +1728,7 @@ async function ttsToggle() {
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara, pitch: prefs.ttsPitch },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: R.lib ? 'ספרייה' : dayPlan(R.iso, { il: prefs.il }).hebDate });
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);

@@ -156,6 +156,17 @@ export const TIMBRES = {
   female: null,
 };
 
-/** Timbre parameters for a voice choice (1.0.88): 'female' and 'natural' (a real male model) are not processed, 'deep'
+/** Timbre parameters for a voice choice (1.0.88; 1.0.92: + the manual pitch offset in semitones): 'female' and 'natural' (a real male model) are not processed, 'deep'
  *  is the lower noa timbre, anything else the default male timbre. */
-export const timbreFor = gender => gender === 'female' || gender === 'natural' ? null : gender === 'deep' ? TIMBRES.deep : TIMBRES.male;
+export const timbreFor = (gender, pitch = 0) => {
+  const base = gender === 'female' || gender === 'natural' ? null : gender === 'deep' ? TIMBRES.deep : TIMBRES.male;
+  const p = clampPitch(pitch);
+  if (!p) return base;                                   // 0 = exactly the voice's own timbre (the objects above)
+  return base ? { ...base, semitones: base.semitones + p } : { semitones: p, formant: 1 };
+};
+/** 1.0.92: the reader's manual pitch offset (semitones, relative to the chosen voice): −6…+6 in steps of 0.5.
+ *  Applied with the same formant-preserving PSOLA as the male timbre, so speed and duration stay the same. */
+export const PITCH_MIN = -6, PITCH_MAX = 6, PITCH_STEP = 0.5;
+export const clampPitch = v => { const n = Number(v); return Number.isFinite(n) ? Math.max(PITCH_MIN, Math.min(PITCH_MAX, Math.round(n / PITCH_STEP) * PITCH_STEP)) || 0 : 0; };
+/** Web Speech (device voice): utterance.pitch is 0…2 with 1 = the voice's own; one semitone ≈ ×2^(1/12) as a rough mapping. */
+export const webPitch = v => Math.max(0.5, Math.min(2, 2 ** (clampPitch(v) / 12)));

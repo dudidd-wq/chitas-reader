@@ -1,12 +1,13 @@
 // Local-only storage: preferences + reading progress. Nothing ever leaves the device.
 import { dayPlan } from './calendar.js';
 import { cleanProfile } from './personal.js';
+import { clampPitch } from './voice-pitch.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, hayomNiqqud: true, gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsSkipCites: true, ttsContinuous: true,
-  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', wakeLock: true, spread: true, locationChosen: false,
+  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
   siddurKaddish: 'read', // 1.0.90: 'read' | 'skip' (Kaddish in the siddur read-aloud)
@@ -39,6 +40,7 @@ function load() {
     // 1.0.88: 'deep' = noa lowered further (no download); 'natural' = a real male voice (separate model, downloaded on choice)
     if (!['male', 'deep', 'natural', 'female'].includes(prefs.ttsGender)) prefs.ttsGender = 'male';
     if (!['israeli', 'chabad'].includes(prefs.ttsHavara)) prefs.ttsHavara = 'israeli';   // 1.0.91
+    prefs.ttsPitch = clampPitch(prefs.ttsPitch);   // 1.0.92: semitones −6…+6, step 0.5; 0 = the voice as it was
     return { prefs, progress: d.progress || {} };
   }
   catch { return { prefs: { ...DEFAULT_PREFS }, progress: {} }; }

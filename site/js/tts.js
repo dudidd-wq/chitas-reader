@@ -3,6 +3,7 @@
 // voices are network voices (localService === false) whose engine sends the text to the browser vendor – those are
 // labelled in the UI and never chosen by default when a local Hebrew voice exists.
 import { prepareForTTS, chunkText } from './tts-prep.js';
+import { webPitch, clampPitch } from './voice-pitch.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 export const ttsSupported = () => !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
@@ -92,6 +93,7 @@ export class Speaker {
     const v = hebrewVoices().find(v => v.name === this.opts.voice) || hebrewVoices()[0];
     try { if (v) u.voice = v; } catch { /* non-native voice object */ }
     u.rate = this.opts.rate || 1;
+    if (clampPitch(this.opts.pitch)) u.pitch = webPitch(this.opts.pitch);   // 1.0.92: only when the reader moved the slider
     const token = this.token = Symbol();
     let started = 0;
     u.onstart = () => { if (this.token !== token) return; started = performance.now(); this.onSegment?.(q.si, q.frac); };
@@ -140,6 +142,8 @@ export class Speaker {
     return -1;
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
+  /** 1.0.92: manual pitch offset (semitones); the current chunk is said again */
+  setPitch(p) { this.opts.pitch = p; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
   finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.({ complete: this.bad === 0 }); }
   mediaSession(on) {
     if (!on) { this.keepAlive?.pause(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; return; }
