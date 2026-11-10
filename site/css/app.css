@@ -103,8 +103,11 @@ input[type="date"], #datepick { min-height: 44px; padding: .3rem .6rem; border-r
 .card.done .go { background: transparent; color: var(--accent); border: 1px solid var(--rule); }
 .card.done { background: color-mix(in srgb, var(--accent) 5%, var(--card)); }
 .home-foot { margin-top: 1.6rem; display: grid; justify-items: center; gap: .8rem; }
-.home-foot .links { display: flex; flex-wrap: wrap; gap: .2rem 1.2rem; justify-content: center; margin: 0; }
-.home-foot .links a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; font-weight: 600; text-underline-offset: .25em; }
+.home-foot .links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: .5rem; max-width: 34rem; margin: 0 auto; }
+/* 1.0.93: equal tiles, icon above the label (labels may take two lines on narrow phones – never cut) */
+.home-foot .links a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; min-height: 64px; min-width: 0; padding: .45rem .3rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--card); font-weight: 600; font-size: .9rem; line-height: 1.25; text-align: center; text-decoration: none; }
+.home-foot .links a:hover { border-color: var(--accent); }
+.home-foot .links a svg { width: 22px; height: 22px; flex: none; }
 .home-foot .note { margin: 0; }
 .links { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1.5rem; }
 .note { color: var(--muted); font-size: .9rem; text-align: center; margin-top: 1rem; }
@@ -136,6 +139,16 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-top, .r-bottom { position: absolute; inset-inline: 0; z-index: 3; display: flex; align-items: center; gap: .25rem; padding: .3rem max(.5rem, env(safe-area-inset-right)) .3rem max(.5rem, env(safe-area-inset-left)); background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); transition: transform .25s, opacity .25s; }
 .r-top { top: 0; padding-top: max(.3rem, env(safe-area-inset-top)); border-bottom: 1px solid var(--rule); }
 .r-bottom { bottom: 0; padding-bottom: max(.3rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); flex-wrap: wrap; }
+/* 1.0.93: the pager is three columns – previous page (right) | page number (centre) | next page (left) – the two
+   buttons labelled and equally wide. While reading aloud the player row (below) takes over. */
+.r-bottom:not(.tts-on) { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: .4rem; }
+.r-bottom:not(.tts-on) #spacer { display: none; }
+.r-bottom:not(.tts-on) #pinfo { justify-self: center; text-align: center; white-space: nowrap; font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.r-bottom:not(.tts-on) #b-prev { justify-content: flex-start; } .r-bottom:not(.tts-on) #b-next { justify-content: flex-end; }
+.pg-btn { min-height: 48px; gap: .3rem; padding-inline: .55rem; font-size: .92rem; font-weight: 600; white-space: nowrap; }
+.pg-btn svg { width: 22px; height: 22px; flex: none; }
+.r-bottom.tts-on .pg-lbl { display: none; }
+@media (max-width: 340px) { .pg-lbl { display: none; } }
 .r-title { flex: 1; min-width: 0; text-align: center; line-height: 1.25; }
 .r-title b { display: block; font-size: 1rem; font-family: var(--text-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .r-title small { color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
@@ -584,7 +597,35 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 #qv .qv-sub { margin: .9rem 0 .3rem; font-weight: 600; }
 #qv-prev-row .qv-prev { min-height: 44px; }
 #qv bdi { white-space: nowrap; }
+#qv small bdi { white-space: normal; } /* 1.0.93: the long model credit may wrap (it widened the page at 360 px) */
 /* 1.0.92: manual pitch slider – "עמוק יותר" at the low (right, RTL) end, "גבוה יותר" at the high end */
 .pitch-row { display: flex; align-items: center; gap: .5rem; }
 .pitch-row input[type=range] { flex: 1; min-width: 0; min-height: 44px; }
 .pitch-end { font-size: .85em; white-space: nowrap; color: var(--muted, inherit); }
+
+/* 1.0.93: settings page – titled cards with a jump index; inside a card (and in the reader's sheets) every setting is
+   a flat row: title on the right, control below or at the left end, helper text under it, a divider between rows. */
+.settings-page { background: none; border: 0; box-shadow: none; padding: 0; }
+.settings-page > h1 { margin-inline: .2rem; }
+.set-jump { display: flex; flex-wrap: wrap; gap: .4rem; margin: .1rem 0 1rem; }
+.set-jump .chip { min-height: 44px; padding-inline: .8rem; font-size: .92rem; }
+#sf.form { gap: 1rem; }
+.set-card { display: grid; min-width: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: .3rem 1.1rem .7rem; box-shadow: var(--shadow); scroll-margin-top: .75rem; }
+.set-card > h2 { font-size: 1.2rem; margin: .65rem 0 .35rem; scroll-margin-top: .75rem; }
+.set-card > h2:focus:not(:focus-visible) { outline: none; }
+.set-card > p { margin: .6rem 0; }
+.set-card > :is(fieldset, .field, .check), #sheet .form > :is(fieldset, .field, .check) { border: 0; border-top: 1px solid var(--rule); border-radius: 0; margin: 0; padding: .7rem 0; min-width: 0; }
+.set-card > h2 + :is(fieldset, .field, .check) { border-top: 0; padding-top: .3rem; }
+.set-card fieldset > legend, #sheet .form fieldset > legend { float: inline-start; width: 100%; padding: 0; margin: 0 0 .45rem; }
+.set-card fieldset > legend + *, #sheet .form fieldset > legend + * { clear: both; }
+.set-card small, #sheet .form small { display: block; color: var(--muted); font-size: .86rem; line-height: 1.45; margin-top: .35rem; }
+.set-card .check, #sheet .form .check { justify-content: space-between; gap: .9rem; }
+.set-card .check input, #sheet .form .check input { order: 2; }
+.check input { flex: none; }
+.set-card fieldset .check + .check, #sheet .form fieldset .check + .check { border-top: 1px dashed var(--rule); }
+.set-sub { font-size: 1rem; color: var(--accent); margin: 1rem 0 .1rem; padding-top: .7rem; border-top: 2px solid var(--rule); }
+.set-card > .set-sub + :is(fieldset, .field, .check), #sheet .form > .set-sub + :is(fieldset, .field, .check) { border-top: 0; }
+#sheet .form { gap: .1rem; }
+#sheet .form > #sh-play { margin-bottom: .6rem; }
+.set-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .4rem 0 .5rem; }
+#set-ver { color: var(--muted); }

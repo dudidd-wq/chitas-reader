@@ -39,6 +39,16 @@ const ICON = {
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
+// 1.0.93: icons of the home page's bottom links (equal tiles, icon above the label)
+const NAV_ICON = {
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M15 9l-2 4-4 2 2-4z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg>',
+};
+
 // Optional reading fonts are never install-preloaded. Real previews request their faces;
 // selecting a family also retains its bold face and license for future offline use.
 const FONT_OPTIONS = [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew'], ['noto-rashi', 'Noto Rashi Hebrew', 'כתב רש״י · כולל טעמים'], ['taamey-d', 'Taamey D', 'כולל טעמים · הדגשה מלאכותית'], ['keter-yg', 'Keter YG', 'כולל טעמים · הדגשה מלאכותית'], ['cardo', 'Cardo', 'כולל טעמים'], ['david', 'David Libre', 'ללא טעמים'], ['assistant', 'Assistant', 'ללא טעמים']];
@@ -314,7 +324,7 @@ async function renderHome(showLoc = false) {
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        <a href="#/lib">ספרייה</a><a href="#/search">חיפוש בספרים</a><a href="#/zmanim/${currentDate}">זמני היום</a><a href="#/siddur">סידור</a><a href="#/kivun">כיוון התפילה</a><a href="#/tehillim">תהילים אישי</a><a href="#/settings">הגדרות</a><a href="#/sources">מקורות ורישיונות</a><a href="#/about">אודות ומגבלות</a>
+        ${[['#/lib', LIB_ICON, 'ספרייה'], ['#/search', SEARCH_ICON, 'חיפוש בספרים'], ['#/zmanim/' + currentDate, NAV_ICON.clock, 'זמני היום'], ['#/siddur', NAV_ICON.book, 'סידור'], ['#/kivun', NAV_ICON.compass, 'כיוון התפילה'], ['#/tehillim', NAV_ICON.heart, 'תהילים אישי'], ['#/settings', ICON.gear, 'הגדרות'], ['#/sources', NAV_ICON.doc, 'מקורות ורישיונות'], ['#/about', NAV_ICON.info, 'אודות ומגבלות']].map(([h, i, t]) => `<a href="${h}">${i}<span>${t}</span></a>`).join('')}
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -487,7 +497,13 @@ const check = (name, value, label) => `<label class="check"><input type="checkbo
 // siddur, in the read-aloud sheet too
 const kaddishField = () => `<fieldset class="kaddish-set"><legend>הקראת קדישים</legend>${radio('siddurKaddish', prefs.siddurKaddish, [['read', 'להקריא'], ['skip', 'לדלג']])}
     <small>״לדלג״ – ההקראה בסידור עוברת על כל קדיש (חצי קדיש, קדיש שלם, קדיש יתום, קדיש דרבנן, כולל ״אמן, יהא שמיה רבא״ ו״עושה שלום״ שבתוכו) בלי להקריא אותו. הקדיש נשאר מוצג במסך. ברכו, קדושה ושאר התפילה מוקראים כרגיל.</small></fieldset>`;
+// 1.0.93: the display settings in two groups – reading display and siddur – so the settings page can show each in its
+// own titled card; the Aא sheet shows both (the siddur group under its own subheading), with the same controls.
 function displayForm() {
+  return `${displayGroup()}<h3 class="set-sub" id="sh-siddur-h">סידור</h3>${siddurGroup()}
+  ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
+}
+function displayGroup() {
   return `
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
   <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
@@ -502,6 +518,12 @@ function displayForm() {
   <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
+  <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
+  ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
+  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}`;
+}
+function siddurGroup() {
+  return `
   ${kaddishField()}
   <fieldset><legend>הנחיות בסידור</legend>${check('hideSiddurInstructions', prefs.hideSiddurInstructions, 'הסתר הנחיות בסידור')}<small>הסרת הוראות התפילה מהתצוגה ומההקראה בלבד. נוסח התפילה, כותרות הניווט וסימוני הדילוג נשמרים.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
@@ -509,11 +531,7 @@ function displayForm() {
     <small>״כבוי״ – הכול מוצג. ״לפי התאריך״ – ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא, ואחרי חצות היום גם לפני יום כזה, כמו שאין אומרים תחנון במנחה שלפניו) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים; בשאר הימים מוצגים כרגיל. ״תמיד״ – מוסתרים בכל יום.</small></fieldset>
   <fieldset><legend>קטעים שלא אומרים בשבת ויום טוב</legend>${radio('shabbatMode', prefs.shabbatMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
     <small>״לפי התאריך״ – בשבת וביום טוב (אחרי השקיעה – לפי היום הבא; ארץ ישראל/חו״ל לפי הלוח שנבחר) הקטעים המסומנים ״בשבת ויו״ט אין אומרים״ מוסתרים ואינם מוקראים. ״תמיד״ – מוסתרים בכל יום.</small></fieldset><fieldset><legend>הנחיות</legend>
-    <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>
-  <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
-  ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
-  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}
-  ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
+    <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>`;
 }
 // 1.0.88: the four voice choices of the local voice. 'natural' is a separate model, downloaded only when chosen.
 const VOICE_CHOICES = [['male', 'קול גברי (ברירת מחדל)'], ['deep', 'קול גברי עמוק'], ['natural', 'קול גברי טבעי'], ['female', 'קול נשי']];
@@ -631,6 +649,7 @@ function ttsForm() {
   <div id="voice-warn"></div>
   <label class="field"><span>קול</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
   <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). ברירת המחדל היא תמיד קול מקומי, כשיש כזה.</small>
+  <h3 class="set-sub" id="tts-opts-h">אפשרויות הקראה</h3>
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
@@ -668,22 +687,34 @@ function voiceHelp() {
   <li><b>macOS:</b> הגדרות מערכת ← נגישות ← תוכן מוקרא ← קול מערכת ← ניהול קולות ← עברית.</li></ul>
   לאחר ההתקנה יש לרענן את הדף.</div>`;
 }
+// 1.0.93: the settings page in titled cards, with a jump index at the top. The controls, their names (storage keys),
+// defaults and behaviour are the ones the sheets use. Jump buttons scroll (no #anchors – the hash is the router's).
+const SET_CARDS = [['set-daily', 'לימוד יומי'], ['set-display', 'תצוגה וגופנים'], ['set-tts', 'הקראה'], ['set-siddur', 'סידור'], ['set-tehillim', 'תהילים אישי'], ['set-backup', 'גיבוי ושחזור'], ['set-about', 'על האפליקציה']];
+const setCard = (id, body, hid) => `<section class="set-card" id="${id}" aria-labelledby="${hid || id + '-h'}"><h2 id="${hid || id + '-h'}">${SET_CARDS.find(c => c[0] === id)[1]}</h2>${body}</section>`;
 function renderSettings() {
-  shell('הגדרות', `<form class="form" id="sf" onsubmit="return false">
-    <fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
+  shell('הגדרות', `<nav class="set-jump" aria-label="קפיצה לקבוצת הגדרות">${SET_CARDS.map(([id, t]) => `<button type="button" class="chip" data-jump="${id}">${t}</button>`).join('')}</nav>
+  <form class="form" id="sf" onsubmit="return false">
+    ${setCard('set-daily', `<fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
     <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}
-    <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>
-    <h2 id="pt-settings">תהילים אישי</h2>
-    <p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>
-    <h2>תצוגה</h2>${displayForm()}
-    <h2>הקראה</h2>${ttsForm()}
-    <h2>גיבוי ושחזור</h2>
-    <p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
-    <div class="seg-ctl"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
+    <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>`)}
+    ${setCard('set-display', displayGroup())}
+    ${setCard('set-tts', ttsForm())}
+    ${setCard('set-siddur', siddurGroup())}
+    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
+    ${setCard('set-backup', `<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
+    <div class="set-actions"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
     <label class="btn" for="imp">ייבוא קובץ גיבוי</label><input type="file" id="imp" accept="application/json,.json" class="sr">
-    <button class="btn" type="button" id="rst">מחיקת כל הנתונים מהמכשיר</button></div>
+    <button class="btn" type="button" id="rst">מחיקת כל הנתונים מהמכשיר</button></div>`)}
+    ${setCard('set-about', `<p id="set-ver">גרסה <bdi dir="ltr" id="set-ver-n">…</bdi></p>
+    <div class="set-actions"><a class="btn" href="#/about">אודות ומגבלות</a><a class="btn" href="#/sources">מקורות ורישיונות</a></div>
+    <p class="hint">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>`)}
   </form>`);
+  $('#view .page').classList.add('settings-page');
+  $('#view').querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
+    const h = $('#' + b.dataset.jump + ' h2'); h.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); h.tabIndex = -1; h.focus({ preventScroll: true }); h.addEventListener('blur', () => h.removeAttribute('tabindex'), { once: true });
+  }));
+  fetch('sw.js').then(r => r.text()).then(t => { const m = t.match(/const VERSION = '([^']+)'/), n = $('#set-ver-n'); if (n) { if (m) n.textContent = m[1]; else $('#set-ver').hidden = true; } }).catch(() => { const v = $('#set-ver'); if (v) v.hidden = true; });
   const f = $('#sf'); bindForm(f);
   $('#exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(exportBackup()); a.download = `chitas-backup-${todayIso()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
   $('#imp').onchange = async e => { const file = e.target.files[0]; if (!file) return; try { importBackup(await file.text()); applyPrefs(); toast('הגיבוי שוחזר'); renderSettings(); } catch { toast('קובץ לא תקין'); } };
@@ -1034,7 +1065,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
   <footer class="r-bottom" id="rb" aria-label="דפדוף והקראה">
     <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
-    <button class="btn ghost" id="b-prev" aria-label="עמוד קודם">${ICON.prev}</button>
+    <button class="btn ghost pg-btn" id="b-prev" aria-label="עמוד קודם">${ICON.prev}<span class="pg-lbl">עמוד קודם</span></button>
     <span class="pageinfo" id="pinfo" aria-live="polite"></span>
     <div class="tts-ctl" id="ttsctl" hidden>
       <button class="btn ghost" id="t-back" aria-label="קטע קודם">${ICON.fwd}</button>
@@ -1046,7 +1077,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
       <select id="t-rate" title="מהירות ההקראה">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
     </div>
     <span style="flex:1" id="spacer"></span>
-    <button class="btn ghost" id="b-next" aria-label="עמוד הבא">${ICON.next}</button>
+    <button class="btn ghost pg-btn" id="b-next" aria-label="עמוד הבא"><span class="pg-lbl">עמוד הבא</span>${ICON.next}</button>
   </footer>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
   <div class="pflash" id="pflash" aria-hidden="true"></div>
