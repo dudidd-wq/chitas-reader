@@ -1,7 +1,7 @@
 {
  "v": 1,
- "source": "5e367507f8972f84",
- "bytes": 13117848,
+ "source": "db3900fbce5b32df",
+ "bytes": 13117945,
  "segs": 47666,
  "shards": [
   {
@@ -218,7 +218,7 @@
    "id": "siddur",
    "fam": "siddur",
    "he": "סידור",
-   "bytes": 343009,
+   "bytes": 343106,
    "segs": 2066
   }
  ]

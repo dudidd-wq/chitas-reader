@@ -29,7 +29,7 @@ test('1.0.90: block boundaries – Kaddish parts in, Barchu / Kedusha / על ה�
   assert.ok(bar > 0 && f1[bar - 3] && !f1[bar], 'Barchu after the Kaddish is read');
   // Full Kaddish: תתקבל, יהא שלמא, the steps-back note and עושה שלום are in; the next paragraph is not
   const s5 = rows('shacharit/5'), f5 = kaddishFlags(s5).flags;
-  for (const re of [/^תתקבל צלותהון/, /^יהא שלמה רבא/, /^עשה שלום/]) assert.ok(s5.some((r, i) => f5[i] && re.test(plain(r[1]))), String(re));
+  for (const re of [/^תתקבל צלותהון/, /^יהא שלמא רבא/, /^עשה שלום/]) assert.ok(s5.some((r, i) => f5[i] && re.test(plain(r[1]))), String(re));
   assert.ok(s5.some((r, i) => f5[i] && r[0] === 'n' && /^פוסעים/.test(r[2])), 'steps-back note');
   // על הכל יתגדל (Torah service) and every Kedusha / Barchu paragraph are never flagged
   for (const b of JSON.parse(fs.readFileSync(root + 'site/data/siddur/index.json', 'utf8')).books) b.secs.forEach((_, i) => {

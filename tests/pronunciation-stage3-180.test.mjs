@@ -4,8 +4,8 @@ import{prepareForTTS}from'../site/js/tts-prep.js';import{textToIPA,normalize,let
 const ROOT=new URL('../',import.meta.url).pathname,walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(d+'/'+e.name):[d+'/'+e.name]);
 const files=walk('site/data/siddur').filter(f=>f.endsWith('.json')&&!f.endsWith('/index.json')).sort(),data=JSON.parse(fs.readFileSync(ROOT+'site/voice/stress-he.json'));
 const trace=s=>{const m=prepareForTTS(s,{primaryStress:true}),tr=[];textToIPA(m.replace(/\u05AB/g,''),{data,accents:{primary:m},trace:tr});return tr;};
-test('1.0.80: every original Siddur source field is identical; display/nusach was not edited',()=>{
- const original=files.map(f=>{const d=JSON.parse(fs.readFileSync(f));delete d.say;return[f,d];});assert.equal(crypto.createHash('sha256').update(JSON.stringify(original)).digest('hex'),'f11cb7682c5dc614b9b6e12b404e332016d032d07181f11bcf0f9580f99efc28');
+test('1.0.80/1.0.94: every Siddur source field is the proofread text; the speech build does not edit display/nusach',()=>{
+ const original=files.map(f=>{const d=JSON.parse(fs.readFileSync(f));delete d.say;return[f,d];});assert.equal(crypto.createHash('sha256').update(JSON.stringify(original)).digest('hex'),'d7b2d812ce07de124bc8215692e7739eb2162962896dee2981167968e0905344'/* 1.0.94: display text changed on purpose by the Tehillat Hashem proofreading (tools/data/siddur-proofread-194.json); still only the say layer is generated */);
 });
 test('1.0.80: speech sanitizer drops nested nonspoken markers/instructions, keeps prayer words',()=>{
  assert.equal(siddurSpeechHtml('(א) אָמֵן <span class="sid-in">הקהל <span lang="en">Cong</span></span> <span data-nr="1">אבג</span> תּוֹדָה').replace(/\s+/g,' ').trim(),'אָמֵן תּוֹדָה'.normalize('NFD'));

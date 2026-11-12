@@ -44,7 +44,7 @@ test('1.0.87: fixShinVav changes only marks, keeps letters and cantillation, lea
   assert.ok(!fixShinVav('יִשְֹרָאֵל').includes('\u05B9') && fixShinVav('יִשְֹרָאֵל').includes('\u05C2'));
 });
 test('1.0.87: lexicon entries keep the letters and are reached by their key', () => {
-  assert.ok(Object.keys(SHIN_VAV_LEX).length >= 90);
+  assert.ok(Object.keys(SHIN_VAV_LEX).length >= 70)   // 1.0.94: fewer defective words once the siddur's own niqqud was proofread;
   for (const [k, v] of Object.entries(SHIN_VAV_LEX)) { assert.equal(letters(v), letters(k), k); assert.equal(shinVavKey(k), k); }
 });
 test('1.0.87: lexicon is what tools/build-shin-vav-lex.mjs builds from the current texts', () => {
@@ -60,7 +60,8 @@ test('1.0.87: display untouched – data hash unchanged, no display module uses 
 });
 test('1.0.87: corpus audit – undotted ש in vocalised words before/after', async () => {
   const b = audit(), a = await auditAfter();
-  assert.ok(b.total['shin-undotted'] >= 1000, 'before ' + b.total['shin-undotted']);
+  // 1.0.94: the siddur's sin-written-as-holam glitch (~940 words) was fixed in the source text itself, so far fewer remain
+  assert.ok(b.total['shin-undotted'] >= 100, 'before ' + b.total['shin-undotted']);
   assert.ok((a.total['shin-undotted'] || 0) <= 20, 'after ' + a.total['shin-undotted']);
   // every vav pattern that used to be misread is now voiced as a consonant v (sample of the most frequent words)
   for (const k of ['vav-holam-haser', 'vav-consonant-holam', 'vav-dagesh-hiriq-qubuts', 'vav-dagesh-shva'])

@@ -14,7 +14,7 @@ test('omit rule: alternatives, Birkat haMazon, shaded verse and Shabbat-RC subst
   const bh = omitPrayerFlags(load('site/data/siddur/brachot/4.json').b, { book: 'brachot', n: 4 });
   assert.equal(bh.omit.some(Boolean), false);
   const rc = load('site/data/siddur/shabbat/6.json').b, orc = omitPrayerFlags(rc, { book: 'shabbat', n: 6 });
-  assert.equal(orc.omit[rc.findIndex(([t, h]) => t === 'p' && /^תקנת שבת/.test(sk(h)))], false);
+  assert.equal(orc.omit[rc.findIndex(([t, h]) => t === 'p' && /^תכנת שבת/.test(sk(h)))], false);
   const s5 = load('site/data/siddur/shacharit/5.json').b, o5 = omitPrayerFlags(s5, { book: 'shacharit', n: 5 });
   assert.equal(o5.omit[s5.findIndex(([t, h]) => t === 'p' && /^ובא לציון/.test(sk(h)))], false);
   assert.equal(o5.omit[s5.findIndex(([t, h]) => t === 'p' && /^למנצח מזמור לדוד יענך/.test(sk(h).replace(/[:,]/g, '')))], true);

@@ -19,7 +19,7 @@ export function kaddishAudit() {
     // anything Kaddish-like that is NOT in a block (missed Kaddish), and words that must never be inside one
     rows.forEach((r, i) => {
       const t = plain(r[1]);
-      if (!flags[i] && r[0] !== 'n' && /^(יתגדל ויתקדש שמה|\(Cong: אמן\. יהא שמה רבא|יהא שמה רבא|תתקבל צלותהון|יהא שלמה רבא)/.test(t)) out.outside.push({ key, i, type: r[0], text: t.slice(0, 80) });
+      if (!flags[i] && r[0] !== 'n' && /^(יתגדל ויתקדש שמה|\(Cong: אמן\. יהא שמה רבא|יהא שמה רבא|תתקבל צלותהון|יהא שלמה רבא|יהא שלמא רבא)/.test(t)) out.outside.push({ key, i, type: r[0], text: t.slice(0, 80) });
       if (flags[i] && r[0] === 'p' && /קדוש קדוש קדוש|ברכו את|נקדש את שמך/.test(t)) out.outside.push({ key, i, falsePositive: true, text: t.slice(0, 80) });
     });
   });
