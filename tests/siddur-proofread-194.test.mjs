@@ -46,3 +46,11 @@ test('Divine Name untouched', () => {
     assert.equal(n(f.old), n(f.new), `${f.loc}: ${f.old}`);
   }
 });
+
+test('1.0.95: doubts settled against the Tehillat Hashem scan', () => {
+  const t = (k, i) => files[k].b[i][1].replace(/<[^>]+>/g, '');
+  assert.match(t('shacharit/4', 38), /הַמְשַׁלְּשִׁים בְּשָׁלשׁ קְדֻשּׁוֹת לְקָדוֹשׁ/);
+  assert.match(t('shacharit/4', 39), /מִתְרַצֶּה בְּרַחֲמִים.*הִתְרַצֶּה וְהִתְפַּיֵּס לְדוֹר עָנִי/);
+  const p = t('boker/5', 16);
+  for (const s of ['קוֹדֶם לְהַטָּבַת חָמֵשׁ נֵרוֹת, וַהֲטָבַת חָמֵשׁ נֵרוֹת קוֹדֶמֶת לְדַם הַתָּמִיד', 'לְהַטָּבַת שְׁתֵּי נֵרוֹת, וְהַטָּבַת שְׁתֵּי נֵרוֹת קוֹדֶמֶת לִקְטֹרֶת']) assert.ok(p.includes(s), s);
+});

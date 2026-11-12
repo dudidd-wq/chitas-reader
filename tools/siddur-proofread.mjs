@@ -2,7 +2,8 @@
 // patch on the built JSON (the Open Siddur rebuild is not reproducible byte-for-byte, so the fixes are not in build-siddur).
 // Every fix replaces a whole Hebrew token/phrase (no letter or niqqud mark next to it) in one paragraph or table cell and
 // must find exactly `n` occurrences; any mismatch aborts before anything is written.
-// Usage: node tools/siddur-proofread.mjs [--check]   (--check: only verify the list is applied)
+// Usage: node tools/siddur-proofread.mjs [--check|--pending]   (--check: only verify the list is applied;
+// --pending: apply only the entries not yet in the data – for fixes appended to the list after it was first applied)
 import fs from 'node:fs';
 
 const root = new URL('..', import.meta.url).pathname;
@@ -58,7 +59,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(p.length ? `${p.length} fixes not applied, e.g. ${p[0].loc} ${p[0].old}` : `all ${LIST.fixes.length} fixes applied`);
     process.exit(p.length ? 1 : 0);
   }
-  const before = JSON.stringify(files), errors = applyFixes(files);
+  const todo = process.argv.includes('--pending') ? pending(files) : LIST.fixes;
+  const before = JSON.stringify(files), errors = applyFixes(files, todo);
   if (errors.length) { console.error(errors.slice(0, 30).join('\n') + `\n${errors.length} mismatches – nothing written`); process.exit(1); }
   const orig = JSON.parse(before); let changed = 0;
   for (const [k, d] of Object.entries(files)) {
@@ -69,5 +71,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     fs.writeFileSync(p, JSON.stringify(d, null, ind || undefined) + (raw.endsWith('\n') ? '\n' : ''));
     changed++;
   }
-  console.log(`applied ${LIST.fixes.length} fixes (${LIST.fixes.reduce((s, f) => s + f.n, 0)} occurrences) in ${changed} files`);
+  console.log(`applied ${todo.length} fixes (${todo.reduce((s, f) => s + f.n, 0)} occurrences) in ${changed} files`);
 }
