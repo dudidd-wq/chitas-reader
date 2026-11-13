@@ -74,8 +74,16 @@ for (const [w, h] of [[390, 800], [320, 568], [568, 320], [1366, 800]]) {
     const prog = await progressOf(p);
     assert.ok(prog['siddur|shacharit/3']?.done, 'the section read through is marked read');
     assert.ok(!prog['siddur|shacharit/4']?.done);
-    // refresh: back at the same place in section 4
-    await p.reload(); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(600);
+    // refresh: back at the same place in section 4 (wait for hash + layout; 568x320 is tight on CI)
+    await p.reload();
+    await p.waitForSelector('#rc .seg');
+    await p.waitForFunction(() => location.hash === '#/s/shacharit/4', null, { timeout: 5000 });
+    await p.waitForFunction(() => {
+      const e = document.querySelector('#sec-4'), v = document.querySelector('#vp')?.getBoundingClientRect();
+      if (!e || !v) return false;
+      const r = e.getBoundingClientRect();
+      return r.width > 0 && r.bottom > v.top && r.top < v.bottom;
+    }, null, { timeout: 8000 });
     assert.equal(await p.evaluate(() => location.hash), '#/s/shacharit/4');
     assert.ok(await inView(p, '#sec-4'), 'refresh keeps the place (the start of section 4)');
     // back into section 3: the address follows, nothing is marked read
