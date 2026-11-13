@@ -438,3 +438,7 @@ npm test && npm run ui && npm run shots
 
 ## 2026-11-13 16:40 – short biur batch 3 (2–15.12) → 1.0.104
 - External review r1 (OpenAI gpt-5.4): **9.668** (Tanya 9.81, Rambam 9.77, Mitzvot 9.83, tolt 9.55). Fixes applied. 135 tolt paragraphs with an unreliable LikuteiTorah.com match were written from the maamar (computer-written label).
+
+
+## 1.0.105 – פיסוק חלקי בתורה אור / לקוטי תורה
+אחרי שלושה סבבי בדיקה חיצונית (gpt-5.4) הממוצע הרשמי נשאר 9.101, מתחת ל־9.5. עלו רק 187 פסקאות שקיבלו מעל 9.5 (מתוך מדגם 1,032). האותיות והניקוד לא השתנו. פירוט: verification/PUNCT-105.md.
