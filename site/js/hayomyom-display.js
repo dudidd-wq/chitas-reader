@@ -19,7 +19,7 @@ function boundaries(a, b) {
   }
   map[0] = 0; map[n] = m; return map;
 }
-function formatWord(html, vocalized) {
+export function formatWord(html, vocalized) {
   const pieces = html.split(/(<[^>]*>)/g), source = clusters(pieces.filter(p => !p.startsWith('<')).join(''));
   const target = clusters(vocalized), map = boundaries(source, target), tags = new Map(); let at = 0;
   for (const p of pieces) {

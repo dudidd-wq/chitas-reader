@@ -149,3 +149,45 @@ export function composeSay(runs, gemWords, nextRab, nextMod, stats = {}) {
 }
 /** Davidson vocalized Gemara segment → its words (for the bold match) */
 export const gemaraWords = html => unescape(html.replace(/<[^>]+>/g, ' ')).replace(/[״"]/g, ' ').split(/[\s\u05BE]+/).map(w => w.replace(/[^\u05D0-\u05EA\u0591-\u05C7]/g, '')).filter(w => /[\u05D0-\u05EA]/.test(w));
+// ---------------- 1.0.97: displayed niqqud for the explanations (Steinsaltz, Bartenura, Penei Moshe) ----------------
+// The display HTML keeps every letter, tag and mark of the edition; each word only gains the niqqud the speech layer
+// chose (bold = Gemara/Yerushalmi words: the vocalized edition's word, else Dicta). No speech marks (stress, dropped
+// shva, added dagesh) – only the plain vocalization. A word without a confident consonant match stays as it is.
+import { formatWord } from '../site/js/hayomyom-display.js';
+const chosenW = t => { const o = t && (t.options.find(x => x.level === 1) || t.options[0]); return o ? clean(o.w) : null; };
+const DISP_STRIP = /[\u0591-\u05AF\u05BD\u05C4\u05C5|]/g;
+export function vocalizeHtml(html, gemWords, nextRab, nextMod) {
+  if (!html) return html;
+  const gsk = gemWords.map(sk); let gp = 0, bold = false, n = 0, hit = 0, inRef = false;
+  html = html.replace(REFP, m => '\u0001' + m + '\u0002');   // verse references are not in the Dicta text: not vocalized
+  const findGem = w => { const s = sk(w); for (let j = gp; j < Math.min(gsk.length, gp + 12); j++) if (gsk[j] === s) { gp = j + 1; return gemWords[j]; } for (let j = 0; j < gsk.length; j++) if (gsk[j] === s) { gp = j + 1; return gemWords[j]; } return null; };
+  const ent = s => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+  const out = html.replace(/(?:<[^>]*>|[^\s<>])+/g, tok => {
+    const pieces = tok.split(/(<[^>]*>)/g); let vis = '', firstBold = null;
+    for (const p of pieces) { if (p.startsWith('<')) { if (/^<b\b/i.test(p)) bold = true; else if (/^<\/b>/i.test(p)) bold = false; continue; } if (p && firstBold === null && /[\u05D0-\u05EA]/.test(p)) firstBold = bold; vis += p; }
+    const refAt = []; { let r = inRef; for (const ch of ent(vis)) { if (ch === '\u0001') r = true; else if (ch === '\u0002') r = false; refAt.push(r); } }
+    const startRef = inRef; inRef = refAt.length ? refAt.at(-1) : inRef;
+    tok = tok.replace(/[\u0001\u0002]/g, ''); 
+    if (!/[\u05D0-\u05EA]/.test(vis) || /&(?!quot;|#39;|amp;)/.test(vis)) return tok;
+    const evis = ent(vis), idxMap = []; [...evis].forEach((ch, i) => { if (ch !== '\u0001' && ch !== '\u0002') idxMap.push(i); });
+    const plainVis = evis.replace(/[\u0001\u0002]/g, '');
+    const v = plainVis.replace(WORD, (whole, at) => {
+      if (refAt[idxMap[[...plainVis.slice(0, at)].length]] ?? startRef) return whole;
+      const trail = /^[^"״]+["״]+$/.test(whole) ? whole.match(/["״]+$/)[0] : '', src = whole.slice(0, whole.length - trail.length);
+      const rab = nextRab(src), mod = nextMod ? nextMod(src) : null; n++;
+      if (/['"׳״]/.test(src) || /[\u05B0-\u05C7]/.test(src)) return whole;
+      const s = sk(src), b = firstBold;
+      let w = null;
+      if (b) { const g = findGem(src); if (g && sk(g) === s) w = g.replace(DISP_STRIP, ''); }
+      for (const t of b ? [rab, mod] : [mod, rab]) { if (w) break; const c = chosenW(t); if (c && sk(c) === s) w = c.replace(DISP_STRIP, ''); }
+      if (!w) return whole;
+      hit++; w = w.replace(/\u05D9\u05B0\u05D9(?=[\u05D0-\u05EA])/g, '\u05D9\u05B0');
+      if ([...w.replace(/[\u0591-\u05C7]/g, '')].join('') !== src.replace(/[\u0591-\u05C7]/g, '')) return whole;   // never change a letter
+      return w + trail;
+    });
+    if (v === plainVis) return tok;
+    return formatWord(tok.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&'), v).replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  });
+  vocalizeHtml.last = { n, hit };
+  return out;
+}

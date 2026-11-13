@@ -88,7 +88,7 @@ export async function renderSearch(q, scope, ctx) {
   document.title = 'חיפוש בכל הספרים';
   shell('חיפוש בכל הספרים', `<form class="sd-search lib-search" role="search" id="gs-form"><label for="gs-q">מילה או צירוף</label>
     <div class="lib-sbar"><input type="search" id="gs-q" value="${esc(q || '')}" placeholder="למשל: שמע ישראל" autocomplete="off" enterkeyhint="search" aria-describedby="gs-hint"><button class="btn" type="submit" aria-label="חיפוש">${SEARCH_ICON}<span>חיפוש</span></button></div>
-    <label class="lib-scope" for="gs-scope">חיפוש ב:</label> <select id="gs-scope"><option value="">כל הספרים</option>${FAMILIES.map(f => `<option value="${f.id}"${scope === f.id ? ' selected' : ''}>${esc(f.he)}</option>`).join('')}</select>
+    <label class="lib-scope" for="gs-scope">חיפוש ב:</label> <select id="gs-scope"><option value="">כל הספרים</option>${FAMILIES.filter(f => !f.noSearch).map(f => `<option value="${f.id}"${scope === f.id ? ' selected' : ''}>${esc(f.he)}</option>`).join('')}</select>
     <p class="note" id="gs-hint">אפשר להקליד עם ניקוד או בלעדיו, בכתיב מלא או חסר; גרש וגרשיים אינם משנים. החיפוש נעשה במכשיר בלבד – דבר אינו נשלח. בפעם הראשונה כל ספר נטען (ונשמר במכשיר) כשמחפשים בו.</p></form>
     <p id="gs-st" role="status" aria-live="polite"></p><div id="gs-res"></div>
     <p class="note"><a href="#/lib">לספרייה</a> · <a href="#/sources">מקורות ורישיונות</a></p>`);

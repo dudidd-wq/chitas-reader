@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""1.0.96 Gemara / Mishnah build – network stage (public Sefaria API + the public Dicta Nakdan, no key).
+"""1.0.96/1.0.97 Gemara / Mishnah build (1.0.96 window stages: the build-gemara.mjs of that version, now replaced by build-shas.mjs) – network stage (public Sefaria API + the public Dicta Nakdan, no key).
 Cache outside the repository (GEMARA_CACHE, default /workspace/gemara-build/cache); resumable, nothing is re-fetched.
   node tools/build-gemara.mjs --plan --from 2026-11-08 --to 2027-02-06
   python3 tools/fetch-gemara.py sefaria       # texts listed in plan.json + Sefaria calendars (Yerushalmi refs)
   node tools/build-gemara.mjs --prepare        # Dicta input batches
   python3 tools/fetch-gemara.py dicta
   node tools/build-gemara.mjs                   # writes site/data/gemara
+1.0.97 (whole Shas): python3 tools/fetch-gemara.py shapes; node tools/shas-plan.mjs; python3 tools/fetch-gemara.py shas;
+  node tools/build-shas.mjs --prepare; python3 tools/fetch-gemara.py dicta (resumable); node tools/build-shas.mjs
 """
 import os,sys,json,gzip,re,time,threading,urllib.request,urllib.parse,urllib.error,concurrent.futures
 C=os.environ.get('GEMARA_CACHE','/workspace/gemara-build/cache')
@@ -50,7 +52,33 @@ def dicta(job):
         out.append({'word':n.get('word',x.get('str','')),'sep':bool(x.get('sep')),'confident':n.get('fconfident',False),
                     'options':[{'w':o['w'],'acc':o.get('Acc'),'level':o.get('levelChoice')} for o in n.get('options',[])]})
     save(f,{'text':job['text'],'genre':job['genre'],'tokens':out})
+    split(job['genre'],job['text'],out)
+def split(genre,text,tokens):
+    """1.0.97: per-segment cache (one line of a batch = one segment): cache/dseg/<genre>/<hh>/<sha24>.json, compact
+    tokens [word, chosen w, chosen Acc] – the build looks segments up by text, so batches can be regrouped freely."""
+    import hashlib
+    lines=text.split('\n'); cur=[]; k=0
+    def flush(k):
+        if k>=len(lines): return
+        h=hashlib.sha256(lines[k].encode()).hexdigest()[:24]; f=f"{C}/dseg/{genre}/{h[:2]}/{h}.json"
+        if not os.path.exists(f):
+            os.makedirs(os.path.dirname(f),exist_ok=True); tmp=f'{f}.{os.getpid()}.{threading.get_ident()}.tmp'
+            json.dump({'t':lines[k],'w':cur},open(tmp,'w'),ensure_ascii=False); os.replace(tmp,f)
+    for x in tokens:
+        if x['sep']:
+            for _ in range(x['word'].count('\n')): flush(k); k+=1; cur=[]
+            continue
+        o=next((o for o in x['options'] if o.get('level')==1),x['options'][0] if x['options'] else None)
+        cur.append([x['word'],o['w'] if o else None,o['acc'] if o else None])
+    flush(k)
+def safe_call(fn):
+    def g(job):
+        try: return fn(job)
+        except Exception as e:   # 1.0.97: one failed job (network) does not stop the run; a later run retries it
+            print('  failed:',type(e).__name__,str(e)[:80],flush=True); time.sleep(10)
+    g.__name__=fn.__name__; return g
 def run(fn,jobs,workers):
+    fn=safe_call(fn)
     print(fn.__name__,len(jobs),flush=True)
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
         for i,_ in enumerate(ex.map(fn,jobs),1):
@@ -67,6 +95,21 @@ if stage=='sefaria':
                 jobs.append({'tag':'yer','ref':it['ref'],'version':P['versions']['yer']})
     seen=set(); jobs=[j for j in jobs if not ((j['tag'],j['ref']) in seen or seen.add((j['tag'],j['ref'])))]
     run(sefaria,jobs,int(os.environ.get('GEMARA_WORKERS','3')))
+elif stage=='shapes':   # 1.0.97: tractate lengths for the whole Shas
+    for c in ('Bavli','Yerushalmi','Mishnah'):
+        f=f"{C}/shapes/shape-{c}.json"
+        if not os.path.exists(f):
+            os.makedirs(os.path.dirname(f),exist_ok=True); json.dump(get('https://www.sefaria.org/api/shape/'+c),open(f,'w'))
+elif stage=='yercal':   # 1.0.97: Sefaria's Yerushalmi Yomi ref for one full Vilna cycle (dates: node tools/shas-plan.mjs)
+    run(calendar,json.load(open(C+'/yercal-dates.json')),3)
+elif stage=='shas':     # 1.0.97: every text in shas-plan.json (node tools/shas-plan.mjs)
+    tags=os.environ.get('GEMARA_TAGS'); J=json.load(open(C+'/shas-plan.json'))['texts']
+    run(sefaria,[j for j in J if not tags or j['tag'] in tags.split(',')],int(os.environ.get('GEMARA_WORKERS','3')))
+elif stage=='split':    # 1.0.97: per-segment cache from batch files fetched before 1.0.97
+    import glob
+    for f in glob.glob(C+'/dicta/*.json.gz'):
+        with gzip.open(f,'rt',encoding='utf8') as g: d=json.load(g)
+        split(d['genre'],d['text'],d['tokens'])
 elif stage in ('dicta','dicta-rev','dicta-mid'):   # dicta-rev: a second process from the other end (files are written atomically)
     J=json.load(open(C+'/dicta-input.json'))
     if stage=='dicta-mid': J=J[len(J)//2:]+J[:len(J)//2]   # a third process from the middle

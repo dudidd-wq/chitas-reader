@@ -45,7 +45,7 @@ async function main() {
     console.log(id.padEnd(22), String(ids.length).padStart(6), 'segs', (Buffer.byteLength(s) / 1024).toFixed(0).padStart(6), 'KB');
   };
   fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
-  const T = {}; for (const f of FAMILIES.filter(f => !f.href)) T[f.id] = await family(f.id);
+  const T = {}; for (const f of FAMILIES.filter(f => !f.href && !f.noSearch)) T[f.id] = await family(f.id);
   for (const b of Object.keys(BOOK_HE)) await add(`torah-${b}`, 'torah', `חומש ${BOOK_HE[b]} ורש״י`, T.torah.leaves.filter(l => l.id.startsWith(`torah/${b}/`)));
   await add('tehillim', 'tehillim', 'תהילים', T.tehillim.leaves.filter(l => l.seq === 'tehillim/c'));
   await add('tanya', 'tanya', 'תניא', T.tanya.leaves);

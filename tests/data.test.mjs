@@ -17,7 +17,7 @@ test('tanya index order matches the reading order', () => {
 
 test('no blank segments in the data except the known numbering gap (Talmud Torah 7:8, absent in the common printed edition)', () => {
   const blanks = [];
-  const walk = dir => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = dir + '/' + e.name; if (e.isDirectory()) { if (e.name !== 'search') walk(p); /* the search index is derived and tested in search.test.mjs */ } else if (e.name.endsWith('.json') && !/index|sources|glossary/.test(e.name)) { const j = JSON.parse(fs.readFileSync(p)); (j.s || j.v || []).forEach((x, i) => { if (Array.isArray(x) ? !x.length || x.some(y => typeof y !== 'string' || !y.trim()) : typeof x !== 'string' || !x.trim()) blanks.push(p.split('/data/')[1] + '#' + (i + 1)); }); } } };
+  const walk = dir => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = dir + '/' + e.name; if (e.isDirectory()) { if (e.name !== 'search' && e.name !== 'gemara') walk(p); /* the search index is derived and tested in search.test.mjs; the Shas in gemara-196 / shas-197 */ } else if (e.name.endsWith('.json') && !/index|sources|glossary/.test(e.name)) { const j = JSON.parse(fs.readFileSync(p)); (j.s || j.v || []).forEach((x, i) => { if (Array.isArray(x) ? !x.length || x.some(y => typeof y !== 'string' || !y.trim()) : typeof x !== 'string' || !x.trim()) blanks.push(p.split('/data/')[1] + '#' + (i + 1)); }); } } };
   walk(new URL('data', root).pathname);
   assert.deepEqual(blanks, ['rambam/Torah_Study/7.json#8']);
 });
@@ -29,7 +29,7 @@ test('every portion resolves to non-empty text (both Israel and diaspora)', asyn
       const plan = dayPlan(new Date(d), { il });
       for (const unit of Object.keys(UNITS)) {
         if (unit === 'siddur') continue; // not a daily portion (tests/siddur.test.mjs)
-        if (['dafyomi', 'amudyomi', 'yerushalmi', 'mishnayomit'].includes(unit)) continue; // 1.0.96: built for a window only (tests/gemara-196.test.mjs)
+        if (['dafyomi', 'amudyomi', 'yerushalmi', 'mishnayomit', 'shasBavli', 'shasYer', 'shasMishna'].includes(unit)) continue; // tests/gemara-196.test.mjs, tests/shas-197.test.mjs
         if (il && unit !== 'chumash') continue; // only Chumash depends on location
         const doc = await buildDoc(plan, unit);
         const segs = doc.blocks.filter(b => b.type !== 'h' && b.type !== 'notes'); // notes: separate study-notes section (tests/study-notes.test.mjs)

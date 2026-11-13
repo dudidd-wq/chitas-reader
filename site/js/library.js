@@ -4,7 +4,7 @@
 // the daily reader (and to the search index, tools/build-search.mjs, which uses this module too).
 // Pure module (no DOM): also imported by Node (tools/build-search.mjs, tests).
 import { gem, BOOK_HE, TANYA_ORDER, TOLT_SLUGS, mitzvotLabel, tehillim as tehillimOfDay, HDate } from './calendar.js';
-import { data, buildDoc, ravSimanDoc, toltLabel, UNITS, HAYOM_MONTHS } from './texts.js';
+import { data, buildDoc, ravSimanDoc, toltLabel, UNITS, HAYOM_MONTHS, gemaraFiles } from './texts.js';
 
 export const FAMILIES = [
   { id: 'torah', he: 'חומש', desc: 'חמשת חומשי תורה עם פירוש רש״י, לפי פרקים', unit: 'chumash' },
@@ -15,6 +15,10 @@ export const FAMILIES = [
   { id: 'tolt', he: 'תורה אור ולקוטי תורה', desc: 'לפי פרשות השבוע ושיעורי היום של לוח ״מורה שיעור״', unit: 'tolt' },
   { id: 'hayomyom', he: 'היום יום', desc: 'לוח הרבי – רשומה לכל יום בשנה (לפי לוח תש״ג)', unit: 'hayomyom' },
   { id: 'rav', he: 'שולחן ערוך אדמו״ר הזקן', desc: 'אורח חיים – הסימנים שבלוח ״רב יומי״', unit: 'ravyomi' },
+  // 1.0.97: the whole Shas – not in the search index (tools/build-search.mjs skips noSearch), loaded per amud / daf / chapter
+  { id: 'bavli', he: 'תלמוד בבלי', desc: 'כל הש״ס – גמרא מנוקדת עם ביאור שטיינזלץ, לפי סדרים, מסכתות ועמודים', unit: 'shasBavli', noSearch: true },
+  { id: 'yerushalmi', he: 'תלמוד ירושלמי', desc: 'מהדורת וילנא, מנוקד, עם פירוש פני משה – לפי סדרים, מסכתות ודפים', unit: 'shasYer', noSearch: true },
+  { id: 'mishnah', he: 'משנה', desc: 'ששה סדרי משנה עם פירוש ברטנורא – לפי סדרים, מסכתות ופרקים', unit: 'shasMishna', noSearch: true },
   { id: 'siddur', he: 'סידור', desc: 'נוסח האריז״ל כמנהג חב״ד – תוכן הסידור והחיפוש בו', href: '#/siddur' },
 ];
 // Mishneh Torah: the 14 books (by position in rambam/index.json, which is in canonical order)
@@ -83,6 +87,15 @@ async function build(fam) {
     const S = await data('ravyomi/schedule.json');
     return { kids: S.simanim.map(n => leaf(`rav/${n}`, `סימן ${gem(n)}`, `שולחן ערוך הרב, אורח חיים סימן ${gem(n)}`, 'ravyomi', null, 'rav', { siman: n })) };
   }
+  if (fam === 'bavli' || fam === 'yerushalmi' || fam === 'mishnah') {
+    const idx = await data('gemara/index.json'), SED = Object.keys(idx.seder);
+    const bySeder = (list, mk) => SED.map(sd => ({ group: true, he: `סדר ${idx.seder[sd]}`, kids: list.filter(x => x.seder === sd).map(mk) })).filter(g => g.kids.length);
+    const amudHe = a => `${gem(parseInt(a))} ${a.endsWith('a') ? 'א' : 'ב'}`;
+    if (fam === 'bavli') return { kids: bySeder(idx.bavli, b => ({ id: `bavli/${b.t}`, he: b.he, kids: b.a.map(a => leaf(`bavli/${b.t}/${a}`, amudHe(a), `${b.he} ${amudHe(a)}`, 'shasBavli', { gem: { kind: 'bavli', t: b.t, amudim: [a] } })) })) };
+    if (fam === 'yerushalmi') return { kids: bySeder(idx.yer, y => ({ id: `yerushalmi/${y.t}`, he: y.he, kids: range(1, y.n).filter(d => !y.missing.includes(d)).map(d => leaf(`yerushalmi/${y.t}/${d}`, `דף ${gem(d)}`, `ירושלמי ${y.he} דף ${gem(d)}`, 'shasYer', { gem: { kind: 'yer', t: y.t, daf: d } })) })) };
+    return { kids: bySeder(idx.mishna, m => ({ id: `mishnah/${m.t}`, he: m.he, kids: m.ch.map((n, i) => n && leaf(`mishnah/${m.t}/${i + 1}`, `פרק ${gem(i + 1)}`, `משנה ${m.he} פרק ${gem(i + 1)}`, 'shasMishna',
+      { gem: { kind: 'mishna', chapter: true, items: range(1, n).map(k => ({ t: m.t, c: i + 1, m: k })) } })).filter(Boolean) })) };
+  }
   throw new Error('unknown family ' + fam);
 }
 /** The tree of one family, with every node indexed by id and the leaves in reading order. */
@@ -135,6 +148,7 @@ export async function libFiles(path) {
     if (l.unit === 'tolt') { const [s] = p.tolt.parts[0]; f.add('tolt/schedule.json'); f.add(`tolt/w/${s}.json`); f.add(`notes/tolt/${s}.json`); }
     if (l.siman) f.add(`ravyomi/s/${l.siman}.json`);
     if (l.unit === 'hayomyom') f.add('hayomyom/days.json');
+    if (p?.gem) { const idx = await data('gemara/index.json'); f.add('gemara/index.json'); gemaraFiles(p.gem, idx).forEach(x => f.add(x)); }
   }
   return [...f];
 }

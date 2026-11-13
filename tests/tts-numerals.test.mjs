@@ -68,8 +68,12 @@ function* files(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d,
 test('corpus: no letter+geresh token is silent', () => {
   const bad = new Map(); let n = 0;
   // 1.0.96: the Bavli Gemara and Steinsaltz (and the Bartenura) are displayed only – the read-aloud reads their `say` text
-  const said = (f, d) => /gemara[\\/]bavli[\\/]/.test(f) ? d.segs.map(x => x[2]) : /gemara[\\/]mishna[\\/]/.test(f) ? [d.m, d.bs] : d;
-  for (const f of files(ROOT)) for (const s of strings(said(f, JSON.parse(fs.readFileSync(f, 'utf8'))))) {
+  // 1.0.97: the speech layer is in gemara/bsay, ysay, msay (`say` / `bs`; `v` is display niqqud); the whole Shas is
+  // sampled (every 7th file) to keep the suite fast
+  const said = (f, d) => /gemara[\\/]bavli[\\/]/.test(f) ? (d.yer ? d.segs.map(x => x[0]) : []) : /gemara[\\/](bsay|ysay)[\\/]/.test(f) ? d.say : /gemara[\\/]msay[\\/]/.test(f) ? d.bs
+    : /gemara[\\/]mishna[\\/]/.test(f) ? d.m : /gemara[\\/]yer[\\/]/.test(f) ? d.segs.map(x => Array.isArray(x) ? x[0] : x) : d;
+  let k = 0;
+  for (const f of files(ROOT)) { if (/gemara[\\/]/.test(f) && !/index\.json$/.test(f) && k++ % 7) continue; for (const s of strings(said(f, JSON.parse(fs.readFileSync(f, 'utf8'))))) {
     for (const w0 of P(s, H).split(/\s+/)) {
       // the token itself: edge punctuation off, a geresh right after the letters kept (ד׳. → ד׳; בלבד...״ → בלבד)
       const w = (w0.match(/^[^\u05D0-\u05EA]*(.*?[\u05D0-\u05EA][\u05B0-\u05C7]*['"]?)[^\u05D0-\u05EA\u05B0-\u05C7]*$/) || [])[1];
@@ -77,7 +81,7 @@ test('corpus: no letter+geresh token is silent', () => {
       n++;
       if (!VOWEL.test(textToIPA(w, { data }))) bad.set(w, path.relative(ROOT, f));
     }
-  }
+  } }
   assert.ok(n > 1000, `scanned ${n}`);
   assert.deepEqual([...bad].slice(0, 20), []);
 });

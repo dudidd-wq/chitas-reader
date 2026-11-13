@@ -15,7 +15,7 @@ const mobile = async (width, height = 760) => {
 const CARDS = ['set-daily', 'set-display', 'set-tts', 'set-siddur', 'set-tehillim', 'set-backup', 'set-about'];
 const GROUP = {
   'set-daily': ['il', 'rambamTrack', 'lessonMitzvot', 'lessonTolt', 'lessonRavYomi', 'lessonDaf', 'lessonAmud', 'lessonYer', 'lessonMishna'],
-  'set-display': ['theme', 'font', 'readingBold', 'size', 'lineHeight', 'layout', 'spread', 'taamim', 'rashi', 'hayomNiqqud', 'divine', 'gloss', 'studyNotes', 'wakeLock'],
+  'set-display': ['theme', 'font', 'readingBold', 'size', 'lineHeight', 'layout', 'spread', 'taamim', 'rashi', 'hayomNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'wakeLock'],
   'set-tts': ['ttsEngine', 'ttsGender', 'ttsPitch', 'ttsHavara', 'ttsModel', 'ttsVoice', 'ttsRate', 'ttsStress', 'ttsDivine', 'ttsRashi', 'ttsSkipCites', 'ttsContinuous', 'ttsLockscreen'],
   'set-siddur': ['siddurKaddish', 'hideSiddurInstructions', 'siddurLang', 'tachanunMode', 'shabbatMode'],
 };

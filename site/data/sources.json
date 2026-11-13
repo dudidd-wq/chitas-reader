@@ -261,7 +261,7 @@
   "gemara": {
     "versionTitle": "William Davidson Edition - Vocalized Aramaic",
     "versionTitleInHebrew": "מהדורת וויליאם דייוידסון - ארמית המנוקד",
-    "versionSource": "https://korenpub.co.il/collections/the-noe-edition-koren-talmud-bavli-1",
+    "versionSource": "http://sefaria.org",
     "license": "CC-BY-NC",
     "sefariaUrl": "https://www.sefaria.org/Bekhorot?vhe=William_Davidson_Edition_-_Vocalized_Aramaic&lang=he",
     "fetchedAt": "2026-11-13"
@@ -269,7 +269,7 @@
   "steinsaltz": {
     "versionTitle": "William Davidson Edition - Hebrew",
     "versionTitleInHebrew": "ביאור הרב עדין שטיינזלץ, מהדורת קורן – ויליאם דייוידסון (עברית)",
-    "versionSource": "https://www.korenpub.com/koren_en_usd/koren/talmud/the-koren-talmud-bavli.html",
+    "versionSource": "https://korenpub.co.il/collections/koren-talmud-bavli-1",
     "license": "CC-BY-NC",
     "sefariaUrl": "https://www.sefaria.org/Steinsaltz_on_Bekhorot?vhe=William_Davidson_Edition_-_Hebrew&lang=he",
     "fetchedAt": "2026-11-13"
@@ -296,6 +296,14 @@
     "versionSource": "http://mobile.tora.ws/",
     "license": "Public Domain",
     "sefariaUrl": "https://www.sefaria.org/Bartenura_on_Mishnah_Oholot?vhe=On_Your_Way&lang=he",
+    "fetchedAt": "2026-11-13"
+  },
+  "peneimoshe": {
+    "versionTitle": "Piotrków, 1898-1900",
+    "versionTitleInHebrew": "פני משה, פיוטרקוב תרנ״ח–ת״ס",
+    "versionSource": "https://www.nli.org.il/he/books/NNL_ALEPH001886777/NLI",
+    "license": "Public Domain",
+    "sefariaUrl": "https://www.sefaria.org/Penei_Moshe_on_Jerusalem_Talmud_Berakhot?vhe=Piotrk%C3%B3w%2C_1898-1900&lang=he",
     "fetchedAt": "2026-11-13"
   }
 }

@@ -46,15 +46,20 @@ test('a short pause at every comma and period; a one-word piece is glued to its 
   assert.deepEqual(c.map(x => x.gap), [0.18, 0.38, 0.38]);
 });
 
-test('every day of the built window has its files; the read-aloud text is the explanation only', async () => {
-  let segs = 0, said = 0, stressed = 0;
-  for (const iso of days(idx.from, idx.to)) for (const unit of GEMARA_UNITS) {
-    for (const f of gemaraFiles(iso, unit)) {
-      if (/bavli\/.*b\.json$/.test(f) && !fs.existsSync(new URL('data/' + f, root)) && fs.existsSync(new URL('data/' + f.replace(/b\.json$/, 'a.json'), root))) continue; // tractate ends on amud a
-      assert.ok(fs.existsSync(new URL('data/' + f, root)), `${iso} ${unit} ${f}`);
-    }
+test('1.0.97: every date has its lesson files (sampled over a full Daf Yomi cycle); the read-aloud text is the explanation only', async () => {
+  const { gemaraSpec } = await import('../site/js/texts.js');
+  const gaps = new Set();
+  for (const iso of days('2026-11-08', '2034-06-30').filter((_, i) => i % 3 === 0)) for (const unit of ['dafyomi', 'amudyomi', 'yerushalmi', 'mishnayomit']) {
+    const spec = gemaraSpec({ iso }, unit); if (spec.none) continue;
+    const files = gemaraFiles(spec, idx);
+    if (!files.length) { gaps.add(`${unit} ${spec.t || spec.items?.[0]?.t}`); continue; }
+    for (const f of files.filter(f => !/say\//.test(f))) assert.ok(fs.existsSync(new URL('data/' + f, root)), `${iso} ${unit} ${f}`);
   }
-  for (const iso of ['2026-11-13', idx.from, idx.to]) {
+  // only the Daf Yomi days of Kinnim / Middot (no Bavli Gemara) and two Vilna dafim without text in Sefaria's
+  // Yerushalmi (Peah 19, Niddah 13) have no text
+  assert.ok([...gaps].every(g => /dafyomi (Kinnim|Middot)|yerushalmi (Peah|Niddah)/.test(g)), [...gaps].join(', '));
+  let segs = 0, said = 0, stressed = 0;
+  for (const iso of ['2026-11-13', '2026-11-08', '2027-02-06']) {
     const doc = await buildDoc({ iso }, 'dafyomi');
     const ps = doc.blocks.filter(b => b.type === 'p');
     assert.ok(ps.length > 10, iso);
@@ -66,8 +71,9 @@ test('every day of the built window has its files; the read-aloud text is the ex
       assert.ok(!/(?<![\u05D0-\u05EA])ר['׳](?=\s)/.test(b.say), b.say);
       assert.ok(!new RegExp(REFP.source).test(b.say), `${b.id}: a verse reference is read`);
       if (/\u05AB/.test(b.say)) stressed++;
-      // the display is not touched: the Steinsaltz shown is Sefaria's text (no niqqud added)
+      // the edition's Steinsaltz is kept (b.biur); the displayed niqqud (b.biurV) only adds vowels – never a letter
       assert.ok(!/[\u05B0-\u05BC]/.test(b.biur[0].replace(/<b>.*?<\/b>/g, '')), b.id);
+      if (b.biurV?.[0]) assert.equal(b.biurV[0].replace(/[\u0591-\u05C7]/g, '').replace(/&quot;/g, '"'), b.biur[0].replace(/[\u0591-\u05C7]/g, '').replace(/&quot;/g, '"'), b.id);
     }
   }
   assert.ok(said > 0.9 * segs && stressed > 0.9 * said, `${said}/${segs}, stressed ${stressed}`);
@@ -86,9 +92,10 @@ test('today\'s (13.11.2026) four lessons', async () => {
   assert.ok(mp.every(b => b.biur.length && b.say.startsWith(b.text.replace(/<[^>]+>/g, '').slice(0, 10))));
 });
 
-test('outside the built window a note with a Sefaria link is shown', async () => {
+test('1.0.97: any date has its lesson (no window): 1.1.2030', async () => {
   const doc = await buildDoc({ iso: '2030-01-01' }, 'dafyomi');
-  assert.ok(doc.blocks.some(b => b.type === 'note' && /sefaria\.org/.test(b.href)));
+  assert.ok(doc.blocks.filter(b => b.type === 'p').length > 5);
+  assert.ok(!doc.blocks.some(b => b.type === 'note' && /sefaria\.org/.test(b.href || '')));
 });
 
 // ---------------- browser ----------------
@@ -115,7 +122,7 @@ test('reader: opt-in cards, the Gemara with the Steinsaltz beneath, only the exp
       assert.match(await p.textContent(`[data-what="${u}"]`), re);
     await p.goto(srv.url + '#/r/dafyomi/2026-11-13'); await p.waitForSelector('#rc .seg.gm .biur');
     const first = await p.$eval('#rc .seg.gm', el => ({ g: el.querySelector('.t').textContent, s: el.querySelector('.biur').textContent }));
-    assert.match(first.g, /בָּנֶיךָ/); assert.match(first.s, /פדיית בכור/);
+    assert.match(first.g, /בָּנֶיךָ/); assert.match(first.s.replace(/[\u0591-\u05C7]/g, ''), /פדיית בכור/); assert.match(first.s, /[\u05B0-\u05BC]/, 'the explanation is shown with niqqud');
     assert.ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'no horizontal overflow at 320 px');
     assert.match(await p.$$eval('#rc .doc-credit', x => x.map(e => e.textContent).join(' ')), /מקור הנוסח.*ביאור שטיינזלץ.*CC BY-NC/);
     await p.keyboard.press('p');
