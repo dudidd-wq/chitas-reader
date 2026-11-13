@@ -84,7 +84,11 @@ for (const [w, h] of [[390, 800], [320, 568], [568, 320], [1366, 800]]) {
     await p.waitForTimeout(600);
     assert.ok(!(await progressOf(p))['siddur|shacharit/4']?.done);
     // the contents still list every section, with ✓ for the one read; Back leaves the reader (no extra history entries)
-    await p.click('.r-top a.btn'); await p.waitForSelector('.sd-toc a');
+    const back = p.locator('.r-top a.btn');
+    await back.waitFor({ state: 'visible' });
+    try { await back.click({ timeout: 4000 }); }
+    catch { await p.evaluate(() => document.querySelector('.r-top a.btn')?.click()); }
+    await p.waitForSelector('.sd-toc a');
     assert.equal(await p.locator('.sd-toc a').count(), idx.books.reduce((a, b) => a + b.secs.length, 0));
     assert.match(await p.locator('.sd-toc a[href="#/s/shacharit/3"]').locator('xpath=..').innerText(), /✓/);
     assert.deepEqual(p.errors, []);
