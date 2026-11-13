@@ -429,3 +429,9 @@ npm test && npm run ui && npm run shots
 - Per Dudi («לשמור מה שצריך ולהמשיך / מאשר הכל לשניכם»; card: «פיסוק: להעלות רק הלכות שקיבלו מעל 9.5»): deployed only units with an individual score **>9.5** — 334 Rambam paragraphs and 6 Sefer HaMitzvot paragraphs. Unreviewed text and anything ≤9.5 left unchanged.
 - Identity: letters+niqqud unchanged (tests/punct-identity-202.test.mjs). A few say/vd transfers skipped because those fields already differed in letters from s.
 - Next: Torah Or / Likkutei Torah, then Pnei Moshe, same rules. Cap $80/provider, stop at $75. Spend after r6: Anthropic ~$21.9, OpenAI ~$27.0.
+
+## 2026-11-13 15:55 – short biur batch 2 (18.11–1.12) → 1.0.103
+- External review (OpenAI gpt-5.4, cross-model): r1 9.60 → r2 9.474 (fail; the LT alignment was wrong for vayishlach day 7) → r3 **9.74**. Deployed per Dudi's "לא מעלים לייצור רק מעל 9.5".
+- A Torah Or / Likkutei Torah paragraph with no reliable LikuteiTorah.com match (alignment score < 0.1) is now written from the maamar itself and labelled computer-written (texts.js sbLt: src 'ai' when there is no link).
+- The batch-1 fixes from the calibration (Slaves, Forbidden Foods, Tanya niqqud) are included.
+- Batch 3 (2–15.12) passed r1 at 9.668 and deploys next.

@@ -150,7 +150,7 @@ async function sbiurIndex() { if (!SB_IDX) { const x = await optional('sbiur/ind
 export async function sbiurFiles(paths) { const I = await sbiurIndex(); return paths.filter(p => I.has(p)).map(p => `sbiur/${p}.json`); }
 async function sbiur(path) { return (await sbiurIndex()).has(path) ? optional(`sbiur/${path}.json`) : null; }
 const sbAi = e => (e ? { sb: { p: e.p, v: e.v, src: 'ai' } } : {});
-const sbLt = e => (e ? { sb: { p: e.p, v: e.v, src: 'lt', link: e.lt } } : {});
+const sbLt = e => (e ? { sb: { p: e.p, v: e.v, src: e.lt ? 'lt' : 'ai', link: e.lt } } : {});
 async function tanyaDoc(plan) {
   const index = await data('tanya/index.json');
   const blocks = [];
