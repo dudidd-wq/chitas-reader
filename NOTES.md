@@ -435,3 +435,6 @@ npm test && npm run ui && npm run shots
 - A Torah Or / Likkutei Torah paragraph with no reliable LikuteiTorah.com match (alignment score < 0.1) is now written from the maamar itself and labelled computer-written (texts.js sbLt: src 'ai' when there is no link).
 - The batch-1 fixes from the calibration (Slaves, Forbidden Foods, Tanya niqqud) are included.
 - Batch 3 (2–15.12) passed r1 at 9.668 and deploys next.
+
+## 2026-11-13 16:40 – short biur batch 3 (2–15.12) → 1.0.104
+- External review r1 (OpenAI gpt-5.4): **9.668** (Tanya 9.81, Rambam 9.77, Mitzvot 9.83, tolt 9.55). Fixes applied. 135 tolt paragraphs with an unreliable LikuteiTorah.com match were written from the maamar (computer-written label).
