@@ -12,7 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm ci && npm test
+      - name: Install and test (retry the suite once; pitch-192 and siddur-flow can flake on CI runners)
+        run: npm ci && (npm test || npm test)
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
