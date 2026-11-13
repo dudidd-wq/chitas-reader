@@ -1711,7 +1711,7 @@ function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
   const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), b.say]));
   const sbm = prefs.ttsBiur && prefs.shortBiur !== false ? new Map(R.doc.blocks.filter(b => b.sb).map(b => [String(b.id), b.sb.v])) : null; // 1.0.100
-  const pauseIds = new Set(R.doc.blocks.filter(b => b.pause).map(b => String(b.id))); // 1.0.96: Gemara – a short pause at every comma / period // 1.0.76: vocalized reading text (Hayom Yom)
+  // 1.0.101: every source uses pauseChunks (0.18 s / 0.38 s). 1.0.96 introduced this for Gemara.
   // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen
   const skipK = R.doc.siddur && prefs.siddurKaddish === 'skip' ? new Set(R.doc.blocks.filter(b => b.kaddish).map(b => String(b.id))) : null;
   return R.segs.map(s => {
@@ -1733,7 +1733,7 @@ function ttsSegments() {
     // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.
     // prepareForTTS strips these before Web Speech; Piper must receive the original in parallel.
     const acc = byId?.get(s.dataset.id)?.text || say.get(s.dataset.id) || null;
-    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, pause: pauseIds.has(s.dataset.id) };
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, pause: true };
   });
 }
 const TTS_ERR = {

@@ -388,6 +388,46 @@ export function stripCitations(t) {
   return t.replace(/\s*\(([^()]{1,90})\)/g, (m, inner) => (isCitation(inner) ? ' ' : m));
 }
 
+
+/** 1.0.101: map disjunctive cantillation to pause punctuation for the read-aloud (not for display).
+ *  Major (atnach, segolta, shalshelet, ole-ve-yored in cantillated text) → ';' (0.38 s via pauseChunks).
+ *  Secondary (zaqef qatan/gadol, revia) → ',' (0.18 s), skipped in short verses (≤ 8 words) and when a side has < 3 words.
+ *  Lesser (tipcha, tevir, pashta, geresh, …) → ',' only in longer verses (> 12 words) with ≥ 4 words on each side.
+ *  Sof pasuq is already a period. Compiled ole stress tags (no other accents in the string) are left alone. */
+const TAAM_MAJOR = new Set(['\u0591', '\u0592', '\u0593']);           // etnachta, segolta, shalshelet
+const TAAM_SHORT = new Set(['\u0594', '\u0595', '\u0597']);           // zaqef qatan, zaqef gadol, revia
+const TAAM_LESSER = new Set(['\u0596', '\u059B', '\u0599', '\u059A', '\u059C', '\u059E', '\u05A1', '\u05A0']); // tipcha, tevir, pashta, yetiv, geresh, gershayim, pazer, telisha gedola
+const TAAM_OLE = '\u05AB';
+const taamKind = (marks, nWords) => {
+  if ([...marks].some(m => TAAM_MAJOR.has(m)) || marks.has(TAAM_OLE)) return 'major';
+  if ([...marks].some(m => TAAM_SHORT.has(m))) return 'short';
+  if (nWords > 12 && [...marks].some(m => TAAM_LESSER.has(m))) return 'lesser';
+  return null;
+};
+export function insertTaamPauses(t) {
+  // real cantillation, not a prose string that only carries compiled ole stress tags
+  if (!/[\u0591-\u05AA\u05AC]/.test(t)) return t;
+  const parts = String(t).split(/(\s+)/);
+  const isWord = s => /[\u05D0-\u05EA]/.test(s);
+  const wordAt = parts.map((p, i) => isWord(p) ? i : -1).filter(i => i >= 0);
+  const nWords = wordAt.length;
+  let last = -1;
+  for (let wi = 0; wi < nWords; wi++) {
+    const i = wordAt[wi], w = parts[i];
+    if (/[.,;:?!][\u0591-\u05C7]*$/.test(w) || wi === nWords - 1) continue;
+    const marks = new Set(w.match(/[\u0591-\u05AF]/g) || []);
+    const kind = taamKind(marks, nWords);
+    if (!kind) continue;
+    if (nWords <= 8 && kind !== 'major') continue;
+    const min = kind === 'lesser' ? 4 : kind === 'short' ? 3 : 2;
+    if (kind !== 'major' && (wi - last < min || nWords - 1 - wi < min)) continue;
+    if (kind === 'major' && nWords - 1 - wi < 1) continue;
+    parts[i] = w + (kind === 'major' ? ';' : ',');
+    last = wi;
+  }
+  return parts.join('');
+}
+
 export function prepareForTTS(html, opt = {}) {
   const o = { stress: true, divineName: 'hashem', ...opt };
   let t = String(html)
@@ -414,6 +454,8 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/[\u05F3]/g, "'").replace(/[\u05F4]/g, '"')
     .replace(/([\u0591-\u05C7])\1+/g, '$1'); // duplicated marks in source
   // Private local-voice option: retain ONLY compiled primary tags, never use this for raw Tanakh or Web Speech.
+  // 1.0.101: disjunctive taamim → pause marks for the voice only (display is unchanged). Then strip the accents.
+  t = insertTaamPauses(t);
   t = t.replace(o.primaryStress ? /[\u0591-\u05AA\u05AC-\u05AF\u05BD\u05C4\u05C5]/g : RE_TAAMIM, '');
   // round 6: the Masoretic ירושלִַם (patah + hiriq, the yod unwritten) is spelled out for the voice; then the impossible
   // vowel marks of the editions are repaired or, where no single repair exists, that word is read without niqqud

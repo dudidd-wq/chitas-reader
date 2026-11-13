@@ -358,3 +358,16 @@ npm test && npm run ui && npm run shots
   - `data.test` מדלג על `sbiur`.
   - ביטויי הגרסה בבדיקות הקול מקבלים עכשיו גם 1.0.1xx.
   - `pitch-192` ו־`voice-choice-188` (F0 של הקול הטבעי) לפעמים נכשלות ועוברות בהרצה חוזרת. אין קשר לשינויים בגרסה זו.
+
+## Checkpoint 13.11.2026 09:45 – short biur, external pipeline
+- Pipeline in /workspace/biur-pilot (llm.py, full/write.py, niq.py, verse.py, xcheck.py, niqproof.py, review.py, applyfix.py). Spend in /workspace/biur-pilot/SPEND.md (cap $25/provider). Log in REVIEW-FULL.md.
+- Calibration: gpt-5.4 scored live batch 1 at 9.76 (56-item sample) → passes; fixes applied locally, to redeploy with batch 2.
+- Batch 2 = 18.11–1.12 (1,210 paragraphs; segs in full/segs-b2.json). Tanya written (Sonnet), tolt (Haiku), Rambam+Mitzvot being rewritten with Sonnet (batch msgbatch_018po3XWPa2WHUNi3dCv9kcZ; resume with write.py ... --resume <id>).
+- texts.js sbLt: tolt paragraph without an LT explanation gets the AI label (uncommitted).
+
+## 1.0.101 – pauses at punctuation for every source; taamim as pause cues
+- Dudi (13.11.2026): «תתחיל / תוסיף אותם גם בטקסט עצמו לא רק בהקראה» after the punctuation audit.
+- Engine: `pauseChunks` (0.18 s comma, 0.38 s sentence, lone-word glue) now in Piper **and** Web Speech, for every source. Gemara is unchanged (it already used this). Tests set `__ttsPauseScale = 0`.
+- `insertTaamPauses` in `prepareForTTS`: disjunctive taamim → `;` / `,` for the voice only. Displayed verses are not edited. Guards against over-pausing short verses. Onkelos left with sof-pasuq only (no 1:1 alignment).
+- Auto-punctuation of displayed Torah Or / Rambam / Sefer HaMitzvot / Penei Moshe is **not** in this version: it needs a >9.5 external review and shares the $25/provider cap (`/workspace/biur-pilot/SPEND.md`).
+- Samples: `/workspace/punct-pauses/`. Tests: `tests/pauses-201.test.mjs`. Doc: `verification/PAUSES-201.md`.

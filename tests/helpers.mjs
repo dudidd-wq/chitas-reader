@@ -26,6 +26,7 @@ export async function pageWith(browser, base, { prefs = {}, progress = {}, viewp
   const ctx = await browser.newContext({ viewport, locale: 'he-IL', serviceWorkers: 'block' });
   const p = await ctx.newPage();
   const errors = []; p.on('pageerror', e => errors.push(e.message));
+  await p.addInitScript(() => { window.__ttsPauseScale = 0; }); // 1.0.101: do not wait out comma/period gaps in tests
   await p.addInitScript(([pr, pg]) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: pr, progress: pg })); sessionStorage.setItem('seeded', '1'); } }, [{ ...PREFS, ...prefs }, progress]);
   if (init) await p.addInitScript(...(Array.isArray(init) ? init : [init]));
   p.errors = errors;

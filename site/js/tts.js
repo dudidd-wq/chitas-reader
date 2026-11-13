@@ -2,7 +2,7 @@
 // optional silent-audio keep-alive for lock-screen controls. The app itself sends nothing; note that some browser
 // voices are network voices (localService === false) whose engine sends the text to the browser vendor – those are
 // labelled in the UI and never chosen by default when a local Hebrew voice exists.
-import { prepareForTTS, chunkText } from './tts-prep.js';
+import { prepareForTTS, pauseChunks } from './tts-prep.js';
 import { webPitch, clampPitch } from './voice-pitch.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -64,10 +64,14 @@ export class Speaker {
     this.queue = [];
     segments.forEach((s, si) => {
       const chunks = [];
-      s.parts.forEach((html, pi) => { for (const c of chunkText(prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi] }))) chunks.push(c); });
+      s.parts.forEach((html, pi) => {
+        const prepared = prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi] });
+        // 1.0.101: same comma/period pauses as the local voice; the gap is a delay after the utterance (tests may set __ttsPauseScale = 0)
+        for (const x of pauseChunks(prepared)) chunks.push(x);
+      });
       // frac: share of the segment already spoken when this chunk starts (lets the view follow long segments)
-      const total = chunks.reduce((a, c) => a + c.length, 0) || 1; let done = 0;
-      for (const c of chunks) { this.queue.push({ si, text: c, frac: done / total }); done += c.length; }
+      const total = chunks.reduce((a, x) => a + x.c.length, 0) || 1; let done = 0;
+      for (const { c, gap } of chunks) { this.queue.push({ si, text: c, gap, frac: done / total }); done += c.length; }
     });
     this.segCount = segments.length; this.bad = 0;
   }
@@ -81,8 +85,9 @@ export class Speaker {
     this.speakCurrent();
     return true;
   }
+  clearGap() { if (this.gapTimer) { clearTimeout(this.gapTimer); this.gapTimer = null; } }
   fail(code) {
-    this.stop(true); this.onState?.('stopped'); this.onError?.(code);
+    this.clearGap(); this.stop(true); this.onState?.('stopped'); this.onError?.(code);
   }
   speakCurrent() {
     if (this.state !== 'playing') return;
@@ -102,7 +107,10 @@ export class Speaker {
       const min = q.text.length * (globalThis.__ttsMinMsPerChar ?? MIN_MS_PER_CHAR) / (u.rate || 1);
       if (!started || performance.now() - started < min) { this.bad++; if (++this.failed >= 2) return this.fail('silent'); }
       else this.failed = 0;
-      this.i++; this.speakCurrent();
+      this.i++;
+      const gap = (q.gap || 0) * (globalThis.__ttsPauseScale ?? 1) / (u.rate || 1);
+      if (gap > 0) this.gapTimer = setTimeout(() => this.speakCurrent(), gap * 1000);
+      else this.speakCurrent();
     };
     u.onerror = e => {
       if (this.token !== token) return;
@@ -115,13 +123,13 @@ export class Speaker {
   pause() {
     // cancel + resume-from-chunk is more reliable across browsers than synth.pause()
     if (this.state !== 'playing') return;
-    this.state = 'paused'; this.token = null; synth.cancel(); this.onState?.('paused');
+    this.state = 'paused'; this.token = null; this.clearGap(); synth.cancel(); this.onState?.('paused');
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     this.keepAlive?.pause();
   }
   toggle() { return this.state === 'playing' ? (this.pause(), true) : this.play(); }
   stop(silent) {
-    this.token = null; this.state = 'stopped';
+    this.token = null; this.state = 'stopped'; this.clearGap();
     if (ttsSupported()) synth.cancel();
     this.mediaSession(false);
     if (!silent) this.onState?.('stopped');
@@ -130,7 +138,7 @@ export class Speaker {
     const cur = this.queue[this.i]?.si ?? 0;
     const target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
     const k = this.queueIndexFor(target, delta);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; this.clearGap(); synth.cancel(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
   }
   /** First chunk of segment `target`; a segment with nothing to say (e.g. a skipped Kaddish, 1.0.90) gives the nearest
    *  spoken one in the direction of the skip. -1 if there is none. */
@@ -141,9 +149,9 @@ export class Speaker {
     for (let j = this.queue.length - 1; j >= 0; j--) if (this.queue[j].si < target) { const si = this.queue[j].si; return this.queue.findIndex(q => q.si === si); }
     return -1;
   }
-  setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
+  setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.token = null; this.clearGap(); synth.cancel(); this.speakCurrent(); } }
   /** 1.0.92: manual pitch offset (semitones); the current chunk is said again */
-  setPitch(p) { this.opts.pitch = p; if (this.state === 'playing') { this.token = null; synth.cancel(); this.speakCurrent(); } }
+  setPitch(p) { this.opts.pitch = p; if (this.state === 'playing') { this.token = null; this.clearGap(); synth.cancel(); this.speakCurrent(); } }
   finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.({ complete: this.bad === 0 }); }
   mediaSession(on) {
     if (!on) { this.keepAlive?.pause(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; return; }

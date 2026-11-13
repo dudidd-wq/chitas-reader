@@ -84,11 +84,20 @@ test('reader: Shnayim Mikra reads the verse twice, then Onkelos; Nach Yomi and S
     await p.goto(srv.url + '#/r/shnayim/2026-11-13'); await p.waitForSelector('#rc .seg .biur');
     assert.ok(!(await p.$('#rc .rashi')), 'no Rashi in Shnayim Mikra');
     await p.keyboard.press('p');
-    await p.waitForFunction(() => window.__spoken.length >= 3);
-    const sp = (await p.evaluate(() => window.__spoken.slice(0, 3))).map(x => x.replace(/[\u0591-\u05C7]/g, ''));
-    assert.equal(sp[0], sp[1], 'the verse twice');
+    // 1.0.101: a verse may be several chunks (taamim pauses). Wait until the first reading equals the second and Onkelos has started.
+    await p.waitForFunction(() => {
+      const sp = (window.__spoken || []).map(x => x.replace(/[\u0591-\u05C7]/g, ''));
+      for (let k = 1; k <= Math.floor(sp.length / 2); k++) {
+        if (sp.slice(0, k).every((x, i) => x === sp[k + i]) && sp[2 * k]) return k;
+      }
+      return false;
+    });
+    const sp = (await p.evaluate(() => window.__spoken)).map(x => x.replace(/[\u0591-\u05C7]/g, ''));
+    let n = 0;
+    for (let k = 1; k <= Math.floor(sp.length / 2); k++) if (sp.slice(0, k).every((x, i) => x === sp[k + i]) && sp[2 * k]) { n = k; break; }
+    assert.ok(n >= 1, 'the verse twice: ' + sp.slice(0, 8).join(' | '));
     const targ = (await p.$eval('#rc .seg .biur', el => el.textContent)).replace(/[\u0591-\u05C7]/g, '').replace(/^\s*תרגום\s*/, '').split(/\s+/)[0];
-    assert.ok(sp[2] !== sp[0] && sp[2].startsWith(targ), `then the Targum: ${sp.join(' | ')}`);
+    assert.ok(sp[2 * n] && sp[2 * n] !== sp[0] && sp[2 * n].startsWith(targ), `then the Targum: ${sp.slice(0, 2 * n + 2).join(' | ')}`);
     assert.ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'no horizontal overflow at 320 px');
     await p.goto(srv.url + '#/r/mitzvot/2026-11-13'); await p.waitForSelector('#rc .seg .t');
     assert.match(await p.$eval('#rc .seg .t', el => el.textContent), /[\u05B0-\u05BC]/, 'Sefer HaMitzvot shown with niqqud');

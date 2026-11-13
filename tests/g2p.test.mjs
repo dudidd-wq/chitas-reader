@@ -22,7 +22,7 @@ test('required words (stress mark ˈ before the stressed vowel)', () => {
 
 test('accents decide the stress in verses (Torah, Tehillim)', () => {
   const gen = 'בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים אֵ֥ת הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃';
-  assert.equal(textToIPA(prepareForTTS(gen, { stress: true, divineName: 'hashem' }), { data, accents: gen }), 'beʁeʃˈit baʁˈa ʔelokˈim ʔˈet haʃamˈajim veʔˈet haʔˈaʁets.');
+  assert.equal(textToIPA(prepareForTTS(gen, { stress: true, divineName: 'hashem' }), { data, accents: gen }), 'beʁeʃˈit baʁˈa ʔelokˈim, ʔˈet haʃamˈajim veʔˈet haʔˈaʁets.');
   // accents left in the text are ignored by the transcription (the stress comes from the map)
   assert.equal(textToIPA(gen, { data, accents: gen }), 'beʁeʃˈit baʁˈa ʔelohˈim ʔˈet haʃamˈajim veʔˈet haʔˈaʁets.');
   // the same word, milel or milra by its accent: קָ֫מָה (she arose, milel) vs. קָמָ֫ה (risen, milra)

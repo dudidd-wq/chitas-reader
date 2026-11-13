@@ -59,8 +59,10 @@ test('1.0.91 Chabad stress: milel for final stress; monosyllables, hataf penult,
   assert.equal(textToIPA('בָּרוּךְ אַתָּה', { data, havara: 'chabad', milel: false }), 'boʁˈuχ atˈo');
   // Torah with cantillation: Ashkenazi Torah reading follows the accents (also for the divine name the accents cannot locate)
   const v = 'בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים אֵ֥ת הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃';
-  const c = chunkText(prepareForTTS(v, { stress: true, divineName: 'hashem' }))[0];
-  assert.equal(textToIPA(c, { data, accents: accentStressMap(v), havara: 'chabad' }), 'beʁejʃˈis boʁˈo elejkˈim ˈejs haʃomˈajim veˈejs hoˈoʁets.');
+  const prepared = prepareForTTS(v, { stress: true, divineName: 'hashem' });
+  assert.match(prepared, /אֱלֹקִים;/);
+  const c = chunkText(prepared).join(' ');
+  assert.equal(textToIPA(c, { data, accents: accentStressMap(v), havara: 'chabad' }), 'beʁejʃˈis boʁˈo elejkˈim, ˈejs haʃomˈajim veˈejs hoˈoʁets.');
 });
 test('1.0.91: Chabad output uses only phonemes every voice model knows (noa, natural) across Hayom Yom, Siddur and Torah', () => {
   const maps = ['he_IL-noa-medium', 'he_IL-ilspeech-male-medium'].map(n => new Set(Object.keys(JSON.parse(read(`site/voice/${n}.onnx.json`)).phoneme_id_map)));
