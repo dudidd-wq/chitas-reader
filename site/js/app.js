@@ -245,7 +245,9 @@ async function libRoute(path, seek) {
 const libCtx = () => ({ shell, $, getProgress, toast, prefs });
 
 // ---------------- Home ----------------
-const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ', tolt: 'ל', ravyomi: 'ש', hayomyom: 'ה', dafyomi: 'ד', amudyomi: 'ע', yerushalmi: 'י', mishnayomit: 'מ' };
+const UNIT_MARK = { chumash: 'ח', tehillim: 'ת', tanya: 'ת', rambam3: 'ר', rambam1: 'ר', mitzvot: 'מ', tolt: 'ל', ravyomi: 'ש', hayomyom: 'ה', dafyomi: 'ד', amudyomi: 'ע', yerushalmi: 'י', mishnayomit: 'מ', nachyomi: 'נ', shnayim: 'ק' };
+// 1.0.99: every card gets a letter – a unit without an entry above falls back to the first letter of its name (never "undefined")
+const unitMark = u => UNIT_MARK[u] || (UNITS[u]?.he || '').match(/[\u05D0-\u05EA]/)?.[0] || '•';
 const PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const guessIsrael = () => { try { return /^Asia\/(Jerusalem|Tel_Aviv)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { return true; } };
@@ -310,7 +312,7 @@ async function renderHome(showLoc = false) {
       <ol class="cards">${units.map(u => `
       <li class="card" id="card-${u}" data-unit="${u}">
         <a class="card-link" href="#/r/${u}/${currentDate}" data-go="${u}">
-          <span class="mark" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="16"/><circle class="ring" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="0 100"/></svg><span class="glyph">${UNIT_MARK[u]}</span><span class="tick">${CHECK}</span></span>
+          <span class="mark" aria-hidden="true"><svg viewBox="0 0 36 36"><circle class="ring-bg" cx="18" cy="18" r="16"/><circle class="ring" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="0 100"/></svg><span class="glyph">${unitMark(u)}</span><span class="tick">${CHECK}</span></span>
           <span class="body"><span class="ttl">${esc(UNITS[u].he)}</span><span class="what" data-what="${u}">…</span><span class="meta" data-meta="${u}"></span></span>
           <span class="go" data-btn>פתח</span>
         </a>
