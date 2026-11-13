@@ -1,0 +1,4125 @@
+{
+  "version": "1.0.102",
+  "rule": "score>9.5 from best official round (rambam=r6 9.287, mitzvot=r5 8.996); unreviewed and \u22649.5 left unchanged",
+  "n_rambam": 334,
+  "n_mitzvot": 6,
+  "n_rows": 686,
+  "rows": [
+    {
+      "file": "rambam/The_Chosen_Temple/1.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "fb0bbcecfdbc883edd608450264f09b7c1bf3d64a9ad46e97856139ba9534034"
+    },
+    {
+      "file": "rambam/The_Chosen_Temple/1.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "f802c0005d8f317f83da1cf12f080fd71ba87b055d0f5cf3b9f09e5ce37771b0"
+    },
+    {
+      "file": "rambam/Sabbath/20.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "194912a6a5f79d774b61cff58e5025762d64166e106b4256c8d76d430cba3965"
+    },
+    {
+      "file": "rambam/Sabbath/20.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "edbc6f74ddaf9ca9053fec7402355fb9c8eb30ffe79a0fcaf6b8737122958901"
+    },
+    {
+      "file": "rambam/Oaths/2.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "21e85736fcbb686037b33e93d8d919082cc8cd1272016b564c6149c5e173cfe3"
+    },
+    {
+      "file": "rambam/Oaths/2.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "bc78d2d44f6ef778861659cadb6bd43d7968fbdb5f2aa86f4bd0ac4b7cc9b675"
+    },
+    {
+      "file": "rambam/Oaths/3.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "0b1619ea40911c2ebac49cc813c42c18bdabbbfb65935aeca8eaf554495da343"
+    },
+    {
+      "file": "rambam/Oaths/3.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "12a1e1f9feb5a1553c163957ff95cabe4b6ed7841b29e961119959bd825aa352"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/13.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "e3cb2c0dc5407e97355c294cce5131d9f4d9fd36a39aeb6253b840a98e649b5c"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/13.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "a486b3660c23e59d6c9bb649ec05d5fab1f14fea25f2f0f103bea414b585e7c5"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/14.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "02a89eb6fae110603cad1ecab2a734dd98faef626948e47e94aeeb98a625b8d8"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/14.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "6a8c634e6c848fb0c26f492bea68dcc62fa97f40abadc41a713113cafdc83350"
+    },
+    {
+      "file": "rambam/Firstlings/7.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "aa81fc24474a12b0cc6811493b2de27fba2d8fffac0a4fe6f6b1cf1ebe04d1a8"
+    },
+    {
+      "file": "rambam/Firstlings/7.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "9b6de1c6af1b7b5e8d7100998dc42400e68cc42019e95708ab462617b5bc9389"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/1.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "59b72f85c84805e7239b29ebc83ae4a7f7b212d380968365a8090bcfce7e825e"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/1.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "a870f599e8e6414f5fd73df04933063eac80a98293dd0c65b573e4e528db915d"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/18.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "c36ed19ad169184bf5a5fde1c8b99bf9e1704ea2e6e6991605e0b6f2d06d636f"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/18.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "077797fce20c1ab37c8b88254160a2f7c2116a85c01b24eae326dcd08b96349e"
+    },
+    {
+      "file": "rambam/Sabbath/3.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "009bce3f2753692cd779f79a90844e234144c0ca66f1a1e4d1942895b2c1fbe1"
+    },
+    {
+      "file": "rambam/Sabbath/3.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "600352afc336df2b59b9e9071a73c0e2f48f6651112a9ec462316f388d513c3b"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "22b40b5bb43ae5e9206681a3e14a779bf3ca5320aaef5b789a9fb2081a966a57"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "77f8eaef267603045b4dcce10a98416502875bf52b020b7ff690084101bbcdbf"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "587a972db9fb8794c45dff611ae1e09d6329061c3872c870a21efe4abe02ad0d"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "ce5a8fecf254477cbf10fa589c73105e88ad8181cf87f5e6e0920597d7463f95"
+    },
+    {
+      "file": "rambam/Marriage/7.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "06f666f746596de005012cfc684e1901d10494ef86c9e0d0e17eaa0ff175e660"
+    },
+    {
+      "file": "rambam/Marriage/7.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "13c714d2e340437e2d58e380c44c3bb733c926dae303873ed778c85c50a832bc"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "422ffbf302c0f3090f04f8fc8893e57e4e4230d24ed299a84849791002df985f"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "c4f3d7bf49c2f2c6125718a091933be3bcb4e0fc54a7509ae618993374cbc16e"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/5.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "00d21ff52f643d2ead6499ac12a3b710feb3869cfc044701e43812f436019cae"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/5.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "c4e8afb77d7073efbe0aa84cc726a3989f6a3ece38be88497067e969d29ce8e8"
+    },
+    {
+      "file": "rambam/Tithes/3.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "19e640976f4f93cc4069bfb652875593fb3615bd22c3bf4c55020629a4eb1e52"
+    },
+    {
+      "file": "rambam/Tithes/3.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "0ebdb66c3d5e4f702e3563b31ccf9c98f9b71b800e6773ba7083d76336966fe0"
+    },
+    {
+      "file": "rambam/Kings_and_Wars/6.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "6364b51389de71c17185cd750f1c528cb5c0d8e82499978dfa8a6e93572682cb"
+    },
+    {
+      "file": "rambam/Kings_and_Wars/6.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "750682c0667ac879d350e6c642772aa5bfe27824170255bcf61928619c18b46c"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/15.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "d188bdb48efc3e2f2310efad553dab26868244de45c17f4f60f05be1ad1cefa2"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/15.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "b9c7b6490e14941906ab5db9d96537236bbe0d48cafc8dc27135607e8d21a9d1"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "cc4aafcbdf3983c3f03e47776df9c43ac9941719db334781b1ee8e2b2e10a605"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "d1c23ee7ab4695695914370479d2695c082783606047d6fe8654914c45a390f5"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "1a1b4d05ea2d6ad42c8d0ad189cbc0969326a1477eb265d34e8dfcbb0acc79e4"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "bc60a31b6306e3411c96da64dfda7c3e0aa311163f05104bf4aabb69d52af04e"
+    },
+    {
+      "file": "rambam/Firstlings/1.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "829a09e96a9de68cc285d37d8538e6a40e90316413ce38825f056ade14b066d4"
+    },
+    {
+      "file": "rambam/Firstlings/1.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "c63bf36f5998eacb8bd34e9101584fee145199a2e327a81be72b2112b4b779ab"
+    },
+    {
+      "file": "rambam/Firstlings/1.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "1024cc2830d6338595b8b6896bb1e63bcadbf0b6aee3385150bb7737e699e3a6"
+    },
+    {
+      "file": "rambam/Firstlings/1.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "8dc1c12794c5461274fbcc2d05f44f25f650455f6cc3b535d268ce5f8f88c258"
+    },
+    {
+      "file": "rambam/The_Chosen_Temple/8.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "8e143fb05fdd36811b695fd16666fa56f27f47358e7b59619d6ddf57fd381f31"
+    },
+    {
+      "file": "rambam/The_Chosen_Temple/8.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "51a0f5715290ac7cee65319d6da3c037aeb2fa9efa1a05ae3d15a4a9a4f00f30"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/9.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "ead6874f404f6269cacd017ffcc222e1da1cab191ee5b0884e729662ed28b7a5"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/9.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "1ce61f0871794fcb604d123dbd74d6c1dcd534e239738176f119f81ed2e04c3e"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/9.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "b4f35a0919c6c9815a8caf044b2e6b3c8344de32b9b9bc7c592cbc4abb32f78f"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/9.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "429f436f972b609d9622ad39425b96f68883be24fa3c821379f9d5fec9a2fa4f"
+    },
+    {
+      "file": "rambam/Vessels/23.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "669e65fe1021760fb2f070cd79ebc15006d62a550e34bae2ce2b23e3d2f64d4a"
+    },
+    {
+      "file": "rambam/Vessels/23.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "5b16f725fb894b45e0bb0e61a2c45d634f2bacbe3e6453327b464e0cc3eb1977"
+    },
+    {
+      "file": "rambam/Things_Forbidden_on_the_Altar/1.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "ee80bc23158800aa256becd4404a43735432d8c0874e52c024a6fb96276060ec"
+    },
+    {
+      "file": "rambam/Things_Forbidden_on_the_Altar/1.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "18e1a894940ce676e9e7b915fdb6942207ed1e07d42f4f6ba94dbe0c743827ce"
+    },
+    {
+      "file": "rambam/Circumcision/1.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "8c4d575192684b4a40deaa777d3f673f53c58b4d2e489d8797a6837b14b3df9d"
+    },
+    {
+      "file": "rambam/Circumcision/1.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "ec9498e0543ea2bd0440f47940dfc8e9a7664cddee3f98b692ac850a781067fa"
+    },
+    {
+      "file": "rambam/Neighbors/14.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "d191670569476d56cf5b4c42a77b3caadd4edb60ae25ebd2b366a4752bca8823"
+    },
+    {
+      "file": "rambam/Neighbors/14.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "12601b868e1ec33f7c0ede44007dda3dc2e614ec9b28df4556eef6e0a01f0156"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/5.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "319bf581d08c17f018278dfa2e5be11d489082f178847b6aab2b44a95c5a76f9"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/5.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "e00833a7180661139d612ebb4c087cc4067d8521d366bc577d2a56279c621c8c"
+    },
+    {
+      "file": "rambam/Marriage/9.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "bc2cc65bfcb104f24eebd4d988d2016050d2fd2cb84933f96889f844c3522a68"
+    },
+    {
+      "file": "rambam/Marriage/9.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "c039c23d28c5b5bdbf5a6da11902fcb48834225a0922e37963dec7f1ddfbf331"
+    },
+    {
+      "file": "rambam/Marriage/24.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "555a66bbbf9689868a4564a1293f6c15f41d17bf61e454b3d12a8e1e52262788"
+    },
+    {
+      "file": "rambam/Marriage/24.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "402aa52ac1dd743ea8b8d980bb28fc5ce1f5febd41195ee71baad8c72e6ac476"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "8ab9898bfe45f6cd53b3e85a70e2cac210079374eb91dadf0422c0a426931c01"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "c29a5fba4341a97c9226a50055144b7a256eabbbd38f8f01c368df89be7e5c2c"
+    },
+    {
+      "file": "rambam/Blessings/10.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "2c23cf47e1dc77a12e371f0c4e015d74d22a28aff0299f3f30a1c8f389824045"
+    },
+    {
+      "file": "rambam/Blessings/10.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "e466eed16bca2b880ba6e068de48e999b12446717a77a7237d57a3c5a5901c8d"
+    },
+    {
+      "file": "rambam/Blessings/3.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "369de6e2facb70c4931a676f3ac200b955ba2cf104e90005ac568bd36498322b"
+    },
+    {
+      "file": "rambam/Blessings/3.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "21925ab254093b5101a967568e55b09214c0c5b5886e224ff63102cc5bc9d0b0"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/10.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "8353e4ff3a9a3d3dc40c9538660cbf658533b87ee54073dd5ce146cd1b344fff"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/10.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "72caee2a28f2d4df43425c1bfa68fc625a2a8d67c43ed03b0c17487bcac686e0"
+    },
+    {
+      "file": "rambam/Foundations_of_the_Torah/4.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "96ed8ae5827708634bd827d6c2e623d28a6a6dc452e0996776d00cf24580bbe5"
+    },
+    {
+      "file": "rambam/Foundations_of_the_Torah/4.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "5081eaca49ccf798cf45e345c0352fbc3c1e4e7eaee0b7145ee34c23aa4ee256"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/7.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "2914c77990044446fef9d545910e31057ab15c108a7183e745c05f3c639bde3e"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/7.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "a3687b87e30c6d5199d7580f205fedcf898dc4100cd601ac38f43d71515c6f9e"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/17.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "3f5d192db1c39f7bde1890bfab894346510b79e86b2c51cd67d9c8e8a8606c68"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/17.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "f73e40c97e2d692d73d5b4c59c8c557e905072203c231cc0b1bcc61ee8b28f3b"
+    },
+    {
+      "file": "rambam/Vessels/22.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "5d8f318c23438c5fd8c245583fc7b280f04ef3faa665546215f6c2c1201dfe3f"
+    },
+    {
+      "file": "rambam/Vessels/22.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "ace754fc871874dfaf1ebbc0c240301b15e86f97459fcc7e3b487fc276180c32"
+    },
+    {
+      "file": "rambam/Sabbath/19.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "fc451300e84266348f345c99342d28f24aeeb2526feae0367c4bd448b9b8f30e"
+    },
+    {
+      "file": "rambam/Sabbath/19.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "5cda992c7ddd604d1f5113b4329f3ad52fad6e714b6e9134c06bdee0c516606c"
+    },
+    {
+      "file": "rambam/Sales/23.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "eca8d76dba9fde76ce7df0def9e05830cbb7e4fe4068bc58172a66245c9f3a64"
+    },
+    {
+      "file": "rambam/Sales/23.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "9863b15f8c8296276dcb6200683c3eb7b0f4f7b06f1117b448f557660643f260"
+    },
+    {
+      "file": "rambam/Sales/23.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "67f11dd919d2adddf576eacf554c031bbf2cd501582bd2545ed1e56c012828f4"
+    },
+    {
+      "file": "rambam/Sales/23.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "640eacaf690268f7c2bb2e7f614b2108cc53ed076285c757bfbd0244645e3804"
+    },
+    {
+      "file": "rambam/Marriage/14.json",
+      "key": "s",
+      "idx": 21,
+      "hash": "c6cbc29f7e0e80e90522c8e905e901ca5292b4b7139b3c69d4049ee5774cb048"
+    },
+    {
+      "file": "rambam/Marriage/14.json",
+      "key": "say",
+      "idx": 21,
+      "hash": "62b1906df9944de5929f4ea8f66c8f5f53f2ad19ac066ca66c37a9006e294f98"
+    },
+    {
+      "file": "rambam/Marriage/15.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "1568db0401861f35d65fea19ca068bf8712f330004dcc56869ede1173535e272"
+    },
+    {
+      "file": "rambam/Marriage/15.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "bcc5556f976a5459d08d14133e93912488242bb31012f900417d3c932e41c932"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/8.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "a892052fd14d9a688aa7e58e78d40d07a04b2bb9b1d4fcb2c93e593881e67dca"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/8.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "5bb3376b4c54467c0ee10481d2ad2a66194b05b751e3f60faf5d7bd4d4b5b357"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/14.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "f009824d0f2a7a16b7098b1b637fcda67bbceaaf114f784a2c596f9df4d4e653"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/14.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "ce16940a15a9fd8ce0b74bff7dc8cdfc7a20333eb2b9e89972dafa19bdbaa251"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/10.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "c3d98191a0c65666a329c926efc226dafe3d2cf94dba9786d3c57bb348169db5"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/10.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "9b08f13b66b0501769adf6d67d61bd1620db7379f4f1d03f105bf45985d90c3d"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/3.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "8017d1023935cb68bd91d068934331d7e5f740bb9d7546bd350f48f93ac1465c"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/3.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "3a16e734f9ee01fb334437dd94758c45a888ebb6d6894f68cfc412c05f757397"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/6.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "620b570b7af0b6ea8271a524cd207f1fc0f5d52dd8a0b50c022634c90e2bb3e8"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/6.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "7c6ee19bfc5d28d73ba676e54bf632bdfc1d58568e64e08109bc39543a9f9b33"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/7.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "9338b062e920ce34ffd3ef7451efab752479dac57e3f435e010e90feaefa08f1"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/7.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "11c129cbd1be0ad5ce7201e7131a4859f97837d588cd88a472644c3b633b44bb"
+    },
+    {
+      "file": "rambam/Reading_the_Shema/3.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "fa7af56803230ed047c5dd1cd14068ab2994663d81ca7791c5b35e8bd8982362"
+    },
+    {
+      "file": "rambam/Reading_the_Shema/3.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "3d8d7cdbe180406998d751359cbd91290d6141d644aa0e57b563888c90df9176"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/21.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "18329b972017f2dbc9174158b07584c465e68aa9d68c45799a187cc21c81c914"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/21.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "21258de896a9716f9fdc11f5f9561c53fdbfec52e236aab7532a91c88d3e58af"
+    },
+    {
+      "file": "rambam/Eruvin/7.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "1f3a75b80ae8e7655cc43e1f854120735e3f301deb05461764f2334af8d1d89d"
+    },
+    {
+      "file": "rambam/Eruvin/7.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "9ef07b163685b374f4bda5b8094b151eca289f6df5622ea8b320d7c3862ea15c"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/10.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "77e3f5b90606a0d1014b879ab6a2c347d12cf8d4fa3dab36134d7b2f9b001593"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/10.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "6fef1ab0cb02effa07607c984394af9462ffc2398e3889c328ab79246a6347d5"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "2fc238389404078902ce47201ee56b0fb91b6aecafbf378322c2edd281fbdf42"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "7ad02205136a59ed3820e5c7b9bdc62dd715f62048cfdfbd383c6c613dbb7a43"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/16.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "ea10ad65839ffd6f536bf4e2b012941c2c130266585c489488a62b44fd0af84d"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/16.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "87a6e67979ec5604db07ba4aec5ec7425f6952c80269a5274152e5deaa53afb3"
+    },
+    {
+      "file": "rambam/Vessels/12.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "e44a25ee08297b38bf85b41505eec1956a4913c53e9512bde3886aa7f0252866"
+    },
+    {
+      "file": "rambam/Vessels/12.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b31e7ec757cade5fd275ae29e2bfe181e256546b0e685584149b8786ee6d0dfd"
+    },
+    {
+      "file": "rambam/Admission_into_the_Sanctuary/2.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "fd592844b71ad97f676a5c9242fb893b17f4c0f56741b6239ee220f1f2887aef"
+    },
+    {
+      "file": "rambam/Admission_into_the_Sanctuary/2.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "31aacdee09303f209a67973428c636f280297b548fe1f3c99fb30b17b87f81be"
+    },
+    {
+      "file": "rambam/Heave_Offerings/13.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "c3dc7a92390819a2000c3794348c33417dbe19e1e989ec45cda1ef1276b58b5f"
+    },
+    {
+      "file": "rambam/Heave_Offerings/13.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "6285486757f3d0644840be8ab41175118b23d8a5ed9f13b79f8c67540c43f496"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/1.json",
+      "key": "s",
+      "idx": 23,
+      "hash": "17f09a82a13da448425621f8df29b65f7ff7eec66d41bd8ec896d6bba9335cda"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/1.json",
+      "key": "say",
+      "idx": 23,
+      "hash": "20f08039d5e0c7663c18e036c96ff2262f5492d818d82fa88ac0fe8854f14c4a"
+    },
+    {
+      "file": "rambam/Fringes/3.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "1510a8533582c748df4fb691f551e0e0ba937f6218e121968abbb6d050cbec56"
+    },
+    {
+      "file": "rambam/Fringes/3.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "8148b75af950c1f3bf416716b99431f52362ae979f14cff1cd7ed773c58fb63b"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/13.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "54af1a71e693b2604b5a2d5385788071a2761f56ded0d0e88910344de7ca8291"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/13.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "81cd1afdf2710a8404d09d159b30a7d72bb9531ade84dbbbcac50e1394afd5dc"
+    },
+    {
+      "file": "rambam/Sabbath/22.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "21b2ce0e9ec0694a4567098602b0daf49bf80535da5c973bfc6f57798cd863ff"
+    },
+    {
+      "file": "rambam/Sabbath/22.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "a74d300170d31fc11e59e464e5c2c22a9b55ca4377768fab7cd5c16a5fb910fe"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "296025b6ade29ece50eda64b07421336da4757e33881c2054b35913ad21f4b69"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "e2c87ea9b9778f0c55c1ba5a257c9c8642cb0df1ff5597a46ede2d7442b30045"
+    },
+    {
+      "file": "rambam/Inheritances/10.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "1487a9faa2b4fb6a113511d5f5f1e4581dff177385ae8d21be21e8d340379c88"
+    },
+    {
+      "file": "rambam/Inheritances/10.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "5fd5ba5f69454ce1d8c2026f3cda4a2a724b6c10ff0eb8ef447116edd2148350"
+    },
+    {
+      "file": "rambam/Marriage/15.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "75e6d491a7df847edc12028fc8b0520ac9e6f1982378368b37b7f048f721b436"
+    },
+    {
+      "file": "rambam/Marriage/15.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "e337fcdf52f3f2178b9658347731bd893a3d554add3f89a13d7a7fee6c0e8131"
+    },
+    {
+      "file": "rambam/Woman_Suspected_of_Infidelity/2.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "fecef7c61e07e8d4d817399955fb27726bf924e1cf7982e2c61e96b8af9742d3"
+    },
+    {
+      "file": "rambam/Woman_Suspected_of_Infidelity/2.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "c72d33a88c7199f8f03f952d5236c0d28e6c427479b0b510baf2c6d0878651b8"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/8.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "f9281bc3f3f7f7a9866c45be43256b96b672c6194ee9ef54bc4280170764ceb0"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/8.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "851d6cf58d5c5b5248b6b9ae7c15d3b6503cd4a76d22bc72f92915610ddde6de"
+    },
+    {
+      "file": "rambam/Repentance/3.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "3669faa58a7ff2e03fcc5068736c5866b65f247773de5038263fa2e9e81c9cdd"
+    },
+    {
+      "file": "rambam/Repentance/3.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "826097122379f5261b3ffbc0943e6bdb63f442392f5cde14191926ece1a898d8"
+    },
+    {
+      "file": "rambam/Hiring/5.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "bfa3d665f074744533984182dc1d5e1efff975000e79b712b9555e62a70c002f"
+    },
+    {
+      "file": "rambam/Hiring/5.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "3712f178c1bed76cc5500327f9fcfbae36c0af010bc2fa4c7eeeb9141e1ff20b"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/8.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "64a478da487a55767404a5cfe1912372f7ccc851c2bc7025f3bab155829896b9"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/8.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "2907cd1d8c0f2f61fb49e303a8985bc0389bd44776cc62e021355ea7ce45a83e"
+    },
+    {
+      "file": "rambam/Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein/7.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "ff3f52aece3e1a48e0a60a508723a3472b1ea5bb764eb72ba6c1fecacb8baf76"
+    },
+    {
+      "file": "rambam/Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein/7.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "cd9245067643f1684d4150b1c01c35df1f40b8f80aa484bf587e42cb6a81a397"
+    },
+    {
+      "file": "rambam/Heave_Offerings/7.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "b2b8f7b93177eb3b89be2f08b8423c82c3bbac0ca9a3a11ff24ed81bdc90b829"
+    },
+    {
+      "file": "rambam/Heave_Offerings/7.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "8d73323f0b3e5fcc6cacb1ef116e5c9ae41e838e8fa15402f775918fe459c8ee"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/12.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "3a3fcce6adf68e3891d1517a5d343fce40d4ae1665b0a1b4626039fda1e8c104"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/12.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "8bdd15c618012c1d8ef49749e304ab46a42dbed408e07cf09fc9856519fc2525"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/16.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "a01b5c819c3cac3983f0802ab45f453f622ceadd3a819a94b131f0a627ab9628"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/16.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "aa9cb7ad615370688d0bb8a99ea392dffd86997b9fc222c80f857988c2e743ad"
+    },
+    {
+      "file": "rambam/Diverse_Species/1.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "7a0bf708df8fe2fa6c85a970c809de0bc282f54549e93286ce885baf36a82015"
+    },
+    {
+      "file": "rambam/Diverse_Species/1.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "7dfceb7c1f8cd8069fa7c1cd9b64f01cc898997508af4d5aa6148599e1ae6ff6"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/23.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "f4be8e8bec292c936837b3ba9ebef2d87316d0851bd152e8813b655144b64a44"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/23.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "aeddf4f94f2dcf0637817c4366cc075b628712356448ec5537a0dadf79b3c07e"
+    },
+    {
+      "file": "rambam/Heave_Offerings/14.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "30679c1c6a772d51bc9784fad6a9685e20d7a95b848d50f38ad4c1df6f975f4d"
+    },
+    {
+      "file": "rambam/Heave_Offerings/14.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "84e0079d02de4c731befd640ef696e32da0b10495bc017f873846d4f51a8f78c"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/5.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "0490153fa67b7a91333bac7301ca0ec51167ffdeea857b2d3232fe1279e5b48e"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/5.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "c0d91370bbad50b6b49d51e6f68c4088d39ae70f18e3a1144135055a0ed87c8b"
+    },
+    {
+      "file": "rambam/Sanctification_of_the_New_Month/2.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "f5898150713aaeef76c38d35e53711181cfcf4d711b99fb6fd9b0e477816a55d"
+    },
+    {
+      "file": "rambam/Sanctification_of_the_New_Month/2.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "bff2bae528914e56829dab5c0c68d4a709750e5f7689307cec3dc6514b6eec0d"
+    },
+    {
+      "file": "rambam/Circumcision/1.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "79ad610099195ee47dd593b9281632e305da2e6d98aca7ce12ce719fcc45f6a2"
+    },
+    {
+      "file": "rambam/Circumcision/1.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "24ea13c23f8f5386965ee7064a4cb9bc70abb5990ce5f4468e31998f291a5bea"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/2.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "d0b215e81c8b42730cfc007cab9e8b56521d6607fae31f28c1dfa0de06e94e2f"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/2.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "576445f73642db6cf186ce590e044f93c6474ce62c23276da224b34c6afbea92"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/3.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "a09fe376104942025bcdf5baa8cd0b5864d39d0688e96dd53b8e3ae818df1ed0"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/3.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "6a30acb2c21b6727036b0db4a003cde5e2d8f1cbde01ccbfa5b1d9e6e12c298b"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/1.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "d271b2ccbf51336276b0dd807081ef036e76601775662b96846c44c7154c9564"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/1.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "515c7a7e7259a99a8404f127d17b71dbde64534ea690db86087a12dfbf2817b8"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/3.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "7cbc824704bb3dd328ebd2e5ba39e854318129bfc3ca22eff8a3b105b339cae8"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/3.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "298239c7cb26ddebfc0b3b5cca8da5d8dce46649644da2349bc15074525b4d6e"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/3.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "b6b74ce69533466e64587f8452265e13101918f792352eca8a073c0e116f1ee5"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/3.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "8cf654640339a35d6bf728c28624c4ef0579c29357cf0c767cef44e0c3eb109d"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/8.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "5843b03dcf9e50c44629e187cc75f2aec85dcfa83cc8ae8ec84fa65c390c7ce1"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/8.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "1d055bac89c036f199d2f436c6049570a533633413d084c422437951f75bd629"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/4.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "e3233a16d0d37e78a5b521bf1d4bc48929ef6d6c47f52cac968f602276c1889a"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/4.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "ea41a47d853389df20c0874743fbf71079ea6580388e21f673f5daf72fc30b36"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "8f89b17dfd30d39cd4d0e817cf002d028bf32ebfc3dd3771dc612f18774e1064"
+    },
+    {
+      "file": "rambam/Blessings/4.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "05f6adfd875ab97975282bd1bce819dfb50df60d2c5d29efdf9305cfb4db3a57"
+    },
+    {
+      "file": "rambam/Divorce/1.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "65fc108ba1a62411487e990109bd9860d9562833a6eaa8ee829b9169b276fc15"
+    },
+    {
+      "file": "rambam/Divorce/1.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "c91636e065baa9af799282d32845c99edb1e48ff272908f55468da2d2c6b6c26"
+    },
+    {
+      "file": "rambam/Sheqel_Dues/3.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "9e3102ebe753f5952edd578ea67d0d0b62ef3b087cf46af82a9ff8e56ca27c94"
+    },
+    {
+      "file": "rambam/Sheqel_Dues/3.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "ceda4d8886762773d893e5dcbef7161b35a33db937e0c37f0872c00acfff540b"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/20.json",
+      "key": "s",
+      "idx": 19,
+      "hash": "5e2020586d2ce0d217a278c297afcb1545964f2dd0000066fef7be6862e15caa"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/20.json",
+      "key": "say",
+      "idx": 19,
+      "hash": "a33930d6ea3160170ae2cea9e54b222e23c24a6d15e1dbe474b62744742be641"
+    },
+    {
+      "file": "rambam/Mourning/4.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "4bff2df1a3dd0eeca868250965568d730e87d64f15ef7a8556b18875d9ec6edc"
+    },
+    {
+      "file": "rambam/Mourning/4.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "4c6a3f952a6584f7f0416e8150ae4fdeb16809a427a17364f0864b8649a31673"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/18.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "1242e881736f939685059492f20bcb7506fab6bbb3ba14a2867efd78dd4a85b9"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/18.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "a1e373084cb25a07eccf6bf33cfcb3122217853abd5dbf56fdbb5799ab8e622b"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/6.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "fe3aa72cae6a08bab66a652ba0870dc4224f6922d8fa610f627b503b687d734a"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/6.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "df8b9a27ea172fc5565e3b812e5757870d033a8c984740cf12a01f225bb077dd"
+    },
+    {
+      "file": "rambam/Festival_Offering/1.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "357c9b34e6fb66f4e91e0e79fedf6c62791872c184ab5f66041afe2b6643b44b"
+    },
+    {
+      "file": "rambam/Festival_Offering/1.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "cd8847c28d696c1cbead26e222909a65a2793242690d60d120f9e6a7915c5b23"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/18.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "c701bd5218f2c8df82404a6a261b089c67bde6ef7e46a66b782a2fc9745632f9"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/18.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "9f4c199f5f455b996e45931f976cc06e5dfb3df1c5c9b21db184333cb0988622"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/18.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "68a5ae8c37ba6c81c8de4eb609c9b0406e44f61fdaa3080f6962c3df75961eac"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/18.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "398c233b42ac671f68ddb82202133e1db4d742397e243ecc14b9df727561d02b"
+    },
+    {
+      "file": "rambam/Mourning/1.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "54b98376690e5a00d15e62af7c5085c28a3d51847016f598f0f09c23fd605270"
+    },
+    {
+      "file": "rambam/Mourning/1.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "6aeaa7c88652784d7b058d3d92aca73c4d00195edfaf3a72857706a5998e4fe1"
+    },
+    {
+      "file": "rambam/Blessings/5.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "57d6e993f3cdcf55a102785974760df3bf4c9cc5171c834982c1cf43b20ac3f0"
+    },
+    {
+      "file": "rambam/Blessings/5.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "d94a8b1b63b319cbe89f720ad483d54b8ab8e157842c24e6dc972a13013cbebc"
+    },
+    {
+      "file": "rambam/Festival_Offering/3.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "8be31703bd4825091f6464b8d6e680d598808a905bd6de715677b85ce6ec2ff7"
+    },
+    {
+      "file": "rambam/Festival_Offering/3.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "5bf52bd90efd242a3e5f81b84cff3d3e4eb53b89cb8a83bf4a0bcf7628fbe5f7"
+    },
+    {
+      "file": "rambam/Marriage/10.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "430fd4a4ddd226a12d99cc4ee57016504a6a86aba9594d5112b8eb8d925df030"
+    },
+    {
+      "file": "rambam/Marriage/10.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "bd0a8bfad8ae012d779c89b08b1856670a465a210e2c5b7a33de11f1f461bd7f"
+    },
+    {
+      "file": "rambam/Marriage/4.json",
+      "key": "s",
+      "idx": 16,
+      "hash": "235626eadc0f91ce8da2c4553c93de490d5ed8b9a77ec6c345579f49a74d2264"
+    },
+    {
+      "file": "rambam/Marriage/4.json",
+      "key": "say",
+      "idx": 16,
+      "hash": "37242f903d33d83e64ed80fd3591105104668cad574049708136cfa89fbcd5a0"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "s",
+      "idx": 21,
+      "hash": "5f6f8b5bd67fd8055983b4288b16da7237fd2d9937b83302df6b131f378c7470"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "say",
+      "idx": 21,
+      "hash": "630ee82077962364cd95af0138c0598f9117e324e467bad546a58535c1e13c4e"
+    },
+    {
+      "file": "rambam/Sabbath/11.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "c942b58a01c0932f6c1251c7627b784972f61d3698bb5f233f38df1d9ff0b9ba"
+    },
+    {
+      "file": "rambam/Sabbath/11.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "ed99dcf5a13ad10b5e5410c09a66713c16affcf472ee0dfef35e6f16029d3617"
+    },
+    {
+      "file": "rambam/Nazariteship/9.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "97314a211d9c32465000e3f4eece8710f5db658c4d75795f76190e6ed6c26df1"
+    },
+    {
+      "file": "rambam/Nazariteship/9.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "2944f202a53fb6c220bb03242407555a722dfb0c2d10ae3af5081adfc5c87785"
+    },
+    {
+      "file": "rambam/Vessels/20.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "782e7ef0edcca03ee3f70a87ce7b62dfd703f96eee0681eadf61a14964aa51ad"
+    },
+    {
+      "file": "rambam/Vessels/20.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "702b672d4a07b401d407bb149322af0a99e5d75dc71cd26a921b6bc1e3492ebc"
+    },
+    {
+      "file": "rambam/Sabbatical_Year_and_the_Jubilee/13.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "b17c3aa0afd092d4a5ef4dbb6c00462b0242aac88c18a49ed6af486032062e6d"
+    },
+    {
+      "file": "rambam/Sabbatical_Year_and_the_Jubilee/13.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "43c68412cb17513628757a4ca1853f597fc344cf1f8a8d1ba43b48aec5756bac"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/17.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "feb6f60b7ed3b7dc84234e9e4acf7252a41aeaaa0218a0408365b62b29f5d3eb"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/17.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "6d337d587e8b0684cd2789f4b2344f7b26aa0442986e57f10668aca4bf8245de"
+    },
+    {
+      "file": "rambam/Red_Heifer/11.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "cac19f1f2defc175bc4c7cd7f28674bee9ecd95e6c0938b6ee68a9d4f9a3384f"
+    },
+    {
+      "file": "rambam/Red_Heifer/11.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "75848b5a06dc087110eccefb7ce564597e852195b10f8494013fc22c6830fdf1"
+    },
+    {
+      "file": "rambam/Sabbath/1.json",
+      "key": "s",
+      "idx": 16,
+      "hash": "0a5a91868e8ace380166d75a85a1706c517faa140ee4f351876b9e5aab3dbab4"
+    },
+    {
+      "file": "rambam/Sabbath/1.json",
+      "key": "say",
+      "idx": 16,
+      "hash": "9d06cc6c3341340448bc093bdcfb084415d230ca9520cd1ab8a91366e4bbb2bf"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/18.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "e14649cf9651b62d07a0d21ade9883a36230d1522cc4f6a0db8402958eeb08b8"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/18.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "a4f7f9bd78cb1d4d673fd1538598c56557c28f8beda3c3bbe2dc252114030425"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/13.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "1c2da13753ff03cb2a1c41089028b95c89cd3254bfd67cfcf88f115a614181fc"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/13.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "a3b19b32f3fcdfb991e863df33f175a1d32b8d57d9d4eb1421441f7469881d05"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/12.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "f84928ae619696ed8e22ffec253ed2dab47220d12b73091b8707d76a55e41270"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/12.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "277f8c0cd1cac46fc362bcdf842294094b1ae36b31fa12f0e2ea9dad8d8bbe1c"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/9.json",
+      "key": "s",
+      "idx": 33,
+      "hash": "e18d48fa887fcb5a1c779aef2ca66649307cdb73f0f2c2e44057d16e3c8f9e3b"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/9.json",
+      "key": "say",
+      "idx": 33,
+      "hash": "0bc6d981612aa2965db041e0c72be33f6b1ac89f02bd178ed1b66b135716c366"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/12.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5b4d4521419b2eca500cb9126dbf88cc30219d4c36e1ed8c74e4c0f219761408"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/12.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "23a766cf4f811e638ba1a0ca63789b362151297811048c0bc9f96b30fb3fab7b"
+    },
+    {
+      "file": "rambam/Those_Who_Defile_Bed_or_Seat/6.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "1fc0ff05d1c65fbe5df38b054fec7f404854791ebca1d9bc899a975d26ff4088"
+    },
+    {
+      "file": "rambam/Those_Who_Defile_Bed_or_Seat/6.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "8087b3b29c67b1f5e0de1075d0cbbf004c84133bb080bfacb9ecf9c9b7b1baae"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/9.json",
+      "key": "s",
+      "idx": 22,
+      "hash": "f5927031742a7ea2845289534e0c7773b2995e4acf357499d358b60a6973427f"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/9.json",
+      "key": "say",
+      "idx": 22,
+      "hash": "1f3e791e839daecd23ed5c9e0832c62f4040145a99b94281472dba659aebb0cc"
+    },
+    {
+      "file": "rambam/Vessels/21.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "e46f8e7a241623bc1fbe71d30bac5a1d549a9caabbb9cf9067f651f334a75f73"
+    },
+    {
+      "file": "rambam/Vessels/21.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "0912da5bf1c916469ee4ee82e7435957be424f9e50233a572494b81184d16e2b"
+    },
+    {
+      "file": "rambam/Things_Forbidden_on_the_Altar/6.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "5353680b8172ccfc7e8dbb4cc249c6453f3ca3279093cfc0c9094bb63af3d5e8"
+    },
+    {
+      "file": "rambam/Things_Forbidden_on_the_Altar/6.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "18f055711e4dae159be6fc3c476097373c51faa9bc3d4482a8b7a9530a82ac47"
+    },
+    {
+      "file": "rambam/Blessings/9.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5c44f58bd3b888a47c057f85447f8ec5fb8b823b57f1363358eb4024b6126d0d"
+    },
+    {
+      "file": "rambam/Blessings/9.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "505b76602a8e9009e67b7be3a6727942ff799cf235dcbfd1911e7ae54b0fc7f2"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/12.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "ae6d67ecb65f12880163ddae1287a2a3d14813b6d50cd60a75fe8ad3e4bf816e"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/12.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "fd816d858f1b393e9a3d1df370f298fa379158050865272579a43198d26cab75"
+    },
+    {
+      "file": "rambam/Blessings/2.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "e4ee79076b64a18a9a092eeb1988d06a7850c439a45fc84d819eb43d99b431dc"
+    },
+    {
+      "file": "rambam/Blessings/2.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "3ac1c31bbc151b8a503cf7b7d86d60114444df9137386893a4f17031face48dc"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/7.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "d1083d029ed0024db2dcb301de09dccdf37412df0861747316e194ee3cba8c1f"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/7.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "97e7f46827ddaef27661d2227cd4ef1b05490d4db6fd554595878b5b031b1def"
+    },
+    {
+      "file": "rambam/Inheritances/5.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "fa1066e873c9112ab9f525fe6e8accf9c9adeda7fa77ce409fbab0e512afa996"
+    },
+    {
+      "file": "rambam/Inheritances/5.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "0ae2e9f7cfe5ab4d5f43428def8da561ec98de8ec446573d8d342a57ef99560f"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/12.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "b183367c751be4d542ec5fb99f8316fdac27913fc8bd1983a61e57a29b97e798"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/12.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "196c8c77a679fc199f70a3c3e1a956e9d1073818001f7d97bed628da2adf50a7"
+    },
+    {
+      "file": "rambam/Service_on_the_Day_of_Atonement/3.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "a5fa14e166dadaf2542a51c42ea6b325297c49632bca28813bf01b0a32ff1c01"
+    },
+    {
+      "file": "rambam/Service_on_the_Day_of_Atonement/3.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "ba60f28ab4206e1953b9db94cd3d952a03d3d0e067cf2ca0a28966033d525389"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/20.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "b2e7a7eec99dab8a521c287ef288737c65a71ec67cffe777ecd7c43466d22363"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/20.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "5c0404ca14c3c86d497ccc55560761158f2af5af74e77455353a050a26c6753d"
+    },
+    {
+      "file": "rambam/The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction/6.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "00c9e7f68c5994e09e7db4d8393e648536ee14b682f37608f4c94fad612909ff"
+    },
+    {
+      "file": "rambam/The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction/6.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "99d55a56d34966ec1d74139cacfad17203a736d48d10fcaca5b9d0fce0a0a33a"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "f6e32c9294a68b6a94edf6f219d006c543ab882f6c51cfc809df99404bdf9ef9"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "d8b15804af751edc8f6cf186a81bc92774be95da02f0919407139756421e9897"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "07b540a047c56b166fc3288a08edb43eb59d315addc35529cf26ff049856fc68"
+    },
+    {
+      "file": "rambam/The_Order_of_Prayer/2.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "140bcbafd58b9e0cbff780a253d48e0feb1415098c56a1e437f405e33fcba58c"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/27.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "95928b9f84284be862406afe677dbf722e1e4d4b36174d5feb2189b6a62ef40f"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/27.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "1c7beb0db1283e27c9f9c8be8381df955dc19936bf86ad56e9382638e83a9a89"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/11.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "e2e7e1c3ff4952801b2601817b22a880b557d7328b4dc82ead15229fc63f5b01"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/11.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b030f896046d2323e2bd82c1659ae140b25374ed90263d2af30ba1d665102010"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/8.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "147626ca94856561a026c5fe883d11217d34a823d916d3c405200551f6ddf6e9"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/8.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "4ae6a894d4cccc72bea23448e2f6de36ce99dbea62d138b3cd7af69068801e11"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/12.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "9a029c5984db38e43044c6f655e7375e64eca730c436584d571fd3a8eb2f4fb9"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/12.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "9de4c60f750ef8d2868c3f1ab3817e1c7906923720201e06a3819e76cb357b8d"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/6.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "024a9b558ed14587d9f0bfcb168209d4fd9e7414d0138310abdacc7ca337309f"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/6.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "8c3a692ffe371fc023854ed44bd79e92a4858c7412f26eb31870829f2212035b"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/6.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "f6f238d4b18e583d4c575e48bc0b3503b64928656c25d9b1b4d1c31ce4126b7a"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/6.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "37d9e05dab222fb74c77c75213a6e0ed159ee8a536d4c864126283ae57ad4e52"
+    },
+    {
+      "file": "rambam/Blessings/1.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "9c1b72cc237a0de06f9384197249133b609a1c05726c72fa136d7f60f8ac23ac"
+    },
+    {
+      "file": "rambam/Blessings/1.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "a0a3bfcef9a3e4f08aef5a3f5552006dde537c1946326605b90081b10f5bd871"
+    },
+    {
+      "file": "rambam/Diverse_Species/10.json",
+      "key": "s",
+      "idx": 26,
+      "hash": "60ee2a72fd88d29423e4d551f82dd9c6fc3bd04c03e9454332f9c0ccb959f50c"
+    },
+    {
+      "file": "rambam/Diverse_Species/10.json",
+      "key": "say",
+      "idx": 26,
+      "hash": "09b1ef43a558d6cadb1ca7478bd54742204eb2fbd7688b9e1fcbc8d9419f02ec"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "547838a698de69e9f077e7286c4512e5b2e4d8109abf34de24feacbb5577efdf"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/7.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "03dc1c07d886bf441a3869f37bf5382b7c63dc83138ef0825d9a220bbcf34d0c"
+    },
+    {
+      "file": "rambam/Divorce/10.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "e4ea1b3e0ed4a1bc83474f5f13ed0a8a15d7f636a884a3d87c61f6dcf7654c8d"
+    },
+    {
+      "file": "rambam/Divorce/10.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "02308cddcae1e973d8f45fa9e547f4211423da49dcf65f02da03744b80c53916"
+    },
+    {
+      "file": "rambam/Divorce/10.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "0d3fc77252668c7b55f1f5e28e2e3d266b4b18378481c60d0976a25b038c8df7"
+    },
+    {
+      "file": "rambam/Divorce/10.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "d0cba7dc9b8ec59a998139b801622bcfb3b482b97a8fe3d8560179f2c6785bde"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/2.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "2ca0f777026052745b4611222d73dd776b1a519633bfc4ced27a46bd78379d94"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/2.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "62322ba9bd413dbcaed1e5a7fc1346364f5ed4a3d7cfa6e734320ec32c388fca"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/2.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "fbe53ed89041fc0046880baa609bc57f1b375a381382d29b737416e57d6d75a5"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/2.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "75e726db6b368c83e423a0b63762f6ad4c3f8d9d1820bfbb5a3c17d9a80ea415"
+    },
+    {
+      "file": "rambam/Vessels/17.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "162e9cc295e4b57480c88890b2db9475e9cbc1363ef7f3d7a785c458b04698a8"
+    },
+    {
+      "file": "rambam/Vessels/17.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "b970c0e7d142558e433b920ecd1fb5ece06d27b164b3be7d785b752ad990ff20"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/4.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "54b4d5dbb6cd24e61539d3f5ba3bfd0d9ec3882b3d1268aa2580df04aca5225a"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/4.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "2f1d0b58848f2951fccb78d56dd5ba980a1965981a020ec1cfc58179f175c216"
+    },
+    {
+      "file": "rambam/Vessels/13.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "174c867ff3fe65fa796ccbade560330d279d07ba0a6e184da79d1c9868e685b7"
+    },
+    {
+      "file": "rambam/Vessels/13.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "ca6158b79d208d258103d400402937bfe80d1805f7447bf54aef520b99475db3"
+    },
+    {
+      "file": "rambam/Sabbath/13.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "7ea1f2a2afa8278b99008669508ef8a727bcd5c046b7083cddd5b6852f4116a1"
+    },
+    {
+      "file": "rambam/Sabbath/13.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "ae3d6cbe31743810661fdc1af1ee5ce8da78815b18d49985e96a10fa8948ef22"
+    },
+    {
+      "file": "rambam/Blessings/7.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "8c537397e932c78561e542be7c09eac618971910d5cad39d7880ea87aeac0983"
+    },
+    {
+      "file": "rambam/Blessings/7.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "3e6581836b83f0278b4ff5ad90e3de51f5b67e213bd759d9ccd245223d2b2519"
+    },
+    {
+      "file": "rambam/Tithes/14.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "23848991d485181bf8ba9d3e08abf6c95ff5966c12c917e81a6a2298a279a22c"
+    },
+    {
+      "file": "rambam/Tithes/14.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "e58bf24e188284dedc2fd3146d982cf772f7c34dacb8aa631ab64f0a8c705cc5"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "fdfeabbec925a9e572ba7e995d5c3a09c07d89e8e40b5b1a3624d85cdecd4699"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "df5dbbb3c29f9a271c9df1504e9961c17f3d70f942f564c7ef3600cf625fb5b2"
+    },
+    {
+      "file": "rambam/Blessings/7.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "0916ea79f0e614cf2b6a23e51cb9535d94cf75b9be4d6ba72af3efd1999d3373"
+    },
+    {
+      "file": "rambam/Blessings/7.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "5a32820a8bf54ecbd96d1f6fe4dd8999cafd5ec6e8ca76595db8ea9bc54f5e0c"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/7.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "cbee167258f824b785310e91863a0fd93bbfaaf863d388a3b885b352721d8d88"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/7.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "72cb45bd728a350b3994acce145f0c01117f224403ac35cfd00b5ddce3a1e039"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/9.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "1a41b43ce73550add62f724ca3f9f18d91312209f0e6504f97edbb60736a71c7"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/9.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "5be7ca76bf4b4145898eeb95e3f014293162a34d1bd746e54f6d08b97797fa0d"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/6.json",
+      "key": "s",
+      "idx": 23,
+      "hash": "af6877cf898160de6a01ea9533b44dea1dd7701b7722d00ca7b20bc6a166f669"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/6.json",
+      "key": "say",
+      "idx": 23,
+      "hash": "6bec41b887528a7afc68e5a40c961118ff143205ea49b63ae2f905423f2bd6ea"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/1.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "2a3da1b3f8237b64af19647e1c50a4158c16fbe2ef710dab2f94b443233c231c"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/1.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "c1f187786ebad4d5a2a4bd072d98e47f0bb98b265a79646b6b8578ff511ad6a1"
+    },
+    {
+      "file": "rambam/Mourning/3.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "dd1b4006b6bb3cf38fade98e802aa139c388f563b9480b274db7f79a75326535"
+    },
+    {
+      "file": "rambam/Mourning/3.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "c6dc3fdb9e1a0dc92cbb28e6b12b2c3796657be43d4ef66bb6b755737e2179f4"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/5.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "2e2be986f71688062906bb486d80c3084f4e67bb887de8b8dc50b561e17e3d5c"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/5.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "c96106547eedf95953f5771d5c5d69d8525bfefe1eca5372e58eaa6c8249c0a0"
+    },
+    {
+      "file": "rambam/Oaths/10.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "cdefbcb1aeae35254a5a47c3caacb7c494acf071b65b43614f9c53e5a2c04071"
+    },
+    {
+      "file": "rambam/Oaths/10.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "53cbc7b9dc7c10e9d2a6b251627b71dbec2e2047da2d360f609d330a5421f1c6"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "9af580b744670aa6421b33266ace45d0aff592c040f33ff1c56520a220fbaadd"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "f27dee962ba3523a98856729b4caa81cbfadb8a6fc211fd95e3f2d37b9f29845"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "fce02757eddf5d57798f3ba304d822c8c2d8a5abae32d6d8092d3fb509ff68f2"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "28dc8091ccc79e7f898676f4c2f4a079ec8712dbf5e0d1e6e0dacaef6d7cb7e4"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "0dcd0cf2367d06acbf00b10a6b024c7f30687c24d5188e83eb0fbb24a7eee0b4"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "571197a9c44928ef1628e5fb579ddb53019dfc7d287d8770f1ef117220e68588"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/2.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "767ea269847055c2856ef97dd11d1a7d93a468c191b1b0e10fc8c3eba39a3230"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/2.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "b37e5e5039dd9bc778132f893cf3f460e95185b0d522c7da29c1f93e6338a9e4"
+    },
+    {
+      "file": "rambam/Repentance/4.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "e658c8a751ac1ecd4af9343e10a11a7ee367279cf4a029fdb7554a1868d6747a"
+    },
+    {
+      "file": "rambam/Repentance/4.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "25bf6b0a507270d19fbf3b9c90997929b918f1b56bb6d0aaa7530fcda112c0f1"
+    },
+    {
+      "file": "rambam/Nazariteship/4.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "cdcb52913ef33258f76aa7155ee4d849eaaba59ba732c6a767d5fcf0469be838"
+    },
+    {
+      "file": "rambam/Nazariteship/4.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "e9975f8cd88b522416940f9efc8479589ee971e9fb87d129b973a690ffeab72f"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/8.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "9e2089ccd469b8cf5d8217fdbcb0bdc915eca54573332891ce715778b74e2fe9"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/8.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "4fbe22b7357d91ce8a733d458bb0817fc873e9b29740f9ff36e487c9e970f525"
+    },
+    {
+      "file": "rambam/Human_Dispositions/6.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "d9af933012a4569ecc8d441e1f455cfc9930e256b70a051c81735e2c1e566069"
+    },
+    {
+      "file": "rambam/Human_Dispositions/6.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "8064cae34d11c4b160d6bfdb890b80ed59960e01b5af485f1706574ca4c49ac4"
+    },
+    {
+      "file": "rambam/Marriage/11.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "a0bea43f852c6b85f83f9eab4e48e904f33fc270d11e3ba497eda7f45031ddac"
+    },
+    {
+      "file": "rambam/Marriage/11.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "d64fa874ba3ff14a78c98e3561cd032f679598ac675b939812f18f59c2fd8429"
+    },
+    {
+      "file": "rambam/Levirate_Marriage_and_Release/4.json",
+      "key": "s",
+      "idx": 25,
+      "hash": "9ca7184fb025a1c07c38630648b6cd9c658f3e9f0dc0f1d1269a5dc399c32f05"
+    },
+    {
+      "file": "rambam/Levirate_Marriage_and_Release/4.json",
+      "key": "say",
+      "idx": 25,
+      "hash": "f87bdbce37e4e0700cb5879b9539d74f6d9235650c0f732f05d926877d0ec5ef"
+    },
+    {
+      "file": "rambam/Immersion_Pools/10.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "4adc60dce5da9ee418c1b1c5fa2027be2322d89c215747916f938c2471d0b798"
+    },
+    {
+      "file": "rambam/Immersion_Pools/10.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "e094d5854c4aba5f64e73a85d9ea0a4dfeea9c5fb40b86a10f9cb96025a5f0ea"
+    },
+    {
+      "file": "rambam/Immersion_Pools/10.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "447e1ebdc0a8e7351d30bba0ccb8a104585a5b3535ab3b91c6cef103beac6c4e"
+    },
+    {
+      "file": "rambam/Immersion_Pools/10.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "1c258cdee0d3007d13c1dfb5cef5657cec06ce7f52a17bd8f89fe762ae37105f"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/1.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "d75149c6d7e48fcb6d25aa6a20d06717921c213296df6dca06a23073a899c0e3"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/1.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "ebd2f809050a60272e086442b47fb93583132ec704c020ba83e460749e470be4"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/9.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "21269567903c32765f0bad466f24e945328c16a3dff0c9da7c3929d996904fdc"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/9.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "94285d994cfe79e6fc3f64b54290725836ea042728391030561db9361af4e808"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/5.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "2e3a6eb94006e067d2368f8c2806c24c76c62554d721e7c0dcaad25096cc7335"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/5.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "8aa68f15e334b95d25864a727ad649eae67598dfbd7eb2d8ba534576e244b710"
+    },
+    {
+      "file": "rambam/Oaths/6.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "925eb7018d0fd1a99ff771bbec10cd8b673067ea3804df5e3004348971386233"
+    },
+    {
+      "file": "rambam/Oaths/6.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "37676e5ed247009b574d144f7292e06148cc0c146997f9e37ee4dfa48ceb2f4c"
+    },
+    {
+      "file": "rambam/Blessings/6.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "f1beec811fad4977733bead20790467797e596e0f8f63bea6a24de1ca2209e47"
+    },
+    {
+      "file": "rambam/Blessings/6.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "13e21955cb85ceb5ada11c5503671b47424173f077c2d01f40d1e4f2344f1e1a"
+    },
+    {
+      "file": "rambam/Blessings/6.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "f1bda8d1832f1d28aa0c91ccf534c9c4802fe8e13ba33ce1a28a8bd1082209c3"
+    },
+    {
+      "file": "rambam/Blessings/6.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "46448d675d67232a35ca21781fa2ebfd532c3670a9716c98f3a25fcfd333287d"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/8.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "4403cd2853354453128ef0276b1600ee6dd57b1e66f5e06094c74f1ed11c3cd8"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/8.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "587bc51c10caff4e7de42980f16dffbcc3409123376f45e712d5a064f254ed9d"
+    },
+    {
+      "file": "rambam/Daily_Offerings_and_Additional_Offerings/5.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "cba73f48897c5ec92d44ec743fbac064e5b7448847e6a0fcd9b47bfc10a4b9b5"
+    },
+    {
+      "file": "rambam/Daily_Offerings_and_Additional_Offerings/5.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "168c350b00cc71b00572bbf26632074e74067adb760f8dfb1fe50a13e760248b"
+    },
+    {
+      "file": "rambam/Heave_Offerings/15.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "efdfcc4df17ec53f3ba08a9d9277e7f598ca680ccc627a64ca4c816cdaa9185a"
+    },
+    {
+      "file": "rambam/Heave_Offerings/15.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "e4009a10d02289157dbc16ce5664bccc80aaa05839a429186adebe806a43d93c"
+    },
+    {
+      "file": "rambam/Appraisals_and_Devoted_Property/5.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5a633ebc90c3f2e5e32a35be7601efc746cb8bd4e5267779f0d5f251365d436b"
+    },
+    {
+      "file": "rambam/Appraisals_and_Devoted_Property/5.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "edaa8111e3e4ddb7f100d366ceb1ec90104a7a230422c6e9c444c0239b058156"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/3.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "81dbb9c0204e417de2980caeeb02a1ed170e2927ceb32c33eb4afedb145c459c"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/3.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "9180f4ee08ca1705e629e8e86ab220361955c6dca280d6171ccc0d57f3d0f8f7"
+    },
+    {
+      "file": "rambam/Oaths/4.json",
+      "key": "s",
+      "idx": 20,
+      "hash": "a92e00b86f77f0fb2ed51a46aef589b11f81aa9ee7c743efd2ed2d8393179c74"
+    },
+    {
+      "file": "rambam/Oaths/4.json",
+      "key": "say",
+      "idx": 20,
+      "hash": "da00ff1b80eef27ca7bb38c0b843fa9e3787a95f2df84a1c438017b953758bcc"
+    },
+    {
+      "file": "rambam/Oaths/5.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "072f5e38dd66cddeb970679322bd08125bc5d8fd1dd3091e63eb520df716272b"
+    },
+    {
+      "file": "rambam/Oaths/5.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "9a6e6b4ad703141ac583b53d8c9b99a4f3dc00fee5aa37f97b1d88ae615113d7"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/14.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "bf424ad3723d29d6959b67c0a025e7d9dcdc55d2aa3f670350fbc2015659d4eb"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/14.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "d70ff3b4f85083a8b542e71b11f141dab883ecf0ee5035a8d58b20710ceb7e4f"
+    },
+    {
+      "file": "rambam/The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction/10.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "b7a1e1b6fdcd6fa2e123cb58f30b6a804f1078ee0e0fbd8b05cfc7ba39c76203"
+    },
+    {
+      "file": "rambam/The_Sanhedrin_and_the_Penalties_within_their_Jurisdiction/10.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "0e731f96f0068e8e3c9d182c0c6a52161f2b647d48ffd36590f23bff4632b2e9"
+    },
+    {
+      "file": "rambam/Sabbath/5.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "1bab26543a97bdd9c3ad4c1b89d53fbe1bfe65b13699654e6a0fb8cc8875c7c0"
+    },
+    {
+      "file": "rambam/Sabbath/5.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "b3a7e4eaeb522e5cc5a381483c376a22cc752a129eb12fe19b8b18240a8c4856"
+    },
+    {
+      "file": "rambam/Inheritances/7.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "c14adaad18498a6f4fb6af18e1a3207a9ce861adf5f89f99b410f501e90f686c"
+    },
+    {
+      "file": "rambam/Inheritances/7.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "ce6df69f2fa7f409d88918dc1412f27f8e7a6c72b503d1cefa23429c11536f81"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/6.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "cc230600e1fea4c820f96de07b4b1a57d1ce78c586f8066478f5785a4ad2682d"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/6.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "74fe5d2e3120120b820db73f9e8d44f82743915b273d20e1ba82851b68f8c4ea"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/4.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "01b621753545771a8cfab54b967a6d4a10f24cb9dce4955057f5b7fabef9f25e"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/4.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "de9eeb9cbdc1dfc22b5f317189810800574fd41956a95b5d4b4fbe48819052ca"
+    },
+    {
+      "file": "rambam/Paschal_Offering/10.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "184bdf2bf80a4e54775fba5d583946937ee998c319a8c0b34f73a61a02e333d9"
+    },
+    {
+      "file": "rambam/Paschal_Offering/10.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "0685f24580370cefaeff5b681b36ff79e20f9de6bcc6a2b4651eee86565f347e"
+    },
+    {
+      "file": "rambam/Divorce/9.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "ccfd4bf7906991ec1f19fc178d1e1eb96f8d6e77c2ec11b0ef563fcf1e216ee5"
+    },
+    {
+      "file": "rambam/Divorce/9.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "bc390c6b3ce663adcf720facc3e095ea96dd22150a68abd95d12f67efb10a487"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/8.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "1128e8bccdaa4afc06a0d236cc5542d0d5afe37fb2710ba9c825b1bacb1050bb"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/8.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "c2b13dce71fad3959c247c57ea1f58d82e03fbca451422c47d6fc3d2b3769436"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/20.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "b125dc958a47a37bff7a83ab3305a97369036654ef99edfe37b33f4be7a2670e"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/20.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "b99caa7ed204f37d103b8ebbff03391a3bfeb04b90479025b9a0f2ae16950cc8"
+    },
+    {
+      "file": "rambam/Ownerless_Property_and_Gifts/10.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "bedcc6ef0fec97336249d4d30e56dcce1a1aa7da1e86265b445794eda124ceec"
+    },
+    {
+      "file": "rambam/Ownerless_Property_and_Gifts/10.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b9c0c4ba724f08bac5d0c5756e5528d9f6c1e92920abb8dae670201d17e29738"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/1.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "42d73cd8ca0058124d77e89df67eecbc2f07b1b18ed2dad157a90028ba5afdbf"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/1.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "9db0c82409b82efd38f68f9637d35c29c3dcc46cfc059c3fd890b4c3520ea204"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/1.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "c9ff4352505678aad03918971e932e33260d19d1c2a8dde0286117d912870757"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/1.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "2e08e756f13c9945d6648a39a88ea69d8d71a94ce17eb503cbb5751a2f65192c"
+    },
+    {
+      "file": "rambam/Mourning/5.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "1375d01bf95cfeb36e93d73698eec1261027ae41a03cb1fc9eddcf4ecec1ed2e"
+    },
+    {
+      "file": "rambam/Mourning/5.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "45c200fa41eb183ca815c322333d834c1ad56f70881dddc90e6bd7535bf647e1"
+    },
+    {
+      "file": "rambam/Vows/4.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "a2f08f897aa0b9790f1a97df5cc0002b6e69c41ca5f3a9cdb013ed7ea3baf5e4"
+    },
+    {
+      "file": "rambam/Vows/4.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "662b8bc06b122d2dd3041b091a565f35c13458e8913e10a1401d103ac2c13396"
+    },
+    {
+      "file": "rambam/Damages_to_Property/14.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "0d8fff3b021ad455bfb0b04f5dcc7e400976ed285e8885ed1ef321ee9147604f"
+    },
+    {
+      "file": "rambam/Damages_to_Property/14.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "c5a04c66ac8bde9c5c24fe9018203f58ffbdf8b00e3120a5bf83a6140eb0c4da"
+    },
+    {
+      "file": "rambam/Damages_to_Property/2.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "845ee18c6193c62d82c6c34779bcbd391ebbb9914c8cd5ff366bb1eec5da5b13"
+    },
+    {
+      "file": "rambam/Damages_to_Property/2.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "bb63d4830ebf184b68a014524780e2aad96c4fffdd6a293a1c315d57603a91fe"
+    },
+    {
+      "file": "rambam/Levirate_Marriage_and_Release/7.json",
+      "key": "s",
+      "idx": 13,
+      "hash": "7ac974ee33a3d659fcd4e74b139238ea77d3a08112fbf5d95e42ffbf9eb37431"
+    },
+    {
+      "file": "rambam/Levirate_Marriage_and_Release/7.json",
+      "key": "say",
+      "idx": 13,
+      "hash": "d5310c18f30216cc8505a2a3eddcd5b5af9006bf4839c09763ccdf83bac91ea8"
+    },
+    {
+      "file": "rambam/Divorce/2.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "7e01698a9036280f90fe3de49456d63bc3dbdf2936457a1ded941e37e937b5cc"
+    },
+    {
+      "file": "rambam/Divorce/2.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "278b84f6f8dc26ef11cff5bf82de0eccb6390527659a51631e4d891c1a05cfea"
+    },
+    {
+      "file": "rambam/Inheritances/11.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "be81de0f1748cd3f2251f0404bf540a77902bc38e20c22ee9b02a0a09cfb264a"
+    },
+    {
+      "file": "rambam/Inheritances/11.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "b38edc55d9bc988cae36cb4d6a60a182e19624cdb1f9a8832eaf5c3bdb552b6e"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/2.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "1f2759d6bd33229be5a7ec0e7a3ede134042a693cb93af0cb5ce68f954fdc744"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/2.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "f740ff88d9a3a8a9e078da4e432a0efefcb5f955d35643d5e0cbc0e805f79dad"
+    },
+    {
+      "file": "rambam/Sabbath/11.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "01decde6a631504cd5a40450168825e3c8a01e3edab06be8e9e8a4ada0874163"
+    },
+    {
+      "file": "rambam/Sabbath/11.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "35a9e278e396020232265956e56af0e9927c10b7a26689602c07257999b11ece"
+    },
+    {
+      "file": "rambam/Vows/11.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "8c72d55e6bd4cb6b72a3f03395cc111b1ae314cc2359072e96068598f7e61373"
+    },
+    {
+      "file": "rambam/Vows/11.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "64d3ff7c17f2a890402bb2935875c86da84feca0db6acee885b2e008884126d1"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/2.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "af2579fb98df6e29e1b39eaf0e3a4c890ec428b7a08aaed80d157f0c1995cf53"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/2.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "2f4d34164a64f6d4d4f5c62459133b11389fbdc419e8fa03d4632214ca195571"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/7.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "71d589bc9dcfb6fc526676e1d8bdbc09af11d129a5de8aa26475c72a54369693"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/7.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "c7b4e8ab9ee32e7bd9996c9e7ccd062f82001865d5a8dcb08309827edd40ec0c"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/5.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "a148875e30c86c515e13f3ca49d34096de09d4def25f45b1b3ffe60c2a70ae7b"
+    },
+    {
+      "file": "rambam/First_Fruits_and_other_Gifts_to_Priests_Outside_the_Sanctuary/5.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "07a7310f31ee1b0a385ca102bbb493c2c6025927c5d0520a1ee63f50b943fe5d"
+    },
+    {
+      "file": "rambam/Scroll_of_Esther_and_Hanukkah/1.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "61bc1c2a71abf20e0dc7e76d176b6dd2cbf1e1b5f6d90833eb5b7c38af0ea794"
+    },
+    {
+      "file": "rambam/Scroll_of_Esther_and_Hanukkah/1.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "29dbccd301dfd56fa3f826673909f9021e780f8a66224194b022e74d2717bc1a"
+    },
+    {
+      "file": "rambam/Scroll_of_Esther_and_Hanukkah/1.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "5e0355a27ad7832945c64c39cd7514ce2af402d6a427860f02d7349ea2923b38"
+    },
+    {
+      "file": "rambam/Scroll_of_Esther_and_Hanukkah/1.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "6e46d6f7e98f011b2a576fd7d7f360dd173d4de466942766025079ead202af65"
+    },
+    {
+      "file": "rambam/Rest_on_the_Tenth_of_Tishrei/2.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5368d69e90a5f98f78338898ba2c45159d8cc5088b0da1b30e2888f4b8083298"
+    },
+    {
+      "file": "rambam/Rest_on_the_Tenth_of_Tishrei/2.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "a4644e8004e46df9cc724553ac6ff5c7c5614dbd6314bb65ff9cb290a552f662"
+    },
+    {
+      "file": "rambam/Sabbath/15.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "d8adb0dc3af68289e311bc3b34064426583535d22f858daea99776974db23954"
+    },
+    {
+      "file": "rambam/Sabbath/15.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "6f8b5fb675d13fbc87ec186d1862c45c9ab4fd11428ea1d59b3f45a70ad9614d"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/13.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "ff2e2e510529851b473daa2a8fc158a65c582c9b4cfa73eb778a6c281c9ab1d7"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/13.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "38ba17f585fdbb88b57f3857f9b07414ceacf33ac5a80b5a550af17154e030f3"
+    },
+    {
+      "file": "rambam/Vows/2.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "83687e3a1abda2ceb0a58c9ca7fca919b9d47e6d4d7db31e4f336d2f9f409fad"
+    },
+    {
+      "file": "rambam/Vows/2.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "802ef5129930cba8887a465c38512c03517387c5d77d9face55945cebd0a1c2f"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/6.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "b1fc962a461732b3ea93d4e877b62a9e039f78b275888514860250c23e1ce16d"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/6.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "854e31cfe1f2775e2e480d9fc31c31bd28a8c7c3134b3c1a66b9c03709a4fcd2"
+    },
+    {
+      "file": "rambam/Testimony/10.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "d5bebc6103d56ac6591cb72515b85dc863ea6619dca7748ccbb1784712d78359"
+    },
+    {
+      "file": "rambam/Testimony/10.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "678a047dbbde4c4fc4c59eae2d867b0bbdad6fd5a37bd8c047351e5c74817684"
+    },
+    {
+      "file": "rambam/Red_Heifer/15.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5f8182fc1f06ce989ee85fef33c46794f30da74082022750840cc62184b70824"
+    },
+    {
+      "file": "rambam/Red_Heifer/15.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "d3cfb0b3f255b9b42a1e339e5f9a706f6648a0dbc761fd2281257f16fcde3e42"
+    },
+    {
+      "file": "rambam/Human_Dispositions/4.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "ade34a20483667ea8924653471ad54b6dd0025de9fd97f49c22079ae9c683de9"
+    },
+    {
+      "file": "rambam/Human_Dispositions/4.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "e5ddf546854c6b5d6ad5435f0c7220a9b4a51bb2249f7b261e39417ff756ebc6"
+    },
+    {
+      "file": "rambam/Damages_to_Property/6.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "4eb554eec7a1180812abec436eea003933ffd10a330129f7f6db28ca13581f49"
+    },
+    {
+      "file": "rambam/Damages_to_Property/6.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "d5426c775e58c776c0a8ac173eeff72f5fbd3f0b13597ca50b880214ee67a26b"
+    },
+    {
+      "file": "rambam/Damages_to_Property/6.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "bae99c77eff56e3e598bfaa9a916cf9feba3c569d138e85f179f03d5acaeb501"
+    },
+    {
+      "file": "rambam/Damages_to_Property/6.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "963dd89e7681c5e47de1313e4861b4f03f013eb6f5ed34d1467c2efff2c4790b"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/2.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "e0552d35208de48e8db8eb16e1a4fbdca4da727ebdf585bd0c19f7e27349fa86"
+    },
+    {
+      "file": "rambam/Prayer_and_the_Priestly_Blessing/2.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "9d3e4bf50f7a0eb363e13a7aa6b44610b008ee31b83bb171e4d3d1ddea08d15a"
+    },
+    {
+      "file": "rambam/Hiring/4.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "218ceee92ffc54c119a55f05d0eb859e83ba681af05e0ddbe322186e457cf786"
+    },
+    {
+      "file": "rambam/Hiring/4.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "4bb088124711317b2857ff2532b53904d28bfc487c57a3e0ca72f8e439016fd5"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/6.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "970b85303ea2947c5e2a78793dbfe89106bc92f702fbbde7daef22c6a001360b"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/6.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "9321feba6ef27c09532bb5635a83248d475930df5c243476df365c73a112b2ba"
+    },
+    {
+      "file": "rambam/Diverse_Species/2.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "76a365c74dbe79cf7cd491dda8f26ba13c7df151449bf5d21f02f90952717d23"
+    },
+    {
+      "file": "rambam/Diverse_Species/2.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "94a3b103ad4af51f67c8f08f892f97cb478bf0ea6a6daf5252e4bf578e32f529"
+    },
+    {
+      "file": "rambam/Marriage/9.json",
+      "key": "s",
+      "idx": 21,
+      "hash": "607c3db22cd68caf54b76eb6a304ce79faf012c0eab62c470ea11913e2d56646"
+    },
+    {
+      "file": "rambam/Marriage/9.json",
+      "key": "say",
+      "idx": 21,
+      "hash": "838e09b728e1def43c9431cae8e3cab95dfbcaca8fb30d4ad51e5c2874f6f363"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/3.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "08c6f327079a727943855e6f45aa70ce6a96a1d0f3c340fd1d5ff785b1ce0da5"
+    },
+    {
+      "file": "rambam/Leavened_and_Unleavened_Bread/3.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "c92ddb5f0c2884b5089279dbb31b1183a3a2bf514c4e9d628054d4039f0383fd"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/2.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "ace45ebe74d1a0b3eab5d39af4fc5dfb6fe7210a841d9ba5fb16d11b24aa7870"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/2.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "5f2b576411a9d0a3a70f66eefd486642b558958129170bad990b198a99277b7e"
+    },
+    {
+      "file": "rambam/Vessels/13.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "97a66b378082c44694b97935dd55ed4869c97dd7c06683dd745b50946a09ce55"
+    },
+    {
+      "file": "rambam/Vessels/13.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "a07fb3aeaf2f7575ddc3344a08ecc3cb4712832fb8fccd1b8159ee246d87d5a3"
+    },
+    {
+      "file": "rambam/Nazariteship/2.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "f0f2b0a22f88668a160d35d7877917561e868ce2e168fc12f259edf906049f11"
+    },
+    {
+      "file": "rambam/Nazariteship/2.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "0cffff191e416faa125124c896bab4b514bb084d5bab8c73abc7d6d5b881eac7"
+    },
+    {
+      "file": "rambam/Offerings_for_Those_with_Incomplete_Atonement/5.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "fff9cd5b033e915ba2b5d6d7166232fe69c298dfc97376e17a0c7bb6630d7263"
+    },
+    {
+      "file": "rambam/Offerings_for_Those_with_Incomplete_Atonement/5.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "249087798a6fc4785b7f3ae645ce04d857f3754350a2d479965eeeb45a96ad05"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/7.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "f4e0b3add454227563dbda2c8291361942af9e4433de0e7337ce112d3f564ff9"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/7.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "b100cf1064d37d5d2fa453bded8b404d75752e486d5d2d26e4cede3611c14fcd"
+    },
+    {
+      "file": "rambam/Neighbors/12.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "8c0cdc008d1d80073b88180dc7374e90e55b714d44af1351071969ed2ddfd737"
+    },
+    {
+      "file": "rambam/Neighbors/12.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "dad67b67a6827f8c3beac369f8560a90c8804dbed1aea852cf7c2ef6122a4069"
+    },
+    {
+      "file": "rambam/Hiring/8.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "345b98fe160350703a4166d627a9ea455ee769ff7f15e23cc839daadb9bc1df6"
+    },
+    {
+      "file": "rambam/Hiring/8.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "fe98718e4aa45602ac081b3986687b3980708a6ab23aa1d0d27cf29386b6f337"
+    },
+    {
+      "file": "rambam/Hiring/8.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "0b557c46d5a5617929eb95d960fabb880fe6b5f8aab621d501d81bfa8289a6a7"
+    },
+    {
+      "file": "rambam/Hiring/8.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "e350e7ff37144efe775e3dad498b430a99ef4d4b4f5f4bcb8335c30b5bf5b6be"
+    },
+    {
+      "file": "rambam/Diverse_Species/5.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "6d4fd81b533f17c95d5163a42a8560034dd5577e39d98bfdfc0baae60728bc71"
+    },
+    {
+      "file": "rambam/Diverse_Species/5.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "812a513a08a4f35abda44766c6f465533bb5b3024ec1433c6756903778f932a7"
+    },
+    {
+      "file": "rambam/Blessings/5.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "1f31be01546b4c954a2430b63b9437717d2e5bf3c1028e9998144676d39431d9"
+    },
+    {
+      "file": "rambam/Blessings/5.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "4a9c9ed2f810c660e95589bd743c692d826631cb79d54cb68b94a7cb02a44716"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/5.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "8e039ae1aa7eb67ebd9fc21a989cd9e5c816b2e1fe8332b37adb9f98a2f92303"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/5.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b053f83f9c928bfa8d3b4f3054e6782f47abc81e0dfea7ccd6557cced4001081"
+    },
+    {
+      "file": "rambam/Torah_Study/1.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "fb4084a808e9cb704845a6ddbca528748886b38c84efde92be1590ecb03a1228"
+    },
+    {
+      "file": "rambam/Torah_Study/1.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "22549ee750c9b8a7d59b7769084586e11b92c10c50c2ba5e370fcc98b4808434"
+    },
+    {
+      "file": "rambam/Sabbath/21.json",
+      "key": "s",
+      "idx": 27,
+      "hash": "4c346d0630d9a4b9fe91fba3d992bd0b706f6939dfd7762278eb194a208beb6e"
+    },
+    {
+      "file": "rambam/Sabbath/21.json",
+      "key": "say",
+      "idx": 27,
+      "hash": "75f20f82bd31a5ecd5dc925021dc13a8f06de62c2efb285d5cce3f2c0f4ca12c"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "28c24cbd28ce51cf476484c2acc51cb17d1f903a6ece4c60708da5be81ef40fd"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "fdd3344bb186c31a68ae4066c7bde4919ff45e2008413d205a4d96fd60c08fcc"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "12b39ae2adc113f95757afc57af0973e1afb2cbfda091c3bfa36d6daa810579a"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "af8da3c66313105e67197c763b3760ac90b45672aa46fce7d527adc902ae8bba"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "6c064e26c55f2121124dfd31d757d9d72ab0be90afae0d5017078abf38823a1b"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/2.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "8c149a613f1d4c6e5f523e2989001ab280d235539918023cc9417a4aa579916c"
+    },
+    {
+      "file": "rambam/Theft/9.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "a51abcc72d2259cf45a80efe5226d6ec5a6d3236a3c1e61f777a2174a264beef"
+    },
+    {
+      "file": "rambam/Theft/9.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "7b3f093e59f2c414702d553b130a170a20926223633da5dca813178cb40b35a3"
+    },
+    {
+      "file": "rambam/Circumcision/3.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "5cc25b624a89d46863cb9277e8944001f701d6783ddee41fd363a5bdf476ff98"
+    },
+    {
+      "file": "rambam/Circumcision/3.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "3235f4ef704d0799a6713ea15b0b1f19286462a11256e99887a16f5792a1fdc0"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "23a0f1f2eeae508c71bf10705d68ec1f7a296bb61a15bfc9c9ff266315a77d9e"
+    },
+    {
+      "file": "rambam/Blessings/11.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "b1da6e07cf01fb94a8c8dcd4f580d7bf836437e0aac065a56e7050066c1b5eb6"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "4c32c14ff37763c8cb7c956454f863cfc511dd40d46d94fda74e6c1488c8231e"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "0673d9011e5d27b5acad667293ec7ac8ce56e4066b3a02dc38603342c47d0f99"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "74885a0437df0ee4d098494397df4f4da8e8029c6d93c4366da5c29c4f50ea35"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "0a06db6702519ccb741ee0b798c7063ddbfbed9da1428b94f23a74ddcb4a4221"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 14,
+      "hash": "fcbf58440c4967bd3618f228975de55b08592d1c04082685ad310360a82db125"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 14,
+      "hash": "904e3d7eace03e1515c5f3f3ab8c3f8e0dbae6ab332cb27e5f9a011f2f4ddb73"
+    },
+    {
+      "file": "rambam/Heave_Offerings/11.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "0f372cad9314a10f3743049f84f5950217e6cc14f3b2e2895f6f60e1af9cad24"
+    },
+    {
+      "file": "rambam/Heave_Offerings/11.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "8aa7a9dc997a8e92d6380e647f6915d7a1ac5c56d992c2272df8fa49577b3234"
+    },
+    {
+      "file": "rambam/Damages_to_Property/13.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "6199ba5ff5ca289da9115d08e68982e654b4dfc99d50f1e75815f151ba53db69"
+    },
+    {
+      "file": "rambam/Damages_to_Property/13.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "fda0a8d9a275eaa04b18664b88d2680a67eb88ad9bc44595f41a978eed3d83bd"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/18.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "d528b6d48c3defe5c42a5e889961ce04aa885728056b8dc83f4fd0452c0119a5"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/18.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "35278273ca4e2c3a22d60f46dc20366b81e4f2e647acd42b9c3a078e4b08ff45"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/2.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "4e85f537d7805c57db0c6c3e86ea648df130e372fc63407a81bf47214b2c8576"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/2.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "f1b84bb0815d95526965a449ef24ba1dd90f83a4b1bbcdd1adbbccf932dc338d"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/27.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "94ebf2f9c906c77ac6446c2c27a5940261925bd39b5716bc6250296196c355b7"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/27.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "9bbc442f551cc7ea3479f7164dcb488b997e5f2f536abc39c80cb96e9e72d53d"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/2.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "1f5b688c490e9cd3bf13c0c1e7fb72c947113857c9d4c609f828572b22c56ca0"
+    },
+    {
+      "file": "rambam/Shofar_Sukkah_and_Lulav/2.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "0e524e1061f797ea0d22d57c5f786a3bc800333921391199a16edcda81870c46"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/4.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "86ef4ae773b9f60c3cd18575a102fea88de03443a02eea7fe973564a0a4b5800"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/4.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "960cf28a299b2b1e4b86a92383b7cb631aa1f706697b36a11c702b4894cb9738"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/5.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "58e137531beb1b68ad519ba03c719a75a33967dda2d4387079a712d279a97197"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/5.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "c414ceeccac9e69f0b10a577f9ee9135127a5beabfb6d083be2f873921c7623f"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/6.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "11f8c5bd2e5d9bb22646906b54acddac1b1ad523a64030dbe7c7c7215b67753e"
+    },
+    {
+      "file": "rambam/Robbery_and_Lost_Property/6.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "3e9b52c051260cce93617f4ee1494fc9235fbf9c996e2e9a836b819b30342c9d"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/7.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "cb72a98801cac4fb9a4cdb52ed25311d4a4f6d6f3feb01b6306bc63ab2d6f9a2"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/7.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "7ddeb1a80ab953ac075be8bd1d84fd29a5e6d92961600acbae53f3117bcd1fdd"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/7.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "2b31494de8d318eb4b37c11571c3a1c9a83c639e0623c18eadf5521cc0a842ea"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/7.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "220ba116af4c6eb8ed646dd0db98f71a645aae7997b277b65145d72f460af194"
+    },
+    {
+      "file": "rambam/Oaths/8.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "fd2231b86f721be30f08c23e5e482c691224d1683dc00a2af4180d9fbf98bf38"
+    },
+    {
+      "file": "rambam/Oaths/8.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "0283bf455251fea06a0a5f2bc15202e9f4453ad6bcd3c64e7ce216ee003e4145"
+    },
+    {
+      "file": "rambam/Oaths/8.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "8c9f35891e7b2ae0525d14af5ba143519da99aefb3ecca50e2b9de7f9cc95072"
+    },
+    {
+      "file": "rambam/Oaths/8.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "45302366db1fc4769181331e3682b034eb4fb1045c36b23524c890ce84107cf7"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/2.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "7a49ccb4903c917b626af7192b359ac1ea0074750de2b9611de510524cc0e50e"
+    },
+    {
+      "file": "rambam/Ritual_Slaughter/2.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "f9f93443eb941edf9bcbab14e89b0882c01fdaccff7d91ccd324cb63cfd3fb02"
+    },
+    {
+      "file": "rambam/Divorce/11.json",
+      "key": "s",
+      "idx": 19,
+      "hash": "7a7b4ff2a9b1f34596966221e8af675ee76e2fdf90788bfda519d981aa499df7"
+    },
+    {
+      "file": "rambam/Divorce/11.json",
+      "key": "say",
+      "idx": 19,
+      "hash": "f16c1129ca23f43199ff83ff62cacbefaddd83b6310bcc1f9c40bd05ade14d91"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/11.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "8eb7e8dab598dda39639eb011c99fe156cd0ebc07b4a05e43d503494e0a3f859"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/11.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "d660057454dc17e070054b9acbd03353b3d2a332c78c4e16dd86eeb7571faf6c"
+    },
+    {
+      "file": "rambam/Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein/6.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "b890f7bbd16b5c12de1c085553b41eb38329e3a1779bbba44e547a1742d2d5ae"
+    },
+    {
+      "file": "rambam/Vessels_of_the_Sanctuary_and_Those_who_Serve_Therein/6.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "7f28214ff9d961e7b6e05ed32213dc4bd837acb71cd8c4a8714e8904994ca93f"
+    },
+    {
+      "file": "rambam/Blessings/1.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "9157f42474cf2bfc5d82e66fc257a756ba06a23a63d7771748e8d43e12d0824c"
+    },
+    {
+      "file": "rambam/Blessings/1.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "c55e1f593b6539137c765d3c2e9aa35c2a0507a66eb415ddada2f4f4924e4af6"
+    },
+    {
+      "file": "rambam/Repentance/2.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "d5bc3458fb16c51b8d66c7f9d5e10ba4479207db1e39bf51b6657a856c0221dc"
+    },
+    {
+      "file": "rambam/Repentance/2.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "d40a2dfa7d0fb0b7ece3c977de4b1317b969515aea434e1beadaec89d7efdab0"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/13.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "056489cecd2936d4baa6f5fa9d7f1737018afde8a0ab6954bd933729f294799c"
+    },
+    {
+      "file": "rambam/Offerings_for_Unintentional_Transgressions/13.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "e5412a7119c29cad58b05bc57a74fe4b8de8be45ea83849e2d983a2607d4819e"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "2e19283db791163bd26fc17400decee90eb1b6d73ef8296665757d59093961b0"
+    },
+    {
+      "file": "rambam/Blessings/8.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "be66b1dc61d2fa8e4c40420efb280a0d7f2f983221c4497da440612fc223bf7f"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/3.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "21e94dac34ea19a52956c6ab6bdfd27c7d203c1e4c76ae7b146417817451dc70"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/3.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "0a61590ec24c66d865e9f35e7b787697648a4659669f7753475a66845468ba0d"
+    },
+    {
+      "file": "rambam/Woman_Suspected_of_Infidelity/4.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "29c34cc1802be1781271be6ac1e18cd89652cf1c121a99fc806f30444268e33f"
+    },
+    {
+      "file": "rambam/Woman_Suspected_of_Infidelity/4.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "739d0f7352fb109653a90e2e1dc5f37930449fc31176eb89392dbad4e42c70b3"
+    },
+    {
+      "file": "rambam/Appraisals_and_Devoted_Property/2.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "f90bdc16f0fa4c07711ee39c8f12ed2bd894cf0d473fbe860be8251ebc945b7b"
+    },
+    {
+      "file": "rambam/Appraisals_and_Devoted_Property/2.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "cf2dfa89d36b9082c2666930d629b4e1cf6651bed019f51f749819ed6f0187e5"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/4.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "ce3c24609b297440a9f35a0f9e0dd3de1ccab3dd12203606e92ddd296781c53f"
+    },
+    {
+      "file": "rambam/Murderer_and_the_Preservation_of_Life/4.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "b0855970748569c241c92b865d7069e60dc157a13c7e07e9a155579681bfca5c"
+    },
+    {
+      "file": "rambam/Those_Who_Defile_Bed_or_Seat/3.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "2f269d5ae82f9f0026ec9792390cb88aa8ca1470a08e446344320e8eb3423d42"
+    },
+    {
+      "file": "rambam/Those_Who_Defile_Bed_or_Seat/3.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "fc3c668bdf95fc9646aa5d452e395a77a5e167bd0902f9b62d16f9b5e1ffe4de"
+    },
+    {
+      "file": "rambam/Marriage/4.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "9f670b9c6be4e0cb1048f931ac601e39ee1a04cc019376fad290556b757ecdb5"
+    },
+    {
+      "file": "rambam/Marriage/4.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "f79242efeefb6500086565fa6712b4f19f3c189fcabb0d725768afcc29553fdc"
+    },
+    {
+      "file": "rambam/Sales/28.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "d065ef92270ebccc5452a98688016015ee057dc3b0fdc6ff981971f23a0cd700"
+    },
+    {
+      "file": "rambam/Sales/28.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "06cbd451733a80286ca2bc72727b6cad10a82dbb4b02f8a57b751ebe3ce57b0d"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/11.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "f3ebb2d9a3cf9c0ca056140b7ea6e8cfeeeb3efde7d9dc331d069eed532ef656"
+    },
+    {
+      "file": "rambam/Defilement_by_Leprosy/11.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "522c9e56351c722791c8dbf6d2c76ffc967b6e2e1379a0218d45df8961f0f6af"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/15.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "e0e1828271a27785c9a3fb554dd3f1be73a8ce7ebf08d14b466b0a2254256c4b"
+    },
+    {
+      "file": "rambam/Sacrifices_Rendered_Unfit/15.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "511b132908d78f1e758f2c0974aac48860d76dcea8eb7aade998515713a67df0"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/3.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "cdd5972aff006786d7cecfd640d4eba554769985c2e0b7944f45824bbb0f2c26"
+    },
+    {
+      "file": "rambam/Second_Tithes_and_Fourth_Year_s_Fruit/3.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "c479f34dc0d67fab7ae312b97ca9889e35a3ae3e738605efd9c0f817fd5b05ab"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/20.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "7a09f83a02c413acc81a1e6d78f21903f41acf8ca9d3ed61c5a24de6896028ca"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/20.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "30f6210f7b90814018900760f9f8dc3c2f8a863c3465d5712c622ad94c972a51"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/10.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "8139738dd4b7988f26feba123d4f72e41489b2d65b76dd9fb8fa3cfe9e2ecc7d"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/10.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "855bbc1875aa38cf32a58332da676197dc0061e074e69dc50adbb7b772695c4f"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/11.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "8955928ff75caaf7e93e57a9a6320c4ef5cae23a52c7f80dbf5a62ab598b5c1b"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/11.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "abfdc89c331482e5c088ed9e0add755de0bf06d47d62c489e58e12e0138f08fa"
+    },
+    {
+      "file": "rambam/Fringes/2.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "028c078b7c1c12a89e94b8b0a7873503212aeb8c9d8c18b6d291a10c0a60163b"
+    },
+    {
+      "file": "rambam/Fringes/2.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "910aaf2410bc482853de51c6d5faa2fef4a10ddcd33887e8d9141e19c8360002"
+    },
+    {
+      "file": "rambam/Fringes/2.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "e0ccbaa111f168c88095e38516fea6a433bfc2f626d178b6998516de654fdc5e"
+    },
+    {
+      "file": "rambam/Fringes/2.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "a5c43680f773df0f80441d4877a45889033373cb892621c8c93efc74ab5455ef"
+    },
+    {
+      "file": "rambam/Paschal_Offering/1.json",
+      "key": "s",
+      "idx": 19,
+      "hash": "f962a6b452192abbb788e17a8dce85c962ce2b017333d53ec4a9e22a8ad58c17"
+    },
+    {
+      "file": "rambam/Paschal_Offering/1.json",
+      "key": "say",
+      "idx": 19,
+      "hash": "7e449e73d9221b44b5d07611b9258985c4783ca36bbf37e4411834be41d2e9f4"
+    },
+    {
+      "file": "rambam/One_Who_Injures_a_Person_or_Property/2.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "efb08e2876df24ed8d808ea2b12ea4697752fe7bca1331c92b1ded75ea740232"
+    },
+    {
+      "file": "rambam/One_Who_Injures_a_Person_or_Property/2.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "1bd56de69b6f6bc2a71924ea1927f63abd9cf4dc9c5f6a9af85c5d6298c650ba"
+    },
+    {
+      "file": "rambam/Nazariteship/9.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "5d0855ae04b223e0325fc833645d9a92aed2e5853d751893608a8c8c52d7c868"
+    },
+    {
+      "file": "rambam/Nazariteship/9.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "cf01f05a343444f08c6d5d5844032d59943294a92e6e4dfe44f18d3a9fe98241"
+    },
+    {
+      "file": "rambam/Vessels/19.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "ec8b1b9f9fd63cb2ca5c8ff3e10ca09d214ed28fc4f8a2b8dd8405068719227a"
+    },
+    {
+      "file": "rambam/Vessels/19.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "54f88f63fa9e5d754ac3beecaf5ab201303af65a17e2ab3ce1b90ee1602cca68"
+    },
+    {
+      "file": "rambam/Immersion_Pools/4.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "3079e44df61cb9eadf544277edec00be6c20f388b0a087270cfba38d62323038"
+    },
+    {
+      "file": "rambam/Immersion_Pools/4.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "97faf91777b971f9f461cfa40e59fd58eb32cfc2f0ed80e788f407cd04304795"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/11.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "dba4411a5aa7b65257c2590182c9ea7ca7d7868949f766f2cef331deb77b8d39"
+    },
+    {
+      "file": "rambam/Foreign_Worship_and_Customs_of_the_Nations/11.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "de89c638f4c49be1791e40be82b9f05ac7cca4d75bfcf5f60892a073ce5d071b"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/20.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "8cdadc8395e1250ae398b43e2a8eec68c5b7d4560bb613d7c1f9e4810095e35a"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/20.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "820c056f83a66a6968c9d728d7ba05fe197ae77f31eccc6fd54dfb5de7d85aa1"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/7.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "14941d4cf778125ce3ec38e6d21338d1db65126d0b80771903de1f18143995ee"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/7.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "2db98227680579bf3bdca02e23f45256c098672971285ba973eb07235085a2be"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/5.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "7f090c2e26fb7b2b9e67a01246501bed525d0bd6feb05ae240dc05644be60d24"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/5.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "202cbab55e1387ca0ef2c7615ba11da469ee3bfb38cb3ea0295b4b0c31a51164"
+    },
+    {
+      "file": "rambam/Neighbors/7.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "8cedef5633bac0cb4211d6650cd240bb8a6a208300e087770bb49ff5c650bdd8"
+    },
+    {
+      "file": "rambam/Neighbors/7.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "1723dec9d8cf404247cc7a27659b6fa6f3e8b5349a1c60eadb78fe27b1fbb7d7"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/12.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "56232737834fcc4189923320db387bda7a2dec6abeae755fdf91a818f5316a71"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/12.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "18030460e7ccfe0d73ccfe30d5d2db17fbf59d2736e20b032128bbd7ddb45301"
+    },
+    {
+      "file": "rambam/Fasts/1.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "66da0d93500c396c28612faed0899d7b58054ae754fee5c41c2a05612ea9f108"
+    },
+    {
+      "file": "rambam/Fasts/1.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "da325ba4df2521156da803dbd9e4db78a50fb7f661343e08ae371e9b9a0bf60d"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/5.json",
+      "key": "s",
+      "idx": 12,
+      "hash": "e48b0cacf49a742e4f69c76c2777833b987c872f360296eb44fe607e4123bf26"
+    },
+    {
+      "file": "rambam/Gifts_to_the_Poor/5.json",
+      "key": "say",
+      "idx": 12,
+      "hash": "9a1fb59c43e7ee2343e6122ea4b2d6fbb9b74f321f17b78defc3e7213a8893f7"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/1.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "0024ad0db187d1df6ae90ce6c11bc276794f23222eb99193c6343a98a6400bf4"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/1.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "c920795517336a9a57b9bdf3c0d5dbd61a2024a7369b32260aaa12993c5bdadd"
+    },
+    {
+      "file": "rambam/Daily_Offerings_and_Additional_Offerings/8.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "3a6901434cf9a377ac8c1af3aabc81c03355107f28286b53b1ace6c56d794265"
+    },
+    {
+      "file": "rambam/Daily_Offerings_and_Additional_Offerings/8.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "fa4c06e71f7c11548dcc70d23d57c3995995dec5d76a8fe7a8980dcfcd4f53b1"
+    },
+    {
+      "file": "rambam/Sabbath/9.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "5cdfe2d4238f4cff5458d099f1dc8660e7bb04ac2959f9763b8bd5582a47b95d"
+    },
+    {
+      "file": "rambam/Sabbath/9.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "35b050c90f619a0906353fbb9962fb523c8ffeaa403ecd199dadd3fcd50d1230"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/19.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "7e4bc7404340faec43ab1c0bb30cbc78a25c2ee6ba417cdeaa54421ce143f8c8"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/19.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "9d38134698610c7c8d2b1e83952ca3c111669f591fb7848206cb1adfb305fb49"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/19.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "343a6db4e030c41f454c7230787ccc7aec039320b305ff595880e997fb001125"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/19.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "6e28750057ace6d349c3a96178085aa625d656752623ea5b53c243a95c56b070"
+    },
+    {
+      "file": "rambam/Repentance/2.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "a20527277b5db0b8afd9130ee7145de983e3faea35c7b809e99d16b82bf98471"
+    },
+    {
+      "file": "rambam/Repentance/2.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "2d3c1c60793b996c36c66e8926421c922bb402aff247fb0cd828d6583a661641"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/2.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "d30c7bf73a3adc13a16ca0f749fef03f6d222f17da0395e8da13145853178df6"
+    },
+    {
+      "file": "rambam/Forbidden_Intercourse/2.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "4e2facab9d392f9a38916ff3b12cb1ecb811c09260472a3ea79e0d92ddb9fed4"
+    },
+    {
+      "file": "rambam/Rebels/6.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "35f07acebbc8bf418645d8943a2d558886d06654742b89c19b60960cb94b297c"
+    },
+    {
+      "file": "rambam/Rebels/6.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "43075307a18ddbba4a6460bdf5cd28546804f413260b222924befbc5131f4f2d"
+    },
+    {
+      "file": "rambam/Damages_to_Property/11.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "1c906dc6277905fd2e730ce4654ddba063352f47ffe86f41e2b819a2f4f5fbd3"
+    },
+    {
+      "file": "rambam/Damages_to_Property/11.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b94cb96de94f8ec001014345aebee66ecc6b145b195e191d8c965ff4e0bca641"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/6.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "674f3f17b34bfc3475db2a33dfbc2f5be4142f352904bf1b8848a1fdd8f0a67b"
+    },
+    {
+      "file": "rambam/Sacrificial_Procedure/6.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "d559e4bafcb722621bc832993063e41a35a425386729de9c4cbd45107166924a"
+    },
+    {
+      "file": "rambam/Nazariteship/1.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "43df1ef8849e90f1f4eb2d00b85b5bcd8f9a300a1b9b3b2824b90509477b750b"
+    },
+    {
+      "file": "rambam/Nazariteship/1.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "bb8679e7ccb2b3e2813f9901450ad8878d60040a26ca28017273c068ac181bc1"
+    },
+    {
+      "file": "rambam/Sabbatical_Year_and_the_Jubilee/5.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "0e44b92a1adeaa9e482de7b58fb35689512862608931b03b65d676d9aea1beb2"
+    },
+    {
+      "file": "rambam/Sabbatical_Year_and_the_Jubilee/5.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "39ebe68ae2378ade0f038426662fd4ec7b10576b95c9576e71cb45c29beda5e5"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/4.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "1f244daefcbb21040aa2e1562191afab57a7b3f18e9c383e67f1c20711fa33a8"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/4.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "7296a6ed73fcce8a0b64093c87f6f2c73c5a519c9e253c65157591beca1216ee"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/4.json",
+      "key": "s",
+      "idx": 11,
+      "hash": "2dfab19eceba99a9e5e772dd476056a9700704aa620823cf172530ceff88a175"
+    },
+    {
+      "file": "rambam/Tefillin_Mezuzah_and_the_Torah_Scroll/4.json",
+      "key": "say",
+      "idx": 11,
+      "hash": "0c935e23e7a4acd2f45ca6a486d4ce3dd2dccdd313e793b2d0d1bd14f17fef8a"
+    },
+    {
+      "file": "rambam/Marriage/3.json",
+      "key": "s",
+      "idx": 22,
+      "hash": "ec3b464d7d9687d4e15c2b76c5ff2eff51873eaff4d4a91267257933214e9e6a"
+    },
+    {
+      "file": "rambam/Marriage/3.json",
+      "key": "say",
+      "idx": 22,
+      "hash": "02ae7c6a928dac5d3e545343d4ccfc5373ad1d963d9b3686c5162f33ee2c7a10"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/3.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "7f16e424be1742c13e86f157a8fe01e57f498d5ad6dd9ee9eeb3d0bfcafe9f04"
+    },
+    {
+      "file": "rambam/Plaintiff_and_Defendant/3.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "450c1292105d73691da1c3f4d593234faa10f068b11cbb3526e0a09b7c901173"
+    },
+    {
+      "file": "rambam/Testimony/5.json",
+      "key": "s",
+      "idx": 7,
+      "hash": "c3a9d46c5142f7acb83abf562f1c37ae0359d940829071d31806a8961d7178ab"
+    },
+    {
+      "file": "rambam/Testimony/5.json",
+      "key": "say",
+      "idx": 7,
+      "hash": "b71b4023e515b73d4a2ef1ad611f52f84175b34ae71eab187f86c260a45d72fa"
+    },
+    {
+      "file": "rambam/Divorce/3.json",
+      "key": "s",
+      "idx": 15,
+      "hash": "be760cb55eb5107d7a1ac8220b470345e110c82959e9eba70e1b68f909e40da5"
+    },
+    {
+      "file": "rambam/Divorce/3.json",
+      "key": "say",
+      "idx": 15,
+      "hash": "25649f85f75dde1becad59672a00b491e3417cfbec9bbf143c44f1ae23abc620"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/8.json",
+      "key": "s",
+      "idx": 2,
+      "hash": "a9e14bdc999a6a7a1817324ae3c2c5a897932968629d4d21ce7923c5de5f3045"
+    },
+    {
+      "file": "rambam/Defilement_by_a_Corpse/8.json",
+      "key": "say",
+      "idx": 2,
+      "hash": "13e720272d703ba7b939b54dc3fb84e6ba24ad26a41af02714dabdaf98890ff6"
+    },
+    {
+      "file": "rambam/Blessings/10.json",
+      "key": "s",
+      "idx": 21,
+      "hash": "a9fd339a754eb25d47196557ec27b64c26ccb1d8a78298a787845259935a59e3"
+    },
+    {
+      "file": "rambam/Blessings/10.json",
+      "key": "say",
+      "idx": 21,
+      "hash": "9bfa0a0fa58bdae7db737af8675f0e5bb588a89bbd5c6f4357403ce2d95dcf44"
+    },
+    {
+      "file": "rambam/Virgin_Maiden/3.json",
+      "key": "s",
+      "idx": 4,
+      "hash": "f040c1f9161cd36647aa110a6ee9c0fc7014f56ec08b4e24cf404f121f129e6d"
+    },
+    {
+      "file": "rambam/Virgin_Maiden/3.json",
+      "key": "say",
+      "idx": 4,
+      "hash": "43ea81229a8cc034b5c4525352b09b9a5d47b31e6811075db537284810e3a455"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/11.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "c94703389cd0c14528a4eefa2a848ad5154de3b6baae0802f09517992eb3a7a0"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/11.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "67575e5a3298b72c9895bed1b8f622c4c93f420e22b41ac4062bbf26164aef4e"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/4.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "755a0cdba0ae2fa0331231bf8dff685ccc24e1969fa23013831b7d5b585298e8"
+    },
+    {
+      "file": "rambam/Defilement_of_Foods/4.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "a08568859b6a6f1956afb67245711c8a3c0a87d1686cf20a08764fbf96306061"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/5.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "985ca1bfe703f65ac75de789db803dfb59b95946325541dab76754c1eab59af9"
+    },
+    {
+      "file": "rambam/Agents_and_Partners/5.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "7574491473371a8bfd9f3bdbff0c560d854f2a8e92203b1c09d4003b7353d8af"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/3.json",
+      "key": "s",
+      "idx": 1,
+      "hash": "0b8ba3e98d5410e1fec89474d823854eb9bede32794eff90466433f034dbcfd9"
+    },
+    {
+      "file": "rambam/Creditor_and_Debtor/3.json",
+      "key": "say",
+      "idx": 1,
+      "hash": "b2900ef70a3bb52765fa096627ce2496181f5f535940c4316c66cef5b8c7258a"
+    },
+    {
+      "file": "rambam/Vows/11.json",
+      "key": "s",
+      "idx": 6,
+      "hash": "398253e948c884e9b2e0e7aa99662e7fb2b6fc8e2c5fe3066ffec4055a2c583d"
+    },
+    {
+      "file": "rambam/Vows/11.json",
+      "key": "say",
+      "idx": 6,
+      "hash": "0d0ba0eecaf4c0bf129ecc24ddf30a8cb2f7c2b44b4c3ff4364c6a67a3042057"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/2.json",
+      "key": "s",
+      "idx": 9,
+      "hash": "dc1ffaea74cbe95f1167b617e4ebaf61a386294cdb87390037ef72d432aac9af"
+    },
+    {
+      "file": "rambam/Borrowing_and_Deposit/2.json",
+      "key": "say",
+      "idx": 9,
+      "hash": "bad3aee37c4cad2cbf9cc0fc17e61101209a6863712ee7ab4900e856299e389e"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/10.json",
+      "key": "s",
+      "idx": 18,
+      "hash": "796eab6bdf967393b317b14c5106b5cbfe57f1a6dc61f427a47aff157904ce7d"
+    },
+    {
+      "file": "rambam/Forbidden_Foods/10.json",
+      "key": "say",
+      "idx": 18,
+      "hash": "e1c0d48f9cf0afbaf457ec39e71fa3a904a666ae1314e5538547407d2b665cd2"
+    },
+    {
+      "file": "rambam/Paschal_Offering/1.json",
+      "key": "s",
+      "idx": 5,
+      "hash": "ea1428608b81062e2a4e47530d29e971e7b2a071b5f91b74f0c7cc31e20f480c"
+    },
+    {
+      "file": "rambam/Paschal_Offering/1.json",
+      "key": "say",
+      "idx": 5,
+      "hash": "1d73b46210864143995457c2c1b68f401b92c5cbd312cd3c18645bd711804346"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/2.json",
+      "key": "s",
+      "idx": 10,
+      "hash": "c55baaf1983909a638890a36f22717465661cf9473d140a4bd58ae7c095209b3"
+    },
+    {
+      "file": "rambam/Other_Sources_of_Defilement/2.json",
+      "key": "say",
+      "idx": 10,
+      "hash": "33f288a7b7dbc77a54d99979fe062d1894cc2a2b83c0f31ddeb599dcfb9f40b6"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/4.json",
+      "key": "s",
+      "idx": 22,
+      "hash": "855ed63d29e3bc3d68b9a2cd179e4fcbaf5b7e5c9cb7b2745f32d013403acd94"
+    },
+    {
+      "file": "rambam/Rest_on_a_Holiday/4.json",
+      "key": "say",
+      "idx": 22,
+      "hash": "4700375c27d2194f53e9f33e5b859db9edc2a2a99630944cc15eef95b9869625"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "s",
+      "idx": 17,
+      "hash": "e42e85d2bd60ccd466095a637cfcd396b3a3ce1fa8c0879a7fded1f60f52d03d"
+    },
+    {
+      "file": "rambam/Fringes/1.json",
+      "key": "say",
+      "idx": 17,
+      "hash": "b9204694417d833e6f15b80bbbcfa89c31159076195a697a791a37632297b2ba"
+    },
+    {
+      "file": "rambam/Fringes/3.json",
+      "key": "s",
+      "idx": 8,
+      "hash": "96b4ae95bd6bf3d3700dd1470d8e8c7432555ad404b220bdc59796aeda3c50a0"
+    },
+    {
+      "file": "rambam/Fringes/3.json",
+      "key": "say",
+      "idx": 8,
+      "hash": "9c0183a1e404eafb5aacda57501edbe125df42898ddd08be3ce309170b5cae33"
+    },
+    {
+      "file": "rambam/Damages_to_Property/4.json",
+      "key": "s",
+      "idx": 3,
+      "hash": "dec22fe92a8de56e5cda2dc1da3887a5215df476a37b25365a588ad088d1e7df"
+    },
+    {
+      "file": "rambam/Damages_to_Property/4.json",
+      "key": "say",
+      "idx": 3,
+      "hash": "9368e37fbd34094805455a79be6ccdb041adaf107808a7090676284cf97cb399"
+    },
+    {
+      "file": "mitzvot/N/164.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "fcc6c4b8be41be07d85d331dadc0be72a9150ffc050c31f14aa889605b121d1f"
+    },
+    {
+      "file": "mitzvot-voc/N/164.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "064cd2a9b670ec26d19b16bc9bbc54e110418908f111fda4b71247cdaa779e8a"
+    },
+    {
+      "file": "mitzvot-voc/N/164.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "0df0867ff070985b1a9694e346fb636e7230b7f8a87d063b643819cf1679c5ca"
+    },
+    {
+      "file": "mitzvot/P/197.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "f2c868f6ac7ef7c15abc90bd2646e5ddd13b54b1c31271fdb68ed363f1360f2c"
+    },
+    {
+      "file": "mitzvot-voc/P/197.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "347362aeabbae53626c6142c35874ecdeaa82a122694f4ce66f09e8c7ef62936"
+    },
+    {
+      "file": "mitzvot-voc/P/197.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "801ebd33d8b2037b4483fc7139ce3d8eb3d60b4975bced85eb06734740df52f7"
+    },
+    {
+      "file": "mitzvot/N/193.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "d7e28ed6cd5720807b4b4f323f5f571b6d31ff4ea39eaa25d35b794e9cb6bfbb"
+    },
+    {
+      "file": "mitzvot-voc/N/193.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "c9edd7fbc932c0fe96fe05c2a95a2f85528a1e78682f8cca2a93cd6a3ba1e711"
+    },
+    {
+      "file": "mitzvot-voc/N/193.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "8dc4f40077bb233b1c7fa0121c3303aeced57582f8f9b3e670e4a8c4b53fbf62"
+    },
+    {
+      "file": "mitzvot/N/216.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "edf1c591b9e1beeeb4b4ff08f27dcb335fe2f981b52ffc6740953aaefac1de2a"
+    },
+    {
+      "file": "mitzvot-voc/N/216.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "20cb622a2fa95f2268338c03e34db4d56b55e36d6a754a3c680175c0e61da1fa"
+    },
+    {
+      "file": "mitzvot-voc/N/216.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "e1153639b5eed90526771fee68e31929e149565d32c5538900f144b599c3d545"
+    },
+    {
+      "file": "mitzvot/P/23.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "2ce003af552c800f6fcdde48f89aec9f1118354cb3291bc26d598d054982ae93"
+    },
+    {
+      "file": "mitzvot-voc/P/23.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "0df8b5cd5de2e7d87d0eb65f3af2549ccedecaca3bff8a4573d6834ed7d4b068"
+    },
+    {
+      "file": "mitzvot-voc/P/23.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "6db72ff24329e4fc0c90e576e20e7f3d3f718de939ea3a1419d9a238ecb9b77e"
+    },
+    {
+      "file": "mitzvot/N/275.json",
+      "key": "s",
+      "idx": 0,
+      "hash": "6ead60d36bba767bc8b6374707a049cf9a9979766bed337d94fae8790a83f35e"
+    },
+    {
+      "file": "mitzvot-voc/N/275.json",
+      "key": "vd",
+      "idx": 0,
+      "hash": "5ddb9f6ea11ae0564297b59d9fcda4a8868431d6f8cfe57e1a378f0c2b27a3e1"
+    },
+    {
+      "file": "mitzvot-voc/N/275.json",
+      "key": "say",
+      "idx": 0,
+      "hash": "9d3b201bad3efe610beddadfdd3149059a925d49f147dc15a725dea0087fe07f"
+    }
+  ]
+}

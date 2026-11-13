@@ -371,3 +371,61 @@ npm test && npm run ui && npm run shots
 - `insertTaamPauses` in `prepareForTTS`: disjunctive taamim → `;` / `,` for the voice only. Displayed verses are not edited. Guards against over-pausing short verses. Onkelos left with sof-pasuq only (no 1:1 alignment).
 - Auto-punctuation of displayed Torah Or / Rambam / Sefer HaMitzvot / Penei Moshe is **not** in this version: it needs a >9.5 external review and shares the $25/provider cap (`/workspace/biur-pilot/SPEND.md`).
 - Samples: `/workspace/punct-pauses/`. Tests: `tests/pauses-201.test.mjs`. Doc: `verification/PAUSES-201.md`.
+- 10:50 checkpoint: b2 drafts complete (Tanya/Rambam/Mitzvot by Sonnet 5.5, tolt by Haiku 5.5; Haiku Rambam kept in full/bak/). out/b2.json vocalized (+142 verse-quote fixes). Next: xcheck b2 → niqproof b2 (batch) → niq → review b2 r1 (5% + sensitive). llm.py spend logging is now file-locked; SPEND.md has an "Other jobs" section counted toward the cap (shared with the punctuation job).
+## Checkpoint 13.11.2026 10:52 – punctuation part 3 starting
+- 1.0.101 is live. Part 3 (displayed-text punctuation) starts now: Rambam + Sefer HaMitzvot first, then TOLT, then Pnei Moshe.
+- Pipeline in /workspace/punct-pauses/part3/. Spend via biur-pilot/llm.py (shared $25 cap). Cheap Haiku batch to write; other-provider review ≥5%; deploy a source only above 9.5.
+## Checkpoint 13.11.2026 10:56 – punct part 3 smoke + batch ready
+- Collected 10,664 long-clause units (Rambam 10,261; Sefer HaMitzvot 403). Backed up 1,761 originals under /workspace/punct-pauses/part3/originals/.
+- Smoke (Haiku 5.5 live, 6 units, 2 requests): 5/6 letter-identical merges after merge-back (original letters+niqqud kept). The one failure was a truncated long paragraph (722 vs 318 letters), not a rewrite. Tightened packing (max 6 items / 2800 chars; long paras alone) and forbade truncation in the prompt.
+- Quality of smoke punctuation looks solid (commas in long clauses, Rambam trailing colons kept, question mark only on וּמִפְּנֵי מָה).
+- Packed 3,022 batch requests. Raw estimate ~$0.98 Haiku batch; will submit with est_usd $2.50. Remain before submit: Anthropic ~$21.37, OpenAI $22.75. Smoke spend was ~$0.007.
+## Checkpoint 13.11.2026 11:10 – punct part 3 write done, review next
+- Haiku batch msgbatch_016hazSZX3TyBSz7XgMFjfdM: 3022/3022 succeeded. Write cost $4.04 (output tokens higher than char/2 estimate). Concurrent biur niqproof also logged.
+- After merge-back + restoring dropped trailing colons (93): 10,616 accepted, 48 letter-mismatch.
+- Retry batch msgbatch_017kjmcS8EiKRUhWdqQhmWaA: 46/48 accepted (~$0.03). Left 2 unpunctuated (The_Order_of_Prayer/3.json, Blessings/4.json) because letters still differed. Coverage 10,662 / 10,664.
+- Spend after write: Anthropic ~$9.17, OpenAI ~$2.64 (biur also spending). Next: other-provider 5%+sensitive review (gpt-5-mini first). Deploy each source only if avg > 9.5.
+- 11:20 checkpoint: niqproof b2 done (Sonnet batch, 384 changes accepted after gpt-5.4 verification, 52 rejected; Dicta rabbinic xcheck skipped – Dicta 503). Detached driver /workspace/biur-pilot/full/run_b2.sh (status in full/status-b2.txt, logs in full/logs/) now running review b2 r1 (5% + 268 sensitive). Resume: rerun ./run_b2.sh (skips DONE steps); then applyfix.py b2 review/b2-r1.json → niq.py b2 → review r2 … deploy b1 fixes + b2 only if avg > 9.5.
+## Checkpoint 13.11.2026 11:24 – cap raised, review r1 in progress
+- Dudi: "תגדיל את השימוש". Shared cap is now $60/provider; stop and report at $55 (already in biur-pilot/llm.py as CAP_USD=55). SPEND.md header will refresh on the next recorded call.
+- Review r1 (gpt-5-mini, 770-item 5%+sensitive sample, 65 packs) still running: ~21/65 calls, flushed 240 scores, running avg ~8.92 (below 9.5). Will not deploy until a later round is above 9.5. After r1 finishes: analyze issues, targeted rewrite, re-review (up to 6 rounds).
+- Spend so far (shared with biur): Anthropic ~$9.17, OpenAI ~$3.6–3.7 (review r1 ~$0.20 and climbing).
+- 11:50: Dudi "תגדיל את השימוש" → project cap $60/provider, llm.py hard stop at $55. b2 r1 = 9.60 (318 items); fixes applied; round 2 running detached via full/round.sh b2 2 (status-b2.txt). Batch 3 (2.12–15.12, 1,263 ¶) pipeline started detached: full/run_b3_write.sh (status-b3.txt). edits.json writes now locked (common.merge_edits).
+## Checkpoint 13.11.2026 11:52 – punct r1 done, r2 review starting
+- Review r1 (gpt-5-mini, 765/770 scored): overall 9.06, Rambam 9.08, Mitzvot 8.80. Below 9.5, not deploying. Main systematic issue: added question marks on כיצד/מניין/אימתי-style clauses (35 scores <8). Also some over-punctuation / broken smikhut.
+- Mechanical revert of all 854 newly added `?` (0 identity failures). Targeted Haiku rewrite of 69 lows: 68 accepted, 1 letter-mismatch left as the ?-reverted text. Rewrite cost ~$0.05. Batch msgbatch_01RpMmNc8oXp3jVg3TjCseok.
+- Starting review r2 with gpt-5.4 (other provider, stronger calibration) on the same 770-item sample, updated texts. Cap is $60, stop at $55. Spend before r2: Anthropic ~$9.44, OpenAI ~$8.39.
+## Checkpoint 13.11.2026 12:15 – punct review r2 done, r3 starting
+- Review r2 (gpt-5.4, same 770-item sample after ?-revert + 69 rewrites): overall **8.998**, Rambam 9.024 (720), Mitzvot 8.626 (50). Below 9.5, not deploying.
+- Liturgy is the worst cluster: all 56 Order-of-Prayer units were in the sample, avg 7.927 (27 below 8). Other recurring issues: over-punctuation (new mid-sentence periods, too many commas), punctuation inside editorial [square brackets], and periods inserted before "ברוך אתה" / mid-blessing.
+- Mechanical r3 (no API): restored original inner text of 88 bracket spans; removed 42 added periods immediately before blessing formulae. Identity preserved. Snapshot: accepted_r2.jsonl.
+- Next: Sonnet 5.5 batch rewrite of ~587 units (all sample scores <9.5, all liturgy, mech-touched). Then gpt-5.4 re-review of the same 770. Long API runs via nohup under /workspace/punct-pauses/part3/logs/.
+- Shared cap $60/provider, stop at $55. Spend at this checkpoint: see SPEND.md / llm.spent (was ~$11.4 each after r2; biur also shares).
+## Checkpoint 13.11.2026 12:55 – punct review r3 done, r4 starting
+- Review r3 (gpt-5.4, 770/770, after Sonnet rewrite of 586 units + mechanical bracket/blessing fixes): overall **9.196**, Rambam **9.214**, Mitzvot **8.932**. Still below 9.5, not deploying. Improvement vs r2 (8.998 / 9.024 / 8.626): +0.20 overall. lt8 88→55, ge95 279→360.
+- Remaining lows still cluster on liturgy (new periods inside blessings) and over-punctuation (added mid-sentence periods).
+- r4 mechanical (no API): on all sample units scoring <9.5 (and all Order of Prayer), reverted periods/semicolons that were not in the original, kept commas and original stops. 153 units changed. Snapshot: accepted_r3.jsonl. Identity ok.
+- Starting review r4 (gpt-5.4, same 770 sample) via nohup: `python3 /workspace/punct-pauses/part3/review_r4.py`. Resume from review_r4_raw.json. Logs: part3/logs/r4_review_status.txt.
+- Spend after r3: Anthropic $15.57, OpenAI $14.12. Cap $60, stop at $55 (remain ~$39.4 / $40.9). No source deployed.
+## Checkpoint 13.11.2026 13:25 – r4 worse than r3, rolled back, r5 starting
+- Review r4 (gpt-5.4, 769/770, after global period-revert on 153 lows): overall **9.108**, Rambam 9.129, Mitzvot 8.816. Worse than r3 (9.196 / 9.214 / 8.932). Stripping new periods from general halakha hurt more than it helped.
+- Rolled `accepted.jsonl` back to `accepted_r3.jsonl`.
+- r5 conservative: liturgy/blessings commas-only (34/56 Order-of-Prayer units already mechanized); do not strip periods from general halakha. Targeted Sonnet rewrite of 275 remaining lows (<9.0, liturgy, issue flags). Then gpt-5.4 review of the same 770-sample.
+- nohup: part3/r5_orchestrator.sh. Resume rewrite via r5_run.py (batch_id_r5.txt); review via review_r5.py (review_r5_raw.json).
+- Spend after r4: Anthropic $15.57, OpenAI $16.95. Remain to $55: ~$39.4 / $38.0. No deploy.
+
+## Checkpoint 13.11.2026 14:25 Asia/Jerusalem
+- **r5 official: overall 9.252, Rambam 9.269 (719), Mitzvot 8.996 (50), gpt-5.4, 769/770** (u08938 missing). Better than r3 (9.196 / 9.214 / 8.932). Still ≤9.5, not deploying a full source.
+- Sample: 388 ≥9.5, 310 >9.5, 78 exactly 9.5, 43 <8, 137 <9. Order of Prayer still worst (55, avg 8.051, 27 <8).
+- Snapshots: accepted_r5.jsonl (current best official texts), accepted_r3.jsonl kept.
+- Weekend rules (Dudi: «לשמור מה שצריך ולהמשיך / מאשר הכל לשניכם»): cap **$80/provider**, stop at **$75**. After r6, if a source avg is still ≤9.5, deploy only units that individually scored **>9.5**; leave the rest unchanged. Then start Torah Or/Likutei Torah and Pnei Moshe under the same rules.
+- r6 launching (last full-source round): tight liturgy commas-only mechanical (Order of Prayer + flagged blessing-breaks + added stop before «ברוך אתה»; not a blanket strip of Blessings/halakha), then conservative Sonnet on remaining lows, then gpt-5.4 review of the same 770. Post-clean strips added periods/semicolons in liturgy after the rewrite so Sonnet cannot re-introduce them.
+- Re-attach: `bash /workspace/punct-pauses/part3/r6_orchestrator.sh` (skips completed steps via r6_mech_done / r6_rewrite_done / r6_review_done). Resume rewrite: `python3 part3/r6_run.py`. Resume review: `PYTHONUNBUFFERED=1 python3 part3/review_r6.py`.
+- Spend at r5 end: Anthropic $18.13, OpenAI $22.54. Remain to $75: ~$56.9 / $52.5.
+- No deploy yet. Live app still 1.0.101.
+
+## 13.11.2026 14:51 Asia/Jerusalem – 1.0.102 partial punctuation deploy
+- r6 official (gpt-5.4, 769/770): overall 9.264, Rambam **9.287**, Mitzvot 8.936. Best per source: Rambam r6 9.287, Mitzvot r5 8.996. Both still ≤9.5.
+- Per Dudi («לשמור מה שצריך ולהמשיך / מאשר הכל לשניכם»; card: «פיסוק: להעלות רק הלכות שקיבלו מעל 9.5»): deployed only units with an individual score **>9.5** — 334 Rambam paragraphs and 6 Sefer HaMitzvot paragraphs. Unreviewed text and anything ≤9.5 left unchanged.
+- Identity: letters+niqqud unchanged (tests/punct-identity-202.test.mjs). A few say/vd transfers skipped because those fields already differed in letters from s.
+- Next: Torah Or / Likkutei Torah, then Pnei Moshe, same rules. Cap $80/provider, stop at $75. Spend after r6: Anthropic ~$21.9, OpenAI ~$27.0.

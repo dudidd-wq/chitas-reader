@@ -1,7 +1,7 @@
 {
  "v": 1,
- "source": "84599e4d178e8f02",
- "bytes": 13117945,
+ "source": "d0a53db0985dc263",
+ "bytes": 13120500,
  "segs": 47666,
  "shards": [
   {
@@ -64,105 +64,105 @@
    "id": "rambam-1",
    "fam": "rambam",
    "he": "רמב״ם – ספר המדע",
-   "bytes": 206181,
+   "bytes": 206273,
    "segs": 457
   },
   {
    "id": "rambam-2",
    "fam": "rambam",
    "he": "רמב״ם – ספר אהבה",
-   "bytes": 263462,
+   "bytes": 264023,
    "segs": 765
   },
   {
    "id": "rambam-3",
    "fam": "rambam",
    "he": "רמב״ם – ספר זמנים",
-   "bytes": 528821,
+   "bytes": 529023,
    "segs": 1739
   },
   {
    "id": "rambam-4",
    "fam": "rambam",
    "he": "רמב״ם – ספר נשים",
-   "bytes": 328966,
+   "bytes": 329155,
    "segs": 1185
   },
   {
    "id": "rambam-5",
    "fam": "rambam",
    "he": "רמב״ם – ספר קדושה",
-   "bytes": 306206,
+   "bytes": 306350,
    "segs": 1206
   },
   {
    "id": "rambam-6",
    "fam": "rambam",
    "he": "רמב״ם – ספר הפלאה",
-   "bytes": 199807,
+   "bytes": 199936,
    "segs": 809
   },
   {
    "id": "rambam-7",
    "fam": "rambam",
    "he": "רמב״ם – ספר זרעים",
-   "bytes": 396370,
+   "bytes": 396504,
    "segs": 1594
   },
   {
    "id": "rambam-8",
    "fam": "rambam",
    "he": "רמב״ם – ספר עבודה",
-   "bytes": 413607,
+   "bytes": 413728,
    "segs": 1532
   },
   {
    "id": "rambam-9",
    "fam": "rambam",
    "he": "רמב״ם – ספר קרבנות",
-   "bytes": 168109,
+   "bytes": 168198,
    "segs": 510
   },
   {
    "id": "rambam-10",
    "fam": "rambam",
    "he": "רמב״ם – ספר טהרה",
-   "bytes": 527286,
+   "bytes": 527639,
    "segs": 1808
   },
   {
    "id": "rambam-11",
    "fam": "rambam",
    "he": "רמב״ם – ספר נזיקין",
-   "bytes": 245724,
+   "bytes": 245807,
    "segs": 941
   },
   {
    "id": "rambam-12",
    "fam": "rambam",
    "he": "רמב״ם – ספר קנין",
-   "bytes": 269190,
+   "bytes": 269279,
    "segs": 985
   },
   {
    "id": "rambam-13",
    "fam": "rambam",
    "he": "רמב״ם – ספר משפטים",
-   "bytes": 281669,
+   "bytes": 281953,
    "segs": 790
   },
   {
    "id": "rambam-14",
    "fam": "rambam",
    "he": "רמב״ם – ספר שופטים",
-   "bytes": 262667,
+   "bytes": 262713,
    "segs": 810
   },
   {
    "id": "mitzvot",
    "fam": "mitzvot",
    "he": "ספר המצוות",
-   "bytes": 376612,
+   "bytes": 376651,
    "segs": 682
   },
   {
