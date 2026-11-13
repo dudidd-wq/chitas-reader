@@ -9,7 +9,7 @@ const fetched = [];
 globalThis.fetch = async p => { fetched.push(String(p)); const f = new URL(p, root); const ok = fs.existsSync(f); return { ok, status: ok ? 200 : 404, json: async () => JSON.parse(fs.readFileSync(f)) }; };
 const { buildDoc, filesFor } = await import('../site/js/texts.js');
 const DAYS = ['2026-11-15', '2026-11-16', '2026-11-17']; // 1.0.103: batch 2 adds 18.11–1.12; 1.0.104: batch 3 adds 2–15.12
-for (let d = new Date('2026-11-18T12:00:00'); d <= new Date('2026-12-29T12:00:00'); d.setDate(d.getDate() + 1)) DAYS.push(d.toISOString().slice(0, 10));
+for (let d = new Date('2026-11-18T12:00:00'); d <= new Date('2027-01-05T12:00:00'); d.setDate(d.getDate() + 1)) DAYS.push(d.toISOString().slice(0, 10));
 const UNITS = ['tanya', 'rambam3', 'rambam1', 'mitzvot', 'tolt'];
 const plan = iso => dayPlan(new Date(`${iso}T12:00:00`));
 const strip = s => s.replace(/[\u0591-\u05C7]/g, '');

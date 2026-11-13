@@ -449,3 +449,6 @@ npm test && npm run ui && npm run shots
 
 ## 2026-11-13 19:11 – short biur batch 4 (16–29.12) → 1.0.108
 - External review r1 (OpenAI gpt-5.4): 9.76. Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5".
+
+## 2026-11-13 22:03 – short biur batch 5 (30.12–5.1) → 1.0.109
+- External review r1 (OpenAI gpt-5.4): 9.744. Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5".

@@ -4,8 +4,8 @@
 // (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
 // re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
 // remains an offline fallback, so an update while the network is poor never loses the 30-day save.
-const VERSION = '1.0.108';
-const DATA_VERSION = '671883d231cc';
+const VERSION = '1.0.109';
+const DATA_VERSION = 'b05a2fc20b9d';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
 const MANIFEST = new URL('data/manifest.json', self.registration.scope).href;
