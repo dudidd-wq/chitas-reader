@@ -102,6 +102,8 @@ elif stage=='shapes':   # 1.0.97: tractate lengths for the whole Shas
             os.makedirs(os.path.dirname(f),exist_ok=True); json.dump(get('https://www.sefaria.org/api/shape/'+c),open(f,'w'))
 elif stage=='yercal':   # 1.0.97: Sefaria's Yerushalmi Yomi ref for one full Vilna cycle (dates: node tools/shas-plan.mjs)
     run(calendar,json.load(open(C+'/yercal-dates.json')),3)
+elif stage=='texts':    # 1.0.98: any plan file with {texts:[{tag,ref,version}]} (Nach, Onkelos)
+    run(sefaria,json.load(open(sys.argv[2]))['texts'],int(os.environ.get('GEMARA_WORKERS','3')))
 elif stage=='shas':     # 1.0.97: every text in shas-plan.json (node tools/shas-plan.mjs)
     tags=os.environ.get('GEMARA_TAGS'); J=json.load(open(C+'/shas-plan.json'))['texts']
     run(sefaria,[j for j in J if not tags or j['tag'] in tags.split(',')],int(os.environ.get('GEMARA_WORKERS','3')))
@@ -111,6 +113,6 @@ elif stage=='split':    # 1.0.97: per-segment cache from batch files fetched bef
         with gzip.open(f,'rt',encoding='utf8') as g: d=json.load(g)
         split(d['genre'],d['text'],d['tokens'])
 elif stage in ('dicta','dicta-rev','dicta-mid'):   # dicta-rev: a second process from the other end (files are written atomically)
-    J=json.load(open(C+'/dicta-input.json'))
+    J=json.load(open(os.environ.get('GEMARA_DICTA_INPUT',C+'/dicta-input.json')))   # 1.0.98: a second job list
     if stage=='dicta-mid': J=J[len(J)//2:]+J[:len(J)//2]   # a third process from the middle
     run(dicta,J[::-1] if stage=='dicta-rev' else J,int(os.environ.get('GEMARA_WORKERS','2')))

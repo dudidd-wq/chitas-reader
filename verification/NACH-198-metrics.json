@@ -1,0 +1,65 @@
+{
+  "coverage": {
+    "nach": {
+      "chapters": 742,
+      "verses": 17360,
+      "comments": 28836,
+      "commentsDicta": 2399,
+      "chaptersFull": 55
+    },
+    "mitzvot": {
+      "segs": 682,
+      "dicta": 682
+    },
+    "onkelos": {
+      "chapters": 187,
+      "verses": 5846
+    }
+  },
+  "sizesMB": {
+    "nach": 8.9,
+    "nachv": 5.7,
+    "onkelos": 2.7,
+    "mitzvot-voc": 2.2
+  },
+  "stats": {
+    "md": {
+      "words": 447898,
+      "bold": 55305,
+      "boldMatched": 47788,
+      "gemara": 47787,
+      "unvocalized": 345978,
+      "abbr": 19250,
+      "stress": 28734,
+      "initialStop": 936,
+      "shva": 1706,
+      "dictaRabbinic": 34883
+    },
+    "rashi": {
+      "gemara": 6622,
+      "shva": 150,
+      "stress": 268,
+      "initialStop": 172,
+      "abbr": 71
+    },
+    "mitzvot": {
+      "words": 65308,
+      "dictaRabbinic": 63877,
+      "stress": 44417,
+      "abbr": 1431,
+      "shva": 1489,
+      "initialStop": 102,
+      "bold": 49
+    },
+    "onkelos": {
+      "gemara": 80516,
+      "shva": 2962,
+      "initialStop": 766,
+      "stress": 1310
+    }
+  },
+  "mitzvotDoubtful": [
+    "N/50.json #1: 48/59 words vocalized"
+  ],
+  "warnings": []
+}

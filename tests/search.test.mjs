@@ -22,7 +22,7 @@ test('the index is up to date with the text data (run `npm run search` after cha
 });
 
 test('library tree: every book, reading order within and across books, breadcrumbs', async () => {
-  assert.deepEqual(FAMILIES.map(f => f.id), ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'hayomyom', 'rav', 'bavli', 'yerushalmi', 'mishnah', 'siddur']);
+  assert.deepEqual(FAMILIES.map(f => f.id), ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'hayomyom', 'rav', 'nach', 'bavli', 'yerushalmi', 'mishnah', 'siddur']);
   const count = {}; for (const f of FAMILIES) if (!f.href) count[f.id] = (await family(f.id)).leaves.length;
   assert.equal(count.torah, 187); assert.equal(count.tehillim, 150 + 30 + 7); assert.equal(count.mitzvot, 1 + 248 + 365 + 14);
   assert.ok(count.rambam > 1000 && count.tanya > 120 && count.tolt > 300 && count.rav > 50, JSON.stringify(count));

@@ -1,7 +1,7 @@
 // Loads prebuilt static JSON (site/data) and assembles a day's portion into a document of blocks.
-import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe, toHDate, HDate } from './calendar.js';
+import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe, toHDate, HDate, chumash as chumashOf, BOOK_HE } from './calendar.js';
 import { localizeRuns } from './siddur-lang.js';
-import { dafYomi, amudYomi, yerushalmi, mishnaYomit, TRACTATE_HE } from './gemara-cycles.js';
+import { dafYomi, amudYomi, yerushalmi, mishnaYomit, TRACTATE_HE, nachYomi, NACH_HE } from './gemara-cycles.js';
 
 const cache = new Map();
 const NOTE_KEYS = ['LA-foreword', 'LA', 'SY-chinukh', 'SY']; // Tanya parts with Wikisource notes (site/data/notes/tanya)
@@ -31,6 +31,8 @@ export const UNITS = {
   amudyomi: { he: 'עמוד היומי', full: 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ' },
   yerushalmi: { he: 'ירושלמי יומי', full: 'תלמוד ירושלמי – דף היומי (מהדורת וילנא)' },
   mishnayomit: { he: 'משניות יומי', full: 'משנה יומית – שתי משניות ליום, עם ברטנורא' },
+  nachyomi: { he: 'נ״ך יומי', full: 'נ״ך יומי – פרק ליום, עם מצודת דוד' },   // 1.0.98
+  shnayim: { he: 'שניים מקרא', full: 'שניים מקרא ואחד תרגום' },
   shasBavli: { he: 'תלמוד בבלי', full: 'תלמוד בבלי – גמרא עם ביאור שטיינזלץ' },   // 1.0.97: library only (#/lib/bavli)
   shasYer: { he: 'תלמוד ירושלמי', full: 'תלמוד ירושלמי (מהדורת וילנא) עם פני משה' },
   shasMishna: { he: 'משנה', full: 'משנה עם פירוש ברטנורא' },
@@ -51,6 +53,9 @@ export async function filesFor(plan, unit) {
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
   if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`, `notes/tolt/${slug}.json`)); }
   if (unit === 'hayomyom') f.push('hayomyom/days.json');
+  if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => shmFile(it).forEach(x => f.push(x.replace(/^mitzvot\//, 'mitzvot-voc/'))));
+  if (unit === 'nachyomi') { const n = plan.nach || nachYomi(plan.iso); f.push('nach/index.json', `nach/${pathB(n.book)}/${n.c}.json`, `nachv/${pathB(n.book)}/${n.c}.json`); }
+  if (unit === 'shnayim') for (const c of shnayimParts(plan)) for (let i = c.from.c; i <= c.to.c; i++) f.push(`torah/${c.book}/${i}.json`, `onkelos/${c.book}/${i}.json`);
   if (GEMARA_UNITS.includes(unit)) {   // only what exists in the build (no amud b after a tractate that ends on amud a)
     const idx = await optional('gemara/index.json');
     f.push('gemara/index.json');
@@ -59,18 +64,20 @@ export async function filesFor(plan, unit) {
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   return [...new Set(f)];
 }
+// 1.0.98: Sefer HaMitzvot niqqud (Dicta, tools/build-nach.mjs): `say` for the read-aloud, `textV` for the display
+const voc = (z, i) => ({ ...(z?.say?.[i] ? { say: z.say[i] } : {}), ...(z?.vd?.[i] ? { textV: z.vd[i] } : {}) });
 async function mitzvotDoc(plan) {
   const blocks = [];
   for (const it of plan.mitzvot.items) {
     blocks.push({ type: 'h', text: mitzvotLabel(it) });
     if (it.k === 'P' || it.k === 'N' || it.k === 'intro') {
-      const d = await data(shmFile(it)[0]);
-      d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot' }));
+      const d = await data(shmFile(it)[0]), z = await optional(shmFile(it)[0].replace(/^mitzvot\//, 'mitzvot-voc/'));
+      d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i) }));
     } else if (it.k === 'S') {
       for (let n = it.from; n <= it.to; n++) {
-        const d = await data(`mitzvot/S/${n}.json`);
+        const d = await data(`mitzvot/S/${n}.json`), z = await optional(`mitzvot-voc/S/${n}.json`);
         if (it.to > it.from) blocks.push({ type: 'h', text: `השורש ה${['', 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שביעי', 'שמיני', 'תשיעי', 'עשירי', 'אחד עשר', 'שנים עשר', 'שלושה עשר', 'ארבעה עשר'][n]}` });
-        d.s.forEach((t, i) => blocks.push({ type: 'p', id: `S${n}.${i + 1}`, text: t, src: 'mitzvot' }));
+        d.s.forEach((t, i) => blocks.push({ type: 'p', id: `S${n}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i) }));
       }
     } else if (it.k === 'conclusion') {
       blocks.push({ type: 'note', text: 'לפי לוח Chabad.org נלמד היום גם סיום ספר המצוות. במהדורה הפתוחה שבאתר (ורשה תרמ״ג, נחלת הכלל) אין לסיום קטע נפרד, ולכן הוא אינו מוצג כאן.' });
@@ -420,7 +427,52 @@ async function gemaraDoc(plan, unit) {
   if (partial) blocks.unshift(partialNote(partial));
   return { title, subtitle, blocks, raw: true, gemara: 'mishna', credits: gemaraCredits(idx, [['משנה', 'mishnah'], ['ברטנורא', 'bartenura']]) };
 }
+// ---------------- 1.0.98: Nach Yomi and Shnayim Mikra ----------------
+const pathB = b => b.replace(/ /g, '_');
+// the app passes its (live) prefs object; Node / tests may pass { shnayimSplit }
+let OPTS = {};
+export function setTextOptions(o) { OPTS = o || {}; }
+const shnayimWeek = () => OPTS.shnayimSplit === 'week';
+export const nachLabel = n => `${NACH_HE[n.book] || n.book} פרק ${gem(n.c)}`;
+async function nachDoc(plan) {
+  const n = plan.nach || nachYomi(plan.iso), idx = await data('nach/index.json');
+  const d = await data(`nach/${pathB(n.book)}/${n.c}.json`), z = await optional(`nachv/${pathB(n.book)}/${n.c}.json`), lbl = d.el === 'rashi' ? 'רש״י' : 'מצודת דוד';
+  const blocks = [{ type: 'h', text: nachLabel(n) }];
+  if (z?.partial || !z) blocks.unshift({ type: 'note', text: `ניקוד הפירוש בפרק הזה עדיין בבנייה (${z?.partial ?? 'כל'} קטעים): הם מוצגים בלי ניקוד, וההקראה שלהם עלולה לשבש מילים. הם יתעדכנו בגרסה הבאה.` });
+  d.v.forEach((t, i) => blocks.push({ type: 'v', id: `${n.c}:${i + 1}`, ref: `${n.book} ${n.c}:${i + 1}`, num: gem(i + 1), text: t, src: 'tanakh',
+    ...(d.e[i]?.length ? { biur: d.e[i], biurV: z?.vd?.[i], biurLabel: lbl, biurSay: z?.say?.[i] } : {}) }));
+  const credits = [['נ״ך (מקרא על פי המסורה)', idx.sources?.nach], [lbl, idx.sources?.[d.el === 'rashi' ? 'nachRashi' : 'metzudat']]].filter(([, m]) => m).map(([label, m]) => ({ label, ...m }));
+  return { book: n.book, title: UNITS.nachyomi.full, subtitle: nachLabel(n), blocks, tanakh: true, noInline: true, credits };
+}
+/** the verses of Shnayim Mikra: today's aliyah (as the daily Chumash) or the whole week's parsha (Sunday–Shabbat) */
+export function shnayimParts(plan) {
+  if (!shnayimWeek() || !plan.hd) return plan.chumash.parts;
+  const out = [];
+  for (let k = 0; k < 7; k++) for (const p of chumashOf(plan.hd.add(k - plan.hd.getDay(), 'd'), plan.il ?? true).parts) {
+    const last = out.at(-1);
+    if (last && last.book === p.book && (p.from.c < last.to.c || p.from.c === last.to.c && p.from.v <= last.to.v + 1)) { if (p.to.c > last.to.c || p.to.c === last.to.c && p.to.v > last.to.v) last.to = p.to; }
+    else out.push({ ...p });
+  }
+  return out;
+}
+async function shnayimDoc(plan) {
+  const blocks = [], parts = shnayimParts(plan), week = shnayimWeek() && !!plan.hd;
+  blocks.push({ type: 'note', text: 'כל פסוק נקרא פעמיים, ואחריו תרגום אונקלוס.' });
+  for (const c of parts) for (let ch = c.from.c; ch <= c.to.c; ch++) {
+    const d = await data(`torah/${c.book}/${ch}.json`), o = await optional(`onkelos/${c.book}/${ch}.json`);
+    const a = ch === c.from.c ? c.from.v : 1, b = ch === c.to.c ? c.to.v : d.v.length;
+    blocks.push({ type: 'h', text: `${c.bookHe || BOOK_HE[c.book]} פרק ${gem(ch)}` });
+    for (let v = a; v <= b; v++) blocks.push({ type: 'v', id: `${ch}:${v}`, ref: `${c.book} ${ch}:${v}`, num: gem(v), text: d.v[v - 1], src: 'tanakh', repeat: 2,
+      ...(o?.t?.[v - 1] ? { biur: [o.t[v - 1]], biurLabel: 'תרגום', biurSay: [o.say[v - 1]] } : {}) });
+  }
+  const sub = c => `${c.bookHe || BOOK_HE[c.book]} ${gem(c.from.c)}, ${gem(c.from.v)} – ${gem(c.to.c)}, ${gem(c.to.v)}`;
+  const idx = await optional('nach/index.json'), on = idx?.sources?.onkelos;
+  return { book: parts[0].book, title: UNITS.shnayim.full, subtitle: (week ? `פרשת ${plan.chumash.parshaHe} – כל הפרשה` : plan.chumash.title) + ' · ' + parts.map(sub).join(' · '), blocks, tanakh: true, noInline: true,
+    credits: on ? [{ label: 'תרגום אונקלוס (ניקוד תימני – תאג׳)', ...on }] : [] };
+}
 export function buildDoc(plan, unit) {
+  if (unit === 'nachyomi') return nachDoc(plan);
+  if (unit === 'shnayim') return shnayimDoc(plan);
   if (GEMARA_UNITS.includes(unit)) return gemaraDoc(plan, unit);
   if (unit === 'hayomyom') return hayomDoc(plan);
   if (unit === 'chumash') return chumashDoc(plan);
@@ -434,6 +486,8 @@ export function buildDoc(plan, unit) {
 /** Short description of a unit's portion for the home cards. */
 export async function describe(plan, unit) {
   if (unit === 'chumash') return plan.chumash.title;
+  if (unit === 'nachyomi') return nachLabel(plan.nach || nachYomi(plan.iso));
+  if (unit === 'shnayim') return shnayimWeek() ? `פרשת ${plan.chumash.parshaHe} – כל הפרשה` : plan.chumash.title;
   if (GEMARA_UNITS.includes(unit)) return plan.gem ? specLabel(plan.gem) : gemaraLabel(plan.iso, unit);
   if (unit === 'tehillim') return plan.tehillim.title;
   if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)

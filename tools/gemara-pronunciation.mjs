@@ -191,3 +191,13 @@ export function vocalizeHtml(html, gemWords, nextRab, nextMod) {
   vocalizeHtml.last = { n, hit };
   return out;
 }
+/** 1.0.98: speech text of an already vocalized text (Targum Onkelos, Rashi of the Metsudah Megillot): every word keeps
+ *  its own niqqud and gets the same corrections, stress, Israeli shva and initial stops as the Gemara words. */
+export function sayVocalized(html, stats = {}) {
+  const text = speechRuns(html).map(r => r.t).join('');
+  return text.replace(WORD, whole => {
+    const trail = /^[^"״]+["״]+$/.test(whole) ? whole.match(/["״]+$/)[0] : '', src = whole.slice(0, whole.length - trail.length);
+    if (!/[\u05B0-\u05BB\u05C7]/.test(src)) return whole;
+    return sayWord(src, { b: true, gem: src }, stats) + trail;
+  }).replace(/\s+/g, ' ').trim();
+}

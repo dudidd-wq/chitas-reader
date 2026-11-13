@@ -4,6 +4,7 @@
 // the daily reader (and to the search index, tools/build-search.mjs, which uses this module too).
 // Pure module (no DOM): also imported by Node (tools/build-search.mjs, tests).
 import { gem, BOOK_HE, TANYA_ORDER, TOLT_SLUGS, mitzvotLabel, tehillim as tehillimOfDay, HDate } from './calendar.js';
+import { NACH_HE } from './gemara-cycles.js';
 import { data, buildDoc, ravSimanDoc, toltLabel, UNITS, HAYOM_MONTHS, gemaraFiles } from './texts.js';
 
 export const FAMILIES = [
@@ -15,6 +16,7 @@ export const FAMILIES = [
   { id: 'tolt', he: 'תורה אור ולקוטי תורה', desc: 'לפי פרשות השבוע ושיעורי היום של לוח ״מורה שיעור״', unit: 'tolt' },
   { id: 'hayomyom', he: 'היום יום', desc: 'לוח הרבי – רשומה לכל יום בשנה (לפי לוח תש״ג)', unit: 'hayomyom' },
   { id: 'rav', he: 'שולחן ערוך אדמו״ר הזקן', desc: 'אורח חיים – הסימנים שבלוח ״רב יומי״', unit: 'ravyomi' },
+  { id: 'nach', he: 'נ״ך', desc: 'נביאים וכתובים עם פירוש מצודת דוד (ברות, איכה ואסתר – רש״י), לפי ספרים ופרקים', unit: 'nachyomi', noSearch: true },   // 1.0.98
   // 1.0.97: the whole Shas – not in the search index (tools/build-search.mjs skips noSearch), loaded per amud / daf / chapter
   { id: 'bavli', he: 'תלמוד בבלי', desc: 'כל הש״ס – גמרא מנוקדת עם ביאור שטיינזלץ, לפי סדרים, מסכתות ועמודים', unit: 'shasBavli', noSearch: true },
   { id: 'yerushalmi', he: 'תלמוד ירושלמי', desc: 'מהדורת וילנא, מנוקד, עם פירוש פני משה – לפי סדרים, מסכתות ודפים', unit: 'shasYer', noSearch: true },
@@ -87,6 +89,11 @@ async function build(fam) {
     const S = await data('ravyomi/schedule.json');
     return { kids: S.simanim.map(n => leaf(`rav/${n}`, `סימן ${gem(n)}`, `שולחן ערוך הרב, אורח חיים סימן ${gem(n)}`, 'ravyomi', null, 'rav', { siman: n })) };
   }
+  if (fam === 'nach') {
+    const idx = await data('nach/index.json'), B = Object.keys(idx.books), k = B.indexOf('Psalms');
+    const book = b => ({ id: `nach/${b}`, he: NACH_HE[b] || b, kids: range(1, idx.books[b]).map(c => leaf(`nach/${b}/${c}`, `פרק ${gem(c)}`, `${NACH_HE[b] || b} פרק ${gem(c)}`, 'nachyomi', { nach: { book: b, c } })) });
+    return { kids: [{ group: true, he: 'נביאים', kids: B.slice(0, k).map(book) }, { group: true, he: 'כתובים', kids: B.slice(k).map(book) }] };
+  }
   if (fam === 'bavli' || fam === 'yerushalmi' || fam === 'mishnah') {
     const idx = await data('gemara/index.json'), SED = Object.keys(idx.seder);
     const bySeder = (list, mk) => SED.map(sd => ({ group: true, he: `סדר ${idx.seder[sd]}`, kids: list.filter(x => x.seder === sd).map(mk) })).filter(g => g.kids.length);
@@ -148,6 +155,7 @@ export async function libFiles(path) {
     if (l.unit === 'tolt') { const [s] = p.tolt.parts[0]; f.add('tolt/schedule.json'); f.add(`tolt/w/${s}.json`); f.add(`notes/tolt/${s}.json`); }
     if (l.siman) f.add(`ravyomi/s/${l.siman}.json`);
     if (l.unit === 'hayomyom') f.add('hayomyom/days.json');
+    if (p?.nach) { const b = p.nach.book.replace(/ /g, '_'); f.add('nach/index.json'); f.add(`nach/${b}/${p.nach.c}.json`); f.add(`nachv/${b}/${p.nach.c}.json`); }
     if (p?.gem) { const idx = await data('gemara/index.json'); f.add('gemara/index.json'); gemaraFiles(p.gem, idx).forEach(x => f.add(x)); }
   }
   return [...f];

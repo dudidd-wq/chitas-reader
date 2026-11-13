@@ -41,3 +41,15 @@ export const TRACTATE_HE = {
   Tamid: 'תמיד', Middot: 'מידות', Kinnim: 'קינים', Kelim: 'כלים', Oholot: 'אהלות', Negaim: 'נגעים', Parah: 'פרה', Tahorot: 'טהרות', Mikvaot: 'מקוואות',
   Niddah: 'נדה', Makhshirin: 'מכשירין', Zavim: 'זבים', 'Tevul Yom': 'טבול יום', Yadayim: 'ידיים', Oktzin: 'עוקצין',
 };
+// 1.0.98: Nach Yomi – one chapter a day of Nevi'im and Ketuvim (cycle from 1.11.2007, 742 days, hebcal NachYomiIndex)
+import { NachYomiIndex } from './vendor/hebcal.js';
+const NACH_NAME = { Nachum: 'Nahum' };
+export const NACH_HE = { Joshua: 'יהושע', Judges: 'שופטים', 'I Samuel': 'שמואל א', 'II Samuel': 'שמואל ב', 'I Kings': 'מלכים א', 'II Kings': 'מלכים ב',
+  Isaiah: 'ישעיהו', Jeremiah: 'ירמיהו', Ezekiel: 'יחזקאל', Hosea: 'הושע', Joel: 'יואל', Amos: 'עמוס', Obadiah: 'עובדיה', Jonah: 'יונה', Micah: 'מיכה',
+  Nahum: 'נחום', Habakkuk: 'חבקוק', Zephaniah: 'צפניה', Haggai: 'חגי', Zechariah: 'זכריה', Malachi: 'מלאכי', Psalms: 'תהילים', Proverbs: 'משלי',
+  Job: 'איוב', 'Song of Songs': 'שיר השירים', Ruth: 'רות', Lamentations: 'איכה', Ecclesiastes: 'קהלת', Esther: 'אסתר', Daniel: 'דניאל', Ezra: 'עזרא',
+  Nehemiah: 'נחמיה', 'I Chronicles': 'דברי הימים א', 'II Chronicles': 'דברי הימים ב' };
+let NY = null;
+export function nachYomi(date) { NY ||= new NachYomiIndex(); const { k, v } = NY.lookup(noon(date)); return { book: NACH_NAME[k] || k, c: v }; }
+/** all 742 chapters in cycle order */
+export function nachChapters() { NY ||= new NachYomiIndex(); return NY.days.map(({ k, v }) => ({ book: NACH_NAME[k] || k, c: v })); }

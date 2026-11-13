@@ -1,6 +1,6 @@
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
-import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS } from './texts.js';
+import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
@@ -86,7 +86,8 @@ let toastAfterNav = ''; // a message meant for the screen being navigated to
 /** a status message belongs to the screen it was shown on: drop it when the user navigates (review 3) */
 function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
 const todayIso = () => isoDate(new HDate(new Date()));
-const unitsFor = () => ['chumash', 'tehillim', 'tanya', 'hayomyom', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : []), ...(prefs.lessonTolt ? ['tolt'] : []), ...(prefs.lessonRavYomi ? ['ravyomi'] : []), ...(prefs.lessonDaf ? ['dafyomi'] : []), ...(prefs.lessonAmud ? ['amudyomi'] : []), ...(prefs.lessonYer ? ['yerushalmi'] : []), ...(prefs.lessonMishna ? ['mishnayomit'] : [])];
+setTextOptions({ get shnayimSplit() { return prefs.shnayimSplit; } });   // 1.0.98: Shnayim Mikra split (live prefs)
+const unitsFor = () => ['chumash', 'tehillim', 'tanya', 'hayomyom', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : []), ...(prefs.lessonTolt ? ['tolt'] : []), ...(prefs.lessonRavYomi ? ['ravyomi'] : []), ...(prefs.lessonDaf ? ['dafyomi'] : []), ...(prefs.lessonAmud ? ['amudyomi'] : []), ...(prefs.lessonYer ? ['yerushalmi'] : []), ...(prefs.lessonMishna ? ['mishnayomit'] : []), ...(prefs.lessonNach ? ['nachyomi'] : []), ...(prefs.lessonShnayim ? ['shnayim'] : [])];
 // Dates shown to the reader: Israeli order only (2 בנובמבר 2026 / 02/11/2026); ISO stays in URLs and storage keys.
 const gregHe = iso => gregLongHe(iso);
 const dayDates = (plan, iso) => `${plan.hebDate} · ${fmtDmy(iso)}`;
@@ -515,7 +516,7 @@ function displayGroup() {
     ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
-  <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
+  <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>ספר המצוות</legend>${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
@@ -696,8 +697,8 @@ function renderSettings() {
   <form class="form" id="sf" onsubmit="return false">
     ${setCard('set-daily', `<fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
-    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}${check('lessonDaf', prefs.lessonDaf, 'דף היומי (בבלי) – גמרא עם ביאור שטיינזלץ')}${check('lessonAmud', prefs.lessonAmud, 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ')}${check('lessonYer', prefs.lessonYer, 'ירושלמי יומי (מהדורת וילנא)')}${check('lessonMishna', prefs.lessonMishna, 'משנה יומית – שתי משניות ליום, עם ברטנורא')}
-    <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset>`)}
+    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}${check('lessonDaf', prefs.lessonDaf, 'דף היומי (בבלי) – גמרא עם ביאור שטיינזלץ')}${check('lessonAmud', prefs.lessonAmud, 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ')}${check('lessonYer', prefs.lessonYer, 'ירושלמי יומי (מהדורת וילנא)')}${check('lessonMishna', prefs.lessonMishna, 'משנה יומית – שתי משניות ליום, עם ברטנורא')}${check('lessonNach', prefs.lessonNach, 'נ״ך יומי – פרק ליום, עם מצודת דוד')}${check('lessonShnayim', prefs.lessonShnayim, 'שניים מקרא ואחד תרגום')}
+    <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset><fieldset><legend>שניים מקרא</legend>${radio('shnayimSplit', prefs.shnayimSplit, [['day', 'לפי ימים – עלייה ליום, כמו החומש היומי'], ['week', 'כל הפרשה']])}</fieldset>`)}
     ${setCard('set-display', displayGroup())}
     ${setCard('set-tts', ttsForm())}
     ${setCard('set-siddur', siddurGroup())}
@@ -739,7 +740,11 @@ async function renderSources() {
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים (בהקראה הם נקראים בניקוד הפסוק כשהם מילות הפסוק)')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
-  ${row('ספר המצוות לרמב״ם', s.mitzvot, 'אינו מנוקד. סריקת המהדורה בספרייה הלאומית')}
+  ${row('ספר המצוות לרמב״ם', s.mitzvot, 'אינו מנוקד במקור. מ-1.0.98 נוסף ניקוד אוטומטי של <a href="https://nakdan.dicta.org.il/" rel="noopener" target="_blank">נקדן דיקטה</a> (מוצג, וגם משמש להקראה), שלא עבר הגהה אנושית; אפשר לכבות את הצגתו בהגדרות. סריקת המהדורה בספרייה הלאומית')}
+  ${row('נ״ך (נ״ך יומי)', s.nach, 'מנוקד ומוטעם. מחזור נ״ך יומי – פרק ליום מ-1.11.2007 (ספריית hebcal)')}
+  ${row('מצודת דוד', s.metzudat, 'אינו מנוקד במקור; נוסף ניקוד אוטומטי של דיקטה (מוצג, וגם משמש להקראה), שלא עבר הגהה אנושית')}
+  ${row('רש״י לרות, איכה ואסתר (אין בהן מצודת דוד)', s.nachRashi, 'מנוקד')}
+  ${row('תרגום אונקלוס (שניים מקרא)', s.onkelos, 'מנוקד לפי מסורת תימן (תאג׳)')}
   ${row('תורה אור ולקוטי תורה', s.tolt, '<b>נוסח מנוקד: חסידות בהירה, על פי מהדורת קה״ת ה׳תשע״ה; באישור, לשימוש לא מסחרי בלבד</b> (<a href="https://chassidutbehirah.com/" rel="noopener" target="_blank">חסידות בהירה</a>; לפי דיווח בעל האתר, אושר ע״י חסידות בהירה וקה״ת, לשימוש לא מסחרי בלבד). הניקוד נקלט רק במילים שאותיותיהן זהות לנוסח קה״ת שבספריא; פסקה שלא אומתה מוצגת בלי ניקוד. נוסח קה״ת: רישיון לשימוש לא מסחרי בלבד (NC). חלוקת השיעורים: <a href="https://hisachdus.co.il/" rel="noopener" target="_blank">לוח המורה שיעור – כינוס השלוחים העולמי</a>; <a href="https://www.torahor.app/he" rel="noopener" target="_blank">torahor.app – התאחדות החסידים</a> (הלוח עצמו אינו מוגש באתר).')}
   ${row('שולחן ערוך אדמו״ר הזקן (רב יומי)', s.ravyomi, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC). חלוקת השיעורים: <a href="https://chabad.info/service/1287411/" rel="noopener" target="_blank">לוח ״רב יומי״ (chabad.info)</a>. הלוח עצמו אינו מוגש באתר')}
   ${row('גמרא בבלי (כל הש״ס; דף היומי, עמוד היומי)', s.gemara, 'מנוקדת. רישיון לשימוש לא מסחרי בלבד (NC)')}
@@ -850,6 +855,7 @@ function renderAbout() {
   <li id="hayomyom-about"><b>היום יום:</b> היום יום — © קה״ת, בהיתר הכללי של קה״ת לאתרים ואפליקציות ללימוד ללא תשלום; הקלדה: <a href="https://text.chabadpedia.com/index.php/%D7%94%D7%99%D7%95%D7%9D_%D7%99%D7%95%D7%9D" rel="noopener" target="_blank">חב״דפדיה-טקסט</a>, ברישיון <a href="https://www.gnu.org/licenses/fdl-1.3.html" rel="noopener" target="_blank">GNU Free Documentation License 1.3</a> (GFDL), ללא שינוי בנוסח (הוסרו רק קישורים פנימיים). הלוח נערך לשנת תש״ג (שנה מעוברת): בשנה פשוטה מוצגות בחודש אדר הרשומות של אדר ב׳; בל׳ חשוון ובל׳ כסלו (שאינם בלוח) מוצגת הרשומה של כ״ט. הטקסט שמור באתר ואינו נטען מהרשת. <b>הקראה:</b> אפשר להציג ניקוד בהיום יום (מופעל כברירת מחדל בהגדרות התצוגה), או את הטקסט המקורי ללא הניקוד הנוסף; הניקוד לתצוגה ולהקראה הוא אוטומטי, שנעשה פעם אחת בבניית האתר ב<a href="https://nakdan.dicta.org.il/" rel="noopener" target="_blank">נקדן של דיקטה</a> (דיקטה – המרכז הישראלי לניתוח טקסטים, סוגה רבנית). ניקוד אוטומטי עלול לטעות, בייחוד בקטעים ביידיש ובארמית; ראשי תיבות נקראים לפי טבלת הקיצורים של האתר. נוספו תיקוני הגייה נקודתיים וסימוני הטעמה למנוע המקומי; ציטוטים מזוהים במדויק מן התורה והתהילים מקבלים את ניקוד המקור. סימוני ההטעמה אינם פקודה לקולות המכשיר (Web Speech).</li>
   <li id="ravyomi-about"><b>שולחן ערוך אדמו״ר הזקן – רב יומי:</b> החלוקה היא לפי <a href="https://chabad.info/service/1287411/" rel="noopener" target="_blank">לוח ״רב יומי״</a> (מחזור שלישי, שנה שנייה: כ״ד טבת תשפ״ו – כ״ג טבת תשפ״ז). לכל יום מוצגים הסימן והסעיפים. כשהלוח מתחיל או מסיים באמצע סעיף, הסעיף מוצג במלואו, ויש הערה עם המילים שבלוח. הטקסט הוא <b>המהדורה המנוקדת</b> של קה״ת בספריא, ברישיון CC BY-NC (שימוש לא מסחרי). הערות השוליים וקונטרס אחרון אינם מוצגים. נבדק שכל 355 ימי הלוח רצופים: כל שיעור מתחיל במקום שבו הסתיים השיעור הקודם. נמצאו שלושה חריגים, והם מוצגים בהערה: (1) בי״ב–י״ג תמוז סעיפים ח–י בסימן רד אינם מופיעים בלוח. זו כנראה השמטה בדפוס, ולא השלמנו אותה. (2) בה׳ כסלו נדפס בלוח ״סימן ו״ במקום ״סימן רסו״, ותיקנו זאת. (3) בז׳ חשוון השיעור הוא ״הלכות שהיה והטמנה בקצרה״, שאינן בספריא, ולכן מוצגת ההפניה בלבד. <b>אימות:</b> 14 התאריכים של פרשיות וירא וחיי שרה תשפ״ז (25.10–7.11.2026) תואמים לשיעורים שנדפסו בחוברת ״דבר מלכות״. לפי החוברת, היא נוהגת ״לפי לוח רב יומי״, ולכן זו בדיקה של הנוסח שנדפס ולא של מקור עצמאי. מחוץ לתאריכים האלה לא נמצא מקור שני לבדיקה. מחוץ לשנת הלוח אין שיעור, ומוצגת הערה.</li>
   <li id="gemara-about"><b>גמרא ומשניות (מ-1.0.96; כל הש״ס מ-1.0.97):</b> בספרייה: <b>תלמוד בבלי</b>, <b>תלמוד ירושלמי</b> ו<b>משנה</b> – כל הש״ס, לפי סדר, מסכת ועמוד / דף / פרק, עם מעבר לעמוד הקודם והבא. העמודים נטענים רק כשפותחים אותם (ונשמרים במכשיר אחרי הפתיחה). ארבעה מחזורים יומיים, מחושבים לפי התאריך (ספריית hebcal), לכל תאריך: <b>דף היומי</b> בבבלי (המחזור הרגיל; מסכת שקלים – מן הירושלמי); <b>עמוד היומי</b> – מחזור ״עמוד היומי״ של דרשו, שהתחיל בברכות ב׳ ע״א בא׳ חשוון תשפ״ד (16.10.2023), עמוד אחד בכל יום בלי ימי הפסקה; <b>ירושלמי יומי</b> – דף אחד ליום לפי מהדורת וילנא (אין שיעור ביום הכיפורים ובתשעה באב); <b>משנה יומית</b> – שתי משניות ליום. בבבלי מוצגת בכל קטע הגמרא המנוקדת, ומתחתיה ביאור הרב שטיינזלץ; בירושלמי – פירוש ״פני משה״; במשנה – פירוש ברטנורא. ההקראה קוראת את הביאור (במשנה – המשנה ואחריה ברטנורא): מראי המקומות של פסוקים מוצגים ואינם נקראים, ״ר׳״ נקרא ״רבי״, ויש הפסקה קצרה בכל פסיק ונקודה. לביאורים נוסף ניקוד אוטומטי (אפשר לכבות את הצגתו בהגדרות). עמוד שהניקוד שלו עדיין בבנייה מסומן בהערה בראשו.</li>
+  <li id="nach-about"><b>נ״ך יומי, ספר המצוות ושניים מקרא (מ-1.0.98):</b> <b>נ״ך יומי</b> – פרק ליום (מחזור hebcal), מקרא על פי המסורה עם <b>מצודת דוד</b> (ברות, איכה ואסתר – רש״י), מנוקד בדיקטה בתצוגה ובהקראה. <b>ספר המצוות</b> מוצג ומוקרא בניקוד אוטומטי של דיקטה (בדיקה ידנית לא נעשתה; אפשר לכבות בהגדרות התצוגה). <b>שניים מקרא ואחד תרגום</b> – כל פסוק פעמיים ואחריו תרגום אונקלוס, בלי רש״י (הוא כבר בחומש היומי); בהגדרות בוחרים עלייה ליום או כל הפרשה. מפעילים בהגדרות ← שיעורים נוספים.</li>
   </ul>
   <h2 id="siddur-about">סידור</h2><ul>
   <li><b>נוסח:</b> נוסח האריז״ל כמנהג חב״ד, מתעתיק Open Siddur (שמואל גונזלס, CC0; ההוראות באנגלית – CC BY). התעתיק נערך ״בהתאם לתהלת ה׳״ אך <b>אינו</b> סידור תהלת ה׳ עצמו (שמוגן בזכויות יוצרים, וכך גם הנוסח של Chabad.org – ולכן לא נלקח משם דבר). ייתכנו הבדלים קטנים מהסידור המודפס.</li>
@@ -1038,7 +1044,7 @@ function ttsHtml(el) {
 // per block: true = vocalised, false = not, null = too short to tell (inherits the previous block's state)
 function vocState(blocks) {
   let last = null;
-  const raw = blocks.map(b => { const t = b.type === 'h' || b.type === 'note' ? '' : (b.text || '') + ' ' + (b.sub || []).join(' '); const L = (t.match(/[\u05D0-\u05EA]/g) || []).length; return L < 20 ? null : niqqudRatio(t) >= 0.3; });
+  const raw = blocks.map(b => { const t = b.type === 'h' || b.type === 'note' ? '' : (b.src === 'mitzvot' && prefs.mitzvotNiqqud && b.textV || b.text || '') + ' ' + (b.sub || []).join(' '); const L = (t.match(/[\u05D0-\u05EA]/g) || []).length; return L < 20 ? null : niqqudRatio(t) >= 0.3; });
   const first = raw.find(v => v !== null) ?? null;
   return raw.map(v => (v === null ? (last ?? first) : (last = v)));
 }
@@ -1243,7 +1249,7 @@ function readerLocNote() {
 async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
-  const inline = d.tanakh && !showRashi;
+  const inline = d.tanakh && !showRashi && !d.noInline;
   const sidd = !!d.siddur;
   const lib = !!R.lib;
   let html = `<header class="doc-head">${lib ? libCrumbsHtml() : `<p class="doc-kicker">${sidd ? 'סידור · נוסח האריז״ל – חב״ד' : `${esc(UNITS[R.unit].he)} · ${esc(dayPlan(R.iso, { il: prefs.il }).hebDate)} · ${esc(gregHe(R.iso))}`}</p>`}<h1>${esc(d.title)}</h1><p class="doc-sub">${esc(d.subtitle)}</p>${sidd ? '<div class="orn" aria-hidden="true"><i></i><b></b><i></i></div>' : lib ? libNavHtml('top') : dayNavHtml('top')}</header>`;
@@ -1255,7 +1261,7 @@ async function renderDoc() {
     mitzvot: [['ספר המצוות', srcs.mitzvot && { ...srcs.mitzvot, versionTitleInHebrew: 'ספר המצוות, ורשה תרמ״ג' }]],
     tolt: [['תורה אור / לקוטי תורה', srcs.tolt && { ...srcs.tolt, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }], d.blocks.some(b => b.voc === 'cb') && srcs.tolt?.niqqud && ['ניקוד', srcs.tolt.niqqud]],
     ravyomi: [['שולחן ערוך הרב', srcs.ravyomi && { ...srcs.ravyomi, versionTitleInHebrew: 'הוצאת קה״ת, מהדורה מנוקדת' }]],
-    siddur: [['סידור', srcs.siddur], [prefs.siddurLang === 'en' ? 'הוראות באנגלית' : 'הנחיות (תרגום לעברית של ההוראות באנגלית)', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || (GEMARA_UNITS.includes(R.unit) ? [] : [['רמב״ם', srcs.rambam]]);
+    siddur: [['סידור', srcs.siddur], [prefs.siddurLang === 'en' ? 'הוראות באנגלית' : 'הנחיות (תרגום לעברית של ההוראות באנגלית)', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || (GEMARA_UNITS.includes(R.unit) || R.unit === 'nachyomi' || R.unit === 'shnayim' ? [] : [['רמב״ם', srcs.rambam]]);
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
   // round 6: vocalisation is judged per block, not for the whole lesson (Positive Mitzvot: the first ~47 mitzvot are
@@ -1286,7 +1292,7 @@ async function renderDoc() {
       const startM = b.omitStart ? `<div class="sid-bound sid-omit-start" data-nr aria-hidden="true">${esc(b.omitLabel || 'אין אומרים')}</div>` : '';
       const endM = (b.omitEnd || b.specialEnd) ? `<div class="sid-bound sid-end" data-nr aria-hidden="true">עד כאן</div>` : '';
       const biur = b.biur?.length ? `<div class="biur">${b.biur.map((r, i) => `<p>${i ? '' : `<span class="lbl">${esc(b.biurLabel || 'ביאור')} </span>`}${fmt(prefs.biurNiqqud && b.biurV?.[i] || r, false, true)}</p>`).join('')}</div>` : '';
-      html += `<div class="${cls}${b.src === 'gemara' ? ' gm' : ''}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${b.repOf ? `<span class="sid-rep" data-nr aria-hidden="true">${b.rep}/${b.repOf}</span>` : ''}${fmt(b.src === 'hayomyom' && prefs.hayomNiqqud ? hayomVocalizedHtml(b.text, b.say) : b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}${biur}</div>`;
+      html += `<div class="${cls}${b.src === 'gemara' ? ' gm' : ''}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${b.repOf ? `<span class="sid-rep" data-nr aria-hidden="true">${b.rep}/${b.repOf}</span>` : ''}${fmt(b.src === 'hayomyom' && prefs.hayomNiqqud ? hayomVocalizedHtml(b.text, b.say) : b.src === 'mitzvot' && prefs.mitzvotNiqqud && b.textV ? b.textV : b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}${biur}</div>`;
     }
   }
   if (open) html += '</p>';
@@ -1658,7 +1664,7 @@ function openSheet(kind, note = '') {
     // 1.0.90: the Kaddish choice changes only what is read: a running read-aloud restarts from the current paragraph
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
     if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
-    else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'hayomNiqqud', 'biurNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
+    else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
@@ -1695,6 +1701,9 @@ function ttsSegments() {
     const parts = [say.has(s.dataset.id) ? say.get(s.dataset.id) : unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Speech-only Rashi keeps the display edition intact and supplies its own primary-stress metadata.
     const block = byId?.get(s.dataset.id), accParts = [block?.text || say.get(s.dataset.id) || null], primaryParts = [say.has(s.dataset.id)];
+    // 1.0.98: Shnayim Mikra – the verse twice; Nach / Onkelos – the explanation / Targum after the verse (speech text)
+    for (let k = 1; k < (block?.repeat || 1); k++) { parts.push(parts[0]); accParts.push(accParts[0]); primaryParts.push(primaryParts[0]); }
+    for (const x of block?.biurSay || []) if (x) { parts.push(x); accParts.push(x); primaryParts.push(true); }
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach((p, i) => {
       const raw = block?.subSay?.[i];
       parts.push(raw || vowelHeadword(p.innerHTML, parts[0]));

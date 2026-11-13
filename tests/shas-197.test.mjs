@@ -56,7 +56,7 @@ test('Shekalim of the Daf Yomi is the Jerusalem Talmud (Vilna Bavli pages)', asy
 });
 
 test('the Shas is not in the search index and not precached', () => {
-  assert.ok(FAMILIES.filter(f => f.noSearch).map(f => f.id).join() === 'bavli,yerushalmi,mishnah');
+  assert.ok(FAMILIES.filter(f => f.noSearch).map(f => f.id).join() === 'nach,bavli,yerushalmi,mishnah');
   const shards = JSON.parse(fs.readFileSync(new URL('data/search/shards.json', root)));
   assert.ok(!shards.shards.some(s => /bavli|yerushalmi|mishnah/.test(s.fam)));
   const sw = fs.readFileSync(new URL('sw.js', root), 'utf8');

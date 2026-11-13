@@ -257,7 +257,7 @@ export function tolt(hd, il) {
 export function dayPlan(date, { il = true } = {}) {
   const hd = toHDate(date);
   return {
-    iso: isoDate(hd), hd, dayHe: DAY_HE[hd.getDay()], hebDate: hebDateHe(hd),
+    iso: isoDate(hd), hd, il, dayHe: DAY_HE[hd.getDay()], hebDate: hebDateHe(hd),
     weekParsha: parshaHe(chumashParsha(hd, il)),
     chumash: chumash(hd, il), tehillim: tehillim(hd), tanyaStart: tanyaStart(hd),
     rambam1: rambam1(hd), rambam3: rambam3(hd), mitzvot: mitzvot(hd), tolt: tolt(hd, il),

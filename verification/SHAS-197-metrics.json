@@ -3,11 +3,11 @@
     "bavli": {
       "amudim": 5349,
       "text": 5349,
-      "speechFull": 932,
-      "speechPartial": 35,
-      "speechNone": 4382,
+      "speechFull": 1399,
+      "speechPartial": 78,
+      "speechNone": 3872,
       "segs": 81484,
-      "segsDicta": 14662
+      "segsDicta": 21668
     },
     "yer": {
       "dafim": 1554,
@@ -29,13 +29,13 @@
       "segs": 13716,
       "withPeneiMoshe": 13116,
       "comments": 66192,
-      "commentsDicta": 260
+      "commentsDicta": 10712
     }
   },
   "sizesMB": {
     "bavli": 85.3,
-    "bsay": 77.3,
-    "ysay": 22,
+    "bsay": 87.1,
+    "ysay": 30.6,
     "yer": 35.2,
     "mishna": 8,
     "msay": 16.8,
@@ -44,16 +44,16 @@
   "stats": {
     "bavli": {
       "words": 4749894,
-      "unvocalized": 2399255,
+      "unvocalized": 2132017,
       "bold": 1827627,
       "boldMatched": 1745423,
       "gemara": 1741649,
-      "shva": 77405,
-      "stress": 642487,
-      "initialStop": 4336,
+      "shva": 83238,
+      "stress": 894132,
+      "initialStop": 4455,
       "abbr": 20155,
-      "dictaModern": 584183,
-      "correction": 34,
+      "dictaModern": 851421,
+      "correction": 40,
       "dictaRabbinic": 4652
     },
     "bartenura": {
@@ -73,11 +73,11 @@
       "bold": 243923,
       "boldMatched": 199228,
       "gemara": 198836,
-      "unvocalized": 1820028,
-      "initialStop": 5704,
-      "shva": 6813,
-      "stress": 10337,
-      "dictaRabbinic": 1141
+      "unvocalized": 1498027,
+      "initialStop": 5926,
+      "shva": 16739,
+      "stress": 217799,
+      "dictaRabbinic": 323142
     }
   },
   "warnings": [
