@@ -27,11 +27,13 @@ version number; Wikisource itself states CC BY-SA 4.0). Per-file metadata: `sour
 | `glossary.json` | short glosses | Hebrew Wiktionary | CC BY-SA 4.0 |
 | `notes/tolt/` | "מראי מקומות הערות וציונים" (Sources and References on Torah Ohr / Likkutei Torah), Kehot Publication Society | Sefaria | **CC BY-NC – non-commercial use only** |
 | `notes/tanya/` | "מראי מקומות" of "תניא מנוקד" (source references only) | Hebrew Wikisource | CC BY-SA 4.0 |
+| `sbiur/tanya/`, `sbiur/rambam/`, `sbiur/mitzvot/` | "ביאור קצר": short Hebrew explanations written for this site with a computer (labelled in the reader "ביאור קצר ממוחשב – אינו פירוש רבני"), reviewed before publishing (`verification/SHORT-BIUR.md`) | this site | same licence as the underlying text |
+| `sbiur/tolt/` | "ביאור קצר": a computer-made Hebrew condensation of the English paragraph explanations of Torah Or / Likkutei Torah at LikuteiTorah.com (linked per paragraph in the reader) | [LikuteiTorah.com](https://www.likuteitorah.com/) | **CC BY-NC 4.0 – non-commercial use only** (as LikuteiTorah.com states) |
 
 Outside this directory, `verification/siddur-ref.json` holds consonant-only word skeletons of 19 passages of the Metsudah Siddur Sefard (Sefaria, CC BY 4.0), used only to verify the siddur; it is not served by the site.
 
 **Non-commercial restriction:** a fork, a paid app-store build, an ad-supported site or any other commercial use
-must not ship `tanya/`, `tolt/`, `notes/tolt/`, `ravyomi/` or `gemara/bavli/` (with `gemara/bsay/`) without permission from the rights holders; remove or replace them instead.
+must not ship `tanya/`, `tolt/`, `notes/tolt/`, `sbiur/tanya/`, `sbiur/tolt/`, `ravyomi/` or `gemara/bavli/` (with `gemara/bsay/`) without permission from the rights holders; remove or replace them instead.
 The niqqud in `tolt/` (Chassidut Behirah) was permitted for this non-commercial site only; it may not be reused elsewhere
 without asking Chassidut Behirah and Kehot.
 

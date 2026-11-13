@@ -62,6 +62,9 @@ export async function filesFor(plan, unit) {
     if (idx) f.push(...gemaraFiles(gemaraSpec(plan, unit), idx));
   }
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
+  // 1.0.100: the short explanation of the same source files, where one exists
+  const sb = f.map(x => x.match(/^(tanya\/[^/]+\/\d+|rambam\/[^/]+\/\d+|mitzvot\/[PN]\/\d+)\.json$/)?.[1] || x.match(/^tolt\/w\/([^/]+)\.json$/)?.[1]?.replace(/^/, 'tolt/')).filter(Boolean);
+  if (sb.length) f.push('sbiur/index.json', ...await sbiurFiles(sb));
   return [...new Set(f)];
 }
 // 1.0.98: Sefer HaMitzvot niqqud (Dicta, tools/build-nach.mjs): `say` for the read-aloud, `textV` for the display
@@ -72,7 +75,8 @@ async function mitzvotDoc(plan) {
     blocks.push({ type: 'h', text: mitzvotLabel(it) });
     if (it.k === 'P' || it.k === 'N' || it.k === 'intro') {
       const d = await data(shmFile(it)[0]), z = await optional(shmFile(it)[0].replace(/^mitzvot\//, 'mitzvot-voc/'));
-      d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i) }));
+      const SB = it.n ? await sbiur(`mitzvot/${it.k}/${it.n}`) : null;
+      d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i), ...sbAi(SB?.s?.[i + 1]) }));
     } else if (it.k === 'S') {
       for (let n = it.from; n <= it.to; n++) {
         const d = await data(`mitzvot/S/${n}.json`), z = await optional(`mitzvot-voc/S/${n}.json`);
@@ -136,6 +140,17 @@ async function tanyaPositions(plan) {
 export const WS_TANYA = 'https://he.wikisource.org/wiki/%D7%AA%D7%A0%D7%99%D7%90_%D7%9E%D7%A0%D7%95%D7%A7%D7%93';
 const firstWords = (html, n = 4) => html.replace(/<span class="daf"[^>]*>[^<]*<\/span>/g, '').replace(/<[^>]+>/g, '').replace(/[()[\]]/g, '').trim().split(/\s+/).slice(0, n).join(' ');
 async function optional(path) { try { return await data(path); } catch { return null; } }
+// ---------------- "ביאור קצר" – a short Hebrew explanation under each paragraph (1.0.100) ----------------
+// Tanya / Rambam / Sefer HaMitzvot: written by the computer (labelled so, never presented as a rabbinic commentary);
+// Torah Or / Likkutei Torah: a Hebrew condensation of LikuteiTorah.com's English explanation (CC BY-NC, linked per
+// paragraph). Lazy: one small file per source file, fetched only when that lesson opens, and only if the index lists it.
+// Data: site/data/sbiur (verification/SHORT-BIUR.md). Shown folded (app.js); read aloud only with the ttsBiur setting.
+let SB_IDX = null;
+async function sbiurIndex() { if (!SB_IDX) { const x = await optional('sbiur/index.json'); if (x) SB_IDX = new Set(x.files); } return SB_IDX || new Set(); }
+export async function sbiurFiles(paths) { const I = await sbiurIndex(); return paths.filter(p => I.has(p)).map(p => `sbiur/${p}.json`); }
+async function sbiur(path) { return (await sbiurIndex()).has(path) ? optional(`sbiur/${path}.json`) : null; }
+const sbAi = e => (e ? { sb: { p: e.p, v: e.v, src: 'ai' } } : {});
+const sbLt = e => (e ? { sb: { p: e.p, v: e.v, src: 'lt', link: e.lt } } : {});
 async function tanyaDoc(plan) {
   const index = await data('tanya/index.json');
   const blocks = [];
@@ -143,7 +158,8 @@ async function tanyaDoc(plan) {
     const d = await data(`tanya/${k}/${c}.json`);
     const multi = index[k].depth === 2 && index[k].chapters.length > 1;
     blocks.push({ type: 'h', text: index[k].he + (multi ? ` – ${k === 'IK' ? 'אגרת' : 'פרק'} ${gem(c)}` : '') + (a > 1 ? ' (המשך)' : '') });
-    for (let s = a; s <= Math.min(b, d.s.length); s++) blocks.push({ type: 'p', id: `${k}.${c}.${s}`, text: d.s[s - 1], say: d.say?.[s - 1], src: 'tanya' });
+    const SB = await sbiur(`tanya/${k}/${c}`);
+    for (let s = a; s <= Math.min(b, d.s.length); s++) blocks.push({ type: 'p', id: `${k}.${c}.${s}`, text: d.s[s - 1], say: d.say?.[s - 1], src: 'tanya', ...sbAi(SB?.s?.[s]) });
     const N = NOTE_KEYS.includes(k) ? (await optional(`notes/tanya/${k}.json`))?.[c] : null;
     const groups = N ? Object.keys(N).map(Number).filter(s => s >= a && s <= Math.min(b, d.s.length)).sort((x, y) => x - y)
       .map(s => ({ target: `${k}.${c}.${s}`, label: firstWords(d.s[s - 1]), items: N[s].map(x => ({ w: x.w, t: x.t })) })) : [];
@@ -201,7 +217,7 @@ async function rambamDoc(plan, unit) {
   for (const it of plan[unit]) {
     const meta = idx[it.name];
     for (const [c, a, b] of rambamChaptersFull(it, meta)) {
-      const d = await data(`rambam/${meta.slug}/${c}.json`);
+      const d = await data(`rambam/${meta.slug}/${c}.json`), SB = await sbiur(`rambam/${meta.slug}/${c}`);
       const label = meta.he + (meta.depth === 2 ? ` – פרק ${gem(c)}` : '');
       // texts that do not come from the main edition (Torat Emet) are credited in the reader, chapter by chapter
       const ov = src.rambamChapterOverrides?.[`${it.name} ${c}`] || src.rambamOverrides?.[it.name];
@@ -212,7 +228,7 @@ async function rambamDoc(plan, unit) {
         const id = `${meta.slug}.${c}.${s}`;
         const { text, applied } = applyErrata(d.s[s - 1], errata[id]);
         for (const f of applied) fixes.push({ id, label: `${label}, הלכה ${gem(s)}`, ...f });
-        blocks.push({ type: 'p', id, num: gem(s), text, say: d.say?.[s - 1], src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}) });
+        blocks.push({ type: 'p', id, num: gem(s), text, say: d.say?.[s - 1], src: 'rambam', srcName: it.name, ...(applied.length ? { fixed: applied.length } : {}), ...sbAi(SB?.s?.[s]) });
       }
       blocks.push({ type: 'notes', kind: 'rambam', title: 'ביאור קצר (קישור)', link: [`ביאור הרב שטיינזלץ ל${label} – בספריא`, steinsaltzUrl(it.name, meta.depth === 2 ? c : 0)],
         attr: { text: 'הביאור של הרב עדין אבן־ישראל שטיינזלץ (הוצאת קורן) מוגן בזכויות יוצרים (״Copyright: Steinsaltz Center״ בספריא), ולכן אינו מוצג כאן – רק קישור אליו. הקישור נפתח באתר ספריא.' } });
@@ -249,7 +265,8 @@ async function toltDoc(plan) {
     // (tools/cb-niqqud, verification/CHASSIDUT-BEHIRAH.md); the rest stay the unvocalised Kehot/Sefaria text
     const nq = paras.filter(p => p.nq).length;
     if (nq) blocks.push({ type: 'note', text: `${CB_ATTR}. `, links: [['חסידות בהירה – chassidutbehirah.com', CB_URL]], tail: nq < paras.length ? `. ${paras.length - nq} מתוך ${paras.length} הפסקאות מוצגות בלי ניקוד, כי לא אומתה בהן התאמה מלאה לאותיות נוסח קה״ת.` : '.' });
-    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, say: p.say, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}) }));
+    const SB = (await sbiur(`tolt/${slug}`))?.days?.[day];
+    paras.forEach((p, i) => blocks.push({ type: 'p', id: `${slug}.${day}.${i + 1}`, text: p.t, say: p.say, src: 'tolt', ...(p.nq ? { voc: 'cb' } : {}), ...sbLt(SB?.[i + 1]) }));
     const N = (await optional(`notes/tolt/${slug}.json`))?.[day];
     if (N) blocks.push({ type: 'notes', kind: 'tolt', title: 'מראי מקומות הערות וציונים', attr: { text: '״מראי מקומות הערות וציונים״ של מהדורת קה״ת, דרך ', links: [['ספריא', e.sefaria]], tail: ' (CC BY-NC). כל הערה מוצגת רק אם מילות הכותרת שלה נמצאות בפסקה שאליה ספריא מקשרת אותה. אינם ביאור, ולא נכתבו באתר זה.' },
       groups: Object.keys(N).map(Number).sort((x, y) => x - y).map(i => ({ target: `${slug}.${day}.${i}`, label: firstWords(paras[i - 1].t), items: N[i].map(h => ({ html: h })) })) });

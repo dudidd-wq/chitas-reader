@@ -23,7 +23,7 @@ test('1.0.92: offset 0 is exactly the old timbre of every voice; offsets add sem
 });
 test('1.0.92: stored, validated, default 0; version bumped; previews still files; device voice only gets pitch when moved', () => {
   const store = read('site/js/store.js'); assert.match(store, /ttsPitch: 0/); assert.match(store, /prefs\.ttsPitch = clampPitch\(prefs\.ttsPitch\)/);
-  assert.match(read('site/sw.js'), /VERSION = '1\.0\.(9[2-9])'/);
+  assert.match(read('site/sw.js'), /VERSION = '1\.0\.(9[2-9]|1\d\d)'/);
   assert.match(read('site/js/tts.js'), /if \(clampPitch\(this\.opts\.pitch\)\) u\.pitch = webPitch/);
 });
 test('1.0.92: in Node the four voices move by the offset and keep their duration (no added latency)', { timeout: 180000 }, async () => {

@@ -17,7 +17,7 @@ test('tanya index order matches the reading order', () => {
 
 test('no blank segments in the data except the known numbering gap (Talmud Torah 7:8, absent in the common printed edition)', () => {
   const blanks = [];
-  const walk = dir => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = dir + '/' + e.name; if (e.isDirectory()) { if (e.name !== 'search' && e.name !== 'gemara') walk(p); /* the search index is derived and tested in search.test.mjs; the Shas in gemara-196 / shas-197 */ } else if (e.name.endsWith('.json') && !/index|sources|glossary/.test(e.name)) { const j = JSON.parse(fs.readFileSync(p)); (j.s || j.v || []).forEach((x, i) => { if (Array.isArray(x) ? !x.length || x.some(y => typeof y !== 'string' || !y.trim()) : typeof x !== 'string' || !x.trim()) blanks.push(p.split('/data/')[1] + '#' + (i + 1)); }); } } };
+  const walk = dir => { for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = dir + '/' + e.name; if (e.isDirectory()) { if (e.name !== 'search' && e.name !== 'gemara' && e.name !== 'sbiur') walk(p); /* the search index is derived and tested in search.test.mjs; the Shas in gemara-196 / shas-197 */ } else if (e.name.endsWith('.json') && !/index|sources|glossary/.test(e.name)) { const j = JSON.parse(fs.readFileSync(p)); (j.s || j.v || []).forEach((x, i) => { if (Array.isArray(x) ? !x.length || x.some(y => typeof y !== 'string' || !y.trim()) : typeof x !== 'string' || !x.trim()) blanks.push(p.split('/data/')[1] + '#' + (i + 1)); }); } } };
   walk(new URL('data', root).pathname);
   assert.deepEqual(blanks, ['rambam/Torah_Study/7.json#8']);
 });

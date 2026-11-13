@@ -518,11 +518,12 @@ function displayGroup() {
     ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
-  <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>ספר המצוות</legend>${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
+  <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>ספר המצוות</legend>${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד, ביאור קצר)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
-  ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור קצר (רמב״ם) בסוף כל קטע')}
+  ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור הרב שטיינזלץ (רמב״ם) בסוף כל קטע')}
+  <fieldset><legend>ביאור קצר</legend>${check('shortBiur', prefs.shortBiur, 'הצג ״ביאור קצר״ מקופל מתחת לפסקה (תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה)')}<small>בתניא, ברמב״ם ובספר המצוות – ביאור ממוחשב; בתורה אור ובלקוטי תורה – תמצית ממוחשבת של הביאור באנגלית באתר LikuteiTorah.com. אינם פירוש רבני, וכל ביאור מסומן כך. כרגע יש ביאור רק לחלק מהשיעורים, ושאר השיעורים יתווספו בהדרגה. הניקוד – לפי ״הצג ניקוד בביאורים״.</small></fieldset>
   ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}`;
 }
 function siddurGroup() {
@@ -658,6 +659,7 @@ function ttsForm() {
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
   ${R.sid ? kaddishField() : ''}
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
+  ${check('ttsBiur', prefs.ttsBiur, 'הקרא גם את ה״ביאור הקצר״ אחרי כל פסקה')}
   ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}`;
@@ -763,6 +765,10 @@ async function renderSources() {
   <ul><li><b>תורה אור ולקוטי תורה:</b> ״מראי מקומות הערות וציונים״ של מהדורת קה״ת, דרך <a href="https://www.sefaria.org/texts/Chasidut" target="_blank" rel="noopener">ספריא</a> (${licenseLink('CC-BY-NC')}). הערה מוצגת רק אם מילות הכותרת שלה נמצאות בפסקה שספריא מקשרת אליה.</li>
   <li><b>תניא:</b> ״מראי מקומות״ של <a href="${WS_TANYA}" target="_blank" rel="noopener">״תניא מנוקד״ בוויקיטקסט</a> (<a href="${WIKISOURCE_DEED}" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), מעוגנים לנוסח קה״ת לפי השוואת המילים שלפני הסימן ואחריו. יש כאלה רק בליקוטי אמרים (כולל ההקדמה) ובשער היחוד והאמונה.</li>
   <li><b>רמב״ם:</b> קישור בלבד לביאור הרב שטיינזלץ בספריא, כי הוא מוגן בזכויות יוצרים.</li></ul>
+  <h2 id="short-biur-src">״ביאור קצר״ מתחת לפסקה</h2><p>חלק מקופל מתחת לפסקה, שאפשר לכבות בהגדרות. הוא מוקרא רק אם בחרת בכך בהגדרות ההקראה.</p>
+  <ul><li><b>תניא, רמב״ם וספר המצוות:</b> ביאור שנכתב לאתר זה בעזרת מחשב, ומסומן ״ביאור קצר ממוחשב – אינו פירוש רבני״. כל קבוצת ביאורים נבדקה מול המקור לפני הפרסום; ייתכנו טעויות, והעיקר הוא המקור.</li>
+  <li><b>תורה אור ולקוטי תורה:</b> תמצית בעברית, שנעשתה בעזרת מחשב, של הביאור באנגלית ב-<a href="https://www.likuteitorah.com/" target="_blank" rel="noopener" dir="ltr">LikuteiTorah.com</a> (${licenseLink('CC-BY-NC')}); בכל פסקה יש קישור לעמוד המקור.</li>
+  <li>הניקוד: ניקוד אוטומטי (דיקטה) שהוגה ידנית. ההגדרה ״הצג ניקוד בביאורים״ קובעת אם הוא מוצג.</li></ul>
   <h2>ביאור מילים</h2><p>הביאורים הקצרים לקוחים מ<a href="https://he.wiktionary.org" target="_blank" rel="noopener">ויקימילון</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.he" target="_blank" rel="noopener" dir="ltr">CC BY-SA 4.0</a>), ולכל ביאור מצורף קישור לערך המקור. ביאור מתפרסם רק אם עבר <b>שתי בדיקות בלתי תלויות</b>, ואחריהן בדיקה ידנית:</p>
   <ol><li><b>ויקימילון:</b> ההגדרה מצטטת את <b>אותו פסוק</b>, ואין עליה (או על הערך) תבנית אזהרה כמו ״פירוש לקוי״, ״משוערת״, ״הבהרה״, ״דרוש מקור״ או ״לשכתוב״.</li>
   <li><b>הצלבה אוטומטית עם שני מקורות אחרים:</b> המשמעות צריכה להתאים גם לתרגום המילה בהקשרה ב-<a href="https://github.com/STEPBible/STEPBible-Data" target="_blank" rel="noopener" dir="ltr">STEPBible TAHOT</a> (Tyndale House, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" dir="ltr">CC BY 4.0</a>) וגם לתרגום הפסוק ב-JPS 1917 (נחלת הכלל, דרך ספריא). הגישור בין עברית לאנגלית נעשה בעזרת ערכי ויקימילון האנגלי (<a href="https://kaikki.org" target="_blank" rel="noopener">kaikki.org</a>, CC BY-SA) ו-Princeton WordNet. מקורות העזר משמשים לבדיקה בלבד ואינם מוצגים באתר.</li>
@@ -873,7 +879,8 @@ function renderAbout() {
   <h2>ניקוד</h2><ul><li>כל טקסטי חת״ת והרמב״ם מנוקדים (ספר המצוות שבשיעורים הנוספים אינו מנוקד; תורה אור ולקוטי תורה מנוקדים ברובם, בנוסח חסידות בהירה, ופסקה שלא אומתה מוצגת בלי ניקוד), חוץ מחלקים ברמב״ם שלא נמצאה להם גרסה מנוקדת ברישיון המתיר שימוש כאן<span id="unvoc-list"></span>. בטקסטים אלה מוצגת הודעה. הפירוט המלא בעמוד ״מקורות ורישיונות״.</li></ul>
   <h2>מראי מקומות וביאור קצר</h2><ul><li>בסוף הקטעים של תורה אור ולקוטי תורה ושל התניא יש חלק מקופל, ״מראי מקומות״: מקורות הפסוקים והמאמרים, ממהדורת קה״ת (דרך ספריא) ומוויקיטקסט. <b>אלה אינם ביאור</b>. בתניא הם קיימים רק בליקוטי אמרים ובשער היחוד והאמונה.</li>
   <li>ברמב״ם יש בסוף כל פרק קישור לביאור הקצר של הרב שטיינזלץ בספריא. הביאור עצמו מוגן בזכויות יוצרים ולכן אינו מוצג כאן.</li>
-  <li>ביאור קצר לתניא ולתורה אור/לקוטי תורה (כמו ״שיעורים בספר התניא״) לא נמצא ברישיון פתוח, ולכן אינו מוצג. האתר אינו כותב ביאורים בעצמו. אפשר לכבות את החלק הזה בהגדרות. <a href="#/sources">פירוט במקורות</a></li></ul>
+  <li>״ביאור קצר״ מקופל מתחת לפסקה (תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה) נכתב בעזרת מחשב, ובתורה אור ולקוטי תורה – כתמצית של הביאור באנגלית ב-LikuteiTorah.com. <b>אינו פירוש רבני</b>, וכל ביאור מסומן כך. כרגע יש ביאור רק לחלק מהשיעורים, ושאר השיעורים יתווספו בהדרגה. <a href="#/sources">מקורות</a></li>
+  <li>ביאור מפורט לתניא ולתורה אור/לקוטי תורה (כמו ״שיעורים בספר התניא״) לא נמצא ברישיון פתוח, ולכן אינו מוצג. אפשר לכבות את החלקים האלה בהגדרות. <a href="#/sources">פירוט במקורות</a></li></ul>
   <h2>ביאור מילים</h2><ul><li><b>הכיסוי קטן, בכוונה:</b> <span id="gloss-n">כ־450</span> ביאורים בכל התורה ותהילים יחד (מתוך יותר מ־90 אלף מילים), ועוד <span id="gloss-rb">9</span> ביאורים בכל הרמב״ם – כלומר ברוב השיעורים יופיעו מעט ביאורים, ובחלקם אף לא אחד. בתניא וברש״י אין ביאורים כלל: בוויקימילון אין ציטוטים מהתניא שאפשר לעגן אליהם ביאור.</li>
   <li>הסיבה: מעדיפים דיוק על פני כמות. ביאור מתפרסם רק אם הגדרת ויקימילון מצטטת את אותו פסוק ואינה מסומנת שם כלקויה, <b>וגם</b> המשמעות מתאימה לשני מקורות בלתי תלויים (STEPBible TAHOT ותרגום JPS 1917), <b>וגם</b> עברה בדיקה ידנית. לרש״י, תניא ורמב״ם אין מקור שני חופשי ברמת המילה, ולכן לא ניתן לעמוד שם בכלל הזה. הפירוט בעמוד ״מקורות ורישיונות״.</li>
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
@@ -1248,6 +1255,14 @@ function readerLocNote() {
   if (prefs.locationChosen || R.unit !== 'chumash' || R.lib) return '';
   return `<aside class="day-note" role="note"><b>לוח:</b> מוצג לפי לוח ${locLabel(prefs.il)} – ברירת מחדל לפי אזור הזמן של המכשיר, כי עדיין לא נבחר לוח. ${isDivergent(R.iso, 'chumash') ? 'השבוע הפרשה שונה בין ארץ ישראל לחוץ לארץ. ' : ''}אפשר לבחור בעמוד הבית או בהגדרות.</aside>`;
 }
+// 1.0.100: "ביאור קצר" under a paragraph (texts.js sbAi/sbLt) – folded; its label says who wrote it. Not part of the
+// segment's text: the read-aloud adds it only with the ttsBiur setting (ttsSegments), the glosses skip it (.lbl/.sbiur).
+const SB_AI = 'ביאור קצר ממוחשב – אינו פירוש רבני. ייתכנו טעויות; העיקר הוא המקור.';
+function sbiurHtml(b) {
+  if (!b.sb || prefs.shortBiur === false) return '';
+  const lbl = b.sb.src === 'lt' ? `תמצית בעברית, ממוחשבת, של הביאור באנגלית באתר <a href="${esc(b.sb.link)}" target="_blank" rel="noopener">LikuteiTorah.com</a> (CC BY-NC). אינה פירוש רבני.` : esc(SB_AI);
+  return `<details class="sbiur" data-nr><summary>ביאור קצר</summary><p>${fmt(prefs.biurNiqqud ? b.sb.v : b.sb.p, false, true)}</p><p class="sb-lbl">${lbl}</p></details>`;
+}
 async function renderDoc() {
   const d = R.doc, rc = $('#rc');
   const showRashi = prefs.rashi && R.unit === 'chumash';
@@ -1294,7 +1309,7 @@ async function renderDoc() {
       const startM = b.omitStart ? `<div class="sid-bound sid-omit-start" data-nr aria-hidden="true">${esc(b.omitLabel || 'אין אומרים')}</div>` : '';
       const endM = (b.omitEnd || b.specialEnd) ? `<div class="sid-bound sid-end" data-nr aria-hidden="true">עד כאן</div>` : '';
       const biur = b.biur?.length ? `<div class="biur">${b.biur.map((r, i) => `<p>${i ? '' : `<span class="lbl">${esc(b.biurLabel || 'ביאור')} </span>`}${fmt(prefs.biurNiqqud && b.biurV?.[i] || r, false, true)}</p>`).join('')}</div>` : '';
-      html += `<div class="${cls}${b.src === 'gemara' ? ' gm' : ''}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${b.repOf ? `<span class="sid-rep" data-nr aria-hidden="true">${b.rep}/${b.repOf}</span>` : ''}${fmt(b.src === 'hayomyom' && prefs.hayomNiqqud ? hayomVocalizedHtml(b.text, b.say) : b.src === 'mitzvot' && prefs.mitzvotNiqqud && b.textV ? b.textV : b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}${biur}</div>`;
+      html += `<div class="${cls}${b.src === 'gemara' ? ' gm' : ''}" data-id="${b.id}"${b.ref ? ` data-ref="${b.ref}"` : ''}>${startM}<div class="t">${num}${b.repOf ? `<span class="sid-rep" data-nr aria-hidden="true">${b.rep}/${b.repOf}</span>` : ''}${fmt(b.src === 'hayomyom' && prefs.hayomNiqqud ? hayomVocalizedHtml(b.text, b.say) : b.src === 'mitzvot' && prefs.mitzvotNiqqud && b.textV ? b.textV : b.text, !!d.tanakh, sidd || !!d.raw)}</div>${endM}${rashi}${biur}${sbiurHtml(b)}</div>`;
     }
   }
   if (open) html += '</p>';
@@ -1313,7 +1328,7 @@ async function renderDoc() {
   else html += `<div class="endmark" id="endmark"><p>— סוף השיעור —</p><button class="btn" id="b-nextunit">לשיעור הבא</button>${dayNavHtml('end')}</div>`;
   rc.innerHTML = html;
   // an opened/closed notes section changes the page count in the paged layout
-  rc.querySelectorAll('details.study-notes').forEach(el => el.addEventListener('toggle', () => { const a = anchor(); layout(); restore(a); }));
+  rc.querySelectorAll('details.study-notes, details.sbiur').forEach(el => el.addEventListener('toggle', () => { const a = anchor(); layout(); restore(a); }));
   rc.className = 'r-content gloss-' + prefs.gloss;
   if (prefs.gloss !== 'off' && !sidd) { const G = await loadGlossary(); if (!rc.isConnected) return; /* the reader was closed or replaced meanwhile */ applyGlosses(rc, d.book); glossNote(rc, G, d.tanakh ? 'tanakh' : d.book === 'Rambam' ? 'rambam' : ''); }
   R.segs = [...rc.querySelectorAll('.seg')];
@@ -1666,7 +1681,7 @@ function openSheet(kind, note = '') {
     // 1.0.90: the Kaddish choice changes only what is read: a running read-aloud restarts from the current paragraph
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
     if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
-    else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
+    else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'shortBiur', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
@@ -1695,6 +1710,7 @@ document.addEventListener('keydown', e => {
 function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
   const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), b.say]));
+  const sbm = prefs.ttsBiur && prefs.shortBiur !== false ? new Map(R.doc.blocks.filter(b => b.sb).map(b => [String(b.id), b.sb.v])) : null; // 1.0.100
   const pauseIds = new Set(R.doc.blocks.filter(b => b.pause).map(b => String(b.id))); // 1.0.96: Gemara – a short pause at every comma / period // 1.0.76: vocalized reading text (Hayom Yom)
   // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen
   const skipK = R.doc.siddur && prefs.siddurKaddish === 'skip' ? new Set(R.doc.blocks.filter(b => b.kaddish).map(b => String(b.id))) : null;
@@ -1711,6 +1727,7 @@ function ttsSegments() {
       parts.push(raw || vowelHeadword(p.innerHTML, parts[0]));
       accParts.push(raw || null); primaryParts.push(!!raw);
     });
+    const sbv = sbm?.get(s.dataset.id); if (sbv) { parts.push(sbv); accParts.push(sbv); primaryParts.push(true); }
     // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
     const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
     // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.

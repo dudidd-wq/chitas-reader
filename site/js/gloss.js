@@ -28,7 +28,7 @@ export function applyGlosses(root, book) {
     if (!G.verses[ref] && !G.rambam?.verses?.[ref]) continue;
     const t = seg.querySelector('.t') || seg;
     const walker = document.createTreeWalker(t, NodeFilter.SHOW_TEXT, {
-      acceptNode: n => (n.parentElement.closest('.vn, .hn, .sr, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn, .daf') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+      acceptNode: n => (n.parentElement.closest('.vn, .hn, .sr, .ketiv, .pe, .endmark, .gl, .lbl, .rashi, .fn, .daf, .sbiur') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
     });
     const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
     const seen = {}; // norm → occurrences so far in this verse (same token split as the glossary builder)

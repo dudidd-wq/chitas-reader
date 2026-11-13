@@ -42,7 +42,7 @@ test('1.0.88: natural model files listed with real sizes, never precached, versi
   }
   assert.ok(VOICE_FILES.natural.size > 60e6 && VOICE_FILES.natural.size < 70e6);
   const sw = read('site/sw.js');
-  assert.match(sw, /VERSION = '1\.0\.(8[89]|9\d)'/);
+  assert.match(sw, /VERSION = '1\.0\.(8[89]|9\d|1\d\d)'/);
   assert.doesNotMatch(sw.match(/const ASSETS = \[[\s\S]*?\];/)[0], /voice\/|\.onnx|voice-samples/);
 });
 test('1.0.88: the natural male voice synthesises in Node with the fixed niqqud/shin-sin/vav G2P, in the male range', { timeout: 120000 }, async () => {

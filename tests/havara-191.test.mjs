@@ -86,7 +86,7 @@ test('1.0.91: the voices synthesise Chabad pronunciation in Node (default noa + 
 test('1.0.91: previews exist and are small; setting stored and validated; version bumped; display code untouched by havara', () => {
   for (const h of ['israeli', 'chabad']) { const n = fs.statSync(root + `site/voice-samples/havara-${h}.mp3`).size; assert.ok(n > 10000 && n < 80000, h + ' ' + n); }
   const store = read('site/js/store.js'); assert.match(store, /ttsHavara: 'israeli'/); assert.match(store, /\['israeli', 'chabad'\]\.includes\(prefs\.ttsHavara\)/);
-  assert.match(read('site/sw.js'), /VERSION = '1\.0\.(9[1-9])'/);
+  assert.match(read('site/sw.js'), /VERSION = '1\.0\.(9[1-9]|1\d\d)'/);
   assert.doesNotMatch(read('site/js/texts.js') + read('site/js/layout.js'), /havara/i);
   const md = read('verification/HAVARA-CHABAD-191.md');
   for (const s of ['linguistics.stackexchange.com', 'torahmusings.com', 'jewishvirtuallibrary.org', 'Ashkenazi_Hebrew']) assert.ok(md.includes(s), s);

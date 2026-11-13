@@ -223,6 +223,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .biur p { margin: 0 0 .3em; orphans: 2; widows: 2; }
 .r-content .biur .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
 .r-content .biur small { font-size: .9em; color: var(--muted); }
+.r-content .sbiur { font-size: .84em; line-height: 1.75; margin: .15em 0 .7em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 90%, var(--muted)); }
+.r-content .sbiur > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: .4em; font-family: var(--ui); font-size: .72em; font-weight: 600; color: var(--accent); }
+.r-content .sbiur > summary:focus-visible, .r-content .sbiur a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.r-content .sbiur p { margin: 0 0 .3em; orphans: 2; widows: 2; }
+.r-content .sbiur .sb-lbl { font-family: var(--ui); font-size: .68em; color: var(--muted); }
 .r-content b { font-weight: 700; }
 .r-content .ketiv { color: var(--muted); font-size: .8em; }
 .r-content .pe { display: inline-block; width: 2em; } /* setuma: a gap inside the line, as in a Torah scroll */
