@@ -29,6 +29,7 @@ test('every portion resolves to non-empty text (both Israel and diaspora)', asyn
       const plan = dayPlan(new Date(d), { il });
       for (const unit of Object.keys(UNITS)) {
         if (unit === 'siddur') continue; // not a daily portion (tests/siddur.test.mjs)
+        if (['dafyomi', 'amudyomi', 'yerushalmi', 'mishnayomit'].includes(unit)) continue; // 1.0.96: built for a window only (tests/gemara-196.test.mjs)
         if (il && unit !== 'chumash') continue; // only Chumash depends on location
         const doc = await buildDoc(plan, unit);
         const segs = doc.blocks.filter(b => b.type !== 'h' && b.type !== 'notes'); // notes: separate study-notes section (tests/study-notes.test.mjs)

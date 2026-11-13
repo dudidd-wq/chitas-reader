@@ -1369,6 +1369,20 @@ Speech is synthesised on the device; no text is sent anywhere.
 
 No code of Piper (GPL) is used: the model is run with ONNX Runtime Web and the input is prepared by g2p.js/piper-core.js.
 
+7. he_IL-ilspeech-male-medium.onnx, he_IL-ilspeech-male-medium.onnx.json (since 1.0.88; downloaded only when the
+   reader chooses "קול גברי טבעי")
+   "piper_medium_male.onnx" and "model.config.json" from https://huggingface.co/notmax123/piper-medium-heb
+   (revision 159c04c325df208e2045d929f11a25015942729a) by notmax123.
+   Licence: Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) –
+   https://creativecommons.org/licenses/by-nc/4.0/ . Trained on the ILSpeech recordings of the Phonikud project
+   (CC BY-NC 4.0). Use here is non-commercial (a free app with no ads or payments).
+   The .onnx is an unmodified copy (sha256 9971617aaa8786aea27325ac458fc4371d54af0d4316c2002b76789806cb2090), renamed.
+   The .onnx.json is the original model.config.json with one added field, "chitas_pad": false (the model takes phoneme
+   ids without the '_' pad between symbols). No endorsement by the original author is implied.
+
+8. ../voice-samples/*.mp3 – short preview recordings of the four voice choices, synthesised by chitas-reader with the
+   models above (male, deep, female: noa, CC BY 4.0, our signal processing; natural: the model of (7), CC BY-NC 4.0).
+
 
 ======== ONNX Runtime Web (MIT) ========
 

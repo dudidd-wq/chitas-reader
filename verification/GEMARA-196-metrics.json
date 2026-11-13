@@ -1,0 +1,56 @@
+{
+  "window": [
+    "2026-11-08",
+    "2027-02-06"
+  ],
+  "counts": {
+    "bavli": 270,
+    "yer": 91,
+    "mishna": 182
+  },
+  "sizes": {
+    "bavli": 9295537,
+    "yer": 1009632,
+    "mishna": 745983
+  },
+  "stats": {
+    "bavli": {
+      "words": 266828,
+      "bold": 95115,
+      "boldMatched": 90075,
+      "gemara": 89889,
+      "stress": 171349,
+      "dictaModern": 171012,
+      "shva": 7911,
+      "dictaRabbinic": 4652,
+      "initialStop": 262,
+      "abbr": 1247,
+      "unvocalized": 28,
+      "correction": 13
+    },
+    "bartenura": {
+      "words": 21706,
+      "bold": 3293,
+      "dictaRabbinic": 21331,
+      "stress": 14535,
+      "shva": 636,
+      "abbr": 375,
+      "initialStop": 45
+    }
+  },
+  "missingDicta": 0,
+  "warnings": [
+    "Bekhorot 52b: 18 Gemara / 17 Steinsaltz segments",
+    "Bekhorot 61a: 14 Gemara / 13 Steinsaltz segments",
+    "no text: Bekhorot 61b",
+    "Arakhin 29a: 24 Gemara / 23 Steinsaltz segments",
+    "Arakhin 34a: 9 Gemara / 8 Steinsaltz segments",
+    "no text: Arakhin 34b",
+    "Temurah 13b: 17 Gemara / 16 Steinsaltz segments",
+    "Temurah 24a: 30 Gemara / 29 Steinsaltz segments",
+    "Temurah 27b: 19 Gemara / 18 Steinsaltz segments",
+    "Temurah 34a: 21 Gemara / 20 Steinsaltz segments",
+    "no text: Temurah 34b",
+    "Sukkah 56b: 9 Gemara / 8 Steinsaltz segments"
+  ]
+}

@@ -257,5 +257,45 @@
     "luach": "לוח ״רב יומי״ – שולחן ערוך אדמו״ר הזקן (מחזור שלישי, שנה שנייה)",
     "luachUrl": "https://chabad.info/service/1287411/",
     "fetchedAt": "2026-11-02"
+  },
+  "gemara": {
+    "versionTitle": "William Davidson Edition - Vocalized Aramaic",
+    "versionTitleInHebrew": "מהדורת וויליאם דייוידסון - ארמית המנוקד",
+    "versionSource": "https://korenpub.co.il/collections/the-noe-edition-koren-talmud-bavli-1",
+    "license": "CC-BY-NC",
+    "sefariaUrl": "https://www.sefaria.org/Bekhorot?vhe=William_Davidson_Edition_-_Vocalized_Aramaic&lang=he",
+    "fetchedAt": "2026-11-13"
+  },
+  "steinsaltz": {
+    "versionTitle": "William Davidson Edition - Hebrew",
+    "versionTitleInHebrew": "ביאור הרב עדין שטיינזלץ, מהדורת קורן – ויליאם דייוידסון (עברית)",
+    "versionSource": "https://www.korenpub.com/koren_en_usd/koren/talmud/the-koren-talmud-bavli.html",
+    "license": "CC-BY-NC",
+    "sefariaUrl": "https://www.sefaria.org/Steinsaltz_on_Bekhorot?vhe=William_Davidson_Edition_-_Hebrew&lang=he",
+    "fetchedAt": "2026-11-13"
+  },
+  "yerushalmi": {
+    "versionTitle": "The Jerusalem Talmud, edition by Heinrich W. Guggenheimer. Berlin, De Gruyter, 1999-2015",
+    "versionTitleInHebrew": "",
+    "versionSource": "https://www.nli.org.il/he/books/NNL_ALEPH001901012/NLI",
+    "license": "CC-BY",
+    "sefariaUrl": "https://www.sefaria.org/Jerusalem_Talmud_Sanhedrin?vhe=The_Jerusalem_Talmud%2C_edition_by_Heinrich_W._Guggenheimer._Berlin%2C_De_Gruyter%2C_1999-2015&lang=he",
+    "fetchedAt": "2026-11-13"
+  },
+  "mishnah": {
+    "versionTitle": "Torat Emet 357",
+    "versionTitleInHebrew": "תורת אמת 357",
+    "versionSource": "http://www.toratemetfreeware.com/index.html?downloads",
+    "license": "Public Domain",
+    "sefariaUrl": "https://www.sefaria.org/Mishnah_Oholot?vhe=Torat_Emet_357&lang=he",
+    "fetchedAt": "2026-11-13"
+  },
+  "bartenura": {
+    "versionTitle": "On Your Way",
+    "versionTitleInHebrew": "ובלכתך בדרך",
+    "versionSource": "http://mobile.tora.ws/",
+    "license": "Public Domain",
+    "sefariaUrl": "https://www.sefaria.org/Bartenura_on_Mishnah_Oholot?vhe=On_Your_Way&lang=he",
+    "fetchedAt": "2026-11-13"
   }
 }

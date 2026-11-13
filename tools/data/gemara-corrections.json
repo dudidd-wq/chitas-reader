@@ -1,0 +1,9 @@
+{
+  "_doc": "1.0.96 speech-only corrections for the Gemara cycles, carried over from the reviewed Aramaic prototype (/workspace/aramaic-eval/multi/pipeline/corrections.json, fixed3). words: Dicta/Davidson form -> [[speech word, stress index from the end], ...]. keepShva: forms whose initial shva stays vocal (shva-drop made the prototype's ASR hear חרחם / בתפילה). The prototype's בָּעֵי / אָתֵי splits were specific to its voice (BlueTTS) and are not used with Piper.",
+  "words": {
+    "מִמֵּתֵי": [["מִמָּתַי", 0]],
+    "וַהֲרֵיהִי": [["וַהֲרֵי", 0], ["הִי", 0]],
+    "בְּסִיּוּם": [["בְּסִיּוּם", 0]]
+  },
+  "keepShva": ["שְׂכַרְכֶם", "תְּחִילָּה"]
+}

@@ -3,7 +3,7 @@
 // ('voice-v1'), outside the service worker's precache, and the synthesis runs on the device in a Web Worker.
 // PiperSpeaker has the interface of tts.js's Speaker (load/startAt/play/pause/toggle/stop/skip/setRate, same callbacks).
 import { Speaker } from './tts.js';
-import { prepareForTTS, chunkText } from './tts-prep.js';
+import { prepareForTTS, chunkText, pauseChunks } from './tts-prep.js';
 import { VOICE_FILES } from './voice-files.js';
 import { timbreFor, f0Stats } from './voice-pitch.js';
 
@@ -102,12 +102,12 @@ export class PiperSpeaker extends Speaker {
       s.parts.forEach((html, pi) => {
         const primary = !!s.primaryParts?.[pi];
         const prepared = prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary });
-        for (const c of chunkText(prepared)) chunks.push(primary
-          ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c } }
-          : { c, acc: s.accParts?.[pi] ?? (pi === 0 ? s.acc : null) });
+        for (const { c, gap } of s.pause ? pauseChunks(prepared) : chunkText(prepared).map(c => ({ c, gap: 0 }))) chunks.push(primary
+          ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c }, gap }
+          : { c, acc: s.accParts?.[pi] ?? (pi === 0 ? s.acc : null), gap });
       });
       const total = chunks.reduce((a, x) => a + x.c.length, 0) || 1; let done = 0;
-      for (const { c, acc } of chunks) { this.queue.push({ si, text: c, acc, frac: done / total }); done += c.length; }
+      for (const { c, acc, gap } of chunks) { this.queue.push({ si, text: c, acc, gap, frac: done / total }); done += c.length; }
     });
     this.segCount = segments.length; this.bad = 0; this.audio = new Map();
   }
@@ -142,7 +142,9 @@ export class PiperSpeaker extends Speaker {
     for (const k of this.audio.keys()) if (parseInt(k) < i - 1) this.audio.delete(k);
     if (this.token !== token || this.state !== 'playing') return;
     if (!m.audio.length) { this.i++; this.speakCurrent(); return; }   // nothing to say (e.g. punctuation only)
-    const ac = this.ctx(), buf = ac.createBuffer(1, m.audio.length, m.sampleRate);
+    // 1.0.96: q.gap – seconds of silence after the chunk (the Gemara's pause at a comma / period), appended to the buffer
+    const pad = Math.round((q.gap || 0) * m.sampleRate / (this.opts.rate || 1));
+    const ac = this.ctx(), buf = ac.createBuffer(1, m.audio.length + pad, m.sampleRate);
     buf.copyToChannel ? buf.copyToChannel(m.audio, 0) : buf.getChannelData(0).set(m.audio);
     const src = this.src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
     src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };

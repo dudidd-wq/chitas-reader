@@ -1,6 +1,7 @@
 // Loads prebuilt static JSON (site/data) and assembles a day's portion into a document of blocks.
 import { gem, tanya as tanyaRange, mitzvotLabel, parshaHe, toHDate, HDate } from './calendar.js';
 import { localizeRuns } from './siddur-lang.js';
+import { dafYomi, amudYomi, yerushalmi, mishnaYomit, TRACTATE_HE } from './gemara-cycles.js';
 
 const cache = new Map();
 const NOTE_KEYS = ['LA-foreword', 'LA', 'SY-chinukh', 'SY']; // Tanya parts with Wikisource notes (site/data/notes/tanya)
@@ -26,6 +27,10 @@ export const UNITS = {
   tolt: { he: 'תורה אור ולקוטי תורה', full: 'תורה אור ולקוטי תורה – שיעור יומי' },
   ravyomi: { he: 'שולחן ערוך אדמו״ר הזקן', full: 'שולחן ערוך אדמו״ר הזקן – רב יומי' },
   hayomyom: { he: 'היום יום', full: 'היום יום – לוח הרבי' },
+  dafyomi: { he: 'דף היומי', full: 'דף היומי – גמרא עם ביאור שטיינזלץ' },
+  amudyomi: { he: 'עמוד היומי', full: 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ' },
+  yerushalmi: { he: 'ירושלמי יומי', full: 'תלמוד ירושלמי – דף היומי (מהדורת וילנא)' },
+  mishnayomit: { he: 'משניות יומי', full: 'משנה יומית – שתי משניות ליום, עם ברטנורא' },
   siddur: { he: 'סידור', full: 'סידור – נוסח חב״ד' }, // not a daily lesson: opened from #/siddur, never listed in the day's cards
 };
 const shmFile = it => it.k === 'P' || it.k === 'N' ? [`mitzvot/${it.k}/${it.n}.json`] : it.k === 'S' ? Array.from({ length: it.to - it.from + 1 }, (_, i) => `mitzvot/S/${it.from + i}.json`) : it.k === 'intro' ? ['mitzvot/intro.json'] : [];
@@ -43,6 +48,11 @@ export async function filesFor(plan, unit) {
   if (unit === 'mitzvot') plan.mitzvot.items.forEach(it => f.push(...shmFile(it)));
   if (unit === 'tolt') { f.push('tolt/schedule.json'); plan.tolt.parts.forEach(([slug]) => f.push(`tolt/w/${slug}.json`, `notes/tolt/${slug}.json`)); }
   if (unit === 'hayomyom') f.push('hayomyom/days.json');
+  if (GEMARA_UNITS.includes(unit)) {   // only what was built: the window, and no amud b after a tractate that ends on amud a
+    const idx = await optional('gemara/index.json');
+    f.push('gemara/index.json');
+    if (idx && plan.iso >= idx.from && plan.iso <= idx.to) f.push(...gemaraFiles(plan.iso, unit).filter(x => !(idx.noAmud || []).includes(x)));
+  }
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   return [...new Set(f)];
 }
@@ -312,7 +322,62 @@ async function hayomDoc(plan) {
   blocks.push({ type: 'note', text: HAYOM_CREDIT + ' ', href: 'https://text.chabadpedia.com/index.php/' + encodeURIComponent('היום יום ' + e.ref), hrefText: 'המקור' });
   return { title: UNITS.hayomyom.full, subtitle: e.ref, blocks, raw: true };
 }
+// ---------------- 1.0.96: Gemara / Mishnah cycles (tools/build-gemara.mjs; gemara-cycles.js computes the day's portion) ----------------
+// Bavli: every segment shows the vocalized Gemara (William Davidson) and, beneath it, the Steinsaltz explanation; the
+// read-aloud reads only the explanation (`say`, prepared at build time). Mishnah: the mishnah with Bartenura beneath.
+export const GEMARA_UNITS = ['dafyomi', 'amudyomi', 'yerushalmi', 'mishnayomit'];
+const pathT = t => t.replace(/ /g, '_');
+export function gemaraFiles(iso, unit) {
+  if (unit === 'dafyomi' || unit === 'amudyomi') { const d = unit === 'dafyomi' ? dafYomi(iso) : amudYomi(iso); return d.amudim.map(a => `gemara/bavli/${pathT(d.t)}/${a}.json`); }
+  if (unit === 'yerushalmi') { const y = yerushalmi(iso); return y ? [`gemara/yer/${pathT(y.t)}/${y.daf}.json`] : []; }
+  return mishnaYomit(iso).map(m => `gemara/mishna/${pathT(m.t)}/${m.c}.${m.m}.json`);
+}
+const amudHe = a => `${gem(parseInt(a))} ${a.endsWith('a') ? 'א' : 'ב'}`, sefUrl = r => `https://www.sefaria.org/${encodeURIComponent(r.replace(/ /g, '_')).replace(/%3A/g, ':')}?lang=he`;
+export function gemaraLabel(iso, unit) {
+  if (unit === 'dafyomi') { const d = dafYomi(iso); return `${TRACTATE_HE[d.t] || d.t} דף ${gem(d.daf)}`; }
+  if (unit === 'amudyomi') { const d = amudYomi(iso); return `${TRACTATE_HE[d.t] || d.t} ${amudHe(d.amudim[0])}`; }
+  if (unit === 'yerushalmi') { const y = yerushalmi(iso); return y ? `ירושלמי ${TRACTATE_HE[y.t] || y.t} דף ${gem(y.daf)}` : 'אין שיעור היום (יום כיפור / תשעה באב)'; }
+  const ms = mishnaYomit(iso), a = ms[0], b = ms.at(-1);
+  return `${TRACTATE_HE[a.t] || a.t} ${gem(a.c)}, ${gem(a.m)}` + (b === a ? '' : b.t === a.t ? (b.c === a.c ? ` – ${gem(b.m)}` : ` – ${gem(b.c)}, ${gem(b.m)}`) : ` – ${TRACTATE_HE[b.t] || b.t} ${gem(b.c)}, ${gem(b.m)}`);
+}
+const gemaraCredits = (idx, keys) => keys.map(([label, k]) => idx.sources?.[k] && { label, ...idx.sources[k] }).filter(Boolean);
+const outside = (idx, ref) => ({ type: 'note', text: `השיעור לתאריך זה עדיין לא נכלל באתר (נבנו התאריכים ${idx.from.split('-').reverse().join('.')} – ${idx.to.split('-').reverse().join('.')}). אפשר ללמוד אותו בספריא: `, href: sefUrl(ref), hrefText: ref });
+async function gemaraDoc(plan, unit) {
+  const iso = plan.iso, idx = await data('gemara/index.json'), blocks = [];
+  if (unit === 'dafyomi' || unit === 'amudyomi') {
+    const d = unit === 'dafyomi' ? dafYomi(iso) : amudYomi(iso);
+    for (const a of d.amudim) {
+      blocks.push({ type: 'h', text: `${TRACTATE_HE[d.t] || d.t} ${amudHe(a)}` });
+      const f = await optional(`gemara/bavli/${pathT(d.t)}/${a}.json`);
+      if (!f) { if (d.amudim.length > 1 && a.endsWith('b')) blocks.pop(); else blocks.push(outside(idx, `${d.t} ${a}`)); continue; }
+      f.segs.forEach(([g, st, say], i) => blocks.push({ type: 'p', id: `${a}.${i + 1}`, ref: `${d.t} ${a}:${i + 1}`, text: g, biur: st ? [st] : [], biurLabel: 'ביאור', say: say || undefined, src: 'gemara', pause: true }));
+    }
+    return { title: UNITS[unit].full, subtitle: gemaraLabel(iso, unit), blocks, raw: true, gemara: 'bavli', credits: gemaraCredits(idx, [['גמרא (מנוקדת)', 'gemara'], ['ביאור שטיינזלץ', 'steinsaltz']]) };
+  }
+  if (unit === 'yerushalmi') {
+    const y = yerushalmi(iso);
+    if (!y) blocks.push({ type: 'note', text: 'במחזור הירושלמי היומי (מהדורת וילנא) אין שיעור ביום הכיפורים ובתשעה באב.' });
+    else {
+      const f = await optional(`gemara/yer/${pathT(y.t)}/${y.daf}.json`);
+      if (!f) blocks.push(outside(idx, `Jerusalem Talmud ${y.t}`));
+      else {
+        blocks.push({ type: 'note', text: 'לתלמוד הירושלמי אין בספריא ביאור שטיינזלץ, ולכן מוצג כאן הטקסט בלבד (מנוקד, מהדורת גוגנהיימר). ההקראה קוראת את הטקסט עצמו.' });
+        f.segs.forEach((t, i) => blocks.push({ type: 'p', id: `y${y.daf}.${i + 1}`, text: t, src: 'gemara', pause: true }));
+      }
+    }
+    return { title: UNITS.yerushalmi.full, subtitle: gemaraLabel(iso, unit), blocks, raw: true, gemara: 'yer', credits: gemaraCredits(idx, [['תלמוד ירושלמי', 'yerushalmi']]) };
+  }
+  for (const m of mishnaYomit(iso)) {
+    blocks.push({ type: 'h', text: `${TRACTATE_HE[m.t] || m.t} פרק ${gem(m.c)} משנה ${gem(m.m)}` });
+    const f = await optional(`gemara/mishna/${pathT(m.t)}/${m.c}.${m.m}.json`);
+    if (!f) { blocks.push(outside(idx, `Mishnah ${m.t} ${m.c}:${m.m}`)); continue; }
+    const plain = f.m.replace(/<[^>]+>/g, '');
+    blocks.push({ type: 'p', id: `${m.c}.${m.m}`, ref: `Mishnah ${m.t} ${m.c}:${m.m}`, text: f.m, biur: f.b, biurLabel: 'ברטנורא', say: [plain, ...f.bs.filter(Boolean)].join(' '), src: 'gemara', pause: true });
+  }
+  return { title: UNITS.mishnayomit.full, subtitle: gemaraLabel(iso, unit), blocks, raw: true, gemara: 'mishna', credits: gemaraCredits(idx, [['משנה', 'mishnah'], ['ברטנורא', 'bartenura']]) };
+}
 export function buildDoc(plan, unit) {
+  if (GEMARA_UNITS.includes(unit)) return gemaraDoc(plan, unit);
   if (unit === 'hayomyom') return hayomDoc(plan);
   if (unit === 'chumash') return chumashDoc(plan);
   if (unit === 'tehillim') return tehillimDoc(plan);
@@ -325,6 +390,7 @@ export function buildDoc(plan, unit) {
 /** Short description of a unit's portion for the home cards. */
 export async function describe(plan, unit) {
   if (unit === 'chumash') return plan.chumash.title;
+  if (GEMARA_UNITS.includes(unit)) return gemaraLabel(plan.iso, unit);
   if (unit === 'tehillim') return plan.tehillim.title;
   if (unit === 'tanya') { const d = await tanyaDoc(plan); return d.blocks.find(b => b.type === 'h')?.text || d.subtitle; }  // with "(המשך)" like the reader (round 4)
   if (unit === 'mitzvot') return plan.mitzvot.items.map(mitzvotLabel).join(' · ');

@@ -482,6 +482,22 @@ export function chunkText(t, max = 180) {
   return out;
 }
 
+/** 1.0.96 (Gemara): chunks for a short pause at every comma and period – a sentence is cut again at each comma, but a
+ *  piece of a single word is glued to its neighbour (the prototype's "lone-word glue": a one-word utterance sounds
+ *  clipped). gap: seconds of silence after the chunk (comma 0.18 s, end of sentence 0.38 s). */
+export function pauseChunks(t, max = 180) {
+  const out = [];
+  const words = x => (x.match(/[\u05D0-\u05EA]+/g) || []).length;
+  for (const sent of chunkText(t, max)) {
+    const pieces = sent.split(/(?<=,)\s+/), merged = [];
+    for (const p of pieces) {
+      if (merged.length && (words(merged.at(-1)) < 2 || words(p) < 2)) merged[merged.length - 1] += ' ' + p; else merged.push(p);
+    }
+    merged.forEach((c, i) => out.push({ c, gap: i === merged.length - 1 ? (/[.:;?!]$/.test(c) ? 0.38 : 0.18) : 0.18 }));
+  }
+  return out;
+}
+
 /** Round 3: Rashi's headwords (דיבור המתחיל) are printed without vowels, so a voice guesses their reading. When the
  *  headword's words are the verse's own words (same consonants, in order), read them with the verse's vowels
  *  (cantillation removed). Matching is word by word from the start of the headword; unmatched words stay as printed. */

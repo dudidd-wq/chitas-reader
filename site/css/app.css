@@ -217,6 +217,12 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .rashi.brk { break-before: column; }
 .r-content .rashi p.pk { break-inside: avoid; }
 .r-content .rashi .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
+/* 1.0.96 Gemara: the vocalized Gemara, and beneath it the explanation that the read-aloud reads (Steinsaltz / Bartenura) */
+.r-content .seg.gm > .t { font-weight: 500; }
+.r-content .biur { font-size: .84em; line-height: 1.75; margin: .2em 0 .8em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 90%, var(--muted)); }
+.r-content .biur p { margin: 0 0 .3em; orphans: 2; widows: 2; }
+.r-content .biur .lbl { font-family: var(--ui); font-size: .72em; color: var(--muted); }
+.r-content .biur small { font-size: .9em; color: var(--muted); }
 .r-content b { font-weight: 700; }
 .r-content .ketiv { color: var(--muted); font-size: .8em; }
 .r-content .pe { display: inline-block; width: 2em; } /* setuma: a gap inside the line, as in a Torah scroll */

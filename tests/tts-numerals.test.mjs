@@ -67,7 +67,9 @@ function* strings(x) { if (typeof x === 'string') { if (/[\u05D0-\u05EA]['"׳״]
 function* files(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) yield* files(p); else if (f.endsWith('.json')) yield p; } }
 test('corpus: no letter+geresh token is silent', () => {
   const bad = new Map(); let n = 0;
-  for (const f of files(ROOT)) for (const s of strings(JSON.parse(fs.readFileSync(f, 'utf8')))) {
+  // 1.0.96: the Bavli Gemara and Steinsaltz (and the Bartenura) are displayed only – the read-aloud reads their `say` text
+  const said = (f, d) => /gemara[\\/]bavli[\\/]/.test(f) ? d.segs.map(x => x[2]) : /gemara[\\/]mishna[\\/]/.test(f) ? [d.m, d.bs] : d;
+  for (const f of files(ROOT)) for (const s of strings(said(f, JSON.parse(fs.readFileSync(f, 'utf8'))))) {
     for (const w0 of P(s, H).split(/\s+/)) {
       // the token itself: edge punctuation off, a geresh right after the letters kept (ד׳. → ד׳; בלבד...״ → בלבד)
       const w = (w0.match(/^[^\u05D0-\u05EA]*(.*?[\u05D0-\u05EA][\u05B0-\u05C7]*['"]?)[^\u05D0-\u05EA\u05B0-\u05C7]*$/) || [])[1];
