@@ -458,3 +458,6 @@ npm test && npm run ui && npm run shots
 - Checked all 32 new `he_lexicon.tsv` entries against the pointed chitas-reader texts. Integrated only the three that scored strictly above 9.5 and whose current Israeli reading was wrong: אַבָּא (A-ba), אַלְפַּיִים, בֵּינְתַיִים. Speech layer only (stress exceptions); displayed letters and niqqud unchanged.
 - These three also lock over stale compiled ole tags in say-text, so already-stamped אַבָּ֫א is read milel. Cantillation and occurrence-specific ole of other words (e.g. קָמָה) are not overridden. No Ashkenazi-only path: rejected milel entries that clash with the Israeli default are already handled by the existing Chabad havara shift.
 - The other 29 were rejected or already produced the correct Israeli reading (and were left untouched). Typical rejects: unpointed homographs (זכר, רבה, אמה), Ashkenazi/yeshiva stress that would change the Israeli default (חסר, פלוני, לרב, שומע, למזבח), claimed niqqud that does not appear in the texts (רשי as רָשִׁי, שדר as שֵׁדַר).
+
+## 2026-11-14 20:48 – short biur batch 6 (6.1–19.1) → 1.0.111
+- External review r2 (Codex CLI on Dudi PC, same rubric as gpt-5.4 step): 9.738. Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5". Sefer HaMitzvot intro and shorashim now get the short biur too (texts.js); test length floor 20→10 for one-line headings.

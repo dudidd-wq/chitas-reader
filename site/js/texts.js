@@ -63,7 +63,7 @@ export async function filesFor(plan, unit) {
   }
   if (unit === 'ravyomi') { f.push('ravyomi/schedule.json'); (await ravLesson(plan)).simanim.forEach(n => f.push(`ravyomi/s/${n}.json`)); }
   // 1.0.100: the short explanation of the same source files, where one exists
-  const sb = f.map(x => x.match(/^(tanya\/[^/]+\/\d+|rambam\/[^/]+\/\d+|mitzvot\/[PN]\/\d+)\.json$/)?.[1] || x.match(/^tolt\/w\/([^/]+)\.json$/)?.[1]?.replace(/^/, 'tolt/')).filter(Boolean);
+  const sb = f.map(x => x.match(/^(tanya\/[^/]+\/\d+|rambam\/[^/]+\/\d+|mitzvot\/[PNS]\/\d+|mitzvot\/intro)\.json$/)?.[1] || x.match(/^tolt\/w\/([^/]+)\.json$/)?.[1]?.replace(/^/, 'tolt/')).filter(Boolean);
   if (sb.length) f.push('sbiur/index.json', ...await sbiurFiles(sb));
   return [...new Set(f)];
 }
@@ -75,13 +75,13 @@ async function mitzvotDoc(plan) {
     blocks.push({ type: 'h', text: mitzvotLabel(it) });
     if (it.k === 'P' || it.k === 'N' || it.k === 'intro') {
       const d = await data(shmFile(it)[0]), z = await optional(shmFile(it)[0].replace(/^mitzvot\//, 'mitzvot-voc/'));
-      const SB = it.n ? await sbiur(`mitzvot/${it.k}/${it.n}`) : null;
+      const SB = await sbiur(it.n ? `mitzvot/${it.k}/${it.n}` : 'mitzvot/intro');   // 1.0.111: the intro has a short explanation too
       d.s.forEach((t, i) => blocks.push({ type: 'p', id: `${it.k}${it.n || ''}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i), ...sbAi(SB?.s?.[i + 1]) }));
     } else if (it.k === 'S') {
       for (let n = it.from; n <= it.to; n++) {
-        const d = await data(`mitzvot/S/${n}.json`), z = await optional(`mitzvot-voc/S/${n}.json`);
+        const d = await data(`mitzvot/S/${n}.json`), z = await optional(`mitzvot-voc/S/${n}.json`), SB = await sbiur(`mitzvot/S/${n}`);
         if (it.to > it.from) blocks.push({ type: 'h', text: `השורש ה${['', 'ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שביעי', 'שמיני', 'תשיעי', 'עשירי', 'אחד עשר', 'שנים עשר', 'שלושה עשר', 'ארבעה עשר'][n]}` });
-        d.s.forEach((t, i) => blocks.push({ type: 'p', id: `S${n}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i) }));
+        d.s.forEach((t, i) => blocks.push({ type: 'p', id: `S${n}.${i + 1}`, text: t, src: 'mitzvot', ...voc(z, i), ...sbAi(SB?.s?.[i + 1]) }));
       }
     } else if (it.k === 'conclusion') {
       blocks.push({ type: 'note', text: 'לפי לוח Chabad.org נלמד היום גם סיום ספר המצוות. במהדורה הפתוחה שבאתר (ורשה תרמ״ג, נחלת הכלל) אין לסיום קטע נפרד, ולכן הוא אינו מוצג כאן.' });

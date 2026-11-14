@@ -9,7 +9,7 @@ const fetched = [];
 globalThis.fetch = async p => { fetched.push(String(p)); const f = new URL(p, root); const ok = fs.existsSync(f); return { ok, status: ok ? 200 : 404, json: async () => JSON.parse(fs.readFileSync(f)) }; };
 const { buildDoc, filesFor } = await import('../site/js/texts.js');
 const DAYS = ['2026-11-15', '2026-11-16', '2026-11-17']; // 1.0.103: batch 2 adds 18.11–1.12; 1.0.104: batch 3 adds 2–15.12
-for (let d = new Date('2026-11-18T12:00:00'); d <= new Date('2027-01-05T12:00:00'); d.setDate(d.getDate() + 1)) DAYS.push(d.toISOString().slice(0, 10));
+for (let d = new Date('2026-11-18T12:00:00'); d <= new Date('2027-01-19T12:00:00'); d.setDate(d.getDate() + 1)) DAYS.push(d.toISOString().slice(0, 10));
 const UNITS = ['tanya', 'rambam3', 'rambam1', 'mitzvot', 'tolt'];
 const plan = iso => dayPlan(new Date(`${iso}T12:00:00`));
 const strip = s => s.replace(/[\u0591-\u05C7]/g, '');
@@ -21,7 +21,7 @@ test('batch 1 (15–17.11.2026): every paragraph of Tanya, Rambam, Sefer HaMitzv
     for (const b of ps) {
       assert.ok(b.sb, `${iso} ${u} ${b.id}: no short explanation`);
       assert.ok(/[\u05B0-\u05BC]/.test(b.sb.v) && !/[\u05B0-\u05BC]/.test(b.sb.p), `${b.id}: v vocalized, p plain`);
-      assert.ok(b.sb.p.length > 20 && b.sb.p.length < 1600, `${b.id}: length ${b.sb.p.length}`);
+      assert.ok(b.sb.p.length > 10 && b.sb.p.length < 1600, `${b.id}: length ${b.sb.p.length}`);   // 1.0.111: 10 (a heading like "ספר זמנים" or a one-line mitzvah gets a one-line explanation)
       assert.equal(strip(b.sb.v).split(/\s+/).length, b.sb.p.split(/\s+/).length, `${b.id}: the vocalized text has the plain text's words`);
       // 1.0.103: a Torah Or / Likkutei Torah paragraph with no matching LikuteiTorah.com explanation is written from the maamar and carries the computer-written label
       if (u === 'tolt' && b.sb.link) assert.ok(b.sb.src === 'lt' && /^https:\/\/www\.likuteitorah\.com\/(likkutei-torah|torah-ohr)\/[\w-]+\/\d+\/$/.test(b.sb.link), b.id);
