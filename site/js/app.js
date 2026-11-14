@@ -61,6 +61,9 @@ const OPTIONAL_FONTS = {
   david: ['david-libre/DavidLibre-Regular.woff2', 'david-libre/DavidLibre-Bold.woff2', 'david-libre/OFL.txt'],
   assistant: ['assistant/Assistant.woff2', 'assistant/OFL.txt'],
 };
+// 1.0.113: optional families a design uses for its headings / UI / Rashi – kept for offline use once the design is chosen
+const DESIGN_FONTS = { sefer: ['keter-yg', 'david', 'noto-rashi'], modern: ['assistant', 'noto-rashi'], nocturne: ['david', 'noto-rashi'] };
+const DESIGNS = [['classic', 'הנוכחי (ברירת מחדל)'], ['sefer', 'ספר קודש'], ['modern', 'מודרני וצבעוני'], ['nocturne', 'לילי']];
 const optionalFontPromises = new Map();
 function cacheOptionalFont(font) {
   if (!('caches' in window) || !OPTIONAL_FONTS[font] || optionalFontPromises.has(font)) return;
@@ -75,6 +78,8 @@ function cacheOptionalFont(font) {
 function applyPrefs() {
   const r = document.documentElement;
   cacheOptionalFont(prefs.font);
+  // 1.0.113: the design (look). The default 'classic' sets no attribute, so the original styles apply unchanged.
+  if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else delete r.dataset.design;
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
@@ -506,8 +511,12 @@ function displayForm() {
   return `${displayGroup()}<h3 class="set-sub" id="sh-siddur-h">סידור</h3>${siddurGroup()}
   ${R.doc && !$('#reader').hidden ? `<p class="note" id="sh-report-p"><a id="sh-report" href="${esc(reportUrl())}" target="_blank" rel="noopener">מצאת טעות? דיווח על טעות בעמוד זה</a> – נפתח טופס ב-GitHub עם פרטי המקום; דבר אינו נשלח עד שתאשר שם.</p>` : ''}`;
 }
+// 1.0.113: a miniature of each design – top bar, date title, two lesson rows (drawn by CSS from data-design-prev)
+const designPreview = () => `<span class="dz" aria-hidden="true"><span class="dz-bar"></span><span class="dz-hd">ד׳ בכסלו</span><span class="dz-row"><i></i><b></b><em></em></span><span class="dz-row"><i></i><b></b><em></em></span></span>`;
 function displayGroup() {
   return `
+  <fieldset class="design-set"><legend>עיצוב</legend><div class="seg-ctl design-options" role="radiogroup" aria-label="עיצוב">${DESIGNS.map(([v, l]) => `<label data-design-prev="${v}"><span><input type="radio" name="design" value="${v}" ${prefs.design === v ? 'checked' : ''}>${l}</span>${designPreview()}</label>`).join('')}</div>
+    <small>העיצוב משנה צבעים, מסגרות, כרטיסים וגופני הכותרות בכל המסכים. גופן הקריאה, גודל האות וערכת הצבע (כהה/לילה) נשמרים; בעיצוב ״לילי״ הרקע תמיד כהה. הטקסט עצמו אינו משתנה.</small></fieldset>
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
   <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
     ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
@@ -1682,7 +1691,7 @@ function openSheet(kind, note = '') {
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
     if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'shortBiur', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
-    else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold'].includes(name)) { const a = anchor(); layout(); restore(a); }
+    else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold', 'design'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
