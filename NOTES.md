@@ -452,3 +452,9 @@ npm test && npm run ui && npm run shots
 
 ## 2026-11-13 22:03 – short biur batch 5 (30.12–5.1) → 1.0.109
 - External review r1 (OpenAI gpt-5.4): 9.744. Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5".
+
+
+## 2026-11-14 – 1.0.110: Kol HaLashon lexicon (Vidi), entries above 9.5 only
+- Checked all 32 new `he_lexicon.tsv` entries against the pointed chitas-reader texts. Integrated only the three that scored strictly above 9.5 and whose current Israeli reading was wrong: אַבָּא (A-ba), אַלְפַּיִים, בֵּינְתַיִים. Speech layer only (stress exceptions); displayed letters and niqqud unchanged.
+- These three also lock over stale compiled ole tags in say-text, so already-stamped אַבָּ֫א is read milel. Cantillation and occurrence-specific ole of other words (e.g. קָמָה) are not overridden. No Ashkenazi-only path: rejected milel entries that clash with the Israeli default are already handled by the existing Chabad havara shift.
+- The other 29 were rejected or already produced the correct Israeli reading (and were left untouched). Typical rejects: unpointed homographs (זכר, רבה, אמה), Ashkenazi/yeshiva stress that would change the Israeli default (חסר, פלוני, לרב, שומע, למזבח), claimed niqqud that does not appear in the texts (רשי as רָשִׁי, שדר as שֵׁדַר).

@@ -1,5 +1,7 @@
 # Stress exceptions for the local voice: word<TAB>stressed nucleus from the end (0 = milra, 1 = milel).
 # Applied before the Torah/Tehillim lexicon and the suffix model (outside verses with accents). Hand-checked list.
+# Optional third field "force": the exception also wins over compiled ole tags in say-text (never over cantillation).
+# Use force only when the word's stress is invariant, so occurrence-specific ole must not keep a stale value.
 דֶּלֶת	1
 חָכְמָה	0
 שָׁלוֹם	0
@@ -173,3 +175,12 @@
 מֵהַצָּדִי	1
 בַּצָּדִי	1
 לַצָּדִי	1
+
+# 1.0.110: Kol HaLashon lexicon entries that scored >9.5 against the app texts (Israeli default). Speech layer only.
+# Typography variants of the same pointed form (dagesh encoding) are listed separately because stressKey keeps dagesh.
+אַבָּא	1	force
+אַבָּא	1	force
+אַלְפַּיִים	1	force
+אַלְפַּיִים	1	force
+בֵּינְתַיִים	1	force
+בֵּינְתַיִים	1	force

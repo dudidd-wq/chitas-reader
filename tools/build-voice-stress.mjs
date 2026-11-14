@@ -49,11 +49,15 @@ export function fit(pairs) {
   return { lex: lexOut, suf: kept, maxn: MAXN };
 }
 function exceptions() {
-  const f = path.join(ROOT, 'tools/data/stress-exceptions.tsv'), out = {};
+  const f = path.join(ROOT, 'tools/data/stress-exceptions.tsv'), out = {}, force = {};
   for (const line of fs.readFileSync(f, 'utf8').split('\n')) {
-    const [w, k] = line.split('#')[0].trim().split(/\s+/); if (w && k !== undefined) out[stressKey(w)] = +k;
+    const parts = line.split('#')[0].trim().split(/\s+/); const [w, k, flag] = parts;
+    if (w && k !== undefined) {
+      const key = stressKey(w); out[key] = +k;
+      if (flag === 'force') force[key] = +k;
+    }
   }
-  return out;
+  return { exc: out, excForce: force };
 }
 function qamatzKatan(rows) {
   const qk = new Map(), plain = new Set();
@@ -109,7 +113,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }
   }
   const m = fit(pairs);
-  const data = { v: 1, source: 'Torah + Tehillim cantillation (site/data), tools/build-voice-stress.mjs', exc: exceptions(), ...m, qk: qamatzKatan(rows) };
+  const { exc, excForce } = exceptions();
+  const data = { v: 1, source: 'Torah + Tehillim cantillation (site/data), tools/build-voice-stress.mjs', exc, excForce, ...m, qk: qamatzKatan(rows) };
   const s = JSON.stringify(data);
   fs.writeFileSync(path.join(ROOT, 'site/voice/stress-he.json'), s);
   writeVoiceFiles();

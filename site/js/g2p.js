@@ -412,6 +412,8 @@ export function textToIPA(text, opt = {}) {
     const key = stressKey(core);
     let k = inline ? stressFromAccents(tagged) : null, src = k === null ? 'acc' : 'primary';
     if (k === null && acc && acc.has(key)) k = acc.get(key);
+    // Locked exceptions win over compiled ole tags in say-text. Real cantillation (acc from a verse) is never overridden.
+    if (data.excForce && key in data.excForce && !acc) { k = data.excForce[key]; src = 'excForce'; }
     if (k === null) [k, src] = predictStress(core, data);
     // 1.0.91 Ashkenazi milel; cantillated text (Torah, Tehillim) keeps its accent / grammatical stress for every word
     if (milel && !acc) { const m = milelStress(core, k); if (m !== k) { k = m; src += '+milel'; } }
