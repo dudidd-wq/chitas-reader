@@ -12,6 +12,9 @@ import { letters, nuclei, stressKey, predictStress, textToIPA, HATAMA, SHVA, DAG
 import { curatedProseStress, proseSource } from './prose-context.mjs';
 import { stampStress } from './siddur-pronunciation.mjs';
 
+import { aramSayText as aramSay } from './aramaic-speech.mjs';
+/** 1.0.112: the Aramaic speech pass (ARAMAIC-112.md) – also run over all compiled data by tools/aramaic-say-pass.mjs */
+export { aramSay };
 export const VERSIONS = { gem: 'hebrew|William Davidson Edition - Vocalized Aramaic', ste: 'hebrew|William Davidson Edition - Hebrew',
   yer: 'hebrew|The Jerusalem Talmud, edition by Heinrich W. Guggenheimer. Berlin, De Gruyter, 1999-2015', mis: 'hebrew|Torat Emet 357', bar: 'hebrew|On Your Way' };
 const ROOT = new URL('../', import.meta.url).pathname;
@@ -193,11 +196,13 @@ export function vocalizeHtml(html, gemWords, nextRab, nextMod) {
 }
 /** 1.0.98: speech text of an already vocalized text (Targum Onkelos, Rashi of the Metsudah Megillot): every word keeps
  *  its own niqqud and gets the same corrections, stress, Israeli shva and initial stops as the Gemara words. */
-export function sayVocalized(html, stats = {}) {
+/*  1.0.112 opt.aram ('onkelos' | 'gemara' | 'prose'): the Aramaic speech rules (tools/aramaic-speech.mjs) on the result. */
+export function sayVocalized(html, stats = {}, opt = {}) {
   const text = speechRuns(html).map(r => r.t).join('');
-  return text.replace(WORD, whole => {
+  const say = text.replace(WORD, whole => {
     const trail = /^[^"״]+["״]+$/.test(whole) ? whole.match(/["״]+$/)[0] : '', src = whole.slice(0, whole.length - trail.length);
     if (!/[\u05B0-\u05BB\u05C7]/.test(src)) return whole;
     return sayWord(src, { b: true, gem: src }, stats) + trail;
   }).replace(/\s+/g, ' ').trim();
+  return opt.aram ? aramSay(say, opt.aram) : say;
 }

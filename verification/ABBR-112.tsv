@@ -1,0 +1,42 @@
+# 1.0.112 abbreviations (site/js/tts-prep.js), Codex review rounds 1–3 (0–10; deploy only strictly > 9.5). count = occurrences in the Chitas corpus (tolt, tanya, hayomyom, notes, rambam).
+abbreviation	kind	reading	count	r1	r2	r3	deployed
+תו"א	table	תּוֹרָה אוֹר	1069	8.0	9.5	10.0	yes
+פע"ח (הפע"ח, מהפע"ח)	table	פְּרִי עֵץ חַיִּים	109	8.5	10.0	10.0	yes
+עכ"ז	table	עִם כָּל זֶה	286	>9.5	10.0	10.0	yes
+עפ"ז	table	עַל פִּי זֶה	17	>9.5	10.0	10.0	yes
+ע"ס (הע"ס, בהע"ס)	table	עֶשֶׂר סְפִירוֹת	177	9.2	10.0	10.0	yes
+רע"מ (הרע"מ, מהרע"מ)	table	רַ֫עְיָא מְהֵ֫ימְנָא	21	7.3	10.0	10.0	yes
+פב"פ	table	פָּנִים בְּפָנִים	90	>9.5	10.0	10.0	yes
+יצ"מ (+ prefixes)	table	יְצִיאַת מִצְרַיִם	71	9.2	10.0	10.0	yes
+עה"ד	table	עֵץ הַדַּעַת	68	>9.5	10.0	10.0	yes
+אה"ר	table	אַהֲבָה רַבָּה	111	>9.5	10.0	10.0	yes
+א"פ	table	אוֹר פְּנִימִי	70	>9.5	10.0	10.0	yes
+ת"ז (הת"ז)	table	תִּיקּוּנֵי ז֫וֹהַר	474	7.8	10.0	10.0	yes
+מדה"ר	table + context (after י"ג: plural)	מִדַּת / מִדּוֹת הָרַחֲמִים	87	>9.5	10.0	10.0	yes
+תש"י	table	תְּפִלִּין שֶׁל יָד	18	-	10.0	10.0	yes
+תש"ר	table	תְּפִלִּין שֶׁל רֹאשׁ	8	-	10.0	10.0	yes
+הק"ש	table	קְרִיאַת שְׁמַע	105	9.0	10.0	10.0	yes
+העכו"ם	table	עוֹבְדֵי הַכּוֹכָבִים וְהַמַּזָּלוֹת	469	8.8	10.0	10.0	yes
+וע"ז, שע"ז	table	וְעַל זֶה / שֶׁעַל זֶה	484	>9.5	10.0	10.0	yes
+ע"ז before נאמר/אמרו/…	context	עַל זֶה	565	>9.5	10.0	10.0	yes
+הרמ"ז (+ prefixes)	table	הָרַמַ"ז	359	>9.5	10.0	10.0	yes
+ב"פ	table	שְׁתֵּי פְּעָמִים	137	>9.5	10.0	10.0	yes
+בעה"כ	table	בְּעֶרְכֵי הַכִּנּוּיִים	81	>9.5	10.0	10.0	yes
+ס"פ / ר"פ before a chapter numeral	context	סוֹף / רֵישׁ פֶּרֶק + number	1266	8.5	8.0	10.0	yes (not before a letter name or ע"א/ע"ב)
+ס"פ / ר"פ before a parasha	context	סוֹף / רֵישׁ פָּרָשַׁת	1266	>9.5	10.0	10.0	yes
+בע"ח before שער/שם/ש"א/פ"ז…	context	בְּעֵץ חַיִּים	616	8.8	10.0	10.0	yes
+ב"ר before פ"X / number	context	בְּרֵאשִׁית רַבָּה, פָּרָשָׁה + number	271	9.0	10.0	10.0	yes
+פ"ק before ד+tractate	context	פֶּרֶק קַ֫מָּא	89	6.0	10.0	10.0	yes
+י"ג before ת"ד; ת"ד after י"ג	context	שְׁלוֹשָׁה עָשָׂר תִּיקּוּנֵי דִּ֫יקְנָא	90	8.6	7.0	10.0	yes
+י"ג before מדה"ר	context	שְׁלוֹשׁ עֶשְׂרֵה מִדּוֹת הָרַחֲמִים	369	-	10.0	10.0	yes
+חו"ב (החו"ב, prefixes)	table	חָכְמָה וּבִינָה	212	8.5	10.0	9.0	no – prefixed forms read /χaχma/
+ק"נ (הק"נ)	table	קְלִיפַּת נוֹגַהּ	92	8.0	10.0	8.6	no – numeric וק"נ (150), /mikelipat/
+ב"ן	table	בַּ"ן	227	8.3	9.5	9.0	no – prefixed /uvan/
+ג"פ	table	שָׁלֹשׁ פְּעָמִים	69	-	10.0	8.5	no – שבג"פ = three verses
+כ"כ, וכ"כ	table	כָּל כָּךְ / וְכֵן כָּתַב	477	8.7	9.5	9.2	no – coverage (מכ"כ)
+years (תרפ"ז …) after a date word	context	תַּרְפַּ"ז …	-	7.0	8.0	8.8	no – stress of תר"ח/תרס"ח/תקע"ג
+ס"פ / ר"פ before a letter name (מ"ם, צדי)	context	number value	-	-	-	9.2	no – צדי not converted
+דר"פ ע"ב (folio)	context bug	-	-	-	-	7.8	fixed by exclusion – reads as 1.0.110
+חו"ג, מו"ס	table	-	232	-	9.2 / 9.3	withdrawn	no
+א"מ, כ"ע, א"צ, יו"ד	table	-	666	5.5–9.0	4.0 (יו"ד)	withdrawn	no – 1.0.110 behaviour
+וש"נ, נ"ך	table	-	872	-	-	not reviewed	no

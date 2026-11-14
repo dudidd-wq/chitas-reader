@@ -18,6 +18,9 @@ export const TSERE = '\u05B5', SEGOL = '\u05B6', QUBUTS = '\u05BB', SIN = '\u05C
 export const HATAMA = '\u05AB';   // Phonikud's stress diacritic (ole)
 export const VSHVA = '\u05BD';    // Phonikud's vocal-shva diacritic (meteg)
 const HASER = '\u05AF';           // Phonikud's nikud-haser mark (letter not read)
+// 1.0.112: speech-only mark after a letter's niqqud: its shva is quiescent (Aramaic dagesh kal / after a mater lectionis).
+// Written into compiled speech text by tools/aramaic-speech.mjs; never in a display text; ignored by stressKey and the letter rules.
+export const NACH = '|';
 export const FULLV = new Set([...'\u05B1\u05B2\u05B3\u05B4\u05B5\u05B6\u05B7\u05B8\u05B9\u05BA\u05BB\u05C7']);
 export const ACCENTS = /[\u0591-\u05AF]/;
 // accents that stand before/after the word, not on its stressed syllable (prepositive / postpositive)
@@ -209,12 +212,14 @@ const BASE = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
  *  1. on the first letter of the word; 2. the second of two shvas in a row (not at the word's end);
  *  3. under the first of two identical letters (הַלְלוּ, הִנְנִי); 4. under a letter with dagesh forte (dagesh after a vowel).
  *  The rule of a shva after a long vowel (Tiberian, needs the meteg of the edition) is not applied. */
-export function markShvaNa(L) {
+export function markShvaNa(L, opt = {}) {
   const n = L.length;
   if (NO_SHVA_NA.has(skel(L))) return L;
   const isShva = i => !!L[i] && L[i].diac.includes(SHVA) && !L[i].diac.includes(VSHVA);
+  const aram = !!opt.aram;
   for (let i = 0; i < n; i++) {
     if (!isShva(i) || L[i].ch === 'ו') continue;            // vav + shva is read "ve" by the vav rules
+    if (L[i].all.includes(NACH)) continue;                    // 1.0.112: speech-only mark – this shva is quiescent (Aramaic)
     const last = i === n - 1 || (i === n - 2 && isShva(n - 1));
     if (last) continue;                                       // final ךְ / תְּ / -שְׁתְּ: quiescent
     let na = false;
@@ -222,7 +227,9 @@ export function markShvaNa(L) {
     else if (isShva(i - 1) && !(i - 1 === 0)) na = true;      // second of two (the first one is not the word's first letter)
     else if (i - 1 === 0 && isShva(0)) na = false;            // שְׁמְ… cannot start a word; leave as written
     if (!na && L[i + 1] && (BASE[L[i].ch] || L[i].ch) === (BASE[L[i + 1].ch] || L[i + 1].ch)) na = true;
-    if (!na && i > 0 && L[i].diac.includes(DAGESH) && (hasFull(L[i - 1]) || (L[i - 1].ch === 'ו' && has(L[i - 1], DAGESH)) || (/[יו]/.test(L[i - 1].ch) && !L[i - 1].diac && hasFull(L[i - 2])))) na = true;
+    // 1.0.112 opt.aram (build tools only, never at runtime): Aramaic – a dagesh in בגדכפת after a vowel is dagesh kal (אִיתְּמַר
+    // itmar), and no vocal shva after a mater yod/vav (מִילְּתָא milta). The tools mark such a shva with NACH in the speech text.
+    if (!na && i > 0 && L[i].diac.includes(DAGESH) && !(aram && /[בגדכפת]/.test(L[i].ch)) && (hasFull(L[i - 1]) || (L[i - 1].ch === 'ו' && has(L[i - 1], DAGESH)) || (!aram && /[יו]/.test(L[i - 1].ch) && !L[i - 1].diac && hasFull(L[i - 2])))) na = true;
     if (na) setAll(L[i], L[i].all + VSHVA);
   }
   return L;
@@ -366,8 +373,11 @@ function wordToIPA1(word, k, data, opt) {
   } else if (L.length) setAll(L[0], L[0].all + HATAMA);   // e.g. an unvocalised word: stress on its first letter
   // Phonikud's sort_hatama: stress on a letter that is not read moves to the next letter
   for (let i = 0; i < L.length - 1; i++) if (L[i].all.includes(HATAMA) && L[i].all.includes(HASER)) { setAll(L[i], L[i].all.replace(HATAMA, '')); setAll(L[i + 1], L[i + 1].all + HATAMA); }
-  return modern(postNormalize(phonemizeLetters(L)));
+  const ipa = modern(postNormalize(phonemizeLetters(L)));
+  // 1.0.112: Aramaic suffix ־ֵיהּ / ־ֵהּ (לֵיהּ, מִינֵּיהּ, קַמֵּיהּ, מִנֵּהּ) is read -ej: the yod is heard, the mappiq he is silent
+  return EYH.test(stressKey(word)) ? ipa.replace(/ej?$/, 'ej') : ipa;
 }
+const EYH = /[\u05D0-\u05EA](?=[\u05BC\u05C1\u05C2]*\u05B5)[\u05BC\u05C1\u05C2\u05B5]+(?:\u05D9)?\u05D4\u05BC$/;
 
 /** Names of the letters (the same table as tts-prep.js – a test keeps them equal), for spelling an unexpanded token. */
 export const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };

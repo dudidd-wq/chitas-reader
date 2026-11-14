@@ -1,0 +1,11 @@
+{
+  "_doc": "1.0.112 Aramaic speech rule groups (tools/aramaic-speech.mjs), per source of the post-pass (tools/aramaic-say-pass.mjs). A group is on for a source only if it passed the external review strictly above 9.5 there (verification/ARAMAIC-112.md, round 3): lav 10, zohar lexicon 9.8, suffix rules 9.7 (Bavli, Yerushalmi, prose), shva 9.8 (Yerushalmi, Onkelos). Off: shva in Bavli (9.3) and prose (9.2), the general lexicon (9.1).",
+  "groups": { "shva": false, "lexicon": false, "zohar": true, "rules": true, "lav": true },
+  "sources": {
+    "bavli": { "shva": false, "lexicon": false, "zohar": true, "rules": true, "lav": true },
+    "yerushalmi": { "shva": true, "lexicon": false, "zohar": true, "rules": true, "lav": true },
+    "onkelos": { "shva": true, "lexicon": false, "zohar": false, "rules": false, "lav": true },
+    "tanya": { "shva": false, "lexicon": false, "zohar": true, "rules": true, "lav": true },
+    "tolt": { "shva": false, "lexicon": false, "zohar": true, "rules": true, "lav": true }
+  }
+}

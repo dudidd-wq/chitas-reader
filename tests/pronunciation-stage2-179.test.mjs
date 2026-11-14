@@ -8,6 +8,7 @@ import { proseContext, curatedProseStress, proseSource } from '../tools/prose-co
 const ROOT=new URL('../',import.meta.url).pathname;
 const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(d+'/'+e.name):[d+'/'+e.name]);
 const files=[...walk('site/data/tanya'),...walk('site/data/ravyomi/s')].filter(f=>f.endsWith('.json')&&!f.endsWith('/index.json')).sort();
+const unlav=s=>s.replace(/(ל\u05B8?[\u0591-\u05AF|]*)א(?=[\u0591-\u05C7|]*ו(?![\u05D0-\u05EA\u0591-\u05C7]))/g,'$1'); // 1.0.112: speech-only לָאו → לָו (aramaic-speech lav)
 const data=JSON.parse(fs.readFileSync(ROOT+'site/voice/stress-he.json'));
 test('1.0.79: Kehot display text and all original vowels are unchanged',()=>{
  const fields=files.map(f=>{const d=JSON.parse(fs.readFileSync(f));return[f,d.s,d.title];});
@@ -15,7 +16,7 @@ test('1.0.79: Kehot display text and all original vowels are unchanged',()=>{
 });
 test('1.0.79: every Tanya and Halacha paragraph has parallel speech, preserving vowels exactly',()=>{
  let n=0;for(const f of files){const d=JSON.parse(fs.readFileSync(f)),family=f.includes('/tanya/')?'tanya':'halacha';assert.equal(d.say.length,d.s.length,f);
- const check=(raw,say)=>{assert.ok(say);assert.doesNotMatch(say,/<|>|https?:/);assert.equal(normalize(say.replace(/\u05AB/g,'')),normalize(proseContext(proseSource(raw),family)),f);n++;};
+ const check=(raw,say)=>{assert.ok(say);assert.doesNotMatch(say,/<|>|https?:/);assert.equal(unlav(normalize(say.replace(/[\u05AB|]/g,''))),unlav(normalize(proseContext(proseSource(raw),family))),f);n++;};
  d.s.forEach((s,i)=>typeof s==='string'?check(s,d.say[i]):(assert.equal(s.length,d.say[i].length),s.forEach((p,j)=>check(p,d.say[i][j]))));}
  assert.equal(n,3986);
 });

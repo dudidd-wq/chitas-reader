@@ -461,3 +461,10 @@ npm test && npm run ui && npm run shots
 
 ## 2026-11-14 20:48 – short biur batch 6 (6.1–19.1) → 1.0.111
 - External review r2 (Codex CLI on Dudi PC, same rubric as gpt-5.4 step): 9.738. Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5". Sefer HaMitzvot intro and shorashim now get the short biur too (texts.js); test length floor 20→10 for one-line headings.
+
+## 2026-11-14 – 1.0.112: Aramaic speech rules + Chassidus abbreviations, groups above 9.5 only
+- Speech layer only: display text, letters and niqqud unchanged (display-identity check 0 diffs; speech keeps every letter except the silent alef of לָאו).
+- Aramaic (verification/ARAMAIC-112.md): post-pass `tools/aramaic-say-pass.mjs` (`npm run aramaic`, also at the end of build-shas) over the speech of Bavli, Yerushalmi, Onkelos, Tanya, Torah Or; g2p `|` = quiescent shva and final ־ֵיהּ /ej/; tts-prep: לֵיהּ / בֵּיהּ are not the Name. Deployed per source (tools/data/aramaic-speech.json): lav 10, ־ֵיהּ 9.8, yah 10, suffix stress rules 9.7 (Bavli, Yerushalmi, prose), Zohar lexicon 9.8, quiescent shva 9.8 (Yerushalmi, Onkelos). Not deployed: shva in Bavli 9.3 / prose 9.2, general lexicon 9.1.
+- Abbreviations (verification/ABBR-112.tsv): Chassidus table entries with their prefixed forms (תו״א, פע״ח, עכ״ז, עפ״ז, ע״ס, רע״מ, פב״פ, יצ״מ, עה״ד, אה״ר, א״פ, ת״ז, מדה״ר, תש״י, תש״ר, הק״ש, העכו״ם, וע״ז/שע״ז, הרמ״ז, ב״פ, בעה״כ) and context rules (ס״פ/ר״פ + chapter numeral or parasha, ע״ז before נאמר/אמרו, בע״ח before a gate, ב״ר פ״X, פ״ק + tractate, י״ג ת״ד / י״ג מדה״ר), all 10.0 in round 3. Withdrawn (≤ 9.5): חו״ב 9.0, ק״נ 8.6, ב״ן 9.0, ג״פ 8.5, כ״כ 9.2, years 8.8, letter-name chapters 9.2; ר״פ before ע״א/ע״ב (a folio) is not a chapter.
+- Review: Codex CLI (read-only) on Dudi's PC, 3 rounds, rubric niqqud 40 / stress 40 / punctuation-abbreviations 20. No OpenAI API or Anthropic spend.
+- Tests: tests/aramaic-abbr-112.test.mjs; the 1.0.79 / 1.0.81 vowel-preservation tests ignore the speech-only `|` and לָאו → לָו.

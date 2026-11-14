@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 // 1.0.97: the whole Shas – Bavli (Davidson vocalized Gemara + Steinsaltz), Yerushalmi (Vilna dafim) and Mishnah with
 // Bartenura, written once as display files; the speech layer (Steinsaltz / Bartenura `say`) goes to separate files
 // (gemara/bsay, gemara/msay) so later Dicta progress only adds/replaces those. Network: tools/fetch-gemara.py.
@@ -170,3 +171,6 @@ fs.writeFileSync(SJ, JSON.stringify(sj, null, 2) + '\n');
 const report = { coverage: cov, sizesMB: Object.fromEntries(Object.entries(sizes).map(([k, v]) => [k, +(v / 1e6).toFixed(1)])), stats, warnings: warn };
 fs.writeFileSync(ROOT + 'verification/SHAS-197-metrics.json', JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify({ ...report, warnings: warn.length + ' (first: ' + warn.slice(0, 12).join(' | ') + ')' }, null, 1));
+// 1.0.112: the Aramaic speech rules need the Mishnah state of the whole tractate (מתני׳ … גמ׳) – applied over bsay / ysay
+// (and Onkelos, Tanya, Torah Or) by the idempotent post-pass; it only rewrites files whose speech text changes.
+execFileSync(process.execPath, [ROOT + 'tools/aramaic-say-pass.mjs'], { stdio: 'inherit' });

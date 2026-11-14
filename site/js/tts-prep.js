@@ -68,8 +68,18 @@ export const ABBREVIATIONS = {
   // 1.0.76: Hayom Yom
   'אנ"ש': 'אַנְשֵׁי שְׁלוֹמֵנוּ', 'בעש"ט': 'בַּעַל שֵׁם טוֹב', 'הבעש"ט': 'הַבַּעַל שֵׁם טוֹב', 'שליט"א': 'שְׁלִיטָ"א', 'בעזה"י': 'בְּעֶזְרַת הַשֵּׁם יִתְבָּרֵךְ',
   'הרש"ב': 'הָרַשַּׁ"ב', 'מהר"ש': 'מַהֲרַ"שׁ', 'המהר"ש': 'הַמַּהֲרַ"שׁ', 'צ"צ': 'צֶמַח צֶדֶק', 'הצ"צ': 'הַצֶּמַח צֶדֶק', 'זצוקללה"ה': 'זֵכֶר צַדִּיק וְקָדוֹשׁ לִבְרָכָה לְחַיֵּי הָעוֹלָם הַבָּא',
+  // 1.0.112: the most frequent abbreviations of Torah Or / Likkutei Torah and the notes that were still spelled out letter by
+  // letter (corpus count in verification/ABBR-112.tsv); each has one reading in these texts. With a prefix: the prefix rule.
+  'תו"א': 'תּוֹרָה אוֹר', 'פע"ח': 'פְּרִי עֵץ חַיִּים', 'עכ"ז': 'עִם כָּל זֶה', 'עפ"ז': 'עַל פִּי זֶה', 'ע"ס': 'עֶשֶׂר סְפִירוֹת', 'הע"ס': 'הָעֶשֶׂר סְפִירוֹת', 'רע"מ': 'רַ֫עְיָא מְהֵ֫ימְנָא', 'הרע"מ': 'רַ֫עְיָא מְהֵ֫ימְנָא', 'מהרע"מ': 'מֵרַ֫עְיָא מְהֵ֫ימְנָא', 'פב"פ': 'פָּנִים בְּפָנִים',
+  'יצ"מ': 'יְצִיאַת מִצְרַיִם', 'ביצ"מ': 'בִּיצִיאַת מִצְרַיִם', 'ליצ"מ': 'לִיצִיאַת מִצְרַיִם', 'דיצ"מ': 'דִּיצִיאַת מִצְרַיִם', 'מיצ"מ': 'מִיצִיאַת מִצְרַיִם', 'ויצ"מ': 'וִיצִיאַת מִצְרַיִם', 'שיצ"מ': 'שֶׁיְּצִיאַת מִצְרַיִם', 'עה"ד': 'עֵץ הַדַּעַת', 'הק"ש': 'קְרִיאַת שְׁמַע', 'תש"י': 'תְּפִלִּין שֶׁל יָד', 'תש"ר': 'תְּפִלִּין שֶׁל רֹאשׁ', 'אה"ר': 'אַהֲבָה רַבָּה', 'א"פ': 'אוֹר פְּנִימִי',
+  'שע"ז': 'שֶׁעַל זֶה', 'וע"ז': 'וְעַל זֶה', 'בעה"כ': 'בְּעֶרְכֵי הַכִּנּוּיִים', 'ת"ז': 'תִּיקּוּנֵי ז֫וֹהַר', 'הת"ז': 'תִּיקּוּנֵי ז֫וֹהַר', 'הפע"ח': 'פְּרִי עֵץ חַיִּים', 'מהפע"ח': 'מִפְּרִי עֵץ חַיִּים', 'בהע"ס': 'בָּעֶשֶׂר סְפִירוֹת',
+  'הרמ"ז': 'הָרַמַ"ז', 'בהרמ"ז': 'בָּרַמַ"ז', 'ובהרמ"ז': 'וּבָרַמַ"ז', 'והרמ"ז': 'וְהָרַמַ"ז',
+  'ב"פ': 'שְׁתֵּי פְּעָמִים',
+  'מדה"ר': 'מִדַּת הָרַחֲמִים', 'העכו"ם': 'עוֹבְדֵי הַכּוֹכָבִים וְהַמַּזָּלוֹת', 'יחו"ע': 'יִחוּדָא עִילָּאָה',
   'אאמו"ר': 'אֲדוֹנִי אָבִי מוֹרִי וְרַבִּי', 'ש"ס': 'שַׁ"ס', 'הש"ס': 'הַשַּׁ"ס', 'תנ"ך': 'תַּנַ"ךְ', 'לקב"ה': 'לְהַקָּדוֹשׁ בָּרוּךְ הוּא', 'דרז"ל': 'דְּרַבּוֹתֵינוּ זִכְרוֹנָם לִבְרָכָה', 'בדרז"ל': 'בְּדִבְרֵי רַבּוֹתֵינוּ זִכְרוֹנָם לִבְרָכָה',
 };
+// gate (round 3, verification/ABBR-112.tsv): only entries reviewed strictly above 9.5; withdrawn: חו״ב, ק״נ, ב״ן, ג״פ, כ״כ, years
+const ABBR_112 = new Set(['תו"א', 'פע"ח', 'עכ"ז', 'עפ"ז', 'ע"ס', 'רע"מ', 'פב"פ', 'יצ"מ', 'עה"ד', 'אה"ר', 'א"פ', 'ת"ז', 'מדה"ר', 'תש"י', 'תש"ר', 'פ"ק']);
 const ABBR = new Map(Object.entries(ABBREVIATIONS).map(([k, v]) => [k.replace(/[״]/g, '"').replace(/[׳]/g, "'"), v]));
 const PREFIXES = ['', 'ו', 'ה', 'ב', 'ל', 'מ', 'כ', 'ש', 'וב', 'ול', 'ומ', 'וכ', 'וש', 'וה', 'שב', 'של', 'שה', 'מה', 'כש', 'לה', 'בה', 'וכש', 'ושב', 'ומה'];
 
@@ -126,6 +136,8 @@ export function replaceWord(w, opt) {
       return lead + prefixWithMarks(core, p.length) + name + trail;
     }
   }
+  // round 2: a 1.0.112 abbreviation that the text itself vocalises (אותיות בֵּ״ן וּבַ״ת) is read as vocalised
+  if (/[\u05B0-\u05BB\u05C7]/.test(core) && [0, 1, 2].some(p => ABBR_112.has(sk.slice(p)))) return w;
   if (ABBR.has(sk)) {
     let v = ABBR.get(sk);
     if (v === HASHEM && opt.divineName === 'adonai') v = 'אֲדֹנָי';
@@ -162,7 +174,9 @@ export function replaceWord(w, opt) {
       return lead + swapLetter(core, hpos, 'ה', 'ק') + trail;
     }
     // יָהּ (with mappiq) → קָהּ
-    if (RE_YAH.test(letters) && /\u05BC/.test(core.slice(-3)) && !/["']/.test(sk)) return lead + swapLetter(core, letters.length - 2, 'י', 'ק') + trail;
+    // 1.0.112: only the Name itself – a qamatz under the yod (יָהּ, בְּיָהּ). The Aramaic suffix ־ֵיהּ (לֵיהּ, בֵּיהּ: no vowel on the
+    // yod) is "to him / in him", never the Name – it was read לֵקהּ.
+    if (RE_YAH.test(letters) && /\u05BC/.test(core.slice(-3)) && !/["']/.test(sk) && /\u05D9[\u0591-\u05C7]*\u05B8/.test(core)) return lead + swapLetter(core, letters.length - 2, 'י', 'ק') + trail;
     // the noun אֵל: vocalised, tsere under the א (the preposition אֶל has segol)
     if (RE_EL.test(letters) && !/["']/.test(sk)) {
       const a = core.lastIndexOf('א');
@@ -263,13 +277,68 @@ const AGE_PREV = /^(ו|כ|וכ|ש|ה)?(בן|בת)$/;
 // Counted nouns and their gender (f / m), checked by hand; the plural, a few singulars used after numbers above ten
 // (י״ב שנה, ל׳ יום) and construct plurals (ד׳ מיני). Not here: words that are also names of parashot / books /
 // tractates when the numeral is פ׳ (פ׳ משפטים = פרשת משפטים, see below), and צבאות (ה׳ צבאות is the Name).
-const COUNTED_F = 'מצות מצוות מדות מידות מעלות מעלה אותיות בחינות בחינה בחי מדרגות מדריגות נתיבות ברכות ידות שעות המשכות ספירות דעות תשובות תיבות תבות עליות נקודות קליפות אהבות רוחות תפלות תפילות שערות מסכתות שניות מלכיות מלאכות הויות חלות תורות תעניות מיתות פרשיות אומות סעודות סעדות כתות השגחות פעמים פעם שנים שנה אמות אמה מלקות מאות אצבעות תקופות דלתות גבורות ספירות נשמות שבתות מנות מנה סאה סאין ידים רגלים אבנים עבירות כוונות כונות מחשבות התבוננות הלכות מילין תיבין צורות דרגות מחיצות פרסאות ערים נשים בנות'.split(' ');
+const COUNTED_F = 'מדהר מצות מצוות מדות מידות מעלות מעלה אותיות בחינות בחינה בחי מדרגות מדריגות נתיבות ברכות ידות שעות המשכות ספירות דעות תשובות תיבות תבות עליות נקודות קליפות אהבות רוחות תפלות תפילות שערות מסכתות שניות מלכיות מלאכות הויות חלות תורות תעניות מיתות פרשיות אומות סעודות סעדות כתות השגחות פעמים פעם שנים שנה אמות אמה מלקות מאות אצבעות תקופות דלתות גבורות ספירות נשמות שבתות מנות מנה סאה סאין ידים רגלים אבנים עבירות כוונות כונות מחשבות התבוננות הלכות מילין תיבין צורות דרגות מחיצות פרסאות ערים נשים בנות'.split(' ');
 const COUNTED_M = 'אברים איברים אברין איברין אברי איברי חלקים ימים יום יומין עולמות עלמין שמות פירושים הפכים הפכיים סעיפים טפחים טפח דברים קוין קווין נהורין מוחין שבטים יסודות מקיפים ענינים ניצוצין ניצוצים נצוצין נצוצים ניצוצות גידים כלים חדשים חדש חודש ספרים ספרין פסוקים צמצומים לבושים שערים כתרים כתרין מינים מיני פרקים פרקין אופנים גוונים גוונין כוכבים רקיעים אלפים אלף אלפין מאמרות מלכים פרים צדיקים כבשים מזלות היכלות לבבות נרות קולות אורות מחנות מטות קצוות צומות שבועות חוטין נימין קוצין שבילין תחומין דורות דור כחות כוחות קרבנות כרובים מלאכים עדים כהנים לוים זוזים זוז דינרים דינר אנשים איש נביאים ראשים גבולים פרצופים תיקונים תקונים תיקוני תקוני זיווגים זווגים חסדים דינים צירופים יחודים מקומות שקלים שקל עמודים עמודי סדרים'.split(' ');
 export const COUNTED = new Map([...COUNTED_F.map(w => [w, 'f']), ...COUNTED_M.map(w => [w, 'm'])]);
 const SINGULAR_COUNTED = new Set(['שנה', 'יום', 'פעם', 'אמה', 'סאה', 'מנה', 'טפח', 'אלף', 'חדש', 'חודש', 'איש', 'זוז', 'דינר', 'שקל', 'דור', 'מעלה', 'בחינה']);
 const PARASHA_NAMES = new Set(['שמות', 'דברים', 'משפטים', 'שופטים', 'קדושים', 'תולדות', 'מסעות', 'שבועות', 'ברכות', 'מנחות']);
 // numerals that are read as a word when they do not count anything (תרי״ג מצוות is a count: 613)
 const NUMERAL_WORDS = { 'תרי"ג': 'תַּרְיַ"ג', 'רמ"ח': 'רַמַ"ח', 'שס"ה': 'שַׁסָ"ה' };
+/** 1.0.112: ת + ק/ר/ש/ת + one or two letters (a year, 5400–5799 / 5800–): vocalised as it is said (ת״ק / ת״ר are counts). */
+export function yearWord(num) {
+  const m = /^ת([קרשת])([\u05D0-\u05EA]?)"([\u05D0-\u05EA])$/.exec(num);
+  if (!m) return null;
+  const fin = c => c;   // the last letter is spirant, as spoken: תַּרְנַ״ב tarnav, תַּרַ״ךְ tarach
+  // three letters: ta-ra-kh (תַּרַ״ךְ); four: tar-sav (תַּרְסַ״ו) – the last letter keeps no vowel (ך gets its shva)
+  const last = fin(m[3]) + (/[ךכ]/.test(m[3]) ? '\u05B0' : '');
+  if (!m[2]) return 'תַּ' + m[1] + (m[1] === 'ש' ? '\u05C1' : '') + '\u05B7"' + last;
+  // the letter after the closed syllable takes dagesh kal (תַּרְפַּ״ז tar-PAZ, תַּקְכַּ״ה)
+  return 'תַּ' + m[1] + (m[1] === 'ש' ? '\u05C1' : '') + '\u05B0' + m[2] + (/[בגדכפת]/.test(m[2]) ? '\u05BC' : '') + (m[2] === 'ש' ? '\u05C1' : '') + '\u05B7"' + last;
+}
+// round 2: a year only after שנת / a month (with its day) / a parasha name / "ה׳" – not a section number (ססי תק״ס) or תר״י
+const YEAR_PREV = /^(?:[ובלמ]?(?:שנת|שנה|תשרי|חשון|חשוון|מרחשון|מרחשוון|כסלו|כסליו|טבת|שבט|אדר|ניסן|אייר|איר|סיון|סיוון|תמוז|אב|מנחם-אב|אלול)|א'|ב'|ראשון|שני|ה'|בראשית|נח|לך|וירא|חיי|תולדות|ויצא|וישלח|וישב|מקץ|ויגש|ויחי|שמות|וארא|בא|בשלח|יתרו|משפטים|תרומה|תצוה|תשא|ויקהל|פקודי|ויקרא|צו|שמיני|תזריע|מצורע|אחרי|קדושים|אמור|בהר|בחקותי|במדבר|נשא|בהעלותך|שלח|קרח|חקת|בלק|פנחס|מטות|מסעי|דברים|ואתחנן|עקב|ראה|שופטים|תצא|תבוא|תבא|נצבים|וילך|האזינו|הברכה|פסח|שבועות|סוכות|הסוכות|השבועות|הפסח|תורה|קיץ|חורף)$/;
+const PARASHOT = new Set('בראשית נח לך וירא חיי תולדות ויצא וישלח וישב מקץ ויגש ויחי שמות וארא בא בשלח יתרו משפטים תרומה תצוה כי תשא ויקהל פקודי ויקרא צו שמיני תזריע מצורע אחרי קדושים אמור בהר בחקותי בחקתי במדבר נשא בהעלותך שלח קרח קורח חקת חוקת בלק פנחס פינחס מטות מסעי דברים ואתחנן עקב ראה שופטים תצא תבוא נצבים וילך האזינו ברכה'.split(' '));
+/** 1.0.112: abbreviations whose reading depends on the next / previous word (otherwise they stay letter by letter):
+ *  ס״פ / ר״פ before a chapter number = סוֹף / רֵישׁ פֶּרֶק, before a parasha = סוֹף / רֵישׁ פָּרָשַׁת; ע״ז before נאמר / אמרו = עַל זֶה;
+ *  בע״ח before a gate / chapter (שער, ש״א, שמ״א, פ״ז, שם) = בְּעֵץ חַיִּים; ב״ר before פ / a number = בְּרֵאשִׁית רַבָּה;
+ *  ת״ד after י״ג = תִּיקּוּנֵי דִּיקְנָא; מדה״ר after י״ג = מִדּוֹת הָרַחֲמִים. */
+// a letter name (ר״פ מ״ם, ר״פ צדי) is not a chapter numeral here (the letter-name reading was not deployed, see contextAbbr)
+const LETTER_VALUE = { אלף: 1, בית: 2, גימל: 3, דלת: 4, הא: 5, ויו: 6, וו: 6, זין: 7, חית: 8, טית: 9, יוד: 10, כף: 20, למד: 30, מם: 40, נון: 50, סמך: 60, עין: 70, פא: 80, צדי: 90, קוף: 100, ריש: 200, שין: 300, תו: 400 };
+export function contextAbbr(words, i) {
+  const w = words[i];
+  // (letter-name chapters after ס״פ / ר״פ – ר״פ צדי – reviewed 9.2 in round 3: not deployed; such a ר״פ stays as in 1.0.110)
+  const m = /^([^\u05D0-\u05EA]*)([\u05D0-\u05EA]+["״][\u05D0-\u05EA])([.,:;)\]]*)$/.exec(w || '');
+  if (!m || /[\u0591-\u05C7]/.test(w)) return null;
+  const near = dir => { for (let j = i + dir; j >= 0 && j < words.length; j += dir) if (words[j] && !/^\s+$/.test(words[j])) return words[j]; return ''; };
+  const norm = x => skeleton(x || '').replace(/״/g, '"').replace(/׳/g, "'").replace(/^[([]+/, '').replace(/[.,:;)\]]+$/, '');
+  const sk = norm(m[2]), nx = norm(near(1)), pv = norm(near(-1)), out = s => m[1] + s + m[3];
+  const isNum = x => /^[\u05D0-\u05EA]{1,3}["'][\u05D0-\u05EA]?$/.test(x) && !ABBR.has(x) && !ABBR_112.has(x) && !!splitNumeral(x) && !splitNumeral(x).pre;
+  // round 2: the chapter number after ס״פ / ר״פ is a number (סוֹף פֶּרֶק עֶשְׂרִים וּשְׁלוֹשָׁה); after ב״ר, פ״א = פָּרָשָׁה אַחַת
+  // gate: not a letter name (מ״ם) and not an amud (דר״פ ע״ב = folio 280b, not chapter 72)
+  const chapterNum = x => isNum(x) && !LETTER_VALUE[x.replace(/"/g, '')] && !/^ע"[אב]$/.test(x);
+  if (chapterNum(sk) && /^[ובד]?(ס"פ|ר"פ)$/.test(pv)) return out(numberWords(splitNumeral(sk).n, 'm'));
+  const br = pv === 'ב"ר' && /^פ"?([\u05D0-\u05EA"']+)$/.exec(sk);
+  if (br) { const r = br[1].replace(/^"/, ''), n = gematria(/["']/.test(r) ? r : r.length === 1 ? r + "'" : r.slice(0, -1) + '"' + r.slice(-1)); if (n) return out('פָּרָשָׁה ' + numberWords(n, 'f')); }
+  // פ״ק before a tractate (פ״ק דברכות) = פֶּרֶק קַמָּא; otherwise letters (אותיות דפ״ק, דודי דופ״ק)
+  const pq = /^(ו|ב|וב)?פ"ק$/.exec(sk);
+  if (pq && /^ד[\u05D0-\u05EA]{2,}$/.test(nx)) return out(pq[1] ? withPrefix(pq[1], 'פֶּרֶק קַ֫מָּא') : 'פֶּרֶק קַ֫מָּא');
+  const parasha = x => PARASHOT.has(x.replace(/^ו/, '')) || PARASHOT.has(x);
+  const pm = /^([ובד]?)(ס"פ|ר"פ)$/.exec(sk);
+  if (pm && !/[.,:;]$/.test(m[3])) {
+    const head = pm[2] === 'ס"פ' ? 'סוֹף' : 'רֵישׁ', pre = pm[1];
+    const r = chapterNum(nx) ? head + ' פֶּרֶק' : parasha(nx) ? head + ' פָּרָשַׁת' : null;
+    if (r) return out(pre ? withPrefix(pre, r) : r);
+  }
+  if (sk === 'ע"ז' && /^(נאמר|נא'|אמרו|ארז"ל|אמר|כתיב|נאמרו|רמזו)$/.test(nx)) return out('עַל זֶה');
+  const be = /^([ושד]?)בע"ח$/.exec(sk);
+  if (be && (/^(שער|שם|ש[\u05D0-\u05EA]{0,2}"[\u05D0-\u05EA]|ש'|ס"פ|ר"פ|פ"[\u05D0-\u05EA]|פ'|בשער|ריש|סוף)$/.test(nx))) return out(be[1] ? withPrefix(be[1], 'בְּעֵץ חַיִּים') : 'בְּעֵץ חַיִּים');
+  if (sk === 'ב"ר' && (/^פ/.test(nx) || isNum(nx))) return out('בְּרֵאשִׁית רַבָּה');
+  // the numeral itself, with a prefix (בי״ג ת״ד, מי״ג ת״ד – not מ״ג = 53): the count before the two nouns
+  const yg = /^([ובדלמשה]*)י"ג$/.exec(sk);
+  if (yg && (nx === 'ת"ד' || nx === 'מדה"ר')) { const nw = numberWords(13, nx === 'ת"ד' ? 'm' : 'f'); return out(yg[1] ? withPrefix(yg[1], nw) : nw); }
+  if (/^[ובדלמשה]*י"ג$/.test(pv)) { if (sk === 'ת"ד') return out('תִּיקּוּנֵי דִּ֫יקְנָא'); if (sk === 'מדה"ר') return out('מִדּוֹת הָרַחֲמִים'); }
+  return null;
+}
 /** The counted noun after a numeral: {g, def} or null. "בחי׳" counts as בחינות. */
 function countedNoun(nx, n) {
   const sk = skeleton(nx).replace(/^[([]+/, '').replace(/["'״׳]/g, '');
@@ -304,6 +373,8 @@ export function numeralReading(words, i) {
   const sk = skeleton(m[2]).replace(/״/g, '"').replace(/׳/g, "'");
   const sp = splitNumeral(sk);
   if (!sp) return null;
+  // 1.0.112: a prefix before a new abbreviation (לחו״ג, מחו״ב: ל/מ + חו״ג, not the number 47 / 56) – replaceWord reads it
+  if (!ABBR.has(sk) && [1, 2].some(p => /^[ובלמכשד]+$/.test(sk.slice(0, p)) && ABBR_112.has(sk.slice(p)))) return null;
   // a vocalised prefix (וְד׳) keeps its own vowel; an unvocalised one is vocalised by rule
   const vocalPre = sp.pre && /[\u05B0-\u05BC]/.test(prefixWithMarks(m[2], sp.pre.length)) ? prefixWithMarks(m[2], sp.pre.length) : null;
   const pref = (word, keep) => (!sp.pre ? word : vocalPre ? vocalPre + word : withPrefix(sp.pre, word, keep));
@@ -351,6 +422,8 @@ export function numeralReading(words, i) {
   // an age without the noun: "בן י״ג" → בֶּן שְׁלוֹשׁ עֶשְׂרֵה (שנה is feminine)
   if (!sp.pre && AGE_PREV.test(pvs) && n > 1 && !/[.,;:]$/.test(pv)) return out(numberWords(n));
   if (!sp.pre && NUMERAL_WORDS[num]) return out(NUMERAL_WORDS[num]);
+  // 1.0.112: a year of the Jewish calendar (תקס״ה, תרס״ו, תר״ך) is said as a word: tak-sa, tar-sav, ta-rakh
+  // (years, yearWord: reviewed 8.8 in round 3 – not deployed; kept for a later round)
   // anything else – a list letter (א׳ … ב׳ …), a folio side (ע״ב), a part (ח״ב), a citation – the names of the letters
   return out(names());
 }
@@ -498,6 +571,8 @@ export function prepareForTTS(html, opt = {}) {
       const at = w.search(/[\u05D0-\u05EA]/), end = w.lastIndexOf("'") >= 0 ? w.lastIndexOf("'") + 1 : w.length;
       return w.slice(0, at) + (bm[1] ? withPrefix(bm[1], form) : form) + w.slice(end);
     }
+    const ctx = contextAbbr(words, i);
+    if (ctx !== null) return ctx;
     const num = numeralReading(words, i);
     if (num !== null) return num;
     return replaceWord(w, chol ? { ...o, chol: true } : { ...o, chol: undefined });

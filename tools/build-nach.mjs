@@ -68,7 +68,7 @@ for (const [b, n] of Object.entries(TORAH)) for (let c = 1; c <= n; c++) {
   const t = sef('onk', `Onkelos ${b} ${c}`), V = t?.versions?.[0]?.text;
   if (!Array.isArray(V)) { warn.push(`no Onkelos: ${b} ${c}`); continue; }
   meta('onkelos', t); cov.onkelos.chapters++; cov.onkelos.verses += V.length;
-  write(`onkelos/${b}/${c}.json`, { t: V.map(display), say: V.map(x => sayVocalized(display(x), stats.onkelos)) });
+  write(`onkelos/${b}/${c}.json`, { t: V.map(display), say: V.map(x => sayVocalized(display(x), stats.onkelos, { aram: 'onkelos' })) });
 }
 const doubt = [];
 for (const f of mitzvotFiles()) {
