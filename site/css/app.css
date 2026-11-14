@@ -1029,3 +1029,29 @@ html[data-design] #reader { background-attachment: scroll; }
 /* the date field must show the whole date (nocturne's letter spacing cut the year) */
 [data-design="nocturne"] #datepick { letter-spacing: .02em; }
 [data-design] .datefield #datepick { width: 8rem; }
+
+/* ---------- 1.0.116: bottom navigation bar on the general screens (designs only; built by syncNav) ---------- */
+.bnav { position: fixed; z-index: 8; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: .3rem max(.4rem, env(safe-area-inset-right)) max(.35rem, env(safe-area-inset-bottom)) max(.4rem, env(safe-area-inset-left));
+  background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -4px 16px rgba(0, 0, 0, .08); }
+.bnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 52px; min-width: 0; border-radius: 12px;
+  color: var(--muted); text-decoration: none; font-family: var(--ui); font-size: .78rem; font-weight: 700; line-height: 1.15; text-align: center; }
+.bnav a svg { width: 24px; height: 24px; flex: none; }
+.bnav a[aria-current="page"] { color: var(--accent); }
+html[data-bnav] #app::after { content: ""; display: block; height: calc(76px + env(safe-area-inset-bottom)); }
+html[data-bnav] #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+/* sefer: a leather strip with a gold edge, the current tab in light gold */
+[data-design="sefer"] .bnav { background: linear-gradient(#55301b, #3a1f0f); border-top: 2px solid var(--gold); box-shadow: 0 -2px 0 color-mix(in srgb, var(--gold) 35%, transparent); }
+[data-design="sefer"] .bnav a { color: #d9c08a; font-weight: 600; }
+[data-design="sefer"] .bnav a[aria-current="page"] { color: #fff1c8; background: rgba(227, 194, 122, .18); }
+/* modern: a dark rounded bar, the current tab as an orange pill */
+[data-design="modern"] .bnav { background: #17130f; border: 0; border-radius: 22px 22px 0 0; box-shadow: none; }
+[data-design="modern"] .bnav a { color: #bdb2a3; font-weight: 800; }
+[data-design="modern"] .bnav a[aria-current="page"] { color: #fff; background: var(--c0); }
+/* nocturne: near-black with a gold hairline, the current tab glows gold */
+[data-design="nocturne"] .bnav { background: #15120e; border-top: 1px solid rgba(201, 164, 92, .5); box-shadow: 0 -8px 24px rgba(0, 0, 0, .5); }
+[data-design="nocturne"][data-theme="night"] .bnav { background: #070604; }
+[data-design="nocturne"] .bnav a { color: #a99d86; font-weight: 600; }
+[data-design="nocturne"] .bnav a[aria-current="page"] { color: var(--gold2); text-shadow: 0 0 10px rgba(241, 215, 154, .45); }
+[data-design="nocturne"] .bnav a[aria-current="page"] svg { filter: drop-shadow(0 0 6px rgba(241, 215, 154, .55)); }
+.bnav a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }

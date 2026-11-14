@@ -481,3 +481,12 @@ npm test && npm run ui && npm run shots
 
 ## 2026-11-15 – 1.0.115: designs – the date field shows the whole date
 - In "לילי" the letter spacing cut the year in the home date field (14/11/202). Date field 8rem in the designs, nocturne spacing .02em; test in designs-204.
+
+## 2026-11-15 – 1.0.116: designs – a bottom navigation bar on the general screens
+Dudi: "בר ניווט במסך הכללי". In the three designs (ספר קודש, מודרני וצבעוני, לילי) the home, library, search, siddur and
+settings screens now have a fixed bottom nav bar with the real destinations only: היום (#/), ספרייה, חיפוש, סידור, הגדרות.
+The current tab is marked (aria-current, per design: gold on leather / an orange pill on a dark bar / a gold glow on black),
+targets are ≥ 44px, the bar pads itself by env(safe-area-inset-bottom), and #app gets a matching spacer so nothing at the
+end of a page hides under it. The bar is removed while the reader is open (its own bar and pager stay on top) and comes back
+on close. syncNav() builds it only when a design is chosen – the original design gets no bar and no extra DOM, so it stays
+exactly as before (designs-203 identity). Tests: designs-205.

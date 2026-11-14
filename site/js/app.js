@@ -83,6 +83,7 @@ function applyPrefs() {
   // 1.0.113: the design (look). The default 'classic' sets no attribute, so the original styles apply unchanged.
   if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; r.dataset.designFont = prefs.designFont; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else { delete r.dataset.design; delete r.dataset.designFont; }
   const bp = document.getElementById('b-play2'); if (bp) bp.hidden = !r.dataset.design; // 1.0.114: the designs' bottom-bar play button
+  if (typeof syncNav === 'function' && document.getElementById('reader')) syncNav();
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
@@ -236,7 +237,25 @@ function route() {
   if (view === 'd' && /^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a;
   renderHome();
 }
-window.addEventListener('hashchange', route);
+window.addEventListener('hashchange', () => { route(); syncNav(); });
+// 1.0.116: in the designs, a fixed bottom navigation bar on the general screens (not over the reader). Built only when a
+// design is chosen, so the original look has no extra element.
+const HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>';
+const BNAV = [['home', '#/', HOME_ICON, 'היום'], ['lib', '#/lib', LIB_ICON, 'ספרייה'], ['search', '#/search', SEARCH_ICON, 'חיפוש'], ['siddur', '#/siddur', NAV_ICON.book, 'סידור'], ['settings', '#/settings', ICON.gear, 'הגדרות']];
+function syncNav() {
+  const root = document.documentElement, show = !!root.dataset.design && $('#reader').hidden;
+  let nav = document.getElementById('bnav');
+  if (!show) { nav?.remove(); delete root.dataset.bnav; return; }
+  if (!nav) {
+    nav = document.createElement('nav'); nav.id = 'bnav'; nav.className = 'bnav'; nav.setAttribute('aria-label', 'ניווט ראשי');
+    nav.innerHTML = BNAV.map(([k, h, i, t]) => `<a href="${h}" data-tab="${k}">${i}<span>${t}</span></a>`).join('');
+    $('#app').after(nav);
+  }
+  root.dataset.bnav = '1';
+  const view = location.hash.replace(/^#\/?/, '').split(/[/?]/)[0];
+  const tab = !view || view === 'd' ? 'home' : ['lib', 'search', 'siddur', 'settings'].includes(view) ? view : '';
+  for (const a of nav.querySelectorAll('a')) { if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }
+}
 window.addEventListener('pageshow', e => { if (e.persisted && snapDateOnResume()) route(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && snapDateOnResume()) route(); });
 // #/lib → the list of books; #/lib/<node> → its list; #/lib/<chapter>[?s=<segment>] → the reader (same as the lessons)
@@ -1086,6 +1105,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
+  syncNav();
   R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
   const lparent = R.libInfo?.crumbs.at(-1);
   const dayFocus = R.dayFocus; R.dayFocus = null;
@@ -1837,6 +1857,7 @@ function closeReader() {
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
+  syncNav();
   R.unit = null; R.sid = null; R.lib = null; R.libInfo = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
   if (R.wake) { R.wake.release().catch(() => {}); R.wake = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -1844,7 +1865,7 @@ function closeReader() {
 
 if (!prefs.locationChosen) prefs.il = guessIsrael();  // stated default until the reader chooses (not saved as a choice)
 applyPrefs();
-route();
+route(); syncNav();
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   // Update flow: the new worker activates immediately (skipWaiting); the running page still has the old code,
   // so reload at once on the home page, or offer a reload in the reader (never interrupt reading/TTS).
