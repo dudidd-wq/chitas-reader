@@ -957,3 +957,72 @@ html[data-design="nocturne"] body, html[data-design="nocturne"] #reader { backgr
 [data-design] .glyph { position: relative; z-index: 1; }
 /* the selected design tile keeps its miniature readable in every design: outlined, never filled */
 :root[data-design] .seg-ctl.design-options label:has(input:checked) { background: var(--paper); color: var(--ink); border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+
+/* ---------- 1.0.114: stronger type in the designs, the design's own reading font, a solid bottom bar with play ---------- */
+/* reading font of each design (unless "הגופן שלי"); these faces are smaller on the body than Noto, so they are scaled */
+:root[data-design="sefer"]:not([data-design-font="mine"]) { --text-font: 'Keter YG', 'Noto Serif Hebrew', serif; --dscale: 1.1; }
+:root[data-design="modern"]:not([data-design-font="mine"]) { --text-font: 'SBL Hebrew', 'Noto Serif Hebrew', serif; --dscale: 1.08; }
+:root[data-design="nocturne"]:not([data-design-font="mine"]) { --text-font: 'Taamey Ashkenaz', 'Noto Serif Hebrew', serif; --dscale: 1.12; }
+[data-design]:not([data-design-font="mine"]) .r-content { font-size: calc(var(--size) * var(--dscale, 1)); }
+[data-design="sefer"]:not([data-design-font="mine"]) .r-content, [data-design="modern"]:not([data-design-font="mine"]) .r-content { font-synthesis: weight style; }
+[data-design="nocturne"]:not([data-design-font="mine"]) .r-content { font-weight: max(500, var(--reading-weight, 400)); }
+/* darker, fuller ink and heavier UI type */
+:root[data-design="sefer"] { --ink: #22120a; --muted: #4f3219; --rashi-ink: #33200f; --title-ink: #3a1d0c; --ui: 'Frank Ruhl Libre', 'Noto Serif Hebrew', serif; }
+:root[data-design="sefer"]:is([data-theme="dark"], [data-theme="night"]) { --ink: #f6e8c8; --muted: #cbb48c; --rashi-ink: #dcc7a0; --title-ink: #f6e3b4; }
+:root[data-design="modern"] { --ink: #120e0a; --muted: #4a4038; }
+:root[data-design="modern"]:is([data-theme="dark"], [data-theme="night"]) { --ink: #fbf6ee; --muted: #cfc4b4; }
+:root[data-design="nocturne"] { --ink: #f3ead6; --muted: #b8ab91; --ui: 'Frank Ruhl Libre', 'Noto Serif Hebrew', serif; }
+[data-design="sefer"] body, [data-design="nocturne"] body { font-weight: 500; }
+[data-design="modern"] body { font-weight: 600; }
+[data-design] .r-content { color: var(--ink); }
+/* sefer */
+[data-design="sefer"] .hero .hd { font-size: 3.1rem; }
+[data-design="sefer"] .hero .kicker, [data-design="sefer"] .hero .sub { font-weight: 600; }
+[data-design="sefer"] .dayhead h2 { font-size: 1.75rem; }
+[data-design="sefer"] .ttl { font-size: 1.32rem; font-weight: 900; }
+[data-design="sefer"] .card .what { font-weight: 600; font-size: 1.05rem; color: var(--muted); }
+[data-design="sefer"] .card .meta { font-weight: 700; }
+[data-design="sefer"] .glyph { font-size: 1.85rem; }
+[data-design="sefer"] .r-content h1 { font-size: 1.5em; }
+[data-design="sefer"] .r-content h2:not(.sd-sec) { font-weight: 800; font-size: .95em; }
+[data-design="sefer"] .r-title b { font-size: 1.08rem; font-weight: 800; }
+[data-design="sefer"] :is(.page h1, .set-card > h2) { font-size: 1.6rem; }
+[data-design="sefer"] .r-content .rashi .lbl, [data-design="sefer"] .r-content .doc-kicker { font-weight: 700; }
+/* modern */
+[data-design="modern"] .hero .hd { font-size: 3.4rem; }
+[data-design="modern"] .ttl { font-size: 1.4rem; }
+[data-design="modern"] .card .what { font-weight: 700; font-size: .98rem; }
+[data-design="modern"] .dayhead h2 { font-size: 1.6rem; font-weight: 900; }
+[data-design="modern"] .r-content h1 { font-size: 1.55em; }
+[data-design="modern"] .r-title b { font-size: 1.08rem; }
+/* nocturne: no hairlines – medium/semibold weights, brighter ivory */
+[data-design="nocturne"] .hero .hd { font-weight: 500; font-size: 3.3rem; }
+[data-design="nocturne"] .hero .kicker { font-weight: 600; color: #c2b597; }
+[data-design="nocturne"] .dayhead h2 { font-weight: 600; font-size: 1.5rem; }
+[data-design="nocturne"] .ttl { font-weight: 700; font-size: 1.3rem; }
+[data-design="nocturne"] .card .what { font-weight: 500; font-size: 1.02rem; color: var(--muted); }
+[data-design="nocturne"] .card .meta, [data-design="nocturne"] .card .go { font-weight: 700; }
+[data-design="nocturne"] .glyph { font-weight: 600; font-size: 1.5rem; }
+[data-design="nocturne"] .r-content h1 { font-weight: 500; font-size: 1.5em; }
+[data-design="nocturne"] .r-content h2:not(.sd-sec) { font-weight: 600; }
+[data-design="nocturne"] .r-title b { font-weight: 700; font-size: 1.05rem; }
+[data-design="nocturne"] .r-content .rashi { color: #cbbd9f; }
+[data-design="nocturne"] :is(.page h1, .set-card > h2) { font-weight: 500; }
+/* bottom bar: always a solid, clearly separated bar (nocturne's was a see-through fade), on its own layer; the background of
+   #reader is not 'fixed' (on phones a fixed background on a fixed layer can repaint over the bars) */
+html[data-design] #reader { background-attachment: scroll; }
+[data-design] :is(.r-top, .r-bottom) { will-change: transform; }
+[data-design="nocturne"] .r-bottom { background: #15120e; border-top: 1px solid rgba(201, 164, 92, .5); }
+[data-design="nocturne"][data-theme="night"] .r-bottom { background: #070604; }
+[data-design="nocturne"] .r-top { background: #15120e; border-bottom-color: rgba(201, 164, 92, .4); }
+[data-design="nocturne"][data-theme="night"] .r-top { background: #070604; }
+[data-design] .pg-btn { font-weight: 700; }
+/* the play button in the middle of the bottom bar, as in the mockups (the read-aloud player replaces the row while playing) */
+[data-design] .r-bottom:not(.tts-on) { grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); }
+[data-design] .r-bottom.tts-on .pg-play { display: none; }
+[data-design] .pg-play { min-width: 48px; min-height: 48px; width: 48px; height: 48px; padding: 0; border-radius: 50%; border: 0; }
+[data-design] .pg-play svg { width: 24px; height: 24px; }
+[data-design="sefer"] .r-bottom .pg-play { background: radial-gradient(#f0d48e, #b08a3e); color: #3a1f0f; box-shadow: 0 0 0 2px #3a1f0f, 0 0 0 3px #b08a3e; }
+[data-design="modern"] .r-bottom .pg-play { background: var(--c0); color: #fff; }
+[data-design="nocturne"] .r-bottom .pg-play { background: linear-gradient(180deg, #f4dca0, #c49a4e); color: #1a140b; box-shadow: 0 0 18px rgba(201, 164, 92, .4); }
+[data-design="modern"] .r-content .rashi .lbl { margin-inline-end: .45em; }

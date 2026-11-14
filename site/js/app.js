@@ -62,7 +62,9 @@ const OPTIONAL_FONTS = {
   assistant: ['assistant/Assistant.woff2', 'assistant/OFL.txt'],
 };
 // 1.0.113: optional families a design uses for its headings / UI / Rashi – kept for offline use once the design is chosen
-const DESIGN_FONTS = { sefer: ['keter-yg', 'david', 'noto-rashi'], modern: ['assistant', 'noto-rashi'], nocturne: ['david', 'noto-rashi'] };
+// 1.0.114: the UI of sefer/nocturne is set in the precached Frank Ruhl Libre; the reading font of each design: sefer Keter YG,
+// modern SBL Hebrew (the Ezra-like face of the mockup), nocturne Taamey Ashkenaz (precached) – all with cantillation marks
+const DESIGN_FONTS = { sefer: ['keter-yg', 'noto-rashi'], modern: ['assistant', 'sbl', 'noto-rashi'], nocturne: ['noto-rashi'] };
 const DESIGNS = [['classic', 'הנוכחי (ברירת מחדל)'], ['sefer', 'ספר קודש'], ['modern', 'מודרני וצבעוני'], ['nocturne', 'לילי']];
 const optionalFontPromises = new Map();
 function cacheOptionalFont(font) {
@@ -79,7 +81,8 @@ function applyPrefs() {
   const r = document.documentElement;
   cacheOptionalFont(prefs.font);
   // 1.0.113: the design (look). The default 'classic' sets no attribute, so the original styles apply unchanged.
-  if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else delete r.dataset.design;
+  if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; r.dataset.designFont = prefs.designFont; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else { delete r.dataset.design; delete r.dataset.designFont; }
+  const bp = document.getElementById('b-play2'); if (bp) bp.hidden = !r.dataset.design; // 1.0.114: the designs' bottom-bar play button
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
   r.style.setProperty('--size', prefs.size + 'px'); r.style.setProperty('--lh', prefs.lineHeight);
@@ -516,7 +519,9 @@ const designPreview = () => `<span class="dz" aria-hidden="true"><span class="dz
 function displayGroup() {
   return `
   <fieldset class="design-set"><legend>עיצוב</legend><div class="seg-ctl design-options" role="radiogroup" aria-label="עיצוב">${DESIGNS.map(([v, l]) => `<label data-design-prev="${v}"><span><input type="radio" name="design" value="${v}" ${prefs.design === v ? 'checked' : ''}>${l}</span>${designPreview()}</label>`).join('')}</div>
-    <small>העיצוב משנה צבעים, מסגרות, כרטיסים וגופני הכותרות בכל המסכים. גופן הקריאה, גודל האות וערכת הצבע (כהה/לילה) נשמרים; בעיצוב ״לילי״ הרקע תמיד כהה. הטקסט עצמו אינו משתנה.</small></fieldset>
+    <small>העיצוב משנה צבעים, מסגרות, כרטיסים וגופנים בכל המסכים. גודל האות, ההדגשה וערכת הצבע (כהה/לילה) נשמרים; בעיצוב ״לילי״ הרקע תמיד כהה. הטקסט עצמו אינו משתנה.</small></fieldset>
+  <fieldset class="design-font-set"><legend>גופן הקריאה בעיצוב</legend>${radio('designFont', prefs.designFont, [['design', 'גופן העיצוב'], ['mine', 'הגופן שלי (מהרשימה למטה)']])}
+    <small>חל כשנבחר עיצוב שאינו הנוכחי. גופן העיצוב: ספר קודש – כתר (Keter YG), מודרני – SBL Hebrew, לילי – טעמי אשכנז. בחירת גופן ברשימה עוברת אוטומטית ל״הגופן שלי״.</small></fieldset>
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
   <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
     ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
@@ -681,6 +686,8 @@ function bindForm(root, onChange) {
     if (el.name === 'il') { v = v === 'true' || v === true; setPref('locationChosen', true); }
     setPref(el.name, v);
     if (el.name === 'font' && (v === 'frank' || v === 'ezra')) setPref('taamim', false);
+    // 1.0.114: under a design, picking a font in the list means "my font" – otherwise the choice would not be seen
+    if (el.name === 'font' && prefs.design !== 'classic' && prefs.designFont !== 'mine') { setPref('designFont', 'mine'); const m = root.querySelector('input[name=designFont][value=mine]'); if (m) m.checked = true; }
     const o = root.querySelector('#o-' + ({ size: 'size', lineHeight: 'lh', ttsRate: 'rate' })[el.name]); if (o) o.textContent = v;
     applyPrefs(); onChange?.(el.name);
   });
@@ -1035,7 +1042,7 @@ function fmt(html, isTanakh, siddur = false) {
   s = markSectionLabels(s); // 1.0.66: (א)(ב) section labels – muted, not spoken (siddur/rambam/…)
   if (!isTanakh && !siddur) s = fixNiqqud(s); // round 6: unambiguous repairs of impossible vowel marks (Rashi, Tanya, Rambam)
   // These reading families lack taamim glyphs – strip so a word never mixes fonts mid-glyph
-  if (isTanakh && (!prefs.taamim || ['frank', 'ezra', 'david', 'assistant'].includes(prefs.font))) s = stripTaamim(s);
+  if (isTanakh && (!prefs.taamim || (['frank', 'ezra', 'david', 'assistant'].includes(prefs.font) && !(prefs.design !== 'classic' && prefs.designFont === 'design')))) s = stripTaamim(s); // 1.0.114: a design's own font has the marks
   return divineName(s, prefs.divine); // the divine name: in full (default) or ה׳ – one setting for every text
 }
 // 1.0.61: a siddur table (texts.js siddurTable) – one segment; each cell isolated in its own direction. Cells that are
@@ -1098,6 +1105,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
     <button class="btn ghost pg-btn" id="b-prev" aria-label="עמוד קודם">${ICON.prev}<span class="pg-lbl">עמוד קודם</span></button>
     <span class="pageinfo" id="pinfo" aria-live="polite"></span>
+    <button class="btn pg-play" id="b-play2" aria-label="הקראה – התחלה" ${prefs.design && prefs.design !== 'classic' ? '' : 'hidden'}>${ICON.play}</button>
     <div class="tts-ctl" id="ttsctl" hidden>
       <button class="btn ghost" id="t-back" aria-label="קטע קודם">${ICON.fwd}</button>
       <button class="btn" id="t-play" aria-label="הפעל">${ICON.play}</button>
@@ -1596,6 +1604,7 @@ function bindReaderUi() {
   };
   syncFullBtn();
   $('#b-aa').onclick = () => openSheet('display');
+  $('#b-play2').onclick = () => ttsToggle(); // 1.0.114: the designs' bottom bar has its own play button (as in the mockups)
   // round 4: one tap starts (or pauses) the reading; a long press – or the ⚙ in the player – opens the settings
   { const bt = $('#b-tts'); let timer = 0, long = false;
     bt.addEventListener('pointerdown', () => { long = false; clearTimeout(timer); timer = setTimeout(() => { long = true; openSheet('tts'); }, 550); });
@@ -1691,7 +1700,7 @@ function openSheet(kind, note = '') {
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
     if ((name === 'hideSiddurInstructions' || name === 'siddurLang' || name === 'tachanunMode' || name === 'shabbatMode') && R.sid) { R.speaker?.stop(true); R.speaker = null; const a = anchor(), [bk] = R.sid.split('/'); try { R.doc = await buildSiddurBookDoc(bk, sidOpts()); } catch { /* offline: keep the text shown */ } await renderDoc(); restore(a); siddurTrack(); }
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'shortBiur', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
-    else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold', 'design'].includes(name)) { const a = anchor(); layout(); restore(a); }
+    else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold', 'design', 'designFont'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
     else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }

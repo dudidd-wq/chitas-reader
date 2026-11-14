@@ -4,7 +4,7 @@ import { cleanProfile } from './personal.js';
 import { clampPitch } from './voice-pitch.js';
 const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
-  theme: 'paper', design: 'classic', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
+  theme: 'paper', design: 'classic', designFont: 'design', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, hayomNiqqud: true, biurNiqqud: true, mitzvotNiqqud: true, lessonNach: false, lessonShnayim: false, shnayimSplit: 'day', gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false, lessonDaf: false, lessonAmud: false, lessonYer: false, lessonMishna: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsBiur: false, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, wakeLock: true, spread: true, locationChosen: false,
@@ -30,6 +30,8 @@ function load() {
     if (!['day', 'week'].includes(prefs.shnayimSplit)) prefs.shnayimSplit = 'day';
     // 1.0.113: the overall design (look) – 'classic' (the original, default) | 'sefer' | 'modern' | 'nocturne'
     if (!['classic', 'sefer', 'modern', 'nocturne'].includes(prefs.design)) prefs.design = 'classic';
+    // 1.0.114: reading text under a design – the design's own font ('design') or the font chosen in the list ('mine')
+    if (!['design', 'mine'].includes(prefs.designFont)) prefs.designFont = 'design';
     prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
     if ('hideNoTachanun' in prefs) { if (prefs.hideNoTachanun === true && !(d.prefs || {}).tachanunMode) prefs.tachanunMode = 'date'; delete prefs.hideNoTachanun; }
     for (const k of ['tachanunMode', 'shabbatMode']) if (!['off', 'date', 'always'].includes(prefs[k])) prefs[k] = 'off';

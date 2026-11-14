@@ -82,7 +82,7 @@ const EXPECT = {
   nocturne: { paper: '#0d0c0a', card: 'rgba(0, 0, 0, 0)', top: /color\(srgb|rgba?\(/, hd: /Frank Ruhl Libre/, rashi: /Noto Rashi Hebrew/, hl: 'rgba(241, 215, 154, .1)' },
 };
 for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applies on home, reader, library, settings and siddur – text, font choice and layout intact`, async () => {
-  const p = await pageWith(browser, srv.url, { prefs: { design: d, font: 'frank' }, viewport: { width: 360, height: 760 } });
+  const p = await pageWith(browser, srv.url, { prefs: { design: d, designFont: 'mine', font: 'frank' }, viewport: { width: 360, height: 760 } });
   await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('.card .what:not(:empty)');
   assert.equal(await p.locator('html').getAttribute('data-design'), d);
   assert.equal(await rootVar(p, '--paper'), e.paper);
@@ -96,7 +96,7 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
   await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .rashi');
   const top = await css(p, '#rt', d === 'sefer' ? 'background-image' : 'background-color');
   if (e.top instanceof RegExp) assert.match(top, e.top); else assert.equal(top, e.top);
-  assert.match(await css(p, '#rc .seg .t', 'font-family'), /Frank Ruhl Libre/, 'the font setting still wins for the text');
+  assert.match(await css(p, '#rc .seg .t', 'font-family'), /Frank Ruhl Libre/, 'with "הגופן שלי" (1.0.114) the font setting wins for the text');
   assert.match(await css(p, '#rc .rashi', 'font-family'), e.rashi);
   assert.equal(await rootVar(p, '--hl'), e.hl);
   const txt = await p.locator('#rc').evaluate(r => [...r.querySelectorAll('.seg .t')].map(t => t.textContent).join('|'));
