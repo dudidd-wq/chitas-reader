@@ -98,3 +98,14 @@ test('1.0.114: the designs\' fonts are cached by the service worker and render o
   }
   await ctx.close();
 });
+
+test('1.0.115: the whole date shows in the date field in every design (320 and 412 px)', async () => {
+  for (const d of ['sefer', 'modern', 'nocturne']) for (const width of [320, 412]) {
+    const p = await pageWith(browser, srv.url, { prefs: { design: d }, viewport: { width, height: 800 } });
+    await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('#datepick'); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(200);
+    const [sw, cw] = await p.locator('#datepick').evaluate(e => [e.scrollWidth, e.clientWidth]);
+    assert.ok(sw <= cw, `${d} ${width}: date cut (${sw} > ${cw})`);
+    assert.ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${d} ${width}: page overflows`);
+    await p.context().close();
+  }
+});

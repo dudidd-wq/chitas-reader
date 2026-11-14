@@ -1026,3 +1026,6 @@ html[data-design] #reader { background-attachment: scroll; }
 [data-design="modern"] .r-bottom .pg-play { background: var(--c0); color: #fff; }
 [data-design="nocturne"] .r-bottom .pg-play { background: linear-gradient(180deg, #f4dca0, #c49a4e); color: #1a140b; box-shadow: 0 0 18px rgba(201, 164, 92, .4); }
 [data-design="modern"] .r-content .rashi .lbl { margin-inline-end: .45em; }
+/* the date field must show the whole date (nocturne's letter spacing cut the year) */
+[data-design="nocturne"] #datepick { letter-spacing: .02em; }
+[data-design] .datefield #datepick { width: 8rem; }
