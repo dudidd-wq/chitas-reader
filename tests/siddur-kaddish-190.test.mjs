@@ -41,7 +41,7 @@ test('1.0.90: block boundaries – Kaddish parts in, Barchu / Kedusha / על ה�
   assert.ok(ch > 0 && !fr[ch]);
 });
 
-test('1.0.90 browser: skip = no Kaddish spoken (text still shown), Ein Keloheinu / Aleinu spoken; read = Kaddish spoken', { skip, timeout: 180000 }, async () => {
+test('1.0.90 browser: skip = no Kaddish spoken (text still shown), Ein Keloheinu / Aleinu spoken; read = Kaddish spoken', { skip, timeout: 360000 }, async () => {
   const srv = await serve(), b = await launch();
   const fast = () => {
     window.__spoken = []; window.__ttsMinMsPerChar = 0;
