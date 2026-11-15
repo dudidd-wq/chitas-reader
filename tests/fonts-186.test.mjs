@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import {serve,launch,pageWith} from './helpers.mjs';
+import {serve,launch,pageWith, openChrome } from './helpers.mjs';
 import {DEFAULT_PREFS} from '../site/js/store.js';
 const fonts=[
  ['noto-rashi','Noto Rashi Hebrew','noto-rashi',['NotoRashiHebrew.woff2','OFL.txt'],true],
@@ -30,7 +30,7 @@ test('1.0.86: original GPL fonts, corresponding sources, adjacent licenses and u
 
 test('1.0.86: no optional font requested on default reading; eleven real previews and per-font hints',async()=>{
  const p=await pageWith(browser,srv.url,{prefs:{layout:'scroll'},viewport:{width:1100,height:1900}}),req=[];p.on('request',r=>{if(/\/fonts\/(taamey-d|keter-yg|cardo|david-libre|assistant)\//.test(r.url()))req.push(r.url());});
- await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');assert.equal(req.length,0);await p.click('#b-aa');assert.equal(await p.locator('.font-sample').count(),11);await p.evaluate(()=>document.fonts.ready);
+ await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');assert.equal(req.length,0);await openChrome(p);await p.click('#b-aa', { force: true });assert.equal(await p.locator('.font-sample').count(),11);await p.evaluate(()=>document.fonts.ready);
  for(const[id,name,,,taamim]of fonts){const l=p.locator(`label:has(input[name=font][value="${id}"])`);assert.match(await l.locator('.font-sample').evaluate(e=>getComputedStyle(e).fontFamily),new RegExp(name));if(!taamim)assert.match(await l.textContent(),/ללא טעמים/);}
  if(process.env.CHITAS_FONT_SHOTS)await p.screenshot({path:process.env.CHITAS_FONT_SHOTS+'/chitas-fonts-picker.png'});
  assert.deepEqual(p.errors,[]);await p.context().close();
@@ -42,19 +42,23 @@ for(const[id,name,,,taamim]of fonts)test('1.0.86: '+name+' actually renders Sidd
   // A full navigation makes each assertion inspect the new document, not stale hash-route DOM.
   await p.goto(srv.url+'?fontcase='+i+route);await p.waitForSelector('#rc .seg .t');await waitFont(p,name);await actualFamily(p,'#rc .seg .t',name);
   const t=await p.locator('#rc .seg .t').first().textContent();assert.match(t,/[\u05b0-\u05bc]/,name+route);
-  if(i===1){assert.equal(/[\u0591-\u05af]/.test(t),taamim);await p.waitForSelector('#rc .rashi p');await actualFamily(p,'#rc .rashi p',name);await p.click('#b-aa');await p.locator('input[name=readingBold]').check();await p.click('#sh-x');await waitFont(p,name,700);const used=await actualFamily(p,'#rc .seg .t',name);if(['cardo','david'].includes(id))assert.ok(used.some(f=>f.postScriptName.endsWith('-Bold')),'native bold face used');assert.equal(/[\u0591-\u05af]/.test(await p.locator('#rc .seg .t').first().textContent()),taamim);}
+  await openChrome(p);
+  if(i===1){assert.equal(/[\u0591-\u05af]/.test(t),taamim);await p.waitForSelector('#rc .rashi p');await actualFamily(p,'#rc .rashi p',name);await p.click('#b-aa', { force: true });await p.locator('input[name=readingBold]').check();await p.click('#sh-x');await waitFont(p,name,700);const used=await actualFamily(p,'#rc .seg .t',name);if(['cardo','david'].includes(id))assert.ok(used.some(f=>f.postScriptName.endsWith('-Bold')),'native bold face used');assert.equal(/[\u0591-\u05af]/.test(await p.locator('#rc .seg .t').first().textContent()),taamim);}
  }
- await p.click('#b-aa');await p.locator('input[name=readingBold]').check();await waitFont(p,name,700);assert.equal(await p.locator('#rc .seg .t').first().evaluate(e=>getComputedStyle(e).fontWeight),'700');
+ await openChrome(p);
+ await p.click('#b-aa', { force: true });await p.locator('input[name=readingBold]').check();await waitFont(p,name,700);assert.equal(await p.locator('#rc .seg .t').first().evaluate(e=>getComputedStyle(e).fontWeight),'700');
  const different=await p.evaluate(name=>{const c=document.createElement('canvas'),x=c.getContext('2d');c.width=600;c.height=90;const draw=w=>{x.clearRect(0,0,600,90);x.font=`${w} 32px "${name}"`;x.fillText('תּוֹרָה אוֹר וְשִׂמְחַת לֵב',10,55);return c.toDataURL();};return draw(400)!==draw(700);},name);assert.ok(different,'bold must visibly differ');
  // Fonts without accents do not destroy the global preference for subsequent fonts.
  assert.equal(await p.locator('input[name=taamim]').isChecked(),true);assert.deepEqual(p.errors,[]);await p.context().close();
 });
 
 test('1.0.86: all selected optional families, real bold and licenses survive actual SW offline reload',async()=>{
- const ctx=await browser.newContext({serviceWorkers:'allow',locale:'he-IL',viewport:{width:1100,height:1500}}),p=await ctx.newPage();await p.addInitScript(()=>{if(!localStorage.getItem('chitas-reader.v1'))localStorage.setItem('chitas-reader.v1',JSON.stringify({prefs:{locationChosen:true,layout:'scroll'}}));});
+ const ctx=await browser.newContext({serviceWorkers:'allow',locale:'he-IL',viewport:{width:1100,height:1500}}),p=await ctx.newPage();await p.addInitScript(()=>{if(!localStorage.getItem('chitas-reader.v1'))localStorage.setItem('chitas-reader.v1',JSON.stringify({prefs:{locationChosen:true,layout:'scroll'}}));window.__ttsPauseScale=0;window.__chromeIdleMs=120000;});
  await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');await p.evaluate(()=>navigator.serviceWorker.ready);await p.waitForFunction(()=>navigator.serviceWorker.controller!==null);await p.reload();await p.waitForSelector('#rc .seg .t');
- for(const[id,,dir,files]of fonts){await p.click('#b-aa');await p.locator(`label:has(input[name=font][value="${id}"])`).click();await p.waitForFunction(async paths=>{const c=await caches.open('optional-fonts-v1');return(await Promise.all(paths.map(f=>c.match(new URL('fonts/'+f,document.baseURI).href)))).every(Boolean);},files.map(f=>dir+'/'+f));await p.click('#sh-x');}
+ await openChrome(p);
+ for(const[id,,dir,files]of fonts){await openChrome(p);await p.evaluate(()=>document.getElementById('b-aa').click());await p.waitForSelector('#sheet:not([hidden])');await p.locator(`label:has(input[name=font][value="${id}"])`).click();await p.waitForFunction(async paths=>{const c=await caches.open('optional-fonts-v1');return(await Promise.all(paths.map(f=>c.match(new URL('fonts/'+f,document.baseURI).href)))).every(Boolean);},files.map(f=>dir+'/'+f));await p.click('#sh-x');}
  await ctx.setOffline(true);
- for(const[id,name]of fonts){await p.click('#b-aa');await p.locator(`label:has(input[name=font][value="${id}"])`).click();await p.click('#sh-x');await p.reload();await p.waitForSelector('#rc .seg .t');await waitFont(p,name);await waitFont(p,name,700);assert.equal(await p.locator('html').getAttribute('data-font'),id);await actualFamily(p,'#rc .seg .t',name);}
+ await openChrome(p);
+ for(const[id,name]of fonts){await openChrome(p);await p.evaluate(()=>document.getElementById('b-aa').click());await p.waitForSelector('#sheet:not([hidden])');await p.locator(`label:has(input[name=font][value="${id}"])`).click();await p.click('#sh-x');await p.reload();await p.waitForSelector('#rc .seg .t');await waitFont(p,name);await waitFont(p,name,700);assert.equal(await p.locator('html').getAttribute('data-font'),id);await actualFamily(p,'#rc .seg .t',name);}
  await ctx.close();
 });

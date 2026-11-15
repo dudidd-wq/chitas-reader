@@ -3,7 +3,7 @@
 // each design's reading font is actually rendered (and cached for offline use), and the user's font, bold and size apply.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, PREFS } from './helpers.mjs';
+import { serve, launch, pageWith, PREFS, openChrome } from './helpers.mjs';
 import { DEFAULT_PREFS } from '../site/js/store.js';
 let srv, browser;
 test.before(async () => { srv = await serve(); browser = await launch(); });
@@ -30,30 +30,33 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.114: "${d}" – the b
   for (const layout of ['pages', 'scroll']) {
     const p = await phone({ design: d, layout });
     await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(400);
+    const fab0 = await p.evaluate(() => { const e = document.getElementById('b-fab'), r = e.getBoundingClientRect(), cs = getComputedStyle(e);
+      return { h: r.height, w: r.width, bot: r.bottom, ih: innerHeight, op: cs.opacity, pe: cs.pointerEvents, on: document.getElementById('reader').classList.contains('chrome-on'), bnav: !!document.getElementById('bnav') }; });
+    assert.equal(fab0.on, false, layout);
+    assert.equal(fab0.bnav, false, `${layout}: app nav still in the reader`);
+    assert.ok(fab0.h >= 44 && fab0.w >= 44 && fab0.op !== '0' && fab0.pe !== 'none', `${layout}: FAB ${JSON.stringify(fab0)}`);
+    assert.ok(fab0.bot <= fab0.ih - 39, `${layout}: FAB should clear the gesture area ${JSON.stringify(fab0)}`);
+    const pad = await p.evaluate(() => parseFloat(getComputedStyle(document.getElementById('rc')).paddingBottom));
+    if (layout === 'pages') assert.ok(pad <= 36, `text padding should stay small (${pad})`);
+    await openChrome(p);
     const m = await bar(p);
     assert.equal(m.disp, 'grid', layout); assert.equal(m.vis, 'visible'); assert.equal(m.op, '1');
-    const stack = await p.evaluate(() => {
-      const rb = document.getElementById('rb').getBoundingClientRect();
-      return { rbBot: rb.bottom, ih: innerHeight, bnav: !!document.getElementById('bnav'), pb: getComputedStyle(document.getElementById('rb')).paddingBottom, home: !!document.getElementById('b-home') };
-    });
-    assert.ok(m.top < m.ih - 60, `${layout}: bar ${JSON.stringify(m)}`);
+    const stack = await p.evaluate(() => ({ bnav: !!document.getElementById('bnav'), home: !!document.getElementById('b-home') }));
     assert.equal(stack.bnav, false, `${layout}: app nav still in the reader`);
     assert.ok(stack.home, `${layout}: no home control`);
-    assert.ok(Math.abs(stack.rbBot - stack.ih) < 1, `${layout}: ${JSON.stringify(stack)}`);
-    assert.equal(stack.pb, '40px', 'the slim bar clears the gesture area');
-    assert.ok(solid(m), `${layout}: see-through bar ${m.bg}`);
-    assert.ok(m.onTop, `${layout}: something covers the bar`); assert.ok(m.labels.filter(Boolean).length >= 2, `${layout}: labels ${m.labels}`);
+    assert.ok(m.labels.filter(Boolean).length >= 2, `${layout}: labels ${m.labels}`);
     assert.ok(m.play && m.play[0] >= 44 && m.play[1] >= 44 && m.play[2], `${layout}: play ${JSON.stringify(m.play)}`);
-    const pad = await p.evaluate(() => parseFloat(getComputedStyle(document.getElementById('rc')).paddingBottom));
-    if (layout === 'pages') assert.ok(pad >= m.h - 1, `text runs under the bar (${pad} < ${m.h})`);
     assert.deepEqual(p.errors, []); await p.context().close();
   }
   // chosen in the reader's Aא sheet: the bar is still there after the sheet closes
   const p = await phone({});
   await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .seg');
-  assert.equal(await p.locator('#b-play2').isHidden(), false, 'play stays in the slim bar in the original look too');
+  await openChrome(p);
+  assert.equal(await p.locator('#b-play2').isHidden(), false, 'play stays in the overlay in the original look too');
   await p.tap('#b-aa'); await p.locator(`#sheet label[data-design-prev=${d}]`).tap(); await p.tap('#sh-x'); await p.waitForTimeout(400);
-  const m = await bar(p); const stack = await p.evaluate(() => { const rb = document.getElementById('rb').getBoundingClientRect(); return { rb: rb.bottom, ih: innerHeight, bnav: !!document.getElementById('bnav') }; }); assert.ok(m.onTop && m.play && !stack.bnav && Math.abs(stack.rb - stack.ih) < 1, JSON.stringify({ m, stack }));
+  await openChrome(p);
+  const m = await bar(p); const stack = await p.evaluate(() => ({ bnav: !!document.getElementById('bnav'), on: document.getElementById('reader').classList.contains('chrome-on') }));
+  assert.ok(m.play && !stack.bnav && stack.on, JSON.stringify({ m, stack }));
   await p.context().close();
 });
 
@@ -69,6 +72,7 @@ for (const [d, [family]] of Object.entries(FONT)) test(`1.0.114: "${d}" – its 
   const size0 = await p.locator('#rc .seg .t').first().evaluate(e => parseFloat(getComputedStyle(e).fontSize));
   assert.ok(size0 >= DEFAULT_PREFS.size, `reading size ${size0}`);
   // bold and size from the Aא sheet are visible in the design font
+  await openChrome(p);
   await p.click('#b-aa'); await p.locator('#sheet input[name=readingBold]').check();
   assert.equal(await p.locator('#rc .seg .t').first().evaluate(e => getComputedStyle(e).fontWeight), '700');
   await p.locator('#sheet input[name=size]').fill('32'); await p.locator('#sheet input[name=size]').dispatchEvent('input');
@@ -80,6 +84,7 @@ for (const [d, [family]] of Object.entries(FONT)) test(`1.0.114: "${d}" – its 
   await p.click('#sh-x'); await ready();
   assert.deepEqual(await fontsOf('#rc .seg .t'), ['Frank Ruhl Libre']);
   // and back to the design's font
+  await openChrome(p);
   await p.click('#b-aa'); await p.locator('#sheet input[name=designFont][value=design]').check({ force: true }); await p.click('#sh-x'); await ready();
   assert.deepEqual(await fontsOf('#rc .seg .t'), [family]);
   // home: headings in the design's faces, heavy
@@ -94,10 +99,12 @@ test('1.0.114: the designs\' fonts are cached by the service worker and render o
   await p.addInitScript(() => { if (!localStorage.getItem('chitas-reader.v1')) localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: { locationChosen: true, layout: 'scroll' } })); });
   await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .seg .t'); await p.evaluate(() => navigator.serviceWorker.ready); await p.waitForFunction(() => navigator.serviceWorker.controller !== null); await p.reload(); await p.waitForSelector('#rc .seg .t');
   const files = ['keter-yg/KeterYG-Medium.ttf', 'noto-rashi/NotoRashiHebrew.woff2', 'SBL_Hbrw.ttf', 'assistant/Assistant.woff2'];
+  await openChrome(p);
   for (const d of ['sefer', 'modern', 'nocturne']) { await p.click('#b-aa'); await p.locator(`#sheet label[data-design-prev=${d}]`).click(); await p.click('#sh-x'); }
   await p.waitForFunction(async fs => { const c = await caches.open('optional-fonts-v1'); return (await Promise.all(fs.map(f => c.match(new URL('fonts/' + f, document.baseURI).href)))).every(Boolean); }, files);
   await ctx.setOffline(true);
   for (const [d, [family]] of Object.entries(FONT)) {
+    await openChrome(p);
     await p.click('#b-aa'); await p.locator(`#sheet label[data-design-prev=${d}]`).click(); await p.click('#sh-x');
     await p.reload(); await p.waitForSelector('#rc .seg .t');
     await p.evaluate(f => document.fonts.load(`400 24px "${f}"`), family);

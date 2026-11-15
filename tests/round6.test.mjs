@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { fixWord, fixNiqqud, niqqudForTTS, impossible } from '../site/js/niqqud.js';
 import { prepareForTTS } from '../site/js/tts-prep.js';
-import { serve, launch, pageWith } from './helpers.mjs';
+import { serve, launch, pageWith, openChrome } from './helpers.mjs';
 const rd = p => JSON.parse(fs.readFileSync(new URL(p, import.meta.url)));
 const N = s => s.normalize('NFC');
 
@@ -105,6 +105,7 @@ test('no Hebrew voice: the message is inside the TTS sheet, no toast over the in
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 }, init: noVoiceSynth });
     await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('#rc .seg');
+    await openChrome(p);
     await p.click('#b-tts'); await p.waitForSelector('#sheet:not([hidden]) #sh-note', { timeout: 10000 });
     assert.match(await p.textContent('#sh-note'), /לא נמצא במכשיר קול עברי/);
     await p.waitForTimeout(400);
@@ -120,6 +121,7 @@ test('full-screen mode: "עמוד X מתוך Y" shows briefly on a page turn', {
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
     await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('#rc .seg');
+    await openChrome(p);
     await p.click('#b-full'); await p.waitForTimeout(500);
     await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(350);
     const f = await p.$eval('#pflash', e => ({ show: e.classList.contains('show'), t: e.textContent, o: getComputedStyle(e).opacity }));
@@ -153,6 +155,7 @@ test('568×320 full screen: page 1 is filled (a Rashi block may start at its foo
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 568, height: 320 } });
     await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(600);
+    await openChrome(p);
     await p.click('#b-full'); await p.waitForTimeout(800);
     const r = await p.evaluate(() => {
       const vp = document.querySelector('#vp').getBoundingClientRect(), rc = document.querySelector('#rc');

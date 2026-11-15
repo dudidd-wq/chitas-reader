@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import AxeBuilder from '@axe-core/playwright';
 import { pageGeometry } from '../site/js/layout.js';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 test('page geometry: ragged text on narrow phones, justified from ~390px, two-page spread only on wide landscape', () => {
   assert.equal(pageGeometry({ W: 320, H: 568, size: 24 }).ragged, true);
@@ -36,8 +36,9 @@ test('small landscape (568x320): text starts on page 1, a single compact bar, pa
     await p.waitForTimeout(300);
     const s = await pageState(p);
     assert.ok(s.visible >= 1, 'page 1 must contain text, not only the title');
-    assert.equal(s.botShown, true, 'slim bottom bar stays in short landscape');
+    assert.ok(await p.evaluate(() => { const f = document.getElementById('b-fab'); return f && getComputedStyle(f).opacity !== '0'; }), 'FAB missing in short landscape');
     assert.ok(s.topH / s.H <= 0.16, `top bar ${s.topH}px of ${s.H}`);
+    await openChrome(p);
     assert.ok(await p.isVisible('#b-next2'));
     await p.click('#b-next2'); await p.waitForTimeout(400);
     assert.match(await p.textContent('#pinfo2'), /^עמוד 2 מתוך/);
@@ -59,9 +60,9 @@ test('immersive mode re-paginates into the freed space and keeps the reading pos
     // the segment the page starts with (its beginning – right edge in RTL – is on this page)
     const segBefore = await p.evaluate(() => { const vr = document.querySelector('#vp').getBoundingClientRect(); return [...document.querySelectorAll('.seg')].find(s => { const r = s.getBoundingClientRect(); return r.right > vr.left + 2 && r.right <= vr.right + 2; })?.dataset.id; });
     await p.mouse.click(195, 420); await p.waitForTimeout(500);
-    // 1.0.119: a tap in portrait must not hide the back-to-home or bottom bars
-    assert.equal(await p.evaluate(() => document.querySelector('#reader').classList.contains('immersive')), false);
-    assert.ok(await p.evaluate(() => { const r = document.getElementById('rt').getBoundingClientRect(), c = getComputedStyle(document.getElementById('rt')); return r.height > 40 && c.opacity !== '0' && c.pointerEvents !== 'none'; }), 'back bar hidden after tap');
+    // 1.0.121: a tap on the text does not open the overlay; the FAB stays the way back
+    assert.equal(await p.evaluate(() => document.getElementById('reader').classList.contains('chrome-on')), false);
+    assert.ok(await p.evaluate(() => { const f = document.getElementById('b-fab'), r = f.getBoundingClientRect(), c = getComputedStyle(f); return r.height >= 44 && c.opacity !== '0' && c.pointerEvents !== 'none'; }), 'FAB hidden after tap');
     const after = await pageState(p);
     const visIds = await p.evaluate(() => { const vr = document.querySelector('#vp').getBoundingClientRect(); return [...document.querySelectorAll('.seg')].filter(s => { const r = s.getBoundingClientRect(); return r.right > vr.left && r.left < vr.right; }).map(s => s.dataset.id); });
     assert.ok(visIds.includes(segBefore), 'the segment that was being read is still on screen');
@@ -109,6 +110,7 @@ test('sheets are modal dialogs: aria-modal, focus trapped, background inert, foc
     await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('.seg'); await p.waitForTimeout(300);
     const axe = async () => (await new AxeBuilder({ page: p }).analyze()).violations.map(v => v.id);
     assert.deepEqual(await axe(), [], 'reader: no axe violations (all rules incl. best practices)');
+    await openChrome(p);
     await p.focus('#b-aa'); await p.keyboard.press('Enter'); await p.waitForSelector('#sheet:not([hidden])');
     assert.equal(await p.getAttribute('#sheet', 'aria-modal'), 'true');
     assert.equal(await p.evaluate(() => document.querySelector('#vp').inert && document.querySelector('#rt').inert), true);

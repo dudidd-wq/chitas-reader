@@ -1,7 +1,7 @@
 // Round-2 findings SHOULD 5 + 6: touch targets ≥44×44 px and a usable 568×320 landscape reader.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 const skip = !CHROME && 'no Chrome';
 const D = '2026-11-02';
@@ -26,6 +26,7 @@ test('every control is at least 44×44 (toolbar in short landscape, Sources link
         await p.goto(srv.url + r); await p.waitForTimeout(r.startsWith('#/r/') ? 900 : 400);
         assert.deepEqual(await scan(p), [], `${w}x${h} ${r}`);
       }
+      await openChrome(p);
       await p.click('#b-aa'); await p.waitForTimeout(300);
       assert.deepEqual(await scan(p), [], `${w}x${h} display sheet`);
       assert.deepEqual(p.errors, []);
@@ -54,35 +55,36 @@ test('glossed words have a ≥44 px tall hit area without changing the text layo
   } finally { await b.close(); srv.close(); }
 });
 
-test('568×320 landscape: bars auto-hide after idle, tap brings them back, more text per page', { skip }, async () => {
+test('568×320 landscape: full-screen text, FAB opens the nav, idle or a text tap closes it', { skip }, async () => {
   const srv = await serve(), b = await launch();
   try {
     const p = await pageWith(b, srv.url, { viewport: { width: 568, height: 320 } });
     await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('.seg'); await p.waitForTimeout(400);
-    const imm = () => p.evaluate(() => document.querySelector('#reader').classList.contains('immersive'));
-    const pages = () => p.evaluate(() => +document.querySelector('#pinfo2').textContent.match(/מתוך (\d+)/)[1]);
-    assert.equal(await imm(), false, 'bars visible at first');
-    // Round 5 added one line of new content at the end (#doc-gloss, the gloss-coverage note). It happens to spill onto a 13th page
-    // here, so the density guard compares like with like: the same content as in round 2, i.e. without that note.
+    const on = () => p.evaluate(() => document.getElementById('reader').classList.contains('chrome-on'));
+    const pages = () => p.evaluate(() => { const t = document.querySelector('#pinfo, #pinfo2')?.textContent || ''; const m = t.match(/מתוך (\d+)/); return m ? +m[1] : (window.R?.pages || 0); });
+    assert.equal(await on(), false, 'overlay should start closed');
+    assert.ok(await p.evaluate(() => { const f = document.getElementById('b-fab'); return f && getComputedStyle(f).opacity !== '0'; }), 'FAB missing');
     await p.addStyleTag({ content: '#doc-gloss{display:none}' }); await p.evaluate(() => window.dispatchEvent(new Event('resize'))); await p.waitForTimeout(600);
     const before = await pages();
     assert.ok(before <= 13, `page count in short landscape (got ${before})`);
-    await p.waitForFunction(() => document.querySelector('#reader').classList.contains('immersive'), null, { timeout: 4000 });
-    assert.ok(await pages() <= before, 'hidden bars give at least as much room');
-    const vp = await p.evaluate(() => { const r = document.querySelector('#vp').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+    await openChrome(p);
+    assert.equal(await on(), true);
+    const afterOpen = await pages();
+    assert.equal(afterOpen, before, 'opening the overlay must not re-paginate');
+    const vp = await p.evaluate(() => { const r = document.querySelector('#vp').getBoundingClientRect(); return [r.left + r.width / 2, r.top + 24]; });
     await p.mouse.click(vp[0], vp[1]); await p.waitForTimeout(300);
-    assert.equal(await imm(), false, 'tap in the middle shows the bars');
-    // an open sheet keeps the bars
-    await p.click('#b-aa'); await p.waitForTimeout(3000);
-    assert.equal(await imm(), false, 'no auto-hide while a sheet is open');
+    assert.equal(await on(), false, 'tap on the text closes the overlay');
+    await openChrome(p);
+    await p.click('#b-aa'); await p.waitForTimeout(5500);
+    assert.equal(await on(), true, 'no auto-hide while a sheet is open');
+    await p.keyboard.press('Escape'); await p.waitForTimeout(200);
     assert.deepEqual(p.errors, []);
-    // round 4: a large phone on its side (844×390) also auto-hides
     const l = await pageWith(b, srv.url, { viewport: { width: 844, height: 390 } });
     await l.goto(srv.url + `#/r/chumash/${D}`); await l.waitForSelector('.seg');
-    await l.waitForFunction(() => document.querySelector('#reader').classList.contains('immersive'), null, { timeout: 4000 });
-    // taller screens never auto-hide
+    assert.equal(await l.evaluate(() => document.getElementById('reader').classList.contains('chrome-on')), false);
     const q = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
-    await q.goto(srv.url + `#/r/chumash/${D}`); await q.waitForSelector('.seg'); await q.waitForTimeout(3200);
-    assert.equal(await q.evaluate(() => document.querySelector('#reader').classList.contains('immersive')), false);
+    await q.goto(srv.url + `#/r/chumash/${D}`); await q.waitForSelector('.seg');
+    assert.equal(await q.evaluate(() => document.getElementById('reader').classList.contains('chrome-on')), false);
+    assert.ok(await q.evaluate(() => { const f = document.getElementById('b-fab'); return f && getComputedStyle(f).opacity !== '0'; }));
   } finally { await b.close(); srv.close(); }
 });

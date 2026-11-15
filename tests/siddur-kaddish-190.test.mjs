@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { kaddishFlags } from '../site/js/texts.js';
 import { kaddishAudit } from '../tools/kaddish-audit.mjs';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 const root = new URL('../', import.meta.url).pathname;
 const rows = key => JSON.parse(fs.readFileSync(`${root}site/data/siddur/${key}.json`, 'utf8')).b;
@@ -85,10 +85,12 @@ test('1.0.90 browser: the setting sits with the siddur settings (Aא sheet) and 
     await p.locator('.kaddish-set input[value=skip]').check({ force: true });
     assert.equal(await p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1')).prefs.siddurKaddish), 'skip');
     await p.goto(srv.url + '#/s/mincha/1'); await p.waitForSelector('#rc .seg');
+    await openChrome(p);
     await p.click('#b-tts'); await p.waitForSelector('#ttsctl:not([hidden])');
     await p.click('#t-set'); await p.waitForSelector('#sheet .kaddish-set');
     assert.equal(await p.isChecked('#sheet .kaddish-set input[value=skip]'), true);
     await p.keyboard.press('Escape'); await p.waitForSelector('#sheet .kaddish-set', { state: 'hidden' });
+    await openChrome(p);
     await p.click('#b-aa'); await p.waitForSelector('#sheet .kaddish-set');
     assert.ok(await p.$('#sheet input[name=hideSiddurInstructions]'), 'next to the other siddur settings');
     assert.deepEqual(p.errors, []);

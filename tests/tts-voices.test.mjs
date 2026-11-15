@@ -2,7 +2,7 @@
 // disclosed, never recommended, and never picked by default when a local Hebrew voice exists.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 const skip = !CHROME && 'no Chrome';
 const synth = () => {
@@ -24,6 +24,7 @@ test('network voices: local voice is the default, network voices are labelled an
     await p.goto(srv.url + '#/r/tanya/2026-02-06'); await p.waitForSelector('#rc .seg');
     const order = await p.evaluate(async () => (await import('./js/tts.js')).hebrewVoices().map(v => v.name));
     assert.deepEqual(order, ['Device Hebrew', 'Cloud Hebrew'], 'local voice first (= default)');
+    await openChrome(p);
     await p.click('#b-tts', { button: 'right' });
     await p.waitForSelector('#sheet:not([hidden]) #voice-sel');
     const opts = await p.$$eval('#voice-sel option', o => o.map(x => x.textContent));
@@ -53,6 +54,7 @@ test('no network voice → no disclosure clutter', { skip }, async () => {
         speak() {}, addEventListener() {}, removeEventListener() {} } });
     } });
     await p.goto(srv.url + '#/r/tanya/2026-02-06'); await p.waitForSelector('#rc .seg');
+    await openChrome(p);
     await p.click('#b-tts', { button: 'right' });
     await p.waitForSelector('#sheet:not([hidden]) #voice-sel');
     assert.equal(await p.$eval('#voice-net', e => e.hidden), true);

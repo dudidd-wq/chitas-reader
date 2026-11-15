@@ -26,10 +26,20 @@ export async function pageWith(browser, base, { prefs = {}, progress = {}, viewp
   const ctx = await browser.newContext({ viewport, locale: 'he-IL', serviceWorkers: 'block' });
   const p = await ctx.newPage();
   const errors = []; p.on('pageerror', e => errors.push(e.message));
-  await p.addInitScript(() => { window.__ttsPauseScale = 0; }); // 1.0.101: do not wait out comma/period gaps in tests
+  await p.addInitScript(() => { window.__ttsPauseScale = 0; window.__chromeIdleMs = 120000; }); // 1.0.101/121: no comma gaps; keep the nav overlay open while a test clicks it
   await p.addInitScript(([pr, pg]) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: pr, progress: pg })); sessionStorage.setItem('seeded', '1'); } }, [{ ...PREFS, ...prefs }, progress]);
   if (init) await p.addInitScript(...(Array.isArray(init) ? init : [init]));
   p.errors = errors;
   return p;
 }
 export const progressOf = p => p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1') || '{}').progress || {});
+
+/** 1.0.121: open the floating reader nav overlay so bar controls can be used. */
+export async function openChrome(p) {
+  const fab = p.locator('#b-fab');
+  if (!(await fab.count()) || !(await fab.isVisible())) return;
+  if (await p.evaluate(() => document.getElementById('reader')?.classList.contains('chrome-on'))) return;
+  await fab.click();
+  await p.waitForFunction(() => document.getElementById('reader')?.classList.contains('chrome-on'));
+  await p.waitForTimeout(350);
+}

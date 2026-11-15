@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { serve, launch, pageWith } from './helpers.mjs';
+import { serve, launch, pageWith, openChrome } from './helpers.mjs';
 import { DEFAULT_PREFS } from '../site/js/store.js';
 let srv, browser;
 test.before(async () => { srv = await serve(); browser = await launch(); });
@@ -67,7 +67,9 @@ test('1.0.113: the design setting – four previewed options (no Chabad), stored
   assert.equal(await p.locator('html').getAttribute('data-design'), null);
   assert.equal(await p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1')).prefs.design), 'classic');
   // the reader's Aא sheet offers the same choice and applies it at once
-  await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.click('#b-aa');
+  await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg');
+  await openChrome(p);
+  await p.click('#b-aa');
   await p.locator('#sheet label[data-design-prev=nocturne]').click();
   assert.equal(await p.locator('html').getAttribute('data-design'), 'nocturne');
   assert.deepEqual(p.errors, []); await p.context().close();
@@ -104,10 +106,11 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
     const rb = document.getElementById('rb').getBoundingClientRect(), rc = document.getElementById('rc');
     return { bottom: rb.bottom, bnav: !!document.getElementById('bnav'), ih: innerHeight, pad: parseFloat(getComputedStyle(rc).paddingBottom), h: rb.height };
   });
-  // 1.0.120: one slim bar at the bottom of the reader; the app nav is not in the reader
-  assert.ok(m.pad >= m.h - 1, JSON.stringify(m));
+  // 1.0.121: full-screen text, no app nav, no fixed bar eating the bottom
   assert.equal(m.bnav, false, JSON.stringify(m));
-  assert.ok(Math.abs(m.bottom - m.ih) <= 2, JSON.stringify(m));
+  assert.ok(m.pad <= 36, 'text padding should stay small: ' + JSON.stringify(m));
+  const fab = await p.evaluate(() => { const e = document.getElementById('b-fab'), r = e.getBoundingClientRect(), cs = getComputedStyle(e); return { h: r.height, op: cs.opacity, pe: cs.pointerEvents }; });
+  assert.ok(fab.h >= 44 && fab.op !== '0' && fab.pe !== 'none', 'FAB missing ' + JSON.stringify(fab));
   await p.evaluate(() => { document.querySelector('#rc .seg').classList.add('speaking'); document.getElementById('rb').classList.add('speaking'); });
   if (d === 'nocturne') { await p.waitForTimeout(500); assert.equal(await css(p, '#rc .seg:not(.speaking)', 'opacity'), '0.55', 'the rest of the page dims while reading aloud'); }
   const q = await pageWith(browser, srv.url, { prefs: { font: 'frank' }, viewport: { width: 360, height: 760 } });

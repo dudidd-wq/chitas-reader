@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 const R = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const src = JSON.parse(R('site/data/sources.json'));
@@ -77,6 +77,7 @@ test('reader credits the Wikisource chapter (Chametz uMatzah ch. 9) with a link 
     await p.goto(srv.url + '#/r/tanya/2026-11-02'); await p.waitForSelector('.seg');
     assert.match(await p.textContent('.doc-credit'), /תניא: הוצאת קה״ת \(Kehot\) \(CC BY-NC\)$/);
     // …and the read-aloud sheet names the source of what it reads
+    await openChrome(p);
     await p.click('#b-tts', { button: 'right' }); await p.waitForSelector('#sh-credit');  // long press / context menu: settings
     assert.match(await p.textContent('#sh-credit'), /^הטקסט המוקרא – תניא: הוצאת קה״ת \(Kehot\) \(CC BY-NC\)$/);
     await p.click('#sh-x');

@@ -36,6 +36,7 @@ const ICON = {
   rew: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',
   fwd: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  fab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
@@ -1053,6 +1054,7 @@ function unvocalizedList(s) {
 
 // ---------------- Reader ----------------
 const R = { unit: null, iso: null, sid: null, lib: null, libInfo: null, doc: null, page: 0, pages: 1, segs: [], speaker: null, wake: null, saveT: null };
+globalThis.R = R;
 function stripTaamim(s) { return s.replace(RE_TAAMIM, ''); }
 // progress key: a lesson is kept per day; a siddur section once (it is not a daily lesson)
 // a library chapter (#/lib/…) once, under its own key – free browsing never marks a daily lesson as done
@@ -1117,6 +1119,9 @@ async function openReader(unit, iso, sid = null, lib = null) {
   const backHref = lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
   const backLbl = lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
   el.innerHTML = `
+  <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
+  <button type="button" class="r-fab" id="b-fab" aria-label="ניווט" aria-expanded="false" aria-controls="rchrome">${ICON.fab}</button>
+  <div class="r-chrome" id="rchrome" aria-hidden="true">
   <header class="r-top" id="rt">
     <a class="btn ghost" href="${backHref}" aria-label="${backLbl}">${ICON.back}</a>
     <div class="r-title"><b id="r-t">${esc(lpath ? (R.libInfo?.node.label || 'ספרייה') : UNITS[unit].full)}</b><small id="r-s" class="sr">${lpath ? esc(R.libInfo?.node.label || '') : sid ? '' : esc(dayDates(plan, iso))}</small></div>
@@ -1127,7 +1132,6 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <button class="btn ghost" id="b-aa" aria-label="הגדרות תצוגה" aria-haspopup="dialog">${ICON.aa}</button>
     <button class="btn ghost" id="b-full" aria-label="מסך מלא">${ICON.full}</button>
   </header>
-  <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
   <footer class="r-bottom" id="rb" aria-label="ניווט">
     <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
     <a class="btn ghost rb-home" id="b-home" href="${backHref}" aria-label="בית – ${backLbl}">${HOME_ICON}<span class="rb-lbl">בית</span></a>
@@ -1148,6 +1152,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <button class="btn ghost pg-btn" id="b-next" hidden aria-label="עמוד הבא"><span class="pg-lbl">עמוד הבא</span>${ICON.next}</button>
     <a class="btn ghost rb-step" id="b-lnext" hidden><span class="rb-lbl">הבא</span>${ICON.next}</a>
   </footer>
+  </div>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
   <div class="pflash" id="pflash" aria-hidden="true"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
@@ -1256,7 +1261,7 @@ function fillLessonNav() {
     slot.href = a.getAttribute('href');
     slot.dataset.day = a.dataset.day || dir;
     const lbl = (a.querySelector('span')?.textContent || a.textContent).trim();
-    const short = /התוכן/.test(lbl) ? 'התוכן' : (dir === 'prev' ? 'הקודם' : 'הבא');
+    const short = /התוכן/.test(lbl) ? 'התוכן' : (R.sid || R.lib) ? (dir === 'prev' ? 'הקודם' : 'הבא') : (dir === 'prev' ? 'יום קודם' : 'יום הבא');
     const raw = a.getAttribute('aria-label') || lbl;
     slot.setAttribute('aria-label', raw.startsWith(short) ? raw : `${short} – ${raw}`);
     slot.innerHTML = dir === 'prev' ? `${ICON.prev}<span class="rb-lbl">${short}</span>` : `<span class="rb-lbl">${short}</span>${ICON.next}`;
@@ -1462,11 +1467,9 @@ function nextUnit(autoplay) {
 // re-paginates into the freed space. Wide landscape screens get a two-page spread; narrow measures are set
 // ragged (start-aligned) because justifying ~4 words per line leaves wide gaps.
 function chromePad() {
-  const el = $('#reader'), compact = el.classList.contains('compact') || el.classList.contains('immersive');
-  // 1.0.120: a compact top bar (hidden when collapsed) and one slim bottom bar that always stays (home + prev/next).
-  const top = compact ? 0 : ($('#rt')?.offsetHeight || 0);
-  const bot = $('#rb')?.offsetHeight || 0;
-  return { top: Math.max(top, 8) + (compact ? 4 : 8), bottom: Math.max(bot, 8) + 8 };
+  // 1.0.121: the text is full-screen. The nav overlay floats over the page, so
+  // padding stays small and does not change when the bar opens or closes.
+  return { top: 12, bottom: 28 };
 }
 // round 4: no Rashi stub at a page edge. A Rashi block that the column flow split is moved whole to the next page
 // when it is short (≤45% of a page) and moving it leaves at most a tenth of the page empty (round 5: was a quarter,
@@ -1629,39 +1632,52 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 // round 4: up to 440 px tall, so large phones on their side (390–430 px tall) also get the whole height
 const SHORT_LANDSCAPE = matchMedia('(orientation: landscape) and (max-height: 440px)');
 const AUTO_HIDE_MS = 2500;
+const CHROME_IDLE_MS = 5000;
 function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
   // a note's "פירוט" changes its height – re-paginate and stay on it
   $('#rc').addEventListener('toggle', e => { if (e.target.matches?.('.note-more') && prefs.layout === 'pages') { const a = anchor(); layout(); restore(a); } }, true);
-  let scrollLock = 0;
-  const setCompact = hide => {
-    if (hide && (!$('#sheet')?.hidden || document.querySelector('.gloss-pop'))) return;
-    const before = el.classList.contains('compact');
-    const after = el.classList.toggle('compact', hide);
-    el.classList.toggle('immersive', after);
-    if (!after) armAutoHide();
-    if (before === after || !R.doc) return;
-    const a = anchor(); layout(); restore(a);
-    scrollLock = Date.now() + 350;
-    lastY = vp.scrollTop;
+  const speaking = () => $('#rb')?.classList.contains('tts-on') || $('#rb')?.classList.contains('speaking');
+  const setChrome = (on, { auto } = {}) => {
+    if (!on && auto && (speaking() || !$('#sheet')?.hidden || document.querySelector('.gloss-pop'))) return;
+    if (on && (!$('#sheet')?.hidden || document.querySelector('.gloss-pop'))) return;
+    el.classList.toggle('chrome-on', !!on);
+    el.classList.toggle('compact', !on);
+    el.classList.toggle('immersive', !on);
+    const fab = $('#b-fab'), chrome = $('#rchrome');
+    if (fab) {
+      fab.setAttribute('aria-expanded', on ? 'true' : 'false');
+      fab.setAttribute('aria-label', on ? 'סגירת הניווט' : 'ניווט');
+    }
+    if (chrome) {
+      chrome.setAttribute('aria-hidden', on ? 'false' : 'true');
+      chrome.inert = !on;
+    }
+    armAutoHide();
   };
-  const toggleChrome = force => setCompact(force == null ? !el.classList.contains('compact') : !!force);
+  // Legacy: setCompact(true) hid the bars; toggleChrome(false) showed them.
+  const setCompact = hide => setChrome(!hide);
+  const toggleChrome = force => setChrome(force == null ? !el.classList.contains('chrome-on') : !force);
+  R.setChrome = setChrome;
   R.toggleChrome = toggleChrome;
   R.setCompact = setCompact;
-  // Short landscape: the top bar hides after a few seconds. The slim bottom bar stays, so home/prev/next are always one tap away.
   const armAutoHide = () => {
     clearTimeout(R.hideT);
-    if (!SHORT_LANDSCAPE.matches) return;
+    if (!el.classList.contains('chrome-on')) return;
+    if (speaking()) return;
     R.hideT = setTimeout(() => {
-      if (el.hidden || !el.isConnected || !$('#sheet') || !$('#sheet').hidden) return;
-      if (el.querySelector('.r-top, .r-bottom')?.contains(document.activeElement) && document.activeElement.matches(':focus-visible')) return;
-      setCompact(true);
-    }, AUTO_HIDE_MS);
+      if (el.hidden || !el.isConnected) return;
+      if (!$('#sheet')?.hidden || document.querySelector('.gloss-pop')) return;
+      const ae = document.activeElement;
+      if (ae && ae.closest?.('#rchrome, #b-fab') && ae.matches?.(':focus-visible')) return;
+      setChrome(false, { auto: true });
+    }, Number(window.__chromeIdleMs) > 0 ? Number(window.__chromeIdleMs) : CHROME_IDLE_MS);
   };
   R.armAutoHide = armAutoHide;
-  $('#rt').addEventListener('pointerdown', armAutoHide); $('#rb').addEventListener('pointerdown', armAutoHide);
-  $('#rt').addEventListener('focusout', armAutoHide);
-  armAutoHide();
+  $('#rchrome')?.addEventListener('pointerdown', armAutoHide);
+  $('#b-fab')?.addEventListener('pointerdown', armAutoHide);
+  $('#b-fab').onclick = () => setChrome(!el.classList.contains('chrome-on'));
+  setChrome(false);
   // Re-paginate whenever a bar changes height (player bar shown/hidden, wrapping, rotation) and keep the position.
   let lastH = '';
   R.ro?.disconnect();
@@ -1689,17 +1705,10 @@ function bindReaderUi() {
     for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) bt.addEventListener(ev, () => clearTimeout(timer));
     bt.addEventListener('contextmenu', e => { e.preventDefault(); if (!long) { clearTimeout(timer); long = true; openSheet('tts'); } });
     bt.onclick = () => { if (long) { long = false; return; } ttsToggle(); }; }
-  let lastY = 0;
   vp.addEventListener('scroll', () => {
     if (prefs.layout === 'scroll') updateProgress();
-    if (prefs.layout !== 'scroll') return;
-    const y = vp.scrollTop;
-    if (Date.now() < scrollLock) { lastY = y; return; }
-    if (y > lastY + 28) setCompact(true);
-    else if (y < lastY - 28) setCompact(false);
-    lastY = y;
   }, { passive: true });
-  // tap zones & swipe (page mode); tap center toggles chrome
+  // tap zones & swipe (page mode); a tap on the text closes the nav overlay
   let sx = 0, sy = 0, st = 0;
   vp.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; st = Date.now(); });
   vp.addEventListener('pointerup', e => {
@@ -1708,10 +1717,10 @@ function bindReaderUi() {
     if (prefs.layout === 'pages' && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { turn(dx > 0 ? 1 : -1); return; }
     if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && Date.now() - st < 500) {
       if (window.getSelection()?.toString()) return;
+      if (el.classList.contains('chrome-on')) { setChrome(false); return; }
       const x = e.clientX / vp.clientWidth;
       if (prefs.layout === 'pages' && x < 0.28) turn(1);
       else if (prefs.layout === 'pages' && x > 0.72) turn(-1);
-      else setCompact(false);
     }
   });
   $('#t-play').onclick = () => ttsToggle();
@@ -1722,8 +1731,8 @@ function bindReaderUi() {
   $('#t-rate').onchange = e => { setPref('ttsRate', snapRate(Number(e.target.value))); R.speaker?.setRate(prefs.ttsRate); };
 }
 function turn(d) {
+  R.setChrome?.(false, { auto: true });
   R.armAutoHide?.();
-  R.setCompact?.(true);
   if (prefs.layout === 'pages') {
     if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast(R.lib ? 'סוף הפרק' : 'סוף השיעור'); return; }
     setPage(R.page + d);
@@ -1734,7 +1743,7 @@ function syncFullBtn() { const b = $('#b-full'); if (b) b.setAttribute('aria-pre
 let fsExitT = 0;
 document.addEventListener('fullscreenchange', () => {
   syncFullBtn();
-  if (!document.fullscreenElement) { fsExitT = Date.now(); if (!$('#reader').hidden) R.toggleChrome?.(false); }
+  if (!document.fullscreenElement) { fsExitT = Date.now(); }
 });
 // Escape never leaves the text: it closes the innermost layer only (word pop-up → sheet → full screen / hidden bars).
 // Going back to the day is the explicit ‹ button (or the browser's Back).
@@ -1743,7 +1752,7 @@ function readerEscape() {
   if (!$('#sheet').hidden) { closeSheet(); return 'sheet'; }
   if (Date.now() - fsExitT < 400) return 'fullscreen';                // this Esc already left full screen
   if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return 'fullscreen'; }
-  if ($('#reader').classList.contains('immersive')) { R.toggleChrome?.(false); return 'chrome'; }
+  if ($('#reader').classList.contains('chrome-on')) { R.setChrome?.(false); return 'chrome'; }
   return 'none';
 }
 document.addEventListener('keydown', e => {
@@ -1848,7 +1857,7 @@ const TTS_ERR = {
 };
 // The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
 // follows the pages by itself). The text area is re-laid out for the bar's real height (ResizeObserver in bindReaderUi).
-function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('tts-on', on); }
+function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('tts-on', on); if (on) R.setChrome?.(true); else R.armAutoHide?.(); }
 // Which engine reads: the local voice when chosen, supported and installed – otherwise Web Speech (fallback).
 async function ttsEngine() {
   if (prefs.ttsEngine !== 'piper' || R.piperBroken || !piperSupported()) return 'web';

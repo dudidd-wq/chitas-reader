@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { serve, launch, pageWith } from './helpers.mjs';
+import { serve, launch, pageWith, openChrome } from './helpers.mjs';
 import { localizeRuns, englishRuns } from '../site/js/siddur-lang.js';
 import { DEFAULT_PREFS } from '../site/js/store.js';
 
@@ -86,6 +86,7 @@ test('reader: Hebrew by default, English or both by the setting, divine name fol
   assert.equal(latinLeft((await p.$$eval('#rc .seg, #rc .sid-note, #rc h2, #rc h3', a => a.map(e => e.textContent).join(' ')))), null);
   assert.doesNotMatch(ns.map(x => x[2]).join(' '), /יְהֹוָה|יהוה/);
   // switch in the display sheet
+  await openChrome(p);
   await p.click('#b-aa');
   await p.click('label:has(input[name="siddurLang"][value="both"])');
   await p.waitForFunction(() => document.querySelector('#rc .sid-note[lang="en"]'));

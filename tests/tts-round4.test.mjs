@@ -2,7 +2,7 @@
 // Also: one tap on 🔊 starts reading, Rashi abbreviations / citations, divine names in the real lesson queue.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 
 const skip = !CHROME && 'no Chrome';
 const synth = () => {
@@ -15,6 +15,7 @@ const synth = () => {
 };
 const queue = async (p, url, n = 400) => {
   await p.goto(url); await p.waitForSelector('#rc .seg');
+  await openChrome(p);
   await p.click('#b-tts');                       // one tap
   await p.waitForSelector('#ttsctl:not([hidden])');
   await p.waitForFunction(k => window.__spoken.length >= k || document.querySelector('#rb:not(.speaking)'), n, { timeout: 20000 }).catch(() => {});

@@ -519,3 +519,14 @@ including the siddur and the library. The top bar is title-only and tighter. The
 (home lives on the slim bar). Scrolling down or turning a page collapses the top bar; a tap in the middle or scrolling up
 shows it again. The slim bar never hides, so back-to-home and prev/next stay one tap away (the old "bars gone with no way
 back" bug is not reintroduced). At 412×915 the text area grows from 639px (1.0.119) to 809px with the bars shown, and 850px with the top collapsed. Tests: reader-120 (new); reader-119, daynav, designs-203/204/205, settings-layout-193 updated for the new chrome.
+
+## 2026-11-15 – 1.0.121: floating button opens the reader nav
+Dudi: "זה לא נראה הכי טוב / אולי צריך כפתור קטן צף שבלחיצה עליו עונה פס הניווט". The 1.0.120 slim always-visible bar is gone.
+The text is full-screen in every design, including the original. A 44px semi-transparent round button sits in the bottom
+corner (inline-end, above the safe area). Tapping it opens a polished overlay with the title, בית, יום קודם/יום הבא
+(or הקודם/הבא in the siddur and the library), play, and Aa / ההקראה / full screen. Tapping the button again, tapping the
+text, or waiting about 5s idle closes it (it stays open while reading aloud or while a sheet is open). Opening the overlay
+does not re-paginate. Home is two taps away (the button, then בית). Prev/next work on every page, including the siddur
+and the library. At 412×915 the text area is 875px (was 809px shown / 850px collapsed in 1.0.120, 639px in 1.0.119).
+Tests: reader-121 (new); reader-120, reader-119, daynav, designs-203/204/205, settings-layout-193, layout, tap-targets,
+escape-fullscreen, siddur-flow and tts-bar updated for the new chrome.

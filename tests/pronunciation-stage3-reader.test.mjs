@@ -1,8 +1,8 @@
-import test from'node:test';import assert from'node:assert/strict';import fs from'node:fs';import{serve,launch,pageWith,CHROME}from'./helpers.mjs';import{VOICE_FILES}from'../site/js/voice-files.js';
+import test from'node:test';import assert from'node:assert/strict';import fs from'node:fs';import {serve,launch,pageWith,CHROME, openChrome } from './helpers.mjs';import{VOICE_FILES}from'../site/js/voice-files.js';
 test('1.0.80: Siddur paragraph/table/repeats keep local primary metadata and skip source-only cells',{skip:!CHROME},async()=>{
  const srv=await serve(),b=await launch();try{const p=await pageWith(b,srv.url,{prefs:{ttsEngine:'web',layout:'scroll',ttsContinuous:false}});
  for(const route of ['#/s/boker/1','#/s/omer/1','#/s/boker/5','#/s/shema/1']){
- await p.goto(srv.url+route);await p.waitForSelector('#rc .seg');await p.evaluate(async()=>{const{Speaker}=await import('/js/tts.js');window.__cap=null;Speaker.prototype.load=function(segs,opts){__cap={segs:segs.map(({el,...s})=>s),opts};};Speaker.prototype.startAt=function(){};});await p.click('#b-play2');await p.waitForFunction(()=>__cap!==null);
+ await p.goto(srv.url+route);await p.waitForSelector('#rc .seg');await p.evaluate(async()=>{const{Speaker}=await import('/js/tts.js');window.__cap=null;Speaker.prototype.load=function(segs,opts){__cap={segs:segs.map(({el,...s})=>s),opts};};Speaker.prototype.startAt=function(){};});await openChrome(p);await p.click('#b-play2');await p.waitForFunction(()=>__cap!==null);
  const r=await p.evaluate(async()=>{const{PiperSpeaker}=await import('/js/piper.js'),{textToIPA}=await import('/js/g2p.js');const data=await(await fetch('/voice/stress-he.json')).json(),s=new PiperSpeaker({});s.load(__cap.segs,__cap.opts);let tr=[];for(const x of s.queue)textToIPA(x.text,{data,accents:x.acc,trace:tr});return{q:s.queue,tr,html:document.querySelector('#rc').innerHTML};});
  assert.ok(r.q.length);assert.ok(r.q.every(x=>x.acc?.primary&&!x.text.includes('\u05AB')),route);assert.doesNotMatch(r.q.map(x=>x.text).join(' '),/אב"ג|ית"ץ|הקהל|ספירה \(מידה\)|\(א\)/);
  if(route==='#/s/boker/1')assert.ok(r.tr.some(t=>t.ipa==='ʃeheχezˈaʁta'&&t.src==='primary'));

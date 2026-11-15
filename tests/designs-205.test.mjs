@@ -57,21 +57,24 @@ for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.116/1.0.11
     });
     assert.ok(r.last <= r.top + 0.5, `${h}: content ends under the nav ${JSON.stringify(r)}`);
   }
-  // 1.0.120: the 5-tab app nav leaves the reader; home lives on the slim bar
+  // 1.0.121: the 5-tab app nav leaves the reader; a FAB opens home / prev / next
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
   await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(400);
   assert.equal(await p.evaluate(() => !!document.getElementById('bnav')), false, 'app nav still in the reader');
+  const fab = await p.evaluate(() => { const e = document.getElementById('b-fab'), r = e.getBoundingClientRect(), cs = getComputedStyle(e);
+    return { h: r.height, op: cs.opacity, pe: cs.pointerEvents, on: document.getElementById('reader').classList.contains('chrome-on') }; });
+  assert.equal(fab.on, false);
+  assert.ok(fab.h >= 44 && fab.op !== '0' && fab.pe !== 'none', 'FAB missing ' + JSON.stringify(fab));
+  await p.evaluate(() => window.R.setChrome(true));
   const stack = await p.evaluate(() => {
-    const rb = document.getElementById('rb').getBoundingClientRect();
-    const rt = document.getElementById('rt').getBoundingClientRect();
     const home = document.getElementById('b-home');
-    const hitRb = document.getElementById('rb').contains(document.elementFromPoint(innerWidth / 2, rb.top + 8));
-    return { rbBot: rb.bottom, ih: innerHeight, rtVis: rt.height > 0 && getComputedStyle(document.getElementById('rt')).pointerEvents !== 'none', hitRb, home: !!(home && !home.hidden && home.getBoundingClientRect().height >= 44) };
+    const rb = document.getElementById('rb');
+    const hitRb = rb.contains(document.elementFromPoint(innerWidth / 2, rb.getBoundingClientRect().top + 8));
+    return { hitRb, home: !!(home && !home.hidden && home.getBoundingClientRect().height >= 44), on: document.getElementById('reader').classList.contains('chrome-on') };
   });
-  assert.ok(stack.rtVis, 'back bar hidden');
-  assert.ok(stack.hitRb, 'the slim bar is covered');
-  assert.ok(stack.home, 'home missing from the slim bar');
-  assert.ok(Math.abs(stack.rbBot - stack.ih) <= 2, `slim bar not at the bottom ${JSON.stringify(stack)}`);
+  assert.ok(stack.on, 'overlay did not open');
+  assert.ok(stack.home, 'home missing from the overlay');
+  assert.ok(stack.hitRb, 'the overlay is covered');
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
   const m = await nav(p); assert.ok(m && !m.hidden, 'nav still on the home screen');
   assert.deepEqual(p.errors, []);

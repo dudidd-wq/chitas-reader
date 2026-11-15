@@ -1,7 +1,7 @@
 // Actual daily AND library reader -> local queue -> IPA, without installing a voice or making any remote request.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 const fake = () => {
   Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: {
     getVoices: () => [{ name: 'Test Hebrew', lang: 'he-IL', default: true, localService: true }],
@@ -20,6 +20,7 @@ test('1.0.78: Rashi primary stress reaches each local part in daily lessons and 
         Speaker.prototype.load = function(segs, opts) { window.__cap = { segs: segs.map(({ el, ...s }) => s), opts }; };
         Speaker.prototype.startAt = function() {};
       });
+      await openChrome(p);
       await p.click('#b-tts'); await p.waitForFunction(() => window.__cap !== null);
       const result = await p.evaluate(async () => {
         const { PiperSpeaker } = await import('/js/piper.js'), { textToIPA } = await import('/js/g2p.js');

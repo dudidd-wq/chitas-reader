@@ -1,7 +1,7 @@
 // Browser regression tests (headless Chrome via playwright-core). Skipped if no Chrome is installed.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, CHROME, pageWith, progressOf } from './helpers.mjs';
+import { serve, launch, CHROME, pageWith, progressOf, openChrome } from './helpers.mjs';
 
 const D = '2026-11-02';
 const skip = !CHROME && 'no Chrome/Chromium installed';
@@ -27,6 +27,7 @@ test('home → open lesson: the home page is not visible behind the reader (roun
     assert.ok(!/rgba\(.*,\s*0\)|transparent/.test(r.bg), 'reader background must be opaque, got ' + r.bg);
     assert.ok(r.allInReader && !r.hitApp, 'every probed point must hit the reader or its nav, never the home page');
     // back to home restores it
+    await openChrome(p);
     await p.click('.r-top a[href^="#/d/"]');
     await p.waitForSelector('.hero');
     assert.equal(await p.evaluate(() => !!document.querySelector('#app').getClientRects().length), true);

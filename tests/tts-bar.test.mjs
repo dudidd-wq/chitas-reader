@@ -2,7 +2,7 @@
 // read is always inside the visible text area (not under the bar). Also: one speed scale for menu + slider.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 import { TTS_RATES, snapRate } from '../site/js/store.js';
 
 const skip = !CHROME && 'no Chrome';
@@ -27,8 +27,9 @@ const slowSynth = () => {
 const visibleCheck = p => p.evaluate(() => {
   const el = document.querySelector('#rc .speaking'); if (!el) return { ok: false, why: 'no highlight' };
   // a top bar that is sliding away (full-screen mode just switched on) no longer counts as covering the text
-  const imm = document.querySelector('#reader').classList.contains('immersive');
-  const top = imm ? 0 : document.querySelector('#rt').getBoundingClientRect().bottom, bot = document.querySelector('#rb').getBoundingClientRect().top;
+  const rc = document.getElementById('rc'), vp = document.getElementById('vp').getBoundingClientRect();
+  const top = vp.top + parseFloat(getComputedStyle(rc).paddingTop);
+  const bot = vp.bottom - parseFloat(getComputedStyle(rc).paddingBottom);
   const rects = [...el.getClientRects()].filter(r => r.width > 2 && r.right > 0 && r.left < innerWidth);
   if (!rects.length) return { ok: false, why: 'highlight off screen' };
   const bad = rects.filter(r => r.top < top - 1 || r.bottom > bot + 1);
@@ -59,7 +60,7 @@ for (const [w, h] of [[320, 568], [360, 740], [390, 844], [844, 390], [568, 320]
       assert.ok(m.gap >= 5, `space between buttons ${m.gap}px`);
       assert.equal(m.rows, 1, 'all player controls on one row');
       assert.deepEqual(m.small, [], 'player controls ≥44px');
-      assert.ok(m.pad >= m.h, `text padding (${m.pad}) accounts for the bar (${m.h}); before ${padBefore}`);
+      assert.equal(m.pad, padBefore, `text padding should stay stable (${m.pad} vs ${padBefore}); overlay bar is ${m.h}px`);
       assert.equal(m.overflow, false);
       // follow the reading through several pages
       // no page-turn animation, so a check never lands mid-slide
@@ -85,6 +86,7 @@ test('speed: the footer menu and the settings slider use one scale; old values s
     const opts = await p.$$eval('#t-rate option', o => o.map(x => Number(x.value)));
     assert.deepEqual(opts, TTS_RATES);
     assert.equal(await p.$eval('#t-rate', s => s.value), '1.3');
+    await openChrome(p);
     await p.click('#b-tts'); await p.waitForSelector('#ttsctl:not([hidden])');  // round 4: one tap starts reading
     await p.click('#t-set'); await p.waitForSelector('#sheet input[name="ttsRate"]');
     const r = await p.$eval('#sheet input[name="ttsRate"]', i => [i.min, i.max, i.step, i.value]);

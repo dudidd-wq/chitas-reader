@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 import { prepareForTTS } from '../site/js/tts-prep.js';
 
 const D = new URL('../site/data/siddur/', import.meta.url);
@@ -108,6 +108,7 @@ test('reader: Ana Bekoach is a 7×2 grid, no middle dot, every cell isolated, th
       r.forEach(c => { assert.equal(c[1], 'rtl'); assert.equal(c[2], 'isolate'); assert.doesNotMatch(c[4], /·/); });
     }
     assert.ok(t.right[0] > t.right[1], 'the prayer is on the right, the Name on the left');
+    await openChrome(p);
     await p.click('#b-play2');
     await p.waitForSelector('#ttsctl:not([hidden])');
     await p.waitForFunction(() => window.__spoken.join(' ').replace(/[\u0591-\u05C7]/g, '').includes('שועתנו') || document.querySelector('#rb:not(.speaking)'), null, { timeout: 30000 }).catch(() => {});

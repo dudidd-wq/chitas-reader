@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { serve, launch, pageWith } from './helpers.mjs';
+import { serve, launch, pageWith, openChrome } from './helpers.mjs';
 let srv, browser;
 test.before(async () => { srv = await serve(); browser = await launch(); });
 test.after(async () => { await browser?.close(); srv?.close(); });
@@ -35,6 +35,7 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.118: "${d}" – chang
   assert.match((await fs_(p, '#rc .seg .t'))[1], /^"?David Libre/);
   // size slider (reader sheet), in "my font" and back in "the design's font"
   for (const mode of ['mine', 'design']) {
+    await openChrome(p);
     await p.click('#b-aa'); await p.locator(`#sheet input[name=designFont][value=${mode}]`).check({ force: true });
     const before = (await fs_(p, '#rc .seg .t'))[0];
     await p.locator('#sheet input[name=size]').fill('36'); await p.waitForTimeout(200);

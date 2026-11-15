@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import AxeBuilder from '@axe-core/playwright';
-import { serve, launch, pageWith, CHROME } from './helpers.mjs';
+import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
 import { dayPlan, fmtDmy } from '../site/js/calendar.js';
 
 const skip = !CHROME && 'no Chrome';
@@ -19,6 +19,7 @@ const state = p => p.evaluate(() => ({ hash: location.hash, sub: document.queryS
 // click a day control and wait for the reader to show the new day
 const go = async (p, which, iso, where = 'top') => {
   const sel = which === 'today' ? '.daynav [data-day="today"]' : (which === 'prev' ? '#b-lprev' : '#b-lnext');
+  if (which !== 'today') await openChrome(p);
   await p.click(sel, { force: which === 'today' });
   await p.waitForFunction(i => location.hash.endsWith('/' + i) && !!document.querySelector('#rc .seg, #rc .doc-credit') && document.querySelector('#r-s').textContent.includes(i.split('-').reverse().join('/')), iso);
   await p.waitForTimeout(250);
@@ -80,8 +81,10 @@ test('day navigation keeps the calendar right: Israel / Diaspora, Tishrei, Rav Y
   const p = await pageWith(browser, srv.url, { prefs: { lessonRavYomi: true } });
   await p.goto(srv.url + '#/r/ravyomi/2027-01-02'); await p.waitForSelector('#rc .doc-credit');
   assert.doesNotMatch(await p.textContent('#rc'), /רק לשנה/);
+  await openChrome(p);
   await p.click('#b-lnext'); await p.waitForFunction(() => location.hash.endsWith('2027-01-03'));
   await p.waitForFunction(() => /רק לשנה/.test(document.querySelector('#rc').textContent));
+  await openChrome(p);
   await p.click('#b-lprev'); await p.waitForFunction(() => location.hash.endsWith('2027-01-02'));
   await p.waitForFunction(() => !/רק לשנה/.test(document.querySelector('#rc').textContent) && /03\/01\/2027|02\/01\/2027/.test(document.querySelector('#r-s').textContent));
   assert.match(await p.textContent('#r-s'), /02\/01\/2027/);
@@ -109,6 +112,7 @@ test('day navigation: accessible (labels with the date, keyboard, focus, announc
   const small = await p.$$eval('#b-lprev, #b-lnext', a => a.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length);
   assert.equal(small, 0);
   // keyboard: Tab to "יום הבא", Enter → next day, focus stays on "יום הבא" of the new day, the day is announced
+  await openChrome(p);
   await p.focus('#b-lnext'); await p.keyboard.press('Enter');
   await p.waitForFunction(() => location.hash.endsWith('2026-11-03') && /03\/11\/2026/.test(document.querySelector('#r-s').textContent) && document.activeElement?.dataset.day === 'next' && !!document.querySelector('#toast').textContent);
   assert.match(await p.textContent('#toast'), /תהילים.*03\/11\/2026/);

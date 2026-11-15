@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {serve,launch,pageWith} from './helpers.mjs';
+import {serve,launch,pageWith,openChrome} from './helpers.mjs';
 import {DEFAULT_PREFS} from '../site/js/store.js';
 import {localizeRuns} from '../site/js/siddur-lang.js';
 let srv,browser;
@@ -33,7 +33,7 @@ test('1.0.82: fonts preview their own real family, emphasis updates live and per
  await p.locator('input[name=readingBold]').check();await p.waitForFunction(()=>getComputedStyle(document.querySelector('#rc .seg .t')).fontWeight==='700');assert.ok(await p.locator('.font-sample').evaluateAll(a=>a.every(e=>getComputedStyle(e).fontWeight==='700')));
  await p.locator('label:has(input[name=font][value=ashkenaz])').click();await p.locator('input[name=hideSiddurInstructions]').check();await p.waitForFunction(()=>!document.querySelector('#rc .sid-note'));assert.equal(await p.locator('#rc .sid-in, #rc .sd-n').count(),0);assert.equal(await p.locator('#rc .seg').count(),before);assert.equal(await p.locator('#rc .sid-end').count(),ends);assert.ok(await p.locator('#rc .sd-sec').count()>0);
  await p.click('#sh-x');
- await p.evaluate(async()=>{const{Speaker}=await import('/js/tts.js');window.__queue=null;Speaker.prototype.load=function(s,o){window.__queue={s:s.map(({el,...x})=>x),o};};Speaker.prototype.startAt=function(){};});await p.click('#b-play2');await p.waitForFunction(()=>window.__queue!==null);
+ await p.evaluate(async()=>{const{Speaker}=await import('/js/tts.js');window.__queue=null;Speaker.prototype.load=function(s,o){window.__queue={s:s.map(({el,...x})=>x),o};};Speaker.prototype.startAt=function(){};});await openChrome(p);await p.click('#b-play2');await p.waitForFunction(()=>window.__queue!==null);
  const queues=await p.evaluate(async()=>{const{PiperSpeaker}=await import('/js/piper.js');const local=new PiperSpeaker({});local.load(__queue.s,__queue.o);return{web:__queue.s.map(s=>s.parts.join(' ')).join(' '),local:local.queue.map(s=>s.text).join(' ')};});
  assert.doesNotMatch(queues.web.replace(/<[^>]+>/g,''),/בשבת אומרים|כאן מכים|[A-Za-z]/);assert.doesNotMatch(queues.local,/בשבת אומרים|כאן מכים|[A-Za-z]/);
  await p.reload();await p.waitForSelector('#rc .seg');assert.equal(await p.locator('#rc .sid-note, #rc .sid-in').count(),0);assert.equal(await p.locator('html').getAttribute('data-reading-bold'),'true');assert.equal(await p.locator('html').getAttribute('data-font'),'ashkenaz');

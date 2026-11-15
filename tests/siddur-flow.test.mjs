@@ -121,10 +121,7 @@ for (const [w, h] of [[320, 568], [390, 800]]) {
     await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
     assert.equal(await p.evaluate(() => location.hash), '#/s/shacharit/4', 'forward again: section 4 at once');
     await p.keyboard.press('ArrowLeft'); await p.waitForTimeout(60);
-    // 1.0.120: a page turn collapses the top bar and re-paginates; expand so the page numbers match a fresh load
-    const mid = await p.evaluate(() => { const r = document.querySelector('#vp').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
-    await p.mouse.click(mid[0], mid[1]);
-    await p.waitForFunction(() => !document.querySelector('#reader').classList.contains('compact'));
+    // 1.0.121: opening or closing the overlay does not re-paginate, so a refresh keeps the same page
     await p.waitForTimeout(250);
     const at = await p.textContent('#pinfo');
     await p.reload(); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(600);
