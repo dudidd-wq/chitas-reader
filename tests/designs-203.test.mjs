@@ -101,13 +101,13 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
   assert.equal(await rootVar(p, '--hl'), e.hl);
   const txt = await p.locator('#rc').evaluate(r => [...r.querySelectorAll('.seg .t')].map(t => t.textContent).join('|'));
   const m = await p.evaluate(() => {
-    const rb = document.getElementById('rb').getBoundingClientRect(), ln = document.getElementById('lnav')?.getBoundingClientRect(), bn = document.getElementById('bnav')?.getBoundingClientRect(), rc = document.getElementById('rc');
-    return { bottom: rb.bottom, lnTop: ln?.top ?? null, bTop: bn?.top ?? null, ih: innerHeight, pad: parseFloat(getComputedStyle(rc).paddingBottom), h: rb.height, lnH: ln?.height ?? 0 };
+    const rb = document.getElementById('rb').getBoundingClientRect(), rc = document.getElementById('rc');
+    return { bottom: rb.bottom, bnav: !!document.getElementById('bnav'), ih: innerHeight, pad: parseFloat(getComputedStyle(rc).paddingBottom), h: rb.height };
   });
-  // 1.0.119: the pager sits above the lesson-nav and the app nav, not at the very bottom
-  assert.ok(m.pad >= m.h + m.lnH - 1, JSON.stringify(m));
-  assert.ok(m.lnTop == null || Math.abs(m.bottom - m.lnTop) < 2, JSON.stringify(m));
-  assert.ok(m.bTop == null || (m.lnTop ?? m.bottom) <= m.bTop + 1, JSON.stringify(m));
+  // 1.0.120: one slim bar at the bottom of the reader; the app nav is not in the reader
+  assert.ok(m.pad >= m.h - 1, JSON.stringify(m));
+  assert.equal(m.bnav, false, JSON.stringify(m));
+  assert.ok(Math.abs(m.bottom - m.ih) <= 2, JSON.stringify(m));
   await p.evaluate(() => { document.querySelector('#rc .seg').classList.add('speaking'); document.getElementById('rb').classList.add('speaking'); });
   if (d === 'nocturne') { await p.waitForTimeout(500); assert.equal(await css(p, '#rc .seg:not(.speaking)', 'opacity'), '0.55', 'the rest of the page dims while reading aloud'); }
   const q = await pageWith(browser, srv.url, { prefs: { font: 'frank' }, viewport: { width: 360, height: 760 } });

@@ -137,34 +137,44 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 #reader::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: var(--texture); background-image: var(--grain), radial-gradient(ellipse at center, transparent 55%, rgba(120, 90, 40, .10)); }
 #reader[hidden] { display: none; }
 .r-top, .r-bottom { position: absolute; inset-inline: 0; z-index: 3; display: flex; align-items: center; gap: .25rem; padding: .3rem max(.5rem, env(safe-area-inset-right)) .3rem max(.5rem, env(safe-area-inset-left)); background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); transition: transform .25s, opacity .25s; }
-.r-top { top: 0; padding-top: max(.3rem, env(safe-area-inset-top)); border-bottom: 1px solid var(--rule); }
-.r-bottom { bottom: 0; padding-bottom: max(.3rem, env(safe-area-inset-bottom)); border-top: 1px solid var(--rule); flex-wrap: wrap; }
-/* 1.0.93: the pager is three columns – previous page (right) | page number (centre) | next page (left) – the two
-   buttons labelled and equally wide. While reading aloud the player row (below) takes over. */
-.r-bottom:not(.tts-on) { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: .4rem; }
-.r-bottom:not(.tts-on) #spacer { display: none; }
-.r-bottom:not(.tts-on) #pinfo { justify-self: center; text-align: center; white-space: nowrap; font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.r-bottom:not(.tts-on) #b-prev { justify-content: flex-start; } .r-bottom:not(.tts-on) #b-next { justify-content: flex-end; }
+.r-top { top: 0; min-height: 44px; padding: 0 max(.25rem, env(safe-area-inset-right)) 0 max(.25rem, env(safe-area-inset-left)); padding-top: env(safe-area-inset-top); border-bottom: 1px solid var(--rule); gap: 0; }
+.r-top .btn { min-height: 44px; min-width: 44px; padding: 0 .1rem; }
+.r-bottom { bottom: 0; min-height: calc(44px + env(safe-area-inset-bottom)); padding: 0 max(.2rem, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(.2rem, env(safe-area-inset-left)); border-top: 1px solid var(--rule); flex-wrap: nowrap; gap: 0; }
+/* 1.0.120: one slim bar – home | הקודם | play | הבא. Page-turn buttons stay in the DOM (hidden) for existing handlers. */
+.r-bottom:not(.tts-on) { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr); column-gap: 0; align-items: center; }
+.r-bottom:not(.tts-on) #b-home { grid-column: 1; }
+.r-bottom:not(.tts-on) #b-lprev { grid-column: 2; }
+.r-bottom:not(.tts-on) #b-play2 { grid-column: 3; justify-self: center; }
+.r-bottom:not(.tts-on) #b-lnext { grid-column: 4; }
+.r-bottom:not(.tts-on) #spacer, .r-bottom:not(.tts-on) #pinfo, .r-bottom:not(.tts-on) #b-prev, .r-bottom:not(.tts-on) #b-next { display: none; }
+.r-bottom .rb-home, .r-bottom .rb-step { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; min-height: 44px; min-width: 44px; padding: 0 .1rem; text-decoration: none; font-family: var(--ui); font-weight: 700; line-height: 1.05; color: inherit; }
+.r-bottom:not(.tts-on) .rb-home, .r-bottom:not(.tts-on) .rb-step { width: 100%; }
+.r-bottom.tts-on #b-home { width: auto; max-width: 56px; flex: 0 0 auto; }
+.r-bottom.tts-on .tts-ctl { min-width: 0; width: auto; flex: 1 1 auto; }
+.r-bottom .rb-lbl { font-size: .65rem; }
+.r-bottom .rb-home svg, .r-bottom .rb-step svg { width: 18px; height: 18px; }
+.pg-play { min-width: 44px; min-height: 44px; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 0; background: var(--accent); color: var(--paper); }
+.pg-play svg { width: 20px; height: 20px; }
 .pg-btn { min-height: 48px; gap: .3rem; padding-inline: .55rem; font-size: .92rem; font-weight: 600; white-space: nowrap; }
 .pg-btn svg { width: 22px; height: 22px; flex: none; }
 .r-bottom.tts-on .pg-lbl { display: none; }
 @media (max-width: 340px) { .pg-lbl { display: none; } }
 .r-title { flex: 1; min-width: 0; text-align: center; line-height: 1.25; }
-.r-title b { display: block; font-size: 1rem; font-family: var(--text-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-title b { display: block; font-size: .92rem; font-family: var(--text-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .r-title small { color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
 /* round 4: on narrow screens the date and the verse range get a line each instead of one line cut with an ellipsis */
 @media (max-width: 480px) { .r-title small { line-height: 1.2; } .r-title small span { display: block; overflow: hidden; text-overflow: ellipsis; } .r-title small i { display: none; } .r-title small span.r-dt { white-space: normal; text-overflow: clip; } .r-title small span.r-dt bdi { white-space: nowrap; } .r-title small span.r-dt bdi + i + bdi { margin-inline-start: .5em; } }
 @media (max-width: 360px) { .r-title small { font-size: .72rem; } .r-title small span.r-rng { white-space: normal; text-overflow: clip; } }
-/* 1.0.119: the back-to-home bar stays; only the page-turn bar may hide in short landscape. */
-#reader.immersive .r-top { transform: none; opacity: 1; pointer-events: auto; }
-#reader.immersive .r-bottom:not(.speaking) { transform: translateY(110%); opacity: 0; pointer-events: none; }
+/* 1.0.120: collapsing hides only the top bar. The slim bottom bar (home / prev / next) always stays. */
+#reader.immersive .r-top, #reader.compact .r-top { transform: translateY(-110%); opacity: 0; pointer-events: none; }
+#reader.immersive .r-bottom, #reader.compact .r-bottom { transform: none; opacity: 1; pointer-events: auto; }
 .progress { position: absolute; top: 0; inset-inline: 0; height: 3px; background: var(--paper2); }
 .progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
 #reader.immersive .thin-progress { opacity: 1; }
 .thin-progress { position: absolute; bottom: 0; inset-inline: 0; height: 2px; z-index: 2; opacity: 0; transition: opacity .3s; }
-.pflash { position: absolute; bottom: max(.6rem, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 4; font-family: var(--ui); font-size: .8rem; color: var(--paper); background: color-mix(in srgb, var(--ink) 78%, transparent); padding: .2rem .7rem; border-radius: 999px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+.pflash { position: absolute; bottom: calc(48px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 4; font-family: var(--ui); font-size: .8rem; color: var(--paper); background: color-mix(in srgb, var(--ink) 78%, transparent); padding: .2rem .7rem; border-radius: 999px; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
 .pflash.show { opacity: 1; }
-#reader:not(.immersive) .pflash { display: none; }
+#reader:not(.immersive):not(.compact) .pflash { display: none; }
 .thin-progress > i { display: block; height: 100%; background: var(--accent); opacity: .6; width: 0; }
 .pageinfo { color: var(--muted); font-size: .85rem; min-width: 5.5em; text-align: center; }
 .tts-ctl { display: flex; align-items: center; gap: .25rem; flex: 1; justify-content: center; flex-wrap: wrap; }
@@ -199,7 +209,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
   .r-title b { font-size: .95rem; } .r-title small { font-size: .74rem; }
   .lsc { display: inline-flex !important; }
   .r-top .pageinfo { min-width: 0; font-size: .78rem; white-space: nowrap; }
-  .r-bottom:not(.speaking) { display: none; }
+  /* the slim lesson bar stays – home / prev / next must remain reachable */
   .r-content .doc-head { margin-bottom: .5em; }
   .r-content .doc-kicker, .r-content .orn { display: none; }
   .r-content h1 { font-size: 1em; }
@@ -270,8 +280,10 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .t .fn::before { content: '('; } .t .fn::after { content: ')'; }
 .t .daf { font-family: var(--ui); font-size: .58em; color: var(--muted); margin-inline: .25em; white-space: nowrap; letter-spacing: 0; }
 /* Read-aloud player: a single compact row in place of the pager */
-.r-bottom.tts-on { flex-wrap: nowrap; gap: .15rem; }
-.r-bottom.tts-on #spacer { display: none; }
+.r-bottom.tts-on { display: flex; flex-wrap: nowrap; gap: .15rem; }
+.r-bottom.tts-on #spacer, .r-bottom.tts-on #b-prev, .r-bottom.tts-on #b-next, .r-bottom.tts-on #pinfo,
+.r-bottom.tts-on #b-lprev, .r-bottom.tts-on #b-lnext, .r-bottom.tts-on #b-play2 { display: none; }
+.r-bottom.tts-on #b-home { flex: none; }
 .r-bottom.tts-on .tts-ctl { flex: 1 1 auto; flex-wrap: nowrap; min-width: 0; gap: .15rem; }
 .tts-ctl .btn { min-width: 48px; min-height: 48px; padding: .2rem .4rem; }
 /* round 6: the main controls are bigger targets – play/pause 64 px, skip 56 px – with more room between them */
@@ -878,7 +890,7 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .r-top .btn { color: #fff; background: rgba(255, 255, 255, .16); border: 0; border-radius: 12px; box-shadow: none; }
 [data-design="modern"] .r-top .btn:hover { background: rgba(255, 255, 255, .28); }
 [data-design="modern"] .r-title b { font-family: var(--ui); font-weight: 800; color: #fff; } [data-design="modern"] .r-title small { color: rgba(255, 255, 255, .85); }
-[data-design="modern"] .r-bottom { background: #17130f; color: #fff; border: 0; border-radius: 22px 22px 0 0; backdrop-filter: none; overflow: hidden; }
+[data-design="modern"] .r-bottom { background: #17130f; color: #fff; border: 0; border-radius: 14px 14px 0 0; backdrop-filter: none; overflow: hidden; }
 [data-design="modern"] .r-bottom .btn { color: #fff; background: transparent; border-color: transparent; box-shadow: none; }
 [data-design="modern"] .r-bottom:not(.tts-on) #pinfo, [data-design="modern"] .pageinfo { color: #bdb2a3; font-weight: 700; }
 [data-design="modern"] .progress { background: #3a332c; height: 4px; } [data-design="modern"] .progress > i, [data-design="modern"] .thin-progress > i { background: var(--c2); }
@@ -1048,10 +1060,10 @@ html[data-design] #reader { background-attachment: scroll; }
 [data-design="nocturne"][data-theme="night"] .r-top { background: #070604; }
 [data-design] .pg-btn { font-weight: 700; }
 /* the play button in the middle of the bottom bar, as in the mockups (the read-aloud player replaces the row while playing) */
-[data-design] .r-bottom:not(.tts-on) { grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr); }
+[data-design] .r-bottom:not(.tts-on) { grid-template-columns: 44px minmax(0, 1fr) 44px minmax(0, 1fr); }
 [data-design] .r-bottom.tts-on .pg-play { display: none; }
-[data-design] .pg-play { min-width: 48px; min-height: 48px; width: 48px; height: 48px; padding: 0; border-radius: 50%; border: 0; }
-[data-design] .pg-play svg { width: 24px; height: 24px; }
+[data-design] .pg-play { min-width: 44px; min-height: 44px; width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 0; }
+[data-design] .pg-play svg { width: 20px; height: 20px; }
 [data-design="sefer"] .r-bottom .pg-play { background: radial-gradient(#f0d48e, #b08a3e); color: #3a1f0f; box-shadow: 0 0 0 2px #3a1f0f, 0 0 0 3px #b08a3e; }
 [data-design="modern"] .r-bottom .pg-play { background: var(--c0); color: #fff; }
 [data-design="nocturne"] .r-bottom .pg-play { background: linear-gradient(180deg, #f4dca0, #c49a4e); color: #1a140b; box-shadow: 0 0 18px rgba(201, 164, 92, .4); }

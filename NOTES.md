@@ -511,3 +511,11 @@ exactly as before (designs-203 identity). Tests: designs-205.
 - Dudi: "כשבוחרים שיעור פס הניווט של חזרה למסך ראשי נעלם וגם הפס ניווט למטה". Causes: a tap in the middle of the reader toggled immersive mode and hid the back bar and the pager; the app's bottom nav was removed while reading (and would have been covered by #reader anyway). Fix: in portrait a tap no longer hides the bars; the back-to-home bar stays even in short-landscape immersive; the app nav stays in the reader (z-index above it, the reader is shortened so nothing is covered). Full-screen no longer hides the bars.
 - Dudi: "ולא תמיד פסי הניווט לשיעור הבא או הקודם מופיעים". Causes: יום קודם / יום הבא lived only at the start and end of the text (in pages mode only on the first or last page), the top bar was hidden on short portrait phones, and the siddur had no such bar. Fix: a fixed #lnav in the reader on every page – יום קודם/יום הבא for daily lessons, הקודם/הבא for library chapters and siddur sections.
 - Tests: reader-119 (new); designs-203/204/205, settings-layout-193, daynav, fonts-186 and a few layout/escape/round-6 assertions updated for the new chrome. npm test 542 pass.
+
+## 2026-11-15 – 1.0.120: one slim reader bar, compact top, auto-collapse
+Dudi: "פסי הניווט הללו תופסים הרבה מקום יקר במסך". In 1.0.119 the reader stacked four bars (back, pager, lesson prev/next, app nav).
+They are now one slim bottom bar (~44px plus the safe area) with בית, הקודם, הבא and play, in every design, on every page,
+including the siddur and the library. The top bar is title-only and tighter. The five-tab app nav leaves the reader again
+(home lives on the slim bar). Scrolling down or turning a page collapses the top bar; a tap in the middle or scrolling up
+shows it again. The slim bar never hides, so back-to-home and prev/next stay one tap away (the old "bars gone with no way
+back" bug is not reintroduced). At 412×915 the text area grows from 639px (1.0.119) to 809px with the bars shown, and 850px with the top collapsed. Tests: reader-120 (new); reader-119, daynav, designs-203/204/205, settings-layout-193 updated for the new chrome.

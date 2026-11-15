@@ -108,7 +108,7 @@ test('reader: Ana Bekoach is a 7×2 grid, no middle dot, every cell isolated, th
       r.forEach(c => { assert.equal(c[1], 'rtl'); assert.equal(c[2], 'isolate'); assert.doesNotMatch(c[4], /·/); });
     }
     assert.ok(t.right[0] > t.right[1], 'the prayer is on the right, the Name on the left');
-    await p.click('#b-tts');
+    await p.click('#b-play2');
     await p.waitForSelector('#ttsctl:not([hidden])');
     await p.waitForFunction(() => window.__spoken.join(' ').replace(/[\u0591-\u05C7]/g, '').includes('שועתנו') || document.querySelector('#rb:not(.speaking)'), null, { timeout: 30000 }).catch(() => {});
     const all = (await p.evaluate(() => window.__spoken.join(' '))).replace(/[\u0591-\u05C7]/g, '');

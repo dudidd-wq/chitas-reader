@@ -84,7 +84,7 @@ function applyPrefs() {
   r.dataset.rashiFont = prefs.rashiFont === 'text' ? 'text' : 'rashi';
   // 1.0.113: the design (look). The default 'classic' sets no attribute, so the original styles apply unchanged.
   if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; r.dataset.designFont = prefs.designFont; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else { delete r.dataset.design; delete r.dataset.designFont; }
-  const bp = document.getElementById('b-play2'); if (bp) bp.hidden = !r.dataset.design; // 1.0.114: the designs' bottom-bar play button
+  // 1.0.120: play lives in the slim bar in every design, including the original.
   if (typeof syncNav === 'function' && document.getElementById('reader')) syncNav();
   r.dataset.theme = prefs.theme; r.dataset.font = prefs.font; r.dataset.readingBold = String(prefs.readingBold);
   r.style.setProperty('--reading-weight', prefs.readingBold ? '700' : '400');
@@ -246,8 +246,9 @@ window.addEventListener('hashchange', () => { route(); syncNav(); });
 const HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>';
 const BNAV = [['home', '#/', HOME_ICON, 'היום'], ['lib', '#/lib', LIB_ICON, 'ספרייה'], ['search', '#/search', SEARCH_ICON, 'חיפוש'], ['siddur', '#/siddur', NAV_ICON.book, 'סידור'], ['settings', '#/settings', ICON.gear, 'הגדרות']];
 function syncNav() {
-  const root = document.documentElement;
+  const root = document.documentElement, reading = $('#reader') && !$('#reader').hidden;
   let nav = document.getElementById('bnav');
+  if (reading) { nav?.remove(); delete root.dataset.bnav; return; }
   if (!nav) {
     nav = document.createElement('nav'); nav.id = 'bnav'; nav.className = 'bnav'; nav.setAttribute('aria-label', 'ניווט ראשי');
     nav.innerHTML = BNAV.map(([k, h, i, t]) => `<a href="${h}" data-tab="${k}">${i}<span>${t}</span></a>`).join('');
@@ -1113,10 +1114,12 @@ async function openReader(unit, iso, sid = null, lib = null) {
   R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
   const lparent = R.libInfo?.crumbs.at(-1);
   const dayFocus = R.dayFocus; R.dayFocus = null;
+  const backHref = lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
+  const backLbl = lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
   el.innerHTML = `
   <header class="r-top" id="rt">
-    <a class="btn ghost" href="${lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso}" aria-label="${lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית'}">${ICON.back}</a>
-    <div class="r-title"><b id="r-t">${esc(lpath ? 'ספרייה' : UNITS[unit].full)}</b><small id="r-s">${lpath ? esc(R.libInfo?.node.label || '') : sid ? '' : esc(dayDates(plan, iso))}</small></div>
+    <a class="btn ghost" href="${backHref}" aria-label="${backLbl}">${ICON.back}</a>
+    <div class="r-title"><b id="r-t">${esc(lpath ? (R.libInfo?.node.label || 'ספרייה') : UNITS[unit].full)}</b><small id="r-s" class="sr">${lpath ? esc(R.libInfo?.node.label || '') : sid ? '' : esc(dayDates(plan, iso))}</small></div>
     <span class="lsc pageinfo" id="pinfo2" aria-hidden="true"></span>
     <button class="btn ghost lsc" id="b-prev2" aria-label="עמוד קודם">${ICON.prev}</button>
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
@@ -1125,11 +1128,13 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <button class="btn ghost" id="b-full" aria-label="מסך מלא">${ICON.full}</button>
   </header>
   <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
-  <footer class="r-bottom" id="rb" aria-label="דפדוף והקראה">
+  <footer class="r-bottom" id="rb" aria-label="ניווט">
     <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
-    <button class="btn ghost pg-btn" id="b-prev" aria-label="עמוד קודם">${ICON.prev}<span class="pg-lbl">עמוד קודם</span></button>
-    <span class="pageinfo" id="pinfo" aria-live="polite"></span>
-    <button class="btn pg-play" id="b-play2" aria-label="הקראה – התחלה" ${prefs.design && prefs.design !== 'classic' ? '' : 'hidden'}>${ICON.play}</button>
+    <a class="btn ghost rb-home" id="b-home" href="${backHref}" aria-label="בית – ${backLbl}">${HOME_ICON}<span class="rb-lbl">בית</span></a>
+    <a class="btn ghost rb-step" id="b-lprev" hidden>${ICON.prev}<span class="rb-lbl">הקודם</span></a>
+    <button class="btn ghost pg-btn" id="b-prev" hidden aria-label="עמוד קודם">${ICON.prev}<span class="pg-lbl">עמוד קודם</span></button>
+    <span class="pageinfo sr" id="pinfo" aria-live="polite"></span>
+    <button class="btn pg-play" id="b-play2" aria-label="הקראה – התחלה">${ICON.play}</button>
     <div class="tts-ctl" id="ttsctl" hidden>
       <button class="btn ghost" id="t-back" aria-label="קטע קודם">${ICON.fwd}</button>
       <button class="btn" id="t-play" aria-label="הפעל">${ICON.play}</button>
@@ -1140,9 +1145,9 @@ async function openReader(unit, iso, sid = null, lib = null) {
       <select id="t-rate" title="מהירות ההקראה">${TTS_RATES.map(r => `<option value="${r}" ${Math.abs(r - prefs.ttsRate) < 0.01 ? 'selected' : ''}>×${r}</option>`).join('')}</select>
     </div>
     <span style="flex:1" id="spacer"></span>
-    <button class="btn ghost pg-btn" id="b-next" aria-label="עמוד הבא"><span class="pg-lbl">עמוד הבא</span>${ICON.next}</button>
+    <button class="btn ghost pg-btn" id="b-next" hidden aria-label="עמוד הבא"><span class="pg-lbl">עמוד הבא</span>${ICON.next}</button>
+    <a class="btn ghost rb-step" id="b-lnext" hidden><span class="rb-lbl">הבא</span>${ICON.next}</a>
   </footer>
-  <nav class="lnav" id="lnav" hidden></nav>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
   <div class="pflash" id="pflash" aria-hidden="true"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
@@ -1239,15 +1244,25 @@ function sidNavHtml() {
     ${next ? `<a class="btn" data-day="next" href="#/s/${next.book}/${next.n}" aria-label="הבא – ${esc(lab(next))}"><span>הבא</span>${ICON.next}</a>` : `<a class="btn" href="#/siddur" aria-label="חזרה לתוכן הסידור"><span>התוכן</span>${ICON.next}</a>`}`;
 }
 function fillLessonNav() {
-  const nav = $('#lnav'); if (!nav) return;
+  const prev = $('#b-lprev'), next = $('#b-lnext'); if (!prev || !next) return;
   const wrap = document.createElement('div');
   wrap.innerHTML = R.sid ? `<nav>${sidNavHtml()}</nav>` : R.lib ? libNavHtml('bar') : dayNavHtml('bar');
-  nav.innerHTML = wrap.querySelector('nav').innerHTML;
-  nav.hidden = false;
-  nav.setAttribute('aria-label', R.sid ? 'חלק קודם והבא – סרגל קבוע' : R.lib ? 'פרק קודם והבא – סרגל קבוע' : 'יום קודם והבא – סרגל קבוע');
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { R.dayFocus = a.dataset.day; }));
-  const el = $('#reader');
-  if (el) el.style.setProperty('--lnav-h', nav.offsetHeight + 'px');
+  const links = [...wrap.querySelectorAll('a')];
+  const pL = links.find(a => a.dataset.day === 'prev') || (R.lib ? null : links[0]);
+  const nL = links.find(a => a.dataset.day === 'next') || (R.lib ? null : links.at(-1));
+  const apply = (slot, a, dir) => {
+    if (!a) { slot.hidden = true; slot.removeAttribute('href'); return; }
+    slot.hidden = false;
+    slot.href = a.getAttribute('href');
+    slot.dataset.day = a.dataset.day || dir;
+    const lbl = (a.querySelector('span')?.textContent || a.textContent).trim();
+    const short = /התוכן/.test(lbl) ? 'התוכן' : (dir === 'prev' ? 'הקודם' : 'הבא');
+    const raw = a.getAttribute('aria-label') || lbl;
+    slot.setAttribute('aria-label', raw.startsWith(short) ? raw : `${short} – ${raw}`);
+    slot.innerHTML = dir === 'prev' ? `${ICON.prev}<span class="rb-lbl">${short}</span>` : `<span class="rb-lbl">${short}</span>${ICON.next}`;
+    slot.onclick = () => { R.dayFocus = slot.dataset.day; };
+  };
+  apply(prev, pL, 'prev'); apply(next, nL, 'next');
 }
 function goDay(which) {
   if (R.lib) { const t = which === 'prev' ? R.libInfo?.prev : which === 'next' ? R.libInfo?.next : null; if (t) { R.dayFocus = which; location.hash = `#/lib/${t.id}`; } return; }
@@ -1447,11 +1462,11 @@ function nextUnit(autoplay) {
 // re-paginates into the freed space. Wide landscape screens get a two-page spread; narrow measures are set
 // ragged (start-aligned) because justifying ~4 words per line leaves wide gaps.
 function chromePad() {
-  const el = $('#reader'), imm = el.classList.contains('immersive');
-  // 1.0.119: the back-to-home bar (r-top) and the lesson prev/next bar stay visible, also in immersive mode.
-  const top = $('#rt')?.offsetHeight || 0;
-  const bot = (imm && !$('#rb').classList.contains('speaking') ? 0 : ($('#rb')?.offsetHeight || 0)) + ($('#lnav') && !$('#lnav').hidden ? $('#lnav').offsetHeight : 0);
-  return { top: Math.max(top, 8) + 14, bottom: Math.max(bot, 8) + 14 };
+  const el = $('#reader'), compact = el.classList.contains('compact') || el.classList.contains('immersive');
+  // 1.0.120: a compact top bar (hidden when collapsed) and one slim bottom bar that always stays (home + prev/next).
+  const top = compact ? 0 : ($('#rt')?.offsetHeight || 0);
+  const bot = $('#rb')?.offsetHeight || 0;
+  return { top: Math.max(top, 8) + (compact ? 4 : 8), bottom: Math.max(bot, 8) + 8 };
 }
 // round 4: no Rashi stub at a page edge. A Rashi block that the column flow split is moved whole to the next page
 // when it is short (≤45% of a page) and moving it leaves at most a tenth of the page empty (round 5: was a quarter,
@@ -1588,7 +1603,8 @@ function updateProgress(save = true) {
     }
     R.flashed = R.page;
   } else {
-    const vp = $('#vp'); const max = vp.scrollHeight - vp.clientHeight;
+    const vp = $('#vp'); if (!vp) return;
+    const max = vp.scrollHeight - vp.clientHeight;
     frac = max <= 0 ? 1 : vp.scrollTop / max;
     $('#pinfo').textContent = $('#pinfo2').textContent = `${Math.round(frac * 100)}%`;
   }
@@ -1617,22 +1633,29 @@ function bindReaderUi() {
   const el = $('#reader'), vp = $('#vp');
   // a note's "פירוט" changes its height – re-paginate and stay on it
   $('#rc').addEventListener('toggle', e => { if (e.target.matches?.('.note-more') && prefs.layout === 'pages') { const a = anchor(); layout(); restore(a); } }, true);
-  const toggleChrome = force => {
-    const before = el.classList.contains('immersive'), after = el.classList.toggle('immersive', force);
+  let scrollLock = 0;
+  const setCompact = hide => {
+    if (hide && (!$('#sheet')?.hidden || document.querySelector('.gloss-pop'))) return;
+    const before = el.classList.contains('compact');
+    const after = el.classList.toggle('compact', hide);
+    el.classList.toggle('immersive', after);
     if (!after) armAutoHide();
     if (before === after || !R.doc) return;
     const a = anchor(); layout(); restore(a);
+    scrollLock = Date.now() + 350;
+    lastY = vp.scrollTop;
   };
+  const toggleChrome = force => setCompact(force == null ? !el.classList.contains('compact') : !!force);
   R.toggleChrome = toggleChrome;
-  // Short landscape screens (phone on its side, ≤440 px tall): the bars hide themselves after a few seconds
-  // without interaction so the text gets the whole height; a tap in the middle (or Esc) brings them back.
+  R.setCompact = setCompact;
+  // Short landscape: the top bar hides after a few seconds. The slim bottom bar stays, so home/prev/next are always one tap away.
   const armAutoHide = () => {
     clearTimeout(R.hideT);
     if (!SHORT_LANDSCAPE.matches) return;
     R.hideT = setTimeout(() => {
       if (el.hidden || !el.isConnected || !$('#sheet') || !$('#sheet').hidden) return;
-      if (el.querySelector('.r-top, .r-bottom')?.contains(document.activeElement) && document.activeElement.matches(':focus-visible')) return; // keyboard user in the bar
-      toggleChrome(true);
+      if (el.querySelector('.r-top, .r-bottom')?.contains(document.activeElement) && document.activeElement.matches(':focus-visible')) return;
+      setCompact(true);
     }, AUTO_HIDE_MS);
   };
   R.armAutoHide = armAutoHide;
@@ -1644,15 +1667,13 @@ function bindReaderUi() {
   R.ro?.disconnect();
   R.ro = new ResizeObserver(() => {
     if (!$('#rt') || !$('#rb') || !$('#rc')) { R.ro?.disconnect(); return; } // reader was left
-    const lnav = $('#lnav'); if (lnav && $('#reader')) $('#reader').style.setProperty('--lnav-h', lnav.hidden ? '0px' : lnav.offsetHeight + 'px');
-    const h = $('#rt').offsetHeight + ':' + $('#rb').offsetHeight + ':' + (lnav && !lnav.hidden ? lnav.offsetHeight : 0);
+    const h = $('#rt').offsetHeight + ':' + $('#rb').offsetHeight;
     if (h === lastH) return; const first = !lastH; lastH = h;
     if (first || !R.doc) return;
     cancelAnimationFrame(R.roF);
     R.roF = requestAnimationFrame(() => { if (!$('#rc')) return; const sp = R.segs.find(x => x.classList.contains('speaking')); if (!sp) { relayoutKeep(); return; } layout(); goToSeg(sp.dataset.id, false); });
   });
   R.ro.observe($('#rt')); R.ro.observe($('#rb'));
-  if ($('#lnav')) R.ro.observe($('#lnav'));
   $('#b-prev').onclick = $('#b-prev2').onclick = () => turn(-1);
   $('#b-next').onclick = $('#b-next2').onclick = () => turn(1);
   $('#b-full').onclick = () => {
@@ -1668,7 +1689,16 @@ function bindReaderUi() {
     for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) bt.addEventListener(ev, () => clearTimeout(timer));
     bt.addEventListener('contextmenu', e => { e.preventDefault(); if (!long) { clearTimeout(timer); long = true; openSheet('tts'); } });
     bt.onclick = () => { if (long) { long = false; return; } ttsToggle(); }; }
-  vp.addEventListener('scroll', () => { if (prefs.layout === 'scroll') updateProgress(); }, { passive: true });
+  let lastY = 0;
+  vp.addEventListener('scroll', () => {
+    if (prefs.layout === 'scroll') updateProgress();
+    if (prefs.layout !== 'scroll') return;
+    const y = vp.scrollTop;
+    if (Date.now() < scrollLock) { lastY = y; return; }
+    if (y > lastY + 28) setCompact(true);
+    else if (y < lastY - 28) setCompact(false);
+    lastY = y;
+  }, { passive: true });
   // tap zones & swipe (page mode); tap center toggles chrome
   let sx = 0, sy = 0, st = 0;
   vp.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; st = Date.now(); });
@@ -1681,7 +1711,7 @@ function bindReaderUi() {
       const x = e.clientX / vp.clientWidth;
       if (prefs.layout === 'pages' && x < 0.28) turn(1);
       else if (prefs.layout === 'pages' && x > 0.72) turn(-1);
-      else if (SHORT_LANDSCAPE.matches) toggleChrome();
+      else setCompact(false);
     }
   });
   $('#t-play').onclick = () => ttsToggle();
@@ -1693,6 +1723,7 @@ function bindReaderUi() {
 }
 function turn(d) {
   R.armAutoHide?.();
+  R.setCompact?.(true);
   if (prefs.layout === 'pages') {
     if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast(R.lib ? 'סוף הפרק' : 'סוף השיעור'); return; }
     setPage(R.page + d);

@@ -36,7 +36,7 @@ test('small landscape (568x320): text starts on page 1, a single compact bar, pa
     await p.waitForTimeout(300);
     const s = await pageState(p);
     assert.ok(s.visible >= 1, 'page 1 must contain text, not only the title');
-    assert.equal(s.botShown, false, 'bottom bar hidden in short landscape');
+    assert.equal(s.botShown, true, 'slim bottom bar stays in short landscape');
     assert.ok(s.topH / s.H <= 0.16, `top bar ${s.topH}px of ${s.H}`);
     assert.ok(await p.isVisible('#b-next2'));
     await p.click('#b-next2'); await p.waitForTimeout(400);
@@ -192,10 +192,12 @@ test('round 4: the reader top-bar subtitle (date + range) is not cut with an ell
     for (const w of [390, 320]) for (const iso of ['2026-11-03', '2026-02-06']) {
       const p = await pageWith(b, srv.url, { viewport: { width: w, height: 844 } });
       await p.goto(srv.url + `#/r/chumash/${iso}`); await p.waitForSelector('.seg'); await p.waitForTimeout(300);
-      const r = await p.$$eval('#r-s span', ss => ss.map(s => ({ t: s.textContent, cut: s.scrollWidth > s.clientWidth + 1 })));
-      assert.equal(r.length, 2, iso); assert.deepEqual(r.filter(x => x.cut), [], `${w} ${iso}`);
-      assert.match(r[0].t, /ב(מרחשוון|שבט) תשפ״[זו]/); assert.match(r[0].t, /\d\d\/\d\d\/\d{4}/);
-      assert.match(r[1].t, /\S/);
+      const title = await p.locator('#r-t').evaluate(e => ({ t: e.textContent, cut: e.scrollWidth > e.clientWidth + 1, vis: !!(e.offsetHeight && getComputedStyle(e).opacity !== '0') }));
+      assert.ok(title.vis && title.t.trim(), `${w} ${iso}: title hidden ${JSON.stringify(title)}`);
+      if (w >= 390) assert.ok(!title.cut, `${w} ${iso}: title cut ${JSON.stringify(title)}`);
+      const r = await p.$$eval('#r-s span, #r-s', ss => ss.filter(s => s.matches && s.matches('#r-s, #r-s span')).map(s => ({ t: s.textContent, sr: getComputedStyle(s).position === 'absolute' || s.closest('.sr') })));
+      // 1.0.120: the top bar is title-only; the date/range stay in #r-s for the screen reader
+      assert.ok(r.some(x => /\d\d\/\d\d\/\d{4}/.test(x.t)), `${w} ${iso}: date missing ${JSON.stringify(r)}`);
       await p.close();
     }
   } finally { await b.close(); srv.close(); }

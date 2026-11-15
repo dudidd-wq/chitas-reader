@@ -18,7 +18,8 @@ const state = p => p.evaluate(() => ({ hash: location.hash, sub: document.queryS
   head: document.querySelector('#rc .doc-head').textContent, text: document.querySelector('#rc').textContent.slice(0, 4000) }));
 // click a day control and wait for the reader to show the new day
 const go = async (p, which, iso, where = 'top') => {
-  await p.click(`#lnav [data-day="${which}"]`);
+  const sel = which === 'today' ? '.daynav [data-day="today"]' : (which === 'prev' ? '#b-lprev' : '#b-lnext');
+  await p.click(sel, { force: which === 'today' });
   await p.waitForFunction(i => location.hash.endsWith('/' + i) && !!document.querySelector('#rc .seg, #rc .doc-credit') && document.querySelector('#r-s').textContent.includes(i.split('-').reverse().join('/')), iso);
   await p.waitForTimeout(250);
 };
@@ -44,7 +45,7 @@ test('day navigation: next / previous / today, dates and address follow, refresh
   }
   // "היום" only when another day is shown, and it leads to today
   await open(p, 'tanya', '2026-12-20');
-  assert.equal(await p.getAttribute('#lnav [data-day="today"]', 'href'), `#/r/tanya/${today}`);
+  assert.equal(await p.getAttribute('.daynav [data-day="today"]', 'href'), `#/r/tanya/${today}`);
   await go(p, 'today', today);
   assert.equal(await p.locator('.daynav [data-day="today"]').count(), 0, 'no "today" button on today');
   // browser Back returns to the previous day
@@ -79,9 +80,9 @@ test('day navigation keeps the calendar right: Israel / Diaspora, Tishrei, Rav Y
   const p = await pageWith(browser, srv.url, { prefs: { lessonRavYomi: true } });
   await p.goto(srv.url + '#/r/ravyomi/2027-01-02'); await p.waitForSelector('#rc .doc-credit');
   assert.doesNotMatch(await p.textContent('#rc'), /רק לשנה/);
-  await p.click('#lnav [data-day="next"]'); await p.waitForFunction(() => location.hash.endsWith('2027-01-03'));
+  await p.click('#b-lnext'); await p.waitForFunction(() => location.hash.endsWith('2027-01-03'));
   await p.waitForFunction(() => /רק לשנה/.test(document.querySelector('#rc').textContent));
-  await p.click('#lnav [data-day="prev"]'); await p.waitForFunction(() => location.hash.endsWith('2027-01-02'));
+  await p.click('#b-lprev'); await p.waitForFunction(() => location.hash.endsWith('2027-01-02'));
   await p.waitForFunction(() => !/רק לשנה/.test(document.querySelector('#rc').textContent) && /03\/01\/2027|02\/01\/2027/.test(document.querySelector('#r-s').textContent));
   assert.match(await p.textContent('#r-s'), /02\/01\/2027/);
   assert.deepEqual(p.errors, []); await p.context().close();
@@ -105,10 +106,10 @@ test('day navigation: accessible (labels with the date, keyboard, focus, announc
   assert.ok(al.some(([, l]) => l.includes('03/11/2026') && l.includes(dayPlan(new Date('2026-11-03T12:00:00')).hebDate)));
   assert.doesNotMatch(await p.innerText('#reader'), ISO);
   // 44×44 targets
-  const small = await p.$$eval('#lnav a', a => a.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length);
+  const small = await p.$$eval('#b-lprev, #b-lnext', a => a.filter(x => { const r = x.getBoundingClientRect(); return r.width < 44 || r.height < 44; }).length);
   assert.equal(small, 0);
   // keyboard: Tab to "יום הבא", Enter → next day, focus stays on "יום הבא" of the new day, the day is announced
-  await p.focus('#lnav [data-day="next"]'); await p.keyboard.press('Enter');
+  await p.focus('#b-lnext'); await p.keyboard.press('Enter');
   await p.waitForFunction(() => location.hash.endsWith('2026-11-03') && /03\/11\/2026/.test(document.querySelector('#r-s').textContent) && document.activeElement?.dataset.day === 'next' && !!document.querySelector('#toast').textContent);
   assert.match(await p.textContent('#toast'), /תהילים.*03\/11\/2026/);
   assert.equal(await p.getAttribute('#toast', 'aria-live'), 'polite');
@@ -119,10 +120,10 @@ test('day navigation: accessible (labels with the date, keyboard, focus, announc
   await p.waitForSelector('#rc .seg'); await p.waitForTimeout(250);
   await p.keyboard.press('Home'); await p.waitForTimeout(300);
   // read-aloud stops when the day changes
-  await p.keyboard.press('p'); await p.waitForSelector('#ttsctl:not([hidden])'); await p.waitForTimeout(300);
+  await p.locator('#vp').click({ position: { x: 200, y: 300 } }); await p.keyboard.press('p'); await p.waitForSelector('#ttsctl:not([hidden])'); await p.waitForTimeout(300);
   assert.ok(await p.evaluate(() => window.__spoken.length) > 0);
   const c0 = await p.evaluate(() => window.__cancel || 0);
-  await p.click('#lnav [data-day="next"]'); await p.waitForFunction(() => location.hash.endsWith('2026-11-04') && /04\/11\/2026/.test(document.querySelector('#r-s').textContent) && !!document.querySelector('#rc .seg'));
+  await p.evaluate(() => document.getElementById('b-lnext').click()); await p.waitForFunction(() => location.hash.endsWith('2026-11-04') && /04\/11\/2026/.test(document.querySelector('#r-s').textContent) && !!document.querySelector('#rc .seg'));
   await p.waitForTimeout(1500);
   assert.ok(await p.evaluate(c => window.__cancel > c, c0), 'speech cancelled');
   assert.equal(await p.evaluate(() => document.querySelectorAll('#rc .speaking').length), 0);

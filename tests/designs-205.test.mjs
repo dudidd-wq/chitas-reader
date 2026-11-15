@@ -57,22 +57,21 @@ for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.116/1.0.11
     });
     assert.ok(r.last <= r.top + 0.5, `${h}: content ends under the nav ${JSON.stringify(r)}`);
   }
-  // 1.0.119: the bottom nav stays in the reader, below the pager, and does not cover it or the text
+  // 1.0.120: the 5-tab app nav leaves the reader; home lives on the slim bar
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
   await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(400);
-  const mR = await nav(p); assert.ok(mR && !mR.hidden && mR.onTop, 'nav missing in the reader');
+  assert.equal(await p.evaluate(() => !!document.getElementById('bnav')), false, 'app nav still in the reader');
   const stack = await p.evaluate(() => {
-    const b = document.getElementById('bnav').getBoundingClientRect();
     const rb = document.getElementById('rb').getBoundingClientRect();
-    const ln = document.getElementById('lnav')?.getBoundingClientRect();
     const rt = document.getElementById('rt').getBoundingClientRect();
+    const home = document.getElementById('b-home');
     const hitRb = document.getElementById('rb').contains(document.elementFromPoint(innerWidth / 2, rb.top + 8));
-    return { bTop: b.top, rbBot: rb.bottom, lnBot: ln?.bottom ?? null, rtVis: rt.height > 0 && getComputedStyle(document.getElementById('rt')).pointerEvents !== 'none', hitRb };
+    return { rbBot: rb.bottom, ih: innerHeight, rtVis: rt.height > 0 && getComputedStyle(document.getElementById('rt')).pointerEvents !== 'none', hitRb, home: !!(home && !home.hidden && home.getBoundingClientRect().height >= 44) };
   });
   assert.ok(stack.rtVis, 'back bar hidden');
-  assert.ok(stack.hitRb, 'the reader pager is covered');
-  assert.ok(stack.rbBot <= stack.bTop + 1, `pager under the nav ${JSON.stringify(stack)}`);
-  if (stack.lnBot != null) assert.ok(stack.lnBot <= stack.bTop + 1, `lesson nav under the nav ${JSON.stringify(stack)}`);
+  assert.ok(stack.hitRb, 'the slim bar is covered');
+  assert.ok(stack.home, 'home missing from the slim bar');
+  assert.ok(Math.abs(stack.rbBot - stack.ih) <= 2, `slim bar not at the bottom ${JSON.stringify(stack)}`);
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
   const m = await nav(p); assert.ok(m && !m.hidden, 'nav still on the home screen');
   assert.deepEqual(p.errors, []);

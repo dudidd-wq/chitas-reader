@@ -59,31 +59,26 @@ test('1.0.93: no horizontal overflow at 320/360/390 px; checkboxes keep their si
   }
 });
 
-test('1.0.93: reader pager – labelled prev/next of equal width, page number centred, one line at 360 px, above the safe area', async () => {
+test('1.0.120: slim reader bar – home, prev, play, next in one row of about 44 px, at the bottom', async () => {
   for (const w of [360, 390]) {
     const p = await mobile(w); await p.goto(srv.url + '#/r/chumash/2026-11-02'); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(300);
-    const m = await p.evaluate(() => { const r = id => document.getElementById(id).getBoundingClientRect(); const rb = r('rb'), a = r('b-prev'), b = r('b-next'), i = r('pinfo');
-      return { rb: [rb.top, rb.bottom, rb.height], a: [a.left, a.right, a.width, a.height, a.top], b: [b.left, b.right, b.width, b.height, b.top], i: [i.left, i.right, i.top], ih: innerHeight, w: innerWidth,
-        lbl: [...document.querySelectorAll('#rb .pg-lbl')].map(e => [e.textContent, e.getClientRects().length, getComputedStyle(e).display !== 'none']),
-        names: ['b-prev', 'b-next'].map(id => document.getElementById(id).getAttribute('aria-label')) }; });
-    assert.deepEqual(m.lbl, [['עמוד קודם', 1, true], ['עמוד הבא', 1, true]]);
-    assert.deepEqual(m.names, ['עמוד קודם', 'עמוד הבא']);
+    const m = await p.evaluate(() => { const r = id => document.getElementById(id).getBoundingClientRect(); const rb = r('rb'), a = r('b-lprev'), b = r('b-lnext'), h = r('b-home'), pl = r('b-play2');
+      return { rb: [rb.top, rb.bottom, rb.height], a: [a.left, a.right, a.width, a.height, a.top], b: [b.left, b.right, b.width, b.height, b.top], h: [h.width, h.height], pl: [pl.width, pl.height], ih: innerHeight, w: innerWidth,
+        lbl: [...document.querySelectorAll('#rb .rb-lbl')].map(e => e.textContent.trim()),
+        names: ['b-home', 'b-lprev', 'b-lnext'].map(id => document.getElementById(id).getAttribute('aria-label')),
+        bnav: !!document.getElementById('bnav') }; });
+    assert.ok(m.lbl.includes('בית') && m.lbl.includes('הקודם') && m.lbl.includes('הבא'), JSON.stringify(m.lbl));
+    assert.ok(m.names[0].includes('חזרה'));
     assert.ok(m.a[3] >= 44 && m.b[3] >= 44 && m.a[2] >= 44 && m.b[2] >= 44);
-    assert.ok(Math.abs(m.a[2] - m.b[2]) <= 2, `prev ${m.a[2]} vs next ${m.b[2]}`);
-    assert.ok(m.a[0] > m.i[1] && m.i[0] > m.b[1], 'RTL order prev | info | next');
-    assert.ok(Math.abs((m.i[0] + m.i[1]) / 2 - m.w / 2) < 4, 'page number centred');
-    assert.ok(Math.abs(m.a[4] - m.b[4]) < 1 && m.rb[2] < 70, `one row (bar ${m.rb[2]}px)`);
+    assert.ok(m.h[0] >= 44 && m.h[1] >= 44 && m.pl[0] >= 44 && m.pl[1] >= 44);
+    assert.ok(Math.abs(m.a[2] - m.b[2]) <= 8, `prev ${m.a[2]} vs next ${m.b[2]}`);
+    assert.ok(m.a[0] > m.b[1], 'RTL order: prev (right) then next (left)');
+    assert.ok(Math.abs(m.a[4] - m.b[4]) < 1 && m.rb[2] <= 52, `one slim row (bar ${m.rb[2]}px)`);
     assert.ok(m.a[0] >= 0 && m.b[1] <= m.w);
-    // 1.0.119: the pager sits above the lesson-nav and the app nav
-    const stack = await p.evaluate(() => {
-      const r = id => document.getElementById(id).getBoundingClientRect();
-      const rb = r('rb'), ln = r('lnav'), bn = r('bnav');
-      return { rbBot: rb.bottom, lnTop: ln.top, lnH: ln.height, bnTop: bn.top, ih: innerHeight };
-    });
-    assert.ok(Math.abs(stack.rbBot - stack.lnTop) < 2, JSON.stringify(stack));
-    assert.ok(stack.lnTop <= stack.bnTop + 1, JSON.stringify(stack));
+    assert.equal(m.bnav, false);
+    assert.ok(Math.abs(m.rb[1] - m.ih) <= 2, JSON.stringify(m.rb));
     const pad = await p.evaluate(() => { const rc = document.getElementById('rc'); return parseFloat(getComputedStyle(rc).paddingBottom); });
-    assert.ok(pad >= m.rb[2] + stack.lnH - 1, `content bottom padding ${pad} < bars ${m.rb[2]}+${stack.lnH}`);
+    assert.ok(pad >= m.rb[2] - 1, `content bottom padding ${pad} < bar ${m.rb[2]}`);
     await p.context().close();
   }
 });
