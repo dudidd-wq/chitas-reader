@@ -530,3 +530,14 @@ does not re-paginate. Home is two taps away (the button, then בית). Prev/next
 and the library. At 412×915 the text area is 875px (was 809px shown / 850px collapsed in 1.0.120, 639px in 1.0.119).
 Tests: reader-121 (new); reader-120, reader-119, daynav, designs-203/204/205, settings-layout-193, layout, tap-targets,
 escape-fullscreen, siddur-flow and tts-bar updated for the new chrome.
+
+## 2026-11-15 – 1.0.122: shuruk vs consonant vav in the local voice
+Dudi: "משהו במנוע ההקראה לא עובד תקין / הוא עדיין מתקשה להבדיל בין ו' רגילה לבין ו' עם שורוק / ויש עוד כמה דוגמאות"
+and "זה כמעט בכל שיעור תניא או חומש / אפילו של היום". Speech layer only (display and DATA_VERSION unchanged).
+Two g2p gaps left from 1.0.87, heard throughout today's and tomorrow's Chumash and Tanya:
+1. A shva after prefix שורוק (וּלְזַרְעֶךָ, וּבְזַרְעֶךָ, וּשְׁמַרְתִּיךָ, וּבְלִי) was read nach, so the "u" was jammed
+   into the next consonant (ulzar, uvzar) and sounded close to a consonant vav. It is now na (ulezar, uvezar).
+   The same rule applies after holam male (יוֹרְדִים, יוֹצְאִים). A word-internal shuruk (נוּקְבָא, קוּרְבָה) is left as written.
+2. הוֹוֶה / הַהוֹוֶה (Rashi on Gen 29:3) was read "hvo": two vavs were merged into one "vo" and the second vav's vowel
+   was swallowed. They are now ho-ve. לְלַוּוֹתוֹ and מִצְווֹת stay "vo".
+Tests: vav-122 (new, real words from 15–16 Nov 2026); g2p, shin-vav-187 and sabato-lexicon-117 expectations for וּבְכָל / וּבְאֵשֶׁת updated.

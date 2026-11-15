@@ -20,7 +20,7 @@ const CASES = {
   // missing shin/sin dot or vav mark, restored from the same word elsewhere in the app's texts (or a reviewed entry)
   'אֲשֶר': 'ʔaʃˈeʁ', 'בָּרוךְ': 'baʁˈuχ', 'לְעולָם': 'leʔolˈam', 'אולָּם': 'ʔulˈam', 'הַיְּהודִּים': 'hajehudˈim', 'וְשחְתָּ': 'vesaχtˈa',
   // shuruq vs consonant vav vs holam male
-  'צִוָּה': 'tsivˈa', 'מִצְוָה': 'mitsvˈa', 'הוּא': 'hˈu', 'וְהָיָה': 'vehajˈa', 'וּבְכָל': 'uvχˈol', 'חַוָּה': 'χavˈa', 'שׁוּב': 'ʃˈuv',
+  'צִוָּה': 'tsivˈa', 'מִצְוָה': 'mitsvˈa', 'הוּא': 'hˈu', 'וְהָיָה': 'vehajˈa', 'וּבְכָל': 'uveχˈol', 'חַוָּה': 'χavˈa', 'שׁוּב': 'ʃˈuv',
   'מִצְוֺת': 'mitsvˈot', 'עָוֹן': 'ʔavˈon', 'עֲוֹנוֹת': 'ʔavonˈot', 'צִוִּיתִי': 'tsivitˈi', 'קַוִּין': 'kavˈin', 'מְצַוְּךָ': 'metsaveχˈa',
   'כַּוָּנָה': 'kavanˈa', 'וְהַנּורָא': 'vehanoʁˈa', 'חַטֹּאותָי': 'χatoʔtˈaj',
 };

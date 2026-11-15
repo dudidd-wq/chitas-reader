@@ -16,7 +16,7 @@ test('required words (stress mark ˈ before the stressed vowel)', () => {
     ['דֶּלֶת', 'dˈelet'],                                                       // segolate – milel
     ['חָכְמָה', 'χoχmˈa'],                                                      // qamatz katan
     ['הַבַּיִת', 'habˈajit'], ['מִצְוָה', 'mitsvˈa'],
-    ['כָּל', 'kˈol'], ['וּבְכָל', 'uvχˈol'], ['הַקָּרְבָּן', 'hakoʁbˈan'],
+    ['כָּל', 'kˈol'], ['וּבְכָל', 'uveχˈol'], ['הַקָּרְבָּן', 'hakoʁbˈan'],
   ]) assert.equal(ipa(w), want, w);
 });
 

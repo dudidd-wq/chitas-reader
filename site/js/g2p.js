@@ -227,6 +227,16 @@ export function markShvaNa(L, opt = {}) {
     else if (isShva(i - 1) && !(i - 1 === 0)) na = true;      // second of two (the first one is not the word's first letter)
     else if (i - 1 === 0 && isShva(0)) na = false;            // שְׁמְ… cannot start a word; leave as written
     if (!na && L[i + 1] && (BASE[L[i].ch] || L[i].ch) === (BASE[L[i + 1].ch] || L[i + 1].ch)) na = true;
+    // 1.0.122: shva after a vowel vav is vocal. Prefix shuruk (וּלְזַרְעֶךָ, וּבְזַרְעֶךָ, וּשְׁמַרְתִּיךָ) was
+    // left as nach in 1.0.87 and jammed the "u" into the next consonant (ulzar, uvzar), so shuruk and
+    // consonant vav were hard to tell apart. Holam male (יוֹרְדִים, יוֹצְאִים, אוֹמְרִים) is the same rule.
+    // A word-internal shuruk (נוּקְבָא, קוּרְבָה) is often a closed syllable and is left as written.
+    if (!na && i > 0 && L[i - 1].ch === 'ו') {
+      const p = L[i - 1];
+      const shuruk = p.diac.includes(DAGESH) && !hasFull(p) && !p.diac.includes(SHVA);
+      const holamVowel = p.diac.includes(HOLAM) || p.diac.includes(HOLAM_HASER);
+      if ((shuruk && i === 1) || holamVowel) na = true;
+    }
     // 1.0.112 opt.aram (build tools only, never at runtime): Aramaic – a dagesh in בגדכפת after a vowel is dagesh kal (אִיתְּמַר
     // itmar), and no vocal shva after a mater yod/vav (מִילְּתָא milta). The tools mark such a shva with NACH in the speech text.
     if (!na && i > 0 && L[i].diac.includes(DAGESH) && !(aram && /[בגדכפת]/.test(L[i].ch)) && (hasFull(L[i - 1]) || (L[i - 1].ch === 'ו' && has(L[i - 1], DAGESH)) || (!aram && /[יו]/.test(L[i - 1].ch) && !L[i - 1].diac && hasFull(L[i - 2])))) na = true;
@@ -297,7 +307,12 @@ function vav(cur, prev, nxt, pp) {
   if (prev && d.includes(DAGESH) && d.includes(SHVA) && !(nxt && nxt.ch === 'ו')) return out(cur, hasFull(prev) ? 've' : 'v', s);
   if (nxt && nxt.ch === 'ו') {
     const dd = d + nxt.diac;
-    if (dd.includes(HOLAM)) return out(cur, vo, s, 1);
+    // 1.0.122: merge the two vavs into one "vo" only when the second is a holam male (no vowel of its
+    // own) and the first is not already a holam male. Otherwise הוֹוֶה (ho-ve) was read "hvo": the
+    // second vav's vowel was swallowed. לְלַוּוֹתוֹ / מִצְווֹת stay "vo".
+    const nxtOwn = /[\u05B0-\u05B8\u05BA\u05BB\u05BC\u05C7]/.test(nxt.diac) || (nxt.diac.includes(HOLAM) && d.includes(HOLAM));
+    const firstHolamMale = d.includes(HOLAM) && !d.includes(DAGESH) && !d.includes(HOLAM_HASER);
+    if (dd.includes(HOLAM) && !nxtOwn && !firstHolamMale) return out(cur, vo, s, 1);
     if (d === nxt.diac) return out(cur, 'vu', s, 1);
     // 1.0.87: וּו after a vowel (כַּוּונָה, written for כַּוָּנָה): the dagesh doubles a consonant vav, it is not a shuruq
     if (prev && hasFull(prev) && d === DAGESH && !nxt.diac) return out(cur, 'v', s);
