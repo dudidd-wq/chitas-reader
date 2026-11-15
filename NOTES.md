@@ -548,3 +548,24 @@ Dudi, after 1.0.122: "אבל היו נשמעת כואו ולא כואו עם ש�
 vowel-initial words already start with a glottal stop (אוּלַי = ʔulaj); prefix shuruk now uses the same ʔu
 onset in Israeli and Ashkenazi, on every voice. Internal shuruk (הוּא, בָּרוּךְ, שֶׁהוּא) is unchanged.
 Tests: vav-123 (new, including phoneme ids); vav-122, g2p, shin-vav-187, sabato-lexicon-117 expectations updated.
+
+## 2026-11-15 – 1.0.124: more read-aloud drops from the post-shuruk audit
+Dudi, after 1.0.123: "מצויין / בדוק אם יד עוד נפילות כאלה". Speech layer only (display and DATA_VERSION unchanged).
+An audit of unique words in the upcoming week (Chumash+Rashi, Tehillim, Tanya, Hayom Yom, Rambam, Siddur)
+found three general failures of the same class (letters or vowels dropped or realised wrongly), and they are fixed:
+
+1. Tanya editorial notes in brackets (`[אולי צריך להיות: …]`, `[נוסח אחר: …]`, manuscript `כתב יד` / `ליתא`) were read
+   aloud, including the unvocalised "אולי צריך להיות". They are now skipped.
+2. Tehillim ketiv/qere is often written `[qere] (ketiv)` (e.g. Ps 66:7 אַל־[יָר֖וּמוּ] (ירימו)). Only `(ketiv) [qere]`
+   was handled, so the unvocalised ketiv was also read. The reverse order is now recognised when the pair is the same
+   word (plene/defective allowed). A bracket plus a parenthetical gloss is left alone.
+3. Rashi speech already vocalised the opening lemma from the verse, but mid-comment quotes of the verse
+   (לָבָן ביום ההוא, ביד בניו, שְׁמוֹ ראובן) stayed unpointed and collapsed. Unique unvocalised tokens that are the
+   verse's own words now take the verse's vowels. A closed speech-only lexicon covers unvocalised book, tractate and
+   personal names (יהושע, חולין, רות, שמואל, …, and a single letter prefix), used when the word is not in the verse.
+   Ambiguous items (שמות, numerals טו/כו, loaz) are not forced.
+
+Not shipped (already correct, or needs a tighter rule / a decision): patach genuva, ךָ, -יו -av/-iv, silent mid-word
+alef, kamatz katan, internal shuruk+shva, Israeli initial ʔ; Chabad bare a/e/i/o onsets (unlike bare u they do produce
+audio); shva after tsere / hiriq male / kamatz; short Tanya `[הוּא]` variants.
+Tests: audit-124 (new). Samples: /workspace/plans/samples/audit-124/.

@@ -5,7 +5,7 @@ import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } from './tefila.js';
 import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
-import { RE_TAAMIM, vowelHeadword } from './tts-prep.js';
+import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
 import { VOICE_FILES } from './voice-files.js';
@@ -1839,7 +1839,7 @@ function ttsSegments() {
     for (const x of block?.biurSay || []) if (x) { parts.push(x); accParts.push(x); primaryParts.push(true); }
     if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach((p, i) => {
       const raw = block?.subSay?.[i];
-      parts.push(raw || vowelHeadword(p.innerHTML, parts[0]));
+      parts.push(fillUnvocalFromVerse(raw || vowelHeadword(p.innerHTML, parts[0]), parts[0]));
       accParts.push(raw || null); primaryParts.push(!!raw);
     });
     const sbv = sbm?.get(s.dataset.id); if (sbv) { parts.push(sbv); accParts.push(sbv); primaryParts.push(true); }

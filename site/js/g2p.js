@@ -12,6 +12,7 @@
 // Pure functions, no DOM: used in the voice worker and in Node tests (tests/g2p.test.mjs).
 
 import { SHIN_VAV_LEX } from './shin-vav-lex.js';
+import { applyUnvocalLex } from './unvocal-lex.js';
 
 export const SHVA = '\u05B0', DAGESH = '\u05BC', HOLAM = '\u05B9', HIRIQ = '\u05B4', QAMATZ = '\u05B8', PATAH = '\u05B7';
 export const TSERE = '\u05B5', SEGOL = '\u05B6', QUBUTS = '\u05BB', SIN = '\u05C2', HATAF_QAMATZ = '\u05B3', QAMATZ_KATAN = '\u05C7';
@@ -378,7 +379,7 @@ export function wordToIPA(word, k = null, data = {}, opt = {}) {
   try { return wordToIPA1(word, k, data, opt); } finally { D = prevD; }
 }
 function wordToIPA1(word, k, data, opt) {
-  let L = letters(opt.raw ? word : fixShinVav(String(word).replace(RE_ACC_METEG, '')));
+  let L = letters(opt.raw ? word : fixShinVav(applyUnvocalLex(String(word).replace(RE_ACC_METEG, ''))));
   if (!L.length) return '';
   // tav rafe and the vowels need a vocalised word: an unvocalised one keeps the Israeli consonants (we cannot tell ת from תּ)
   if (D.tavRafe !== 't' && !L.some(l => /[\u05B0-\u05BC\u05C7]/.test(l.diac))) D = { ...D, tavRafe: 't' };

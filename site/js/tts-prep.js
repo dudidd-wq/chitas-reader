@@ -517,6 +517,10 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&[a-z]+;/g, ' ')
     .replace(/\{[פס]\}/g, ' ')
     .replace(/\(([^()]*)\)\s*\[([^\]]*)\]/g, '$2') // ketiv (…) followed by qere […]: read the qere
+    // 1.0.124: the Tanakh/Tehillim order is often [qere] (ketiv). Read only the qere when the pair is the same word.
+    .replace(/\[([^\]]*)\]\s*\(([^()]*)\)/g, (m, qere, ketiv) => (isKetivOf(qere, ketiv) ? qere : m))
+    // 1.0.124: Tanya (and similar) editorial notes in brackets are not the lesson text and are not read.
+    .replace(/\s*\[[^\[\]]*(?:צריך להיות|נוסח אחר|בכתב יד|ליתא)[^\[\]]*\]/g, ' ')
     .replace(/[^]*/, x => (o.cites ? stripCitations(x) : x))
     .replace(/\u05C6/g, ' ')            // inverted nun (Ps 107, Num 10) – a scribal mark, not read
     .replace(/\u05C0/g, ' ')            // paseq
@@ -623,6 +627,49 @@ const NAME = /^[ובלמכש]{0,2}ה['׳]$/;
 // same consonants; plene/defective spelling (ו/י) may differ for words of 3+ letters (Rashi often writes מלא)
 const noMatres = x => x.length >= 3 ? x[0] + x.slice(1).replace(/[וי]/g, '') : x;
 const eq = (w, h, v) => v === h || (NAME.test(w) && v === h.slice(0, -1) + 'יהוה') || (h.length >= 3 && noMatres(v) === noMatres(h));
+
+/** 1.0.124: (ketiv) already handled above; this checks the reverse [qere] (ketiv) order.
+ *  The ketiv must be the same word as the qere (plene/defective spelling allowed), not a gloss. */
+function isKetivOf(qere, ketiv) {
+  const k = w => w.replace(/[^\u05D0-\u05EA]/g, '');
+  const qk = k(qere), kk = k(ketiv);
+  if (!qk || !kk) return false;
+  const ketivWords = ketiv.replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(w => k(w));
+  if (ketivWords.length > 2) return false;
+  if (qk === kk) return true;
+  return qk.length >= 3 && kk.length >= 3 && noMatres(qk) === noMatres(kk);
+}
+
+/** 1.0.124: in Rashi speech, fully unvocalised words that are the verse's own words
+ *  (same consonants; unique vocalisation in this verse) are read with the verse's vowels.
+ *  Mid-comment quotes such as "ביום ההוא" were left unpointed after the opening lemma was filled.
+ *  Abbreviations and loaz (quotes in the token) are left as printed. Display is unchanged. */
+export function fillUnvocalFromVerse(speech, verseHtml) {
+  if (!speech || !verseHtml) return speech;
+  const key = w => w.replace(/[^\u05D0-\u05EA]/g, '');
+  const verseWords = String(verseHtml).replace(/<[^>]+>/g, '').replace(RE_TAAMIM, '').replace(/[\u05C0\u05C3|]/g, ' ').split(/[\s\u05BE]+/).filter(w => key(w) && /[\u05B0-\u05BC\u05C7]/.test(w));
+  const map = new Map();
+  const vocalOf = w => w.replace(/[^\u05D0-\u05EA\u05B0-\u05BC\u05C1\u05C2\u05C7]/g, '');
+  for (const w of verseWords) {
+    const k = key(w), vocal = vocalOf(w);
+    if (!map.has(k)) map.set(k, vocal);
+    else if (map.get(k) !== vocal) map.set(k, null);
+  }
+  return String(speech).replace(/[\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05C7'"׳״]*/g, tok => {
+    if (/[\u05B0-\u05BC\u05C7]/.test(tok) || /["'״׳]/.test(tok)) return tok;
+    const k = key(tok);
+    if (k.length < 2) return tok;
+    if (map.get(k)) return map.get(k);
+    if (k.length >= 3) {
+      const nm = noMatres(k);
+      const cands = [...map.entries()].filter(([, val]) => val).filter(([vk]) => noMatres(vk) === nm);
+      const forms = new Set(cands.map(([, val]) => val));
+      if (forms.size === 1) return cands[0][1];
+    }
+    return tok;
+  });
+}
+
 export function vowelHeadword(rashiHtml, verseHtml) {
   const m = rashiHtml.match(/^(\s*(?:<span[^>]*>[^<]*<\/span>)?\s*<b>)([^<]+)(<\/b>)/);
   if (!m) return rashiHtml;
