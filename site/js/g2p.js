@@ -283,6 +283,10 @@ function sortStress(syl) {
   return s;
 }
 const out = (cur, con, vow = null, skip = 0) => [clean(sortStress([...(con ? [con] : []), ...(vow ?? vowelsOf(cur))])), skip];
+// 1.0.123: Piper realizes a word-initial bare "u" with a v/w onset. Vowel-initial
+// Hebrew already starts with ʔ (אוּלַי ʔulaj); the same onset yields a clean shuruk "u"
+// in every voice. Only the first letter of the word (no prev). Internal shuruk is unchanged.
+const shurukOut = (cur, v, prev, s) => out(cur, (v === 'u' && !prev) ? 'ʔu' : v, s);
 function vavVowel(d) {
   if (d.includes(PATAH)) return 'va';
   if (d.includes(QAMATZ)) return 'v' + D.qamatz;
@@ -316,11 +320,11 @@ function vav(cur, prev, nxt, pp) {
     if (d === nxt.diac) return out(cur, 'vu', s, 1);
     // 1.0.87: וּו after a vowel (כַּוּונָה, written for כַּוָּנָה): the dagesh doubles a consonant vav, it is not a shuruq
     if (prev && hasFull(prev) && d === DAGESH && !nxt.diac) return out(cur, 'v', s);
-    const v = vavVowel(d); if (v) return out(cur, v, s);
+    const v = vavVowel(d); if (v) return shurukOut(cur, v, prev, s);
     if (d.includes(SHVA) && !nxt.diac) return out(cur, 'v', s);
     return out(cur, '', s);
   }
-  const v = vavVowel(d); if (v) return out(cur, v, s);
+  const v = vavVowel(d); if (v) return shurukOut(cur, v, prev, s);
   if (d.includes(SHVA) && !prev) return out(cur, 've', s);
   // 1.0.87: a vav with no mark between a consonant without a vowel and a vowelled letter (לְעולָם, הושִׁיעֵנוּ) is a lost
   // holam male / shuruq, never silent. Most such words get their exact form from SHIN_VAV_LEX; otherwise holam (the more common).

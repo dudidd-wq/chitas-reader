@@ -14,13 +14,13 @@ const letters = w => w.replace(/[^\u05D0-\u05EA]/g, '');
 
 const CASES = {
   // sin / shin
-  'שָׂרָה': 'saʁˈa', 'יִשְׂרָאֵל': 'jisʁaʔˈel', 'עֹשֶׂה': 'ʔosˈe', 'שָׁלוֹם': 'ʃalˈom', 'וּמִשְׂנְאָיו': 'umisneʔˈav', 'עָשׂוּ': 'ʔasˈu',
+  'שָׂרָה': 'saʁˈa', 'יִשְׂרָאֵל': 'jisʁaʔˈel', 'עֹשֶׂה': 'ʔosˈe', 'שָׁלוֹם': 'ʃalˈom', 'וּמִשְׂנְאָיו': 'ʔumisneʔˈav', 'עָשׂוּ': 'ʔasˈu',
   // Siddur: the sin dot encoded as a holam on ש
   'יִשְֹרָאֵל': 'jisʁaʔˈel', 'לְשָֹשֹוֹן': 'lesasˈon',
   // missing shin/sin dot or vav mark, restored from the same word elsewhere in the app's texts (or a reviewed entry)
   'אֲשֶר': 'ʔaʃˈeʁ', 'בָּרוךְ': 'baʁˈuχ', 'לְעולָם': 'leʔolˈam', 'אולָּם': 'ʔulˈam', 'הַיְּהודִּים': 'hajehudˈim', 'וְשחְתָּ': 'vesaχtˈa',
   // shuruq vs consonant vav vs holam male
-  'צִוָּה': 'tsivˈa', 'מִצְוָה': 'mitsvˈa', 'הוּא': 'hˈu', 'וְהָיָה': 'vehajˈa', 'וּבְכָל': 'uveχˈol', 'חַוָּה': 'χavˈa', 'שׁוּב': 'ʃˈuv',
+  'צִוָּה': 'tsivˈa', 'מִצְוָה': 'mitsvˈa', 'הוּא': 'hˈu', 'וְהָיָה': 'vehajˈa', 'וּבְכָל': 'ʔuveχˈol', 'חַוָּה': 'χavˈa', 'שׁוּב': 'ʃˈuv',
   'מִצְוֺת': 'mitsvˈot', 'עָוֹן': 'ʔavˈon', 'עֲוֹנוֹת': 'ʔavonˈot', 'צִוִּיתִי': 'tsivitˈi', 'קַוִּין': 'kavˈin', 'מְצַוְּךָ': 'metsaveχˈa',
   'כַּוָּנָה': 'kavanˈa', 'וְהַנּורָא': 'vehanoʁˈa', 'חַטֹּאותָי': 'χatoʔtˈaj',
 };

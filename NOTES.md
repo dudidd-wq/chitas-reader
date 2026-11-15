@@ -541,3 +541,10 @@ Two g2p gaps left from 1.0.87, heard throughout today's and tomorrow's Chumash a
 2. הוֹוֶה / הַהוֹוֶה (Rashi on Gen 29:3) was read "hvo": two vavs were merged into one "vo" and the second vav's vowel
    was swallowed. They are now ho-ve. לְלַוּוֹתוֹ and מִצְווֹת stay "vo".
 Tests: vav-122 (new, real words from 15–16 Nov 2026); g2p, shin-vav-187 and sabato-lexicon-117 expectations for וּבְכָל / וּבְאֵשֶׁת updated.
+
+## 2026-11-15 – 1.0.123: clean "u" for prefix shuruk
+Dudi, after 1.0.122: "אבל היו נשמעת כואו ולא כואו עם שורוק". The g2p already sent Piper a bare word-initial "u"
+(^ _ u _ l _ e … for וּלְזַרְעֶךָ). The noa and natural voices realized that onset with a v/w glide. Hebrew
+vowel-initial words already start with a glottal stop (אוּלַי = ʔulaj); prefix shuruk now uses the same ʔu
+onset in Israeli and Ashkenazi, on every voice. Internal shuruk (הוּא, בָּרוּךְ, שֶׁהוּא) is unchanged.
+Tests: vav-123 (new, including phoneme ids); vav-122, g2p, shin-vav-187, sabato-lexicon-117 expectations updated.

@@ -52,7 +52,7 @@ test('1.0.91 Chabad consonants: tav rafe s (vocalised words only), silent alef/a
 test('1.0.91 Chabad stress: milel for final stress; monosyllables, hataf penult, article prefix kept; cantillation keeps the accents', () => {
   const t = 'בָּרוּךְ אַתָּה הַשֵּׁם אֱלֹקֵינוּ מֶלֶךְ הָעוֹלָם, שַׁבָּת שָׁלוֹם, אֲנִי בַּיּוֹם וּמָה עַל';
   const tr = []; const ipa = textToIPA(t, { data, havara: 'chabad', trace: tr });
-  assert.equal(ipa, 'bˈoʁuχ ˈato haʃˈejm elejkˈejnu mˈeleχ hoˈejlom, ʃˈabos ʃˈolejm, anˈi bajˈejm umˈo ˈal');
+  assert.equal(ipa, 'bˈoʁuχ ˈato haʃˈejm elejkˈejnu mˈeleχ hoˈejlom, ʃˈabos ʃˈolejm, anˈi bajˈejm ʔumˈo ˈal');
   assert.equal(milelStress('בָּרוּךְ', 0), 1); assert.equal(milelStress('מֶלֶךְ', 1), 1); assert.equal(milelStress('עַל', 0), 0);
   assert.equal(milelStress('אֲנִי', 0), 0); assert.equal(milelStress('הַשֵּׁם', 0), 0); assert.equal(milelStress('בַּיּוֹם', 0), 0);
   // opt.milel=false: Chabad vowels with the original (grammatical) stress
@@ -67,14 +67,13 @@ test('1.0.91 Chabad stress: milel for final stress; monosyllables, hataf penult,
 test('1.0.91: Chabad output uses only phonemes every voice model knows (noa, natural) across Hayom Yom, Siddur and Torah', () => {
   const maps = ['he_IL-noa-medium', 'he_IL-ilspeech-male-medium'].map(n => new Set(Object.keys(JSON.parse(read(`site/voice/${n}.onnx.json`)).phoneme_id_map)));
   const seen = new Set(); let n = 0;
-  const add = s => { for (const x of s) seen.add(x); n++; };
+  const add = s => { for (const x of s) seen.add(x); n++; assert.ok(!/ʔ(?![ˈ]?u)/.test(s), 'chabad glottal only as ʔu: ' + s); };
   const hy = JSON.parse(read('site/data/hayomyom/days.json'));
   for (const d of Object.values(hy).slice(0, 60)) for (const p of d.p) for (const c of chunkText(prepareForTTS(p[2], { stress: true, primaryStress: true }))) add(textToIPA(c.replace(/\u05AB/g, ''), { data, accents: { primary: c }, havara: 'chabad' }));
   const sid = JSON.parse(read('site/data/siddur/boker/1.json'));
   for (const s of Object.values(sid.say)) for (const c of chunkText(prepareForTTS(s, { stress: true, primaryStress: true, divineName: 'adonai' }))) add(textToIPA(c.replace(/\u05AB/g, ''), { data, accents: { primary: c }, havara: 'chabad' }));
   for (const v of JSON.parse(read('site/data/torah/Genesis/1.json')).v) { const raw = v.replace(/<[^>]+>/g, ''); for (const c of chunkText(prepareForTTS(raw, { stress: true }))) add(textToIPA(c, { data, accents: accentStressMap(raw), havara: 'chabad' })); }
   assert.ok(n > 300);
-  assert.ok(!seen.has('ʔ'), 'no glottal stop');
   for (const m of maps) for (const x of seen) if (x !== ' ') assert.ok(m.has(x), 'phoneme ' + x);
 });
 test('1.0.91: the voices synthesise Chabad pronunciation in Node (default noa + natural)', { timeout: 120000 }, async () => {
