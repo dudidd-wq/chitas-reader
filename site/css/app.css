@@ -388,10 +388,10 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .sd-secs li { line-height: 1.3; }
 .sd-done { color: var(--accent); margin-inline-start: .4rem; font-weight: 700; }
 .sd-miss li { margin: .3rem 0; }
-.sid-note { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); margin: .5em 0; text-align: left; overflow-wrap: anywhere; }
-.sid-note.sid-he { text-align: right; font-size: .82em; overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
+.sid-note { font-family: system-ui, sans-serif; font-size: clamp(.85rem, .6em, 1.15rem); color: var(--muted); margin: .5em 0; text-align: left; overflow-wrap: anywhere; }
+.sid-note.sid-he { text-align: right; font-size: clamp(.9rem, .62em, 1.2rem); overflow-wrap: normal; } /* round 7: Hebrew translation of the instructions */
 .sid-note.sid-he + .sid-note[lang=en] { margin-top: -.3em; }
-.sid-in { font-family: system-ui, sans-serif; font-size: .78em; color: var(--muted); } /* an instruction inside a prayer line */
+.sid-in { font-family: system-ui, sans-serif; font-size: .6em; color: var(--muted); } /* an instruction inside a prayer line */
 .sid-mark { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .15em; vertical-align: .15em; } /* (א)(ב) section labels – shown, not spoken */
 .sid-rep { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .3em; vertical-align: .15em; } /* 2/3 repeat counter – shown, not spoken */
 /* Special insertions (יעלה ויבוא, על הניסים, …): spoken paragraphs, not .sid-note.
@@ -640,6 +640,19 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 #sheet .form > #sh-play { margin-bottom: .6rem; }
 .set-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .4rem 0 .5rem; }
 #set-ver { color: var(--muted); }
+
+/* ---------- 1.0.118: bottom navigation bar on the general screens, in every design incl. the original (built by syncNav) ---------- */
+.bnav { position: fixed; z-index: 8; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: .3rem max(.4rem, env(safe-area-inset-right)) max(.35rem, env(safe-area-inset-bottom)) max(.4rem, env(safe-area-inset-left));
+  background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -4px 16px rgba(0, 0, 0, .08); }
+.bnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 52px; min-width: 0; border-radius: 12px;
+  color: var(--muted); text-decoration: none; font-family: var(--ui); font-size: .78rem; font-weight: 700; line-height: 1.15; text-align: center; }
+.bnav a svg { width: 24px; height: 24px; flex: none; }
+.bnav a[aria-current="page"] { color: var(--accent); }
+html[data-bnav] #app::after { content: ""; display: block; height: calc(76px + env(safe-area-inset-bottom)); }
+html[data-bnav] #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+.bnav a:hover { color: var(--accent); }
+.bnav a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
 
 /* ===================================================================================================================
    1.0.113: designs (prefs.design) – "ספר קודש" (sefer), "מודרני וצבעוני" (modern), "לילי" (nocturne).
@@ -1030,16 +1043,7 @@ html[data-design] #reader { background-attachment: scroll; }
 [data-design="nocturne"] #datepick { letter-spacing: .02em; }
 [data-design] .datefield #datepick { width: 8rem; }
 
-/* ---------- 1.0.116: bottom navigation bar on the general screens (designs only; built by syncNav) ---------- */
-.bnav { position: fixed; z-index: 8; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
-  padding: .3rem max(.4rem, env(safe-area-inset-right)) max(.35rem, env(safe-area-inset-bottom)) max(.4rem, env(safe-area-inset-left));
-  background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -4px 16px rgba(0, 0, 0, .08); }
-.bnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 52px; min-width: 0; border-radius: 12px;
-  color: var(--muted); text-decoration: none; font-family: var(--ui); font-size: .78rem; font-weight: 700; line-height: 1.15; text-align: center; }
-.bnav a svg { width: 24px; height: 24px; flex: none; }
-.bnav a[aria-current="page"] { color: var(--accent); }
-html[data-bnav] #app::after { content: ""; display: block; height: calc(76px + env(safe-area-inset-bottom)); }
-html[data-bnav] #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+/* ---------- 1.0.116: per-design colours of the bottom navigation bar (base rules: 1.0.118, before the designs) ---------- */
 /* sefer: a leather strip with a gold edge, the current tab in light gold */
 [data-design="sefer"] .bnav { background: linear-gradient(#55301b, #3a1f0f); border-top: 2px solid var(--gold); box-shadow: 0 -2px 0 color-mix(in srgb, var(--gold) 35%, transparent); }
 [data-design="sefer"] .bnav a { color: #d9c08a; font-weight: 600; }
@@ -1054,4 +1058,7 @@ html[data-bnav] #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
 [data-design="nocturne"] .bnav a { color: #a99d86; font-weight: 600; }
 [data-design="nocturne"] .bnav a[aria-current="page"] { color: var(--gold2); text-shadow: 0 0 10px rgba(241, 215, 154, .45); }
 [data-design="nocturne"] .bnav a[aria-current="page"] svg { filter: drop-shadow(0 0 6px rgba(241, 215, 154, .55)); }
-.bnav a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+/* 1.0.118: Dudi – "לאחר בחירת עיצוב שינוי הפונטים לא עובד". With "הגופן שלי" the user's reading font also sets the
+   home screen's date title and lesson names (before, only the reader followed it). */
+[data-design][data-design-font="mine"] :is(.hero .hd, .card .what, .glyph) { font-family: var(--text-font); }

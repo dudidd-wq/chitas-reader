@@ -238,12 +238,12 @@ function route() {
   renderHome();
 }
 window.addEventListener('hashchange', () => { route(); syncNav(); });
-// 1.0.116: in the designs, a fixed bottom navigation bar on the general screens (not over the reader). Built only when a
-// design is chosen, so the original look has no extra element.
+// 1.0.116: a fixed bottom navigation bar on the general screens (not over the reader). 1.0.118 (Dudi: "הבר עדיין לא
+// מופיע"): in every design, the original one included.
 const HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>';
 const BNAV = [['home', '#/', HOME_ICON, 'היום'], ['lib', '#/lib', LIB_ICON, 'ספרייה'], ['search', '#/search', SEARCH_ICON, 'חיפוש'], ['siddur', '#/siddur', NAV_ICON.book, 'סידור'], ['settings', '#/settings', ICON.gear, 'הגדרות']];
 function syncNav() {
-  const root = document.documentElement, show = !!root.dataset.design && $('#reader').hidden;
+  const root = document.documentElement, show = $('#reader').hidden;
   let nav = document.getElementById('bnav');
   if (!show) { nav?.remove(); delete root.dataset.bnav; return; }
   if (!nav) {
@@ -1878,5 +1878,9 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     t.classList.add('show');
     $('#swReload').onclick = () => location.reload();
   });
-  navigator.serviceWorker.register('sw.js').then(r => { r.update?.().catch(() => {}); }).catch(() => {});
+  // 1.0.118: an installed app resumed from the background never reloads, so look for a new version on every return too
+  navigator.serviceWorker.register('sw.js').then(r => {
+    r.update?.().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') r.update?.().catch(() => {}); });
+  }).catch(() => {});
 }

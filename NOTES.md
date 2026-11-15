@@ -498,3 +498,10 @@ exactly as before (designs-203 identity). Tests: designs-205.
 - **חֹמֶץ – 9.8, no change:** the pointed texts already separate חֹמֶץ (vinegar, milel) from חָמֵץ (leaven, milra); an unpointed entry would break חָמֵץ.
 - **אפילו – 9.1, not deployed:** the owner's 1.0.79 policy (aFIlu) already covers the Rambam forms; the dagesh spellings אֲפִילּוּ/וַאֲפִילּוּ/דַּאֲפִילּוּ/שֶׁאֲפִילּוּ (~700 fallback occurrences, mostly Gemara and Torah Or) still fall back to milra and stay as they were.
 - Speech layer only: displayed letters and niqqud unchanged. Review: /workspace/hebrew-tts/sabato_rambam/review/. Tests: tests/sabato-lexicon-117.test.mjs.
+
+## 2026-11-15 – 1.0.118: nav bar in the original design, smaller instructions, the user's font wins under a design
+- Dudi: "הבר עדיין לא מופיע". The live check showed the bar in the three designs but not in the original (default) design, which is what Dudi uses – it was built only under a design. syncNav now builds it on every general screen in every design; its base rules moved before the design section (the original look is still identical with/without the design CSS, designs-203). Same padding/safe-area rules, removed over the reader.
+- SW: the update flow (skipWaiting + reload on controllerchange on home) was already in place, but an installed app resumed from the background only checked at a cold start; it now calls registration.update() on every return to the foreground.
+- Dudi: "הפונטים של ההנחיות גדולים מידי". Siddur instructions (.sid-note / .sid-in) are now ~0.6em of the prayer text, clamped to 13.6–19.2px (were 0.78em, up to ~31px), in all designs.
+- Dudi: "ולאחר בחירת עיצוב שינוי הפונטים לא עובד". The reader already followed the font, but under a design the home screen's title and lesson names kept the design's fonts even with "הגופן שלי". Now they follow the user's reading font. Picking a font still switches "גופן הקריאה בעיצוב" to "הגופן שלי"; the size slider works in both modes.
+- Tests: designs-205 (classic included), designs-206 (new), designs-203 updated; siddur-flow 568x320 shared-page threshold 2→1 (chance page breaks moved by the smaller notes).

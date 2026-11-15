@@ -87,7 +87,7 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
   assert.equal(await p.locator('html').getAttribute('data-design'), d);
   assert.equal(await rootVar(p, '--paper'), e.paper);
   assert.equal(await css(p, '.card', 'background-color'), e.card);
-  assert.match(await css(p, '.hero .hd', 'font-family'), e.hd);
+  assert.match(await css(p, '.hero .hd', 'font-family'), /^"?Frank Ruhl Libre/, '1.0.118: with "my font" the title follows the user\'s font');
   if (d === 'modern') { assert.equal(await css(p, '.card:nth-child(2)', 'background-color'), 'rgb(31, 138, 122)'); assert.equal(await css(p, '.cards', 'grid-template-columns').then(v => v.split(' ').length), 2); }
   if (d === 'sefer') assert.match(await css(p, '.hero', 'background-image'), /svg/);
   if (d === 'nocturne') assert.equal(await css(p, '.hero .hd', 'color'), 'rgba(0, 0, 0, 0)'); // gold gradient text

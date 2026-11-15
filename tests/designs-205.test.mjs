@@ -24,7 +24,7 @@ const nav = p => p.evaluate(() => {
 });
 const SCREENS = [['d/' + D, 'היום'], ['', 'היום'], ['lib', 'ספרייה'], ['search', 'חיפוש'], ['siddur', 'סידור'], ['settings', 'הגדרות']];
 
-for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.116: "${d}" – bottom nav on every general screen, current tab marked, clears the safe area`, async () => {
+for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.116/1.0.118: "${d}" – bottom nav on every general screen, current tab marked, clears the safe area`, async () => {
   const p = await phone({ design: d });
   for (const [h, cur] of SCREENS) {
     await p.goto(srv.url + '#/' + h); await p.waitForTimeout(500);
@@ -45,7 +45,7 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.116: "${d}" – botto
   assert.deepEqual(p.errors, []);
 });
 
-for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.116: "${d}" – the nav never covers content (bottom of home, settings) and keeps away from the reader`, async () => {
+for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.116/1.0.118: "${d}" – the nav never covers content (bottom of home, settings) and keeps away from the reader`, async () => {
   const p = await phone({ design: d });
   for (const h of ['d/' + D, 'settings', 'siddur']) {
     await p.goto(srv.url + '#/' + h); await p.waitForTimeout(600);
@@ -69,16 +69,16 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.116: "${d}" – the n
   assert.deepEqual(p.errors, []);
 });
 
-test('1.0.116: no nav in the original design; switching designs adds / removes it; narrow phones fit', async () => {
+test('1.0.118: the original design has the nav too (Dudi: "הבר עדיין לא מופיע"); switching designs keeps it; narrow phones fit', async () => {
   const p = await phone({});
-  for (const h of ['d/' + D, 'lib', 'settings']) { await p.goto(srv.url + '#/' + h); await p.waitForTimeout(400); assert.equal(await nav(p), null, h); }
-  assert.equal(await p.evaluate(() => document.documentElement.hasAttribute('data-bnav')), false);
+  for (const h of ['d/' + D, 'lib', 'settings']) { await p.goto(srv.url + '#/' + h); await p.waitForTimeout(400); const m = await nav(p); assert.ok(m && !m.hidden && m.onTop, h); }
   await p.goto(srv.url + '#/settings'); await p.waitForTimeout(400);
   await p.check('input[name="design"][value="modern"]', { force: true }); await p.waitForTimeout(300);
-  assert.ok(await nav(p), 'picking a design adds the nav');
+  assert.ok(await nav(p), 'modern');
   await p.check('input[name="design"][value="classic"]', { force: true }); await p.waitForTimeout(300);
-  assert.equal(await nav(p), null, 'back to the original – no nav');
-  for (const d of ['sefer', 'modern', 'nocturne']) {
+  assert.ok(await nav(p), 'back to the original – nav stays');
+  assert.equal(await p.evaluate(() => document.querySelectorAll('#bnav').length), 1);
+  for (const d of ['classic', 'sefer', 'modern', 'nocturne']) {
     const q = await phone({ design: d }, 320); await q.goto(srv.url + '#/d/' + D); await q.waitForTimeout(500);
     const m = await nav(q); assert.ok(!m.overflow, d);
     const fit = await q.evaluate(() => [...document.querySelectorAll('#bnav a span')].every(s => s.scrollWidth <= s.parentElement.clientWidth + 1));
