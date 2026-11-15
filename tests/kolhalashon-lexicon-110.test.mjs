@@ -109,7 +109,8 @@ test('1.0.110: Chabad pronunciation of Abba stays milel; displayed Hayom Yom let
 });
 
 test('1.0.110: TSV marks only the accepted forms as force, and the builder copied them', () => {
-  const forced = tsv.split('\n').filter(l => l.split('#')[0].includes('\tforce') || /\sforce\s*$/.test(l.split('#')[0]));
+  const block = tsv.split('# 1.0.117')[0]; // later versions append their own forced entries
+  const forced = block.split('\n').filter(l => l.split('#')[0].includes('\tforce') || /\sforce\s*$/.test(l.split('#')[0]));
   assert.equal(forced.length, 6); // typography pairs of the three accepted pointed forms
-  assert.equal(Object.keys(data.excForce).length, 3);
+  for (const w of ['אַבָּא', 'אַלְפַּיִים', 'בֵּינְתַיִים']) assert.equal(data.excForce[stressKey(w)], 1, w);
 });

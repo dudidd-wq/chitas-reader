@@ -14,8 +14,8 @@ export const VOICE_FILES = {
     "size": 5048
   },
   "stress": {
-    "url": "voice/stress-he.json?v=d5b428c615ab",
-    "size": 48135
+    "url": "voice/stress-he.json?v=e600aef22c5a",
+    "size": 48683
   },
   "full": {
     "url": "voice/he_IL-noa-medium.onnx?v=83b18c0b8fad",

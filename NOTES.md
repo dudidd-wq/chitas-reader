@@ -490,3 +490,11 @@ targets are ≥ 44px, the bar pads itself by env(safe-area-inset-bottom), and #a
 end of a page hides under it. The bar is removed while the reader is open (its own bar and pager stay on top) and comes back
 on close. syncNav() builds it only when a design is chosen – the original design gets no bar and no extra DOM, so it stays
 exactly as before (designs-203 identity). Tests: designs-205.
+
+## 2026-11-15 – 1.0.117: Rav Sabato Rambam lexicon (Vidi), entries above 9.5 only
+- Vidi's 4 proposals from Rav Sabato's Rambam shiurim (/workspace/hebrew-tts/sabato_rambam/proposals.tsv): טפח, ואפלו, חמץ, אשת, all milel. Same gate as 1.0.110 (Dudi: "מילון: להעלות אם עובר 9.5"), checked against the pointed app texts and the actual compiled speech IPA. Independent review: Claude Sonnet (Anthropic batch, ~$0.02); no OpenAI, no Codex.
+- **אֵשֶׁת – 9.6, deployed.** Construct of אִשָּׁה is milel (E-shet), but stale compiled ole tags read ~450 occurrences milra (Gemara, Rambam לְאֵשֶׁת/בְּאֵשֶׁת…, Sefer HaMitzvot, Tanya, Siddur, Nach). Added as `force` exceptions for the bare form and 11 prefixed forms (tools/data/stress-exceptions.tsv). Cantillation still wins; Chabad havara unchanged (ˈejʃes).
+- **טֶפַח – 9.8, no change:** already milel everywhere pointed; the verb טָפַח stays milra.
+- **חֹמֶץ – 9.8, no change:** the pointed texts already separate חֹמֶץ (vinegar, milel) from חָמֵץ (leaven, milra); an unpointed entry would break חָמֵץ.
+- **אפילו – 9.1, not deployed:** the owner's 1.0.79 policy (aFIlu) already covers the Rambam forms; the dagesh spellings אֲפִילּוּ/וַאֲפִילּוּ/דַּאֲפִילּוּ/שֶׁאֲפִילּוּ (~700 fallback occurrences, mostly Gemara and Torah Or) still fall back to milra and stay as they were.
+- Speech layer only: displayed letters and niqqud unchanged. Review: /workspace/hebrew-tts/sabato_rambam/review/. Tests: tests/sabato-lexicon-117.test.mjs.

@@ -184,3 +184,19 @@
 אַלְפַּיִים	1	force
 בֵּינְתַיִים	1	force
 בֵּינְתַיִים	1	force
+
+# 1.0.117: Rav Sabato Rambam lexicon (Vidi) – only אֵשֶׁת scored >9.5 (9.6, independent Claude review). Construct of אִשָּׁה is milel (E-shet);
+# force overrides stale compiled milra ole tags (~450 occurrences in Gemara, Rambam, Sefer HaMitzvot, Tanya, Siddur, Nach). Never over cantillation.
+# Typography variants listed separately because stressKey keeps mark order. טֶפַח and חֹמֶץ were already milel; אפילו dagesh spellings scored 9.1, not added.
+אֵשֶׁת	1	force
+אֵשֶּׁת	1	force
+וְאֵשֶׁת	1	force
+בְּאֵשֶׁת	1	force
+לְאֵשֶׁת	1	force
+כְּאֵשֶׁת	1	force
+מֵאֵשֶׁת	1	force
+שֶׁאֵשֶׁת	1	force
+דְּאֵשֶׁת	1	force
+וּבְאֵשֶׁת	1	force
+שֶׁבְּאֵשֶׁת	1	force
+שֶׁמֵּאֵשֶׁת	1	force
