@@ -32,12 +32,20 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.114: "${d}" – the b
     await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(400);
     const m = await bar(p);
     assert.equal(m.disp, 'grid', layout); assert.equal(m.vis, 'visible'); assert.equal(m.op, '1');
-    assert.ok(Math.abs(m.bottom - m.ih) < 1 && m.top < m.ih - 60, `${layout}: bar ${JSON.stringify(m)}`);
-    assert.equal(m.pb, '40px', 'the bar clears the gesture area'); assert.ok(solid(m), `${layout}: see-through bar ${m.bg}`);
+    const stack = await p.evaluate(() => {
+      const r = id => document.getElementById(id).getBoundingClientRect();
+      const rb = r('rb'), ln = r('lnav'), bn = r('bnav');
+      return { rbBot: rb.bottom, lnTop: ln.top, lnH: ln.height, bnTop: bn.top, bnBot: bn.bottom, ih: innerHeight, bnPb: getComputedStyle(document.getElementById('bnav')).paddingBottom };
+    });
+    assert.ok(m.top < m.ih - 60, `${layout}: bar ${JSON.stringify(m)}`);
+    assert.ok(Math.abs(stack.rbBot - stack.lnTop) < 2, `${layout}: pager not above lesson nav ${JSON.stringify(stack)}`);
+    assert.ok(stack.lnTop <= stack.bnTop + 1 && Math.abs(stack.bnBot - stack.ih) < 1, `${layout}: ${JSON.stringify(stack)}`);
+    assert.equal(stack.bnPb, '40px', 'the app nav clears the gesture area');
+    assert.ok(solid(m), `${layout}: see-through bar ${m.bg}`);
     assert.ok(m.onTop, `${layout}: something covers the bar`); assert.deepEqual(m.labels, [true, true]);
     assert.ok(m.play && m.play[0] >= 44 && m.play[1] >= 44 && m.play[2], `${layout}: play ${JSON.stringify(m.play)}`);
     const pad = await p.evaluate(() => parseFloat(getComputedStyle(document.getElementById('rc')).paddingBottom));
-    if (layout === 'pages') assert.ok(pad >= m.h - 1, `text runs under the bar (${pad} < ${m.h})`);
+    if (layout === 'pages') assert.ok(pad >= m.h + stack.lnH - 1, `text runs under the bars (${pad} < ${m.h}+${stack.lnH})`);
     assert.deepEqual(p.errors, []); await p.context().close();
   }
   // chosen in the reader's Aא sheet: the bar is still there after the sheet closes
@@ -45,7 +53,7 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.114: "${d}" – the b
   await p.goto(srv.url + `#/r/chumash/${D}`); await p.waitForSelector('#rc .seg');
   assert.equal(await p.locator('#b-play2').isHidden(), true, 'the original look has no extra button');
   await p.tap('#b-aa'); await p.locator(`#sheet label[data-design-prev=${d}]`).tap(); await p.tap('#sh-x'); await p.waitForTimeout(400);
-  const m = await bar(p); assert.ok(m.onTop && Math.abs(m.bottom - m.ih) < 1 && m.play, JSON.stringify(m));
+  const m = await bar(p); const stack = await p.evaluate(() => { const r = id => document.getElementById(id).getBoundingClientRect(); return { rb: r('rb').bottom, ln: r('lnav').top, bn: r('bnav').top, ih: innerHeight }; }); assert.ok(m.onTop && m.play && Math.abs(stack.rb - stack.ln) < 2 && stack.ln <= stack.bn + 1, JSON.stringify({ m, stack }));
   await p.context().close();
 });
 

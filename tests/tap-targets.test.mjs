@@ -40,11 +40,13 @@ test('glossed words have a ≥44 px tall hit area without changing the text layo
     const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
     await p.goto(srv.url + `#/r/chumash/${DG}`); await p.waitForSelector('.seg'); await p.waitForTimeout(400);
     const r = await p.evaluate(() => {
-      const g = [...document.querySelectorAll('.r-content .gl')].find(e => { const b = e.getBoundingClientRect(); return b.width && b.top > 100 && b.bottom < innerHeight - 100 && b.left > 30 && b.right < innerWidth - 30; });
+      const vp = document.getElementById('vp');
+      const g = document.querySelector('.r-content .gl');
       if (!g) return null;
+      g.scrollIntoView({ block: 'center', inline: 'center' });
       const b = g.getBoundingClientRect(), hit = getComputedStyle(g, '::before');
       const x = b.left + b.width / 2;
-      return { h: b.height, extra: parseFloat(hit.top), above: document.elementFromPoint(x, b.top - 7) === g, below: document.elementFromPoint(x, b.bottom + 7) === g };
+      return { h: b.height, extra: parseFloat(hit.top), above: document.elementFromPoint(x, b.top - 7) === g, below: document.elementFromPoint(x, b.bottom + 7) === g, on: b.top > 0 && b.bottom < innerHeight };
     });
     assert.ok(r, 'a visible glossed word');
     assert.ok(r.h + 2 * -r.extra >= 44, `hit area ${r.h} + ${-2 * r.extra}`);

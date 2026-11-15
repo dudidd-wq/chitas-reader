@@ -29,7 +29,7 @@ test('1.0.86: original GPL fonts, corresponding sources, adjacent licenses and u
 });
 
 test('1.0.86: no optional font requested on default reading; eleven real previews and per-font hints',async()=>{
- const p=await pageWith(browser,srv.url,{prefs:{layout:'scroll'},viewport:{width:1100,height:1900}}),req=[];p.on('request',r=>{if(/\/fonts\/(noto-rashi|taamey-d|keter-yg|cardo|david-libre|assistant)\//.test(r.url()))req.push(r.url());});
+ const p=await pageWith(browser,srv.url,{prefs:{layout:'scroll'},viewport:{width:1100,height:1900}}),req=[];p.on('request',r=>{if(/\/fonts\/(taamey-d|keter-yg|cardo|david-libre|assistant)\//.test(r.url()))req.push(r.url());});
  await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');assert.equal(req.length,0);await p.click('#b-aa');assert.equal(await p.locator('.font-sample').count(),11);await p.evaluate(()=>document.fonts.ready);
  for(const[id,name,,,taamim]of fonts){const l=p.locator(`label:has(input[name=font][value="${id}"])`);assert.match(await l.locator('.font-sample').evaluate(e=>getComputedStyle(e).fontFamily),new RegExp(name));if(!taamim)assert.match(await l.textContent(),/ללא טעמים/);}
  if(process.env.CHITAS_FONT_SHOTS)await p.screenshot({path:process.env.CHITAS_FONT_SHOTS+'/chitas-fonts-picker.png'});
@@ -37,7 +37,7 @@ test('1.0.86: no optional font requested on default reading; eleven real preview
 });
 
 for(const[id,name,,,taamim]of fonts)test('1.0.86: '+name+' actually renders Siddur, Chumash+Rashi, Tanya, vocalized Hayom Yom and bold',async()=>{
- const p=await pageWith(browser,srv.url,{prefs:{font:id,layout:'scroll',rashi:true,taamim:true},viewport:{width:1100,height:1000}});
+ const p=await pageWith(browser,srv.url,{prefs:{font:id,layout:'scroll',rashi:true,rashiFont:'text',taamim:true},viewport:{width:1100,height:1000}});
  for(const [i,route]of ['#/s/boker/1','#/lib/torah/Genesis/1','#/r/tanya/2026-11-08','#/lib/hayomyom/cheshvan-28'].entries()){
   // A full navigation makes each assertion inspect the new document, not stale hash-route DOM.
   await p.goto(srv.url+'?fontcase='+i+route);await p.waitForSelector('#rc .seg .t');await waitFont(p,name);await actualFamily(p,'#rc .seg .t',name);

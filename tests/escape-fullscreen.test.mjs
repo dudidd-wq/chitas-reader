@@ -29,13 +29,13 @@ test('#b-full aria-pressed follows fullscreenchange (incl. leaving full screen b
 });
 
 test('Escape: closes pop-up, then sheet, then shows the bars – and never navigates home', { skip }, async () => {
-  const p = await pageWith(browser, srv.url);
+  const p = await pageWith(browser, srv.url, { prefs: { layout: 'scroll' }, viewport: { width: 390, height: 844 } });
   await p.goto(srv.url + `#/r/chumash/${DG}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(300);
   // gloss pop-up open + bars hidden: first Esc only closes the pop-up
   await p.evaluate(() => document.querySelector('#reader').classList.add('immersive'));
-  const gl = await p.$('.gl');
-  assert.ok(gl, 'reading has a gloss'); {
-    await p.evaluate(() => { const g = document.querySelector('.gl'); g.scrollIntoView(); g.click(); });
+  const vis = await p.$$eval('.gl', es => es.map((e, i) => { const r = e.getBoundingClientRect(), v = document.getElementById('vp').getBoundingClientRect(); return r.width && r.left >= v.left && r.right <= v.right && r.top > v.top + 8 && r.bottom < v.bottom - 8 ? i : -1; }).filter(i => i >= 0));
+  assert.ok(vis.length, 'reading has a visible gloss'); {
+    await p.locator('.gl').nth(vis[0]).click();
     await p.waitForSelector('.gloss-pop');
     await p.keyboard.press('Escape'); await p.waitForTimeout(100);
     assert.equal(await p.$('.gloss-pop'), null, 'pop-up closed');

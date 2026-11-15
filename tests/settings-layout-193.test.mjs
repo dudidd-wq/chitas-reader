@@ -15,7 +15,7 @@ const mobile = async (width, height = 760) => {
 const CARDS = ['set-daily', 'set-display', 'set-tts', 'set-siddur', 'set-tehillim', 'set-backup', 'set-about'];
 const GROUP = {
   'set-daily': ['il', 'rambamTrack', 'lessonMitzvot', 'lessonTolt', 'lessonRavYomi', 'lessonDaf', 'lessonAmud', 'lessonYer', 'lessonMishna', 'lessonNach', 'lessonShnayim', 'shnayimSplit'],
-  'set-display': ['design', 'designFont', 'theme', 'font', 'readingBold', 'size', 'lineHeight', 'layout', 'spread', 'taamim', 'rashi', 'hayomNiqqud', 'mitzvotNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'shortBiur', 'wakeLock'],
+  'set-display': ['design', 'designFont', 'theme', 'font', 'readingBold', 'size', 'lineHeight', 'layout', 'spread', 'taamim', 'rashi', 'rashiFont', 'hayomNiqqud', 'mitzvotNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'shortBiur', 'wakeLock'],
   'set-tts': ['ttsEngine', 'ttsGender', 'ttsPitch', 'ttsHavara', 'ttsModel', 'ttsVoice', 'ttsRate', 'ttsStress', 'ttsDivine', 'ttsRashi', 'ttsBiur', 'ttsSkipCites', 'ttsContinuous', 'ttsLockscreen'],
   'set-siddur': ['siddurKaddish', 'hideSiddurInstructions', 'siddurLang', 'tachanunMode', 'shabbatMode'],
 };
@@ -73,10 +73,17 @@ test('1.0.93: reader pager – labelled prev/next of equal width, page number ce
     assert.ok(m.a[0] > m.i[1] && m.i[0] > m.b[1], 'RTL order prev | info | next');
     assert.ok(Math.abs((m.i[0] + m.i[1]) / 2 - m.w / 2) < 4, 'page number centred');
     assert.ok(Math.abs(m.a[4] - m.b[4]) < 1 && m.rb[2] < 70, `one row (bar ${m.rb[2]}px)`);
-    assert.ok(Math.abs(m.rb[1] - m.ih) < 1 && m.a[0] >= 0 && m.b[1] <= m.w);
-    // content of the page ends above the bar
+    assert.ok(m.a[0] >= 0 && m.b[1] <= m.w);
+    // 1.0.119: the pager sits above the lesson-nav and the app nav
+    const stack = await p.evaluate(() => {
+      const r = id => document.getElementById(id).getBoundingClientRect();
+      const rb = r('rb'), ln = r('lnav'), bn = r('bnav');
+      return { rbBot: rb.bottom, lnTop: ln.top, lnH: ln.height, bnTop: bn.top, ih: innerHeight };
+    });
+    assert.ok(Math.abs(stack.rbBot - stack.lnTop) < 2, JSON.stringify(stack));
+    assert.ok(stack.lnTop <= stack.bnTop + 1, JSON.stringify(stack));
     const pad = await p.evaluate(() => { const rc = document.getElementById('rc'); return parseFloat(getComputedStyle(rc).paddingBottom); });
-    assert.ok(pad >= m.rb[2] - 1, `content bottom padding ${pad} < bar ${m.rb[2]}`);
+    assert.ok(pad >= m.rb[2] + stack.lnH - 1, `content bottom padding ${pad} < bars ${m.rb[2]}+${stack.lnH}`);
     await p.context().close();
   }
 });

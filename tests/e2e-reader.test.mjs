@@ -20,12 +20,12 @@ test('home → open lesson: the home page is not visible behind the reader (roun
       const app = document.querySelector('#app'), rd = document.querySelector('#reader');
       const bg = getComputedStyle(rd).backgroundColor;
       const pts = [[0.5, 0.5], [0.1, 0.3], [0.9, 0.7], [0.5, 0.95], [0.5, 0.05]].map(([x, y]) => document.elementFromPoint(innerWidth * x, innerHeight * y));
-      return { appVisible: !!app.getClientRects().length, bg, allInReader: pts.every(e => e && rd.contains(e)), heroVisible: !!document.querySelector('.hero')?.getClientRects().length };
+      return { appVisible: !!app.getClientRects().length, bg, allInReader: pts.every(e => e && (rd.contains(e) || e.closest('#bnav'))), heroVisible: !!document.querySelector('.hero')?.getClientRects().length, hitApp: pts.some(e => e && app.contains(e) && !e.closest('#bnav')) };
     });
     assert.equal(r.appVisible, false, `#app must be hidden (${viewport.width}x${viewport.height})`);
     assert.equal(r.heroVisible, false);
     assert.ok(!/rgba\(.*,\s*0\)|transparent/.test(r.bg), 'reader background must be opaque, got ' + r.bg);
-    assert.ok(r.allInReader, 'every probed point must hit the reader');
+    assert.ok(r.allInReader && !r.hitApp, 'every probed point must hit the reader or its nav, never the home page');
     // back to home restores it
     await p.click('.r-top a[href^="#/d/"]');
     await p.waitForSelector('.hero');

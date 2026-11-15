@@ -59,11 +59,10 @@ test('immersive mode re-paginates into the freed space and keeps the reading pos
     // the segment the page starts with (its beginning – right edge in RTL – is on this page)
     const segBefore = await p.evaluate(() => { const vr = document.querySelector('#vp').getBoundingClientRect(); return [...document.querySelectorAll('.seg')].find(s => { const r = s.getBoundingClientRect(); return r.right > vr.left + 2 && r.right <= vr.right + 2; })?.dataset.id; });
     await p.mouse.click(195, 420); await p.waitForTimeout(500);
-    assert.ok(await p.evaluate(() => document.querySelector('#reader').classList.contains('immersive')));
+    // 1.0.119: a tap in portrait must not hide the back-to-home or bottom bars
+    assert.equal(await p.evaluate(() => document.querySelector('#reader').classList.contains('immersive')), false);
+    assert.ok(await p.evaluate(() => { const r = document.getElementById('rt').getBoundingClientRect(), c = getComputedStyle(document.getElementById('rt')); return r.height > 40 && c.opacity !== '0' && c.pointerEvents !== 'none'; }), 'back bar hidden after tap');
     const after = await pageState(p);
-    assert.ok(after.padTop < before.padTop - 30, `padding shrinks: ${before.padTop} → ${after.padTop}`);
-    const n = s => Number(s.info.match(/מתוך (\d+)/)[1]);
-    assert.ok(n(after) <= n(before), `page count ${n(before)} → ${n(after)}`);
     const visIds = await p.evaluate(() => { const vr = document.querySelector('#vp').getBoundingClientRect(); return [...document.querySelectorAll('.seg')].filter(s => { const r = s.getBoundingClientRect(); return r.right > vr.left && r.left < vr.right; }).map(s => s.dataset.id); });
     assert.ok(visIds.includes(segBefore), 'the segment that was being read is still on screen');
     assert.deepEqual(p.errors, []);

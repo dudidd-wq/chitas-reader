@@ -1,6 +1,6 @@
 // 1.0.116: Dudi – "בר ניווט במסך הכללי". In the three designs the general screens (home, library, search, siddur, settings)
 // get a fixed bottom navigation bar with the real destinations; the current tab is marked, it clears the phone's gesture area,
-// never covers the page's content or the reader (and its pager), and the original design has no bar at all.
+// never covers the page's content; 1.0.119: the bar also stays in the reader, below the pager, without covering it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { serve, launch, PREFS } from './helpers.mjs';
@@ -57,15 +57,24 @@ for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.116/1.0.11
     });
     assert.ok(r.last <= r.top + 0.5, `${h}: content ends under the nav ${JSON.stringify(r)}`);
   }
-  // open a reading → no nav at all; its own bar and pager are on top; back home → the nav returns
+  // 1.0.119: the bottom nav stays in the reader, below the pager, and does not cover it or the text
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
-  await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(300);
-  assert.equal(await nav(p), null, 'nav over the reader');
-  assert.equal(await p.evaluate(() => document.documentElement.hasAttribute('data-bnav')), false);
-  const rbTop = await p.evaluate(() => { const r = document.getElementById('rb').getBoundingClientRect(); return document.getElementById('rb').contains(document.elementFromPoint(innerWidth / 2, r.top + 8)); });
-  assert.ok(rbTop, 'the reader bar is covered');
+  await p.goto(srv.url + `#/r/tanya/${D}`); await p.waitForSelector('#rc .seg'); await p.waitForTimeout(400);
+  const mR = await nav(p); assert.ok(mR && !mR.hidden && mR.onTop, 'nav missing in the reader');
+  const stack = await p.evaluate(() => {
+    const b = document.getElementById('bnav').getBoundingClientRect();
+    const rb = document.getElementById('rb').getBoundingClientRect();
+    const ln = document.getElementById('lnav')?.getBoundingClientRect();
+    const rt = document.getElementById('rt').getBoundingClientRect();
+    const hitRb = document.getElementById('rb').contains(document.elementFromPoint(innerWidth / 2, rb.top + 8));
+    return { bTop: b.top, rbBot: rb.bottom, lnBot: ln?.bottom ?? null, rtVis: rt.height > 0 && getComputedStyle(document.getElementById('rt')).pointerEvents !== 'none', hitRb };
+  });
+  assert.ok(stack.rtVis, 'back bar hidden');
+  assert.ok(stack.hitRb, 'the reader pager is covered');
+  assert.ok(stack.rbBot <= stack.bTop + 1, `pager under the nav ${JSON.stringify(stack)}`);
+  if (stack.lnBot != null) assert.ok(stack.lnBot <= stack.bTop + 1, `lesson nav under the nav ${JSON.stringify(stack)}`);
   await p.goto(srv.url + '#/d/' + D); await p.waitForTimeout(400);
-  const m = await nav(p); assert.ok(m && !m.hidden, 'nav back after closing the reader');
+  const m = await nav(p); assert.ok(m && !m.hidden, 'nav still on the home screen');
   assert.deepEqual(p.errors, []);
 });
 

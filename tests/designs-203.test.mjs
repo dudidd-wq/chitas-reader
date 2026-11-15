@@ -100,8 +100,14 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
   assert.match(await css(p, '#rc .rashi', 'font-family'), e.rashi);
   assert.equal(await rootVar(p, '--hl'), e.hl);
   const txt = await p.locator('#rc').evaluate(r => [...r.querySelectorAll('.seg .t')].map(t => t.textContent).join('|'));
-  const m = await p.evaluate(() => { const rb = document.getElementById('rb').getBoundingClientRect(), rc = document.getElementById('rc'); return { bottom: rb.bottom, ih: innerHeight, pad: parseFloat(getComputedStyle(rc).paddingBottom), h: rb.height }; });
-  assert.ok(Math.abs(m.bottom - m.ih) < 1 && m.pad >= m.h - 1, JSON.stringify(m));
+  const m = await p.evaluate(() => {
+    const rb = document.getElementById('rb').getBoundingClientRect(), ln = document.getElementById('lnav')?.getBoundingClientRect(), bn = document.getElementById('bnav')?.getBoundingClientRect(), rc = document.getElementById('rc');
+    return { bottom: rb.bottom, lnTop: ln?.top ?? null, bTop: bn?.top ?? null, ih: innerHeight, pad: parseFloat(getComputedStyle(rc).paddingBottom), h: rb.height, lnH: ln?.height ?? 0 };
+  });
+  // 1.0.119: the pager sits above the lesson-nav and the app nav, not at the very bottom
+  assert.ok(m.pad >= m.h + m.lnH - 1, JSON.stringify(m));
+  assert.ok(m.lnTop == null || Math.abs(m.bottom - m.lnTop) < 2, JSON.stringify(m));
+  assert.ok(m.bTop == null || (m.lnTop ?? m.bottom) <= m.bTop + 1, JSON.stringify(m));
   await p.evaluate(() => { document.querySelector('#rc .seg').classList.add('speaking'); document.getElementById('rb').classList.add('speaking'); });
   if (d === 'nocturne') { await p.waitForTimeout(500); assert.equal(await css(p, '#rc .seg:not(.speaking)', 'opacity'), '0.55', 'the rest of the page dims while reading aloud'); }
   const q = await pageWith(browser, srv.url, { prefs: { font: 'frank' }, viewport: { width: 360, height: 760 } });
@@ -132,7 +138,8 @@ test('1.0.113: designs keep the colour schemes – sefer/modern turn dark under 
 test('1.0.113: no optional font is requested in the original design; a design caches its own fonts', async () => {
   const p = await pageWith(browser, srv.url), req = []; p.on('request', r => { if (/\/fonts\/(noto-rashi|keter-yg|david-libre|assistant)\//.test(r.url())) req.push(r.url()); });
   await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('.card .what:not(:empty)'); await p.waitForTimeout(500);
-  assert.deepEqual(req, []); await p.context().close();
+  // 1.0.119: Noto Rashi is fetched in the original design too (Rashi-script setting, default on); the design-only families are not
+  assert.ok(req.every(u => /\/fonts\/noto-rashi\//.test(u)), req.join('\n')); await p.context().close();
   const sw = fs.readFileSync(new URL('../site/sw.js', import.meta.url), 'utf8');
   assert.match(sw, /'css\/app\.css'/, 'the design CSS ships inside the precached stylesheet');
 });

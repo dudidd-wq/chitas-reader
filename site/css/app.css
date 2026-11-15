@@ -155,7 +155,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 /* round 4: on narrow screens the date and the verse range get a line each instead of one line cut with an ellipsis */
 @media (max-width: 480px) { .r-title small { line-height: 1.2; } .r-title small span { display: block; overflow: hidden; text-overflow: ellipsis; } .r-title small i { display: none; } .r-title small span.r-dt { white-space: normal; text-overflow: clip; } .r-title small span.r-dt bdi { white-space: nowrap; } .r-title small span.r-dt bdi + i + bdi { margin-inline-start: .5em; } }
 @media (max-width: 360px) { .r-title small { font-size: .72rem; } .r-title small span.r-rng { white-space: normal; text-overflow: clip; } }
-#reader.immersive .r-top { transform: translateY(-110%); opacity: 0; pointer-events: none; }
+/* 1.0.119: the back-to-home bar stays; only the page-turn bar may hide in short landscape. */
+#reader.immersive .r-top { transform: none; opacity: 1; pointer-events: auto; }
 #reader.immersive .r-bottom:not(.speaking) { transform: translateY(110%); opacity: 0; pointer-events: none; }
 .progress { position: absolute; top: 0; inset-inline: 0; height: 3px; background: var(--paper2); }
 .progress > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
@@ -211,7 +212,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); min-height: 44px
 .r-content .seg { margin: 0 0 .55em; border-radius: 6px; transition: background .2s; }
 .r-content .seg.inline { display: inline; margin: 0; }
 .r-content .vn, .r-content .hn { font-family: var(--ui); font-size: .55em; color: var(--muted); font-weight: 600; margin-inline-end: .25em; vertical-align: .25em; }
-.r-content .rashi { font-size: .78em; line-height: 1.75; margin: .25em 0 .7em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 88%, var(--muted)); }
+.r-content .rashi { font-family: 'Noto Rashi Hebrew', var(--text-font); font-size: .78em; line-height: 1.75; margin: .25em 0 .7em; padding-inline-start: .7em; border-inline-start: 2px solid var(--rule); color: color-mix(in srgb, var(--ink) 88%, var(--muted)); }
+html[data-rashi-font="text"] .r-content .rashi { font-family: var(--text-font); }
 .r-content .rashi p { margin: 0 0 .3em; orphans: 2; widows: 2; /* round 4: never a lone Rashi line at a page edge */ }
 .r-content .rashi.keep { break-inside: avoid; }
 .r-content .rashi.brk { break-before: column; }
@@ -464,7 +466,7 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .r-content .daynav-end { margin: 1.1em 0 0; }
 .r-content .endmark p { margin: 0 0 .5em; }
 /* short screens: page 1 is kept for the text; the day controls stay at the end of the lesson */
-@media (orientation: landscape) and (max-height: 500px) { .r-content .daynav-top { display: none; } }
+@media (orientation: landscape) and (max-height: 500px) { .r-content .daynav-top, .lnav { display: none; } }
 @media (orientation: portrait) and (max-height: 640px) { .r-content .daynav-top { display: none; } }
 /* 1.0.55: the siddur flows through a whole seder – a section start is a light marker, never a break */
 .r-content h2.sd-sec { font-family: var(--ui); font-size: .62em; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 1.1em 0 .5em; display: flex; align-items: center; gap: .6em; break-before: auto; break-after: avoid; }
@@ -642,7 +644,7 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 #set-ver { color: var(--muted); }
 
 /* ---------- 1.0.118: bottom navigation bar on the general screens, in every design incl. the original (built by syncNav) ---------- */
-.bnav { position: fixed; z-index: 8; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+.bnav { position: fixed; z-index: 12; inset-inline: 0; bottom: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   padding: .3rem max(.4rem, env(safe-area-inset-right)) max(.35rem, env(safe-area-inset-bottom)) max(.4rem, env(safe-area-inset-left));
   background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -4px 16px rgba(0, 0, 0, .08); }
 .bnav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 52px; min-width: 0; border-radius: 12px;
@@ -651,6 +653,21 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .bnav a[aria-current="page"] { color: var(--accent); }
 html[data-bnav] #app::after { content: ""; display: block; height: calc(76px + env(safe-area-inset-bottom)); }
 html[data-bnav] #toast { bottom: calc(80px + env(safe-area-inset-bottom)); }
+html[data-bnav] #reader { bottom: calc(76px + env(safe-area-inset-bottom)); }
+html[data-bnav] #reader .r-bottom, html[data-bnav] #reader .lnav { padding-bottom: .3rem; }
+.lnav { position: absolute; z-index: 3; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .35rem;
+  min-height: 48px; padding: .2rem max(.5rem, env(safe-area-inset-right)) .25rem max(.5rem, env(safe-area-inset-left));
+  background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--rule); }
+#reader:has(#lnav:not([hidden])) .r-bottom { bottom: var(--lnav-h, 48px); padding-bottom: .25rem; }
+.lnav .btn { min-height: 44px; min-width: 44px; padding: .25rem .7rem; font-weight: 700; }
+.lnav .btn svg { width: 18px; height: 18px; }
+.lnav:empty, .lnav[hidden] { display: none; }
+@media (max-height: 500px) and (orientation: landscape) {
+  html[data-bnav] #reader { bottom: 0; }
+  .bnav, .lnav { display: none !important; }
+  #reader { --lnav-h: 0px !important; }
+  #reader .r-bottom, #reader:has(#lnav:not([hidden])) .r-bottom { bottom: 0 !important; }
+}
 .bnav a:hover { color: var(--accent); }
 .bnav a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
 
@@ -1062,3 +1079,13 @@ html[data-design] #reader { background-attachment: scroll; }
 /* 1.0.118: Dudi – "לאחר בחירת עיצוב שינוי הפונטים לא עובד". With "הגופן שלי" the user's reading font also sets the
    home screen's date title and lesson names (before, only the reader followed it). */
 [data-design][data-design-font="mine"] :is(.hero .hd, .card .what, .glyph) { font-family: var(--text-font); }
+
+/* 1.0.119: Dudi – "בחומש רשי מופיע באותיות רשי / תוסיף הגדרה שיופיע בפונט". The user's "הגופן של הקריאה" wins over a design's Rashi script. */
+html[data-rashi-font="text"] .r-content .rashi,
+html[data-rashi-font="text"][data-design] .r-content .rashi { font-family: var(--text-font); }
+/* 1.0.119: the lesson prev/next bar matches the reader's bottom bar in each design */
+[data-design="sefer"] .lnav { background: var(--bar-bg); color: var(--bar-ink); backdrop-filter: none; border-color: var(--gold); border-top-width: 2px; }
+[data-design="sefer"] .lnav .btn { color: var(--bar-icon); background: transparent; border-color: transparent; }
+[data-design="modern"] .lnav { background: var(--bar-bg, #17130f); color: #fff; border: 0; }
+[data-design="nocturne"] .lnav { background: #15120e; border-top: 1px solid rgba(201, 164, 92, .5); }
+[data-design="nocturne"][data-theme="night"] .lnav { background: #070604; }

@@ -80,6 +80,8 @@ function cacheOptionalFont(font) {
 function applyPrefs() {
   const r = document.documentElement;
   cacheOptionalFont(prefs.font);
+  if (prefs.rashiFont !== 'text') cacheOptionalFont('noto-rashi');
+  r.dataset.rashiFont = prefs.rashiFont === 'text' ? 'text' : 'rashi';
   // 1.0.113: the design (look). The default 'classic' sets no attribute, so the original styles apply unchanged.
   if (prefs.design && prefs.design !== 'classic') { r.dataset.design = prefs.design; r.dataset.designFont = prefs.designFont; for (const f of DESIGN_FONTS[prefs.design] || []) cacheOptionalFont(f); } else { delete r.dataset.design; delete r.dataset.designFont; }
   const bp = document.getElementById('b-play2'); if (bp) bp.hidden = !r.dataset.design; // 1.0.114: the designs' bottom-bar play button
@@ -238,14 +240,14 @@ function route() {
   renderHome();
 }
 window.addEventListener('hashchange', () => { route(); syncNav(); });
-// 1.0.116: a fixed bottom navigation bar on the general screens (not over the reader). 1.0.118 (Dudi: "הבר עדיין לא
-// מופיע"): in every design, the original one included.
+// 1.0.116: a fixed bottom navigation bar. 1.0.118: in every design, the original one included.
+// 1.0.119 (Dudi: the bar disappeared inside a lesson): it stays in the reader too, below the pager, with the reader
+// shortened so the text and the back control are never covered.
 const HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5h4v5"/></svg>';
 const BNAV = [['home', '#/', HOME_ICON, 'היום'], ['lib', '#/lib', LIB_ICON, 'ספרייה'], ['search', '#/search', SEARCH_ICON, 'חיפוש'], ['siddur', '#/siddur', NAV_ICON.book, 'סידור'], ['settings', '#/settings', ICON.gear, 'הגדרות']];
 function syncNav() {
-  const root = document.documentElement, show = $('#reader').hidden;
+  const root = document.documentElement;
   let nav = document.getElementById('bnav');
-  if (!show) { nav?.remove(); delete root.dataset.bnav; return; }
   if (!nav) {
     nav = document.createElement('nav'); nav.id = 'bnav'; nav.className = 'bnav'; nav.setAttribute('aria-label', 'ניווט ראשי');
     nav.innerHTML = BNAV.map(([k, h, i, t]) => `<a href="${h}" data-tab="${k}">${i}<span>${t}</span></a>`).join('');
@@ -551,6 +553,8 @@ function displayGroup() {
     ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
+  <fieldset class="rashi-font-set"><legend>גופן רש״י</legend>${radio('rashiFont', prefs.rashiFont, [['rashi', 'כתב רש״י'], ['text', 'הגופן של הקריאה']])}
+    <small>חל בכל מקום שבו מוצג פירוש רש״י (בחומש ובספרייה). ״כתב רש״י״ הוא ברירת המחדל; ״הגופן של הקריאה״ משתמש באותו גופן של הפסוקים.</small></fieldset>
   <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>ספר המצוות</legend>${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד, ביאור קצר)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
@@ -1118,7 +1122,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <button class="btn ghost lsc" id="b-next2" aria-label="עמוד הבא">${ICON.next}</button>
     <button class="btn ghost" id="b-tts" aria-label="הקראה – התחלה או השהיה (לחיצה ארוכה: הגדרות הקראה)" title="הקראה (לחיצה ארוכה: הגדרות)">${ICON.speak}</button>
     <button class="btn ghost" id="b-aa" aria-label="הגדרות תצוגה" aria-haspopup="dialog">${ICON.aa}</button>
-    <button class="btn ghost" id="b-full" aria-label="מסך מלא – הסתרת הסרגלים">${ICON.full}</button>
+    <button class="btn ghost" id="b-full" aria-label="מסך מלא">${ICON.full}</button>
   </header>
   <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
   <footer class="r-bottom" id="rb" aria-label="דפדוף והקראה">
@@ -1138,6 +1142,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     <span style="flex:1" id="spacer"></span>
     <button class="btn ghost pg-btn" id="b-next" aria-label="עמוד הבא"><span class="pg-lbl">עמוד הבא</span>${ICON.next}</button>
   </footer>
+  <nav class="lnav" id="lnav" hidden></nav>
   <div class="thin-progress" aria-hidden="true"><i id="tbar"></i></div>
   <div class="pflash" id="pflash" aria-hidden="true"></div>
   <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title"></div>`;
@@ -1224,6 +1229,26 @@ function seekSeg(id) {
   el.classList.add('seek-hit'); setTimeout(() => document.addEventListener('pointerdown', () => el.classList.remove('seek-hit'), { once: true }), 0);
   return true;
 }
+// 1.0.119: a fixed prev/next bar in the reader (יום קודם / יום הבא, or the matching library / siddur targets).
+// The in-text daynav at the start and end of a lesson is easy to miss: in pages mode it is only on the first or last
+// page, and on a short phone the top bar was hidden. This one stays on every page and in every lesson type.
+function sidNavHtml() {
+  const prev = sidStep(-1), next = sidStep(1);
+  const lab = x => x ? `${x.bookHe} – ${x.he}` : 'תוכן הסידור';
+  return `${prev ? `<a class="btn" data-day="prev" href="#/s/${prev.book}/${prev.n}" aria-label="הקודם – ${esc(lab(prev))}">${ICON.prev}<span>הקודם</span></a>` : `<a class="btn" href="#/siddur" aria-label="חזרה לתוכן הסידור">${ICON.prev}<span>התוכן</span></a>`}
+    ${next ? `<a class="btn" data-day="next" href="#/s/${next.book}/${next.n}" aria-label="הבא – ${esc(lab(next))}"><span>הבא</span>${ICON.next}</a>` : `<a class="btn" href="#/siddur" aria-label="חזרה לתוכן הסידור"><span>התוכן</span>${ICON.next}</a>`}`;
+}
+function fillLessonNav() {
+  const nav = $('#lnav'); if (!nav) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = R.sid ? `<nav>${sidNavHtml()}</nav>` : R.lib ? libNavHtml('bar') : dayNavHtml('bar');
+  nav.innerHTML = wrap.querySelector('nav').innerHTML;
+  nav.hidden = false;
+  nav.setAttribute('aria-label', R.sid ? 'חלק קודם והבא – סרגל קבוע' : R.lib ? 'פרק קודם והבא – סרגל קבוע' : 'יום קודם והבא – סרגל קבוע');
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { R.dayFocus = a.dataset.day; }));
+  const el = $('#reader');
+  if (el) el.style.setProperty('--lnav-h', nav.offsetHeight + 'px');
+}
 function goDay(which) {
   if (R.lib) { const t = which === 'prev' ? R.libInfo?.prev : which === 'next' ? R.libInfo?.next : null; if (t) { R.dayFocus = which; location.hash = `#/lib/${t.id}`; } return; }
   if (!R.unit || R.sid || !R.iso) return;
@@ -1266,6 +1291,7 @@ function siddurTrack() {
     if (n > +old) setProgress('siddur', R.sid, { done: true, frac: 1 }); // read past it
     R.sid = `${bk}/${n}`;
     if (location.hash.startsWith(`#/s/${bk}/`)) history.replaceState(history.state, '', `#/s/${bk}/${n}`);
+    fillLessonNav();
   }
   const sec = R.doc.siddur.secs[(n || +old) - 1];
   const sub = R.doc.siddur.secs.length > 1 && sec ? sec.he : R.doc.subtitle;
@@ -1372,6 +1398,7 @@ async function renderDoc() {
   const rep = $('#b-report'); if (rep) { const upd = () => { rep.href = reportUrl(); }; rep.addEventListener('pointerdown', upd); rep.addEventListener('focus', upd); rep.addEventListener('click', upd); }
   $('#b-nextunit').onclick = () => nextUnit(false);
   rc.querySelectorAll('.daynav a').forEach(a => a.addEventListener('click', () => { R.dayFocus = a.dataset.day; }));
+  fillLessonNav();
   layout();
 }
 /** Round 8: "מראי מקומות" / short-explanation link – a separate, attributed section after the text (texts.js 'notes'
@@ -1395,6 +1422,13 @@ function glossNote(rc, G, kind) {
 }
 // the siddur reader shows a whole book (seder); "next" is the first section of the next book
 function nextSid() { if (!R.sid || !R.sorder) return null; const bk = R.sid.split('/')[0], i = R.sorder.findLastIndex(x => x.book === bk); return i >= 0 ? R.sorder[i + 1] || null : null; }
+function prevSid() { if (!R.sid || !R.sorder) return null; const bk = R.sid.split('/')[0], i = R.sorder.findIndex(x => x.book === bk); return i > 0 ? R.sorder[i - 1] : null; }
+function sidStep(dir) {
+  if (!R.sid || !R.sorder) return null;
+  const [bk, n] = R.sid.split('/');
+  const i = R.sorder.findIndex(x => x.book === bk && x.n === +n);
+  return i < 0 ? (dir > 0 ? nextSid() : prevSid()) : R.sorder[i + dir] || null;
+}
 function nextUnitId() { if (R.lib) return R.libInfo?.next ? 'lib' : null; if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
   setProgress(...pk(), { done: true, frac: 1 });
@@ -1414,7 +1448,9 @@ function nextUnit(autoplay) {
 // ragged (start-aligned) because justifying ~4 words per line leaves wide gaps.
 function chromePad() {
   const el = $('#reader'), imm = el.classList.contains('immersive');
-  const top = imm ? 0 : $('#rt').offsetHeight, bot = imm ? ($('#rb').classList.contains('speaking') ? $('#rb').offsetHeight : 0) : $('#rb').offsetHeight;
+  // 1.0.119: the back-to-home bar (r-top) and the lesson prev/next bar stay visible, also in immersive mode.
+  const top = $('#rt')?.offsetHeight || 0;
+  const bot = (imm && !$('#rb').classList.contains('speaking') ? 0 : ($('#rb')?.offsetHeight || 0)) + ($('#lnav') && !$('#lnav').hidden ? $('#lnav').offsetHeight : 0);
   return { top: Math.max(top, 8) + 14, bottom: Math.max(bot, 8) + 14 };
 }
 // round 4: no Rashi stub at a page edge. A Rashi block that the column flow split is moved whole to the next page
@@ -1546,7 +1582,7 @@ function updateProgress(save = true) {
     const a = R.spread ? 2 * R.page + 1 : R.page + 1, b = R.spread ? Math.min(2 * R.page + 2, R.cols) : a;
     $('#pinfo').textContent = $('#pinfo2').textContent = a === b ? `עמוד ${a} מתוך ${R.cols}` : `עמודים ${a}–${b} מתוך ${R.cols}`;
     // round 6: in full-screen mode the bars are hidden, so the page number shows briefly on each page turn
-    if (R.flashed !== R.page && $('#reader').classList.contains('immersive')) {
+    if (R.flashed !== R.page) {
       const f = $('#pflash'); f.textContent = $('#pinfo').textContent; f.classList.add('show');
       clearTimeout(R.flashT); R.flashT = setTimeout(() => f.classList.remove('show'), 1400);
     }
@@ -1608,19 +1644,20 @@ function bindReaderUi() {
   R.ro?.disconnect();
   R.ro = new ResizeObserver(() => {
     if (!$('#rt') || !$('#rb') || !$('#rc')) { R.ro?.disconnect(); return; } // reader was left
-    const h = $('#rt').offsetHeight + ':' + $('#rb').offsetHeight;
+    const lnav = $('#lnav'); if (lnav && $('#reader')) $('#reader').style.setProperty('--lnav-h', lnav.hidden ? '0px' : lnav.offsetHeight + 'px');
+    const h = $('#rt').offsetHeight + ':' + $('#rb').offsetHeight + ':' + (lnav && !lnav.hidden ? lnav.offsetHeight : 0);
     if (h === lastH) return; const first = !lastH; lastH = h;
     if (first || !R.doc) return;
     cancelAnimationFrame(R.roF);
     R.roF = requestAnimationFrame(() => { if (!$('#rc')) return; const sp = R.segs.find(x => x.classList.contains('speaking')); if (!sp) { relayoutKeep(); return; } layout(); goToSeg(sp.dataset.id, false); });
   });
   R.ro.observe($('#rt')); R.ro.observe($('#rb'));
+  if ($('#lnav')) R.ro.observe($('#lnav'));
   $('#b-prev').onclick = $('#b-prev2').onclick = () => turn(-1);
   $('#b-next').onclick = $('#b-next2').onclick = () => turn(1);
   $('#b-full').onclick = () => {
     if (!document.fullscreenElement && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
     else if (document.fullscreenElement) document.exitFullscreen();
-    toggleChrome(true);
   };
   syncFullBtn();
   $('#b-aa').onclick = () => openSheet('display');
@@ -1644,7 +1681,7 @@ function bindReaderUi() {
       const x = e.clientX / vp.clientWidth;
       if (prefs.layout === 'pages' && x < 0.28) turn(1);
       else if (prefs.layout === 'pages' && x > 0.72) turn(-1);
-      else toggleChrome();
+      else if (SHORT_LANDSCAPE.matches) toggleChrome();
     }
   });
   $('#t-play').onclick = () => ttsToggle();
