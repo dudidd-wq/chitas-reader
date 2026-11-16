@@ -682,12 +682,15 @@ function omitStartLabel(en, he) {
 
 /**
  * 1.0.67: paragraphs omitted on Shabbat/Yom Tov / no-Tachanun / etc.
- * @returns {{ omit: boolean[], isStart: boolean[], isEnd: boolean[], label: (string|null)[] }}
+ * @returns {{ omit: boolean[], isStart: boolean[], isEnd: boolean[], label: (string|null)[], instructions: number[][] }}
  */
 export function omitPrayerFlags(rows, { book, n: secN } = {}) {
   const n = rows.length;
+  // Instruction ownership is separate from spoken styling/boundaries. A note can
+  // introduce a block before its first paragraph, or sit between its paragraphs.
+  const instructions = Array.from({ length: n }, () => []);
   // Birkat haMazon is an always-available prayer: its variants are never omit-styled.
-  if (book === 'brachot' && secN === 4) return { omit: Array(n).fill(false), isStart: Array(n).fill(false), isEnd: Array(n).fill(false), label: Array(n).fill(null) };
+  if (book === 'brachot' && secN === 4) return { omit: Array(n).fill(false), isStart: Array(n).fill(false), isEnd: Array(n).fill(false), label: Array(n).fill(null), instructions };
   const omit = Array(n).fill(false), isStart = Array(n).fill(false), isEnd = Array(n).fill(false), label = Array(n).fill(null);
   const isCite = (t, h) => t === 'n' && CITE_NOTE_RE.test(stripTags(h).trim());
   for (let i = 0; i < n; i++) {
@@ -762,6 +765,16 @@ export function omitPrayerFlags(rows, { book, n: secN } = {}) {
       }
     }
     if (!idxs.length) continue;
+    let firstNote = i;
+    // A split day label or citation also belongs to the following instruction.
+    // Do not swallow unrelated navigation, translations of the previous prayer,
+    // or the title of a larger section that remains visible.
+    while (firstNote > 0 && rows[firstNote - 1][0] === 'n' &&
+      (isCitationNote(rows[firstNote - 1][1], rows[firstNote - 1][2]) ||
+       isSituationalLabel(rows[firstNote - 1][1], rows[firstNote - 1][2]))) firstNote--;
+    for (let k = firstNote; k <= idxs.at(-1); k++) {
+      if (rows[k][0] === 'n') instructions[idxs[0]].push(k);
+    }
     for (const k of idxs) omit[k] = true;
     isStart[idxs[0]] = true;
     label[idxs[0]] = lab;
@@ -772,12 +785,20 @@ export function omitPrayerFlags(rows, { book, n: secN } = {}) {
     if (z >= n) continue;
     for (let k = a; k <= z; k++) { isStart[k] = false; isEnd[k] = false; label[k] = null; if (rows[k][0] === 'p') omit[k] = true; }
     isStart[a] = true; label[a] = lab; isEnd[z] = true;
+    let firstNote = a;
+    while (firstNote > 0 && rows[firstNote - 1][0] === 'n') firstNote--;
+    for (let k = firstNote; k <= z; k++) {
+      if (rows[k][0] === 'n') instructions[a].push(k);
+    }
   }
-  return { omit, isStart, isEnd, label };
+  return { omit, isStart, isEnd, label, instructions };
 }
-/** 1.0.74 audit: [first, last, label] row spans. Tachanun itself (Vidui → ואנחנו לא נדע) at Shacharit and Mincha,
+/** Explicit [first, last, label] row spans. Tachanun itself (Vidui → ואנחנו לא נדע) at Shacharit and Mincha,
  *  and Tikkun Rachel ("only said on days in which Tachanun is said", chatzot/1#10). */
 export const SIDDUR_EXTRA_OMIT = {
+  // Ribon haOlamim immediately before Eizehu Mekoman in morning korbanot.
+  // The surrounding incense and Mishnah passages remain part of the service.
+  'boker/5': [[21, 21, 'בשבת ויו״ט אין אומרים']],
   'shacharit/4': [[2, 45, 'בימים שאין אומרים תחנון']],
   'mincha/3': [[2, 18, 'בימים שאין אומרים תחנון']],
   'chatzot/1': [[15, 31, 'בימים שאין אומרים תחנון']],
@@ -864,6 +885,21 @@ export function dupTitleDrops(rows, book, n) {
 export const SHABBAT_LABELS = ['בשבת ויו״ט אין אומרים'];
 export const TACHANUN_LABELS = ['בימים שאין אומרים תחנון', 'רק בימי שני וחמישי (כשיש תחנון)'];
 const TIMES_HE = { 2: 'פעמיים', 3: 'שלוש פעמים' };
+/** Apply any date/setting predicate to complete omission blocks, including their
+ * instructions. Both the renderer and speech queue consume the resulting doc. */
+export function hiddenSiddurRows(rows, omission, shouldHide) {
+  const hidden = new Set();
+  let open = false;
+  rows.forEach(([type], i) => {
+    if (omission.isStart[i]) {
+      open = shouldHide(omission.label[i]);
+      if (open) for (const note of omission.instructions[i]) hidden.add(note);
+    }
+    if (open && (omission.omit[i] || type === 'n')) hidden.add(i);
+    if (omission.isEnd[i]) open = false;
+  });
+  return hidden;
+}
 /** row index → repeat count for one section (paragraph rows only). */
 export function repeatCounts(book, n) {
   const m = SIDDUR_REPEATS[`${book}/${n}`] || {}, out = new Map();
@@ -882,16 +918,9 @@ export async function buildSiddurDoc(book, n, { lang = 'he', hideNoTachanun = fa
   const reps = repeatCounts(book, n), repNotes = SIDDUR_REPEATS[`${book}/${n}`] || {};
   const dupT = SIDDUR_DUP_TITLES[`${book}/${n}`] || {}, drops = dupTitleDrops(sec.b, book, n);
   const kd = kaddishFlags(sec.b).flags;   // 1.0.90: Kaddish paragraphs (read aloud or skipped – prefs.siddurKaddish)
-  // 1.0.72: hide no-Tachanun spans (incl. notes inside them) when today is a no-Tachanun day and the setting is on
-  const hid = new Set();
-  if (hideNoTachanun || hideShabbat) {
-    let open = false, lab = null;
-    sec.b.forEach((_, i) => {
-      if (om.isStart[i]) { lab = om.label[i]; open = (hideNoTachanun && TACHANUN_LABELS.includes(lab)) || (hideShabbat && SHABBAT_LABELS.includes(lab)); }
-      if (open && (om.omit[i] || sec.b[i][0] === 'n')) hid.add(i);
-      if (om.isEnd[i]) open = false;
-    });
-  }
+  const hid = hiddenSiddurRows(sec.b, om, lab =>
+    (hideNoTachanun && TACHANUN_LABELS.includes(lab)) ||
+    (hideShabbat && SHABBAT_LABELS.includes(lab)));
   sec.b.forEach(([t0, h, he], i) => {
     if (hid.has(i)) {
       return;
