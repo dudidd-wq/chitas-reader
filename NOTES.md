@@ -569,3 +569,6 @@ Not shipped (already correct, or needs a tighter rule / a decision): patach genu
 alef, kamatz katan, internal shuruk+shva, Israeli initial ʔ; Chabad bare a/e/i/o onsets (unlike bare u they do produce
 audio); shva after tsere / hiriq male / kamatz; short Tanya `[הוּא]` variants.
 Tests: audit-124 (new). Samples: /workspace/plans/samples/audit-124/.
+
+## 2026-11-17 01:40 – short biur batch 7 (20.1–2.2) → 1.0.126
+- External review r2 (Codex CLI on Dudi's PC, gpt-6-astra, same rubric as previous batches): 9.792 (faith 9.98, accuracy 9.98, clarity 9.97, niqqud 9.03, label 10.0; Mitzvot 9.73, Rambam 9.81, Tanya 9.81, tolt 9.77; fresh sample 9.778). Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5". Writer was also Codex CLI (ChatGPT Pro), not the Anthropic/OpenAI APIs. r1 was 9.594 overall but niqqud 8.14 and tolt 9.42, so one fix round was applied first. 1404 paragraphs (20.1–2.2.2027).
