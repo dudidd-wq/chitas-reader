@@ -575,3 +575,7 @@ Tests: audit-124 (new). Samples: /workspace/plans/samples/audit-124/.
 
 ## 2026-11-17 03:05 – engine leftovers (Task B) → 1.0.127
 Exact vocal shva for יֵלְכוּ/וַיֵּלְכוּ/יֵצְאוּ/אֵלְכָה/יִירְאוּ; conservative Tanya bracket omissions (duplicate/citation, vocalization-conflict protected); Yerushalmi אדרבה stress; Windows file-URL in tools. Codex review 9.8 (G1,G3,G4 round 1; G2 8.8 -> fix -> 9.8). Held: qamatz, Chabad onset, Bavli/Tanya/tolt shva, general lexicon. See verification/ENGINE-126-B.md. Speech-only; no data rebuild.
+
+## 2026-11-17 07:35 – Task C (holam oy, reduced) → 1.0.128
+
+- Chabad holam = oy; siddur stress unchanged from HEAD (G2 held); afilu gate OFF. Codex review 4: G1 9.6, G3 9.9, G4 9.9, G5 10.0. See verification/HAVARA-CHABAD-191.md.

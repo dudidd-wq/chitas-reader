@@ -28,19 +28,19 @@ test('1.0.91: Israeli stays the default and byte-identical (explicit or omitted)
   assert.equal(textToIPA('בָּרוּךְ אַתָּה הַשֵּׁם', { data }), 'baʁˈuχ ʔatˈa haʃˈem');
   assert.equal(wordToIPA('תּוֹרָה', null, data), 'toʁˈa');
 });
-test('1.0.91 Chabad vowels: qamatz (gadol and katan) o, hataf-qamatz o, holam ey, tsere ey, segol e, shuruq/qubuts u', () => {
+test('1.0.91 Chabad vowels: qamatz (gadol and katan) o, hataf-qamatz o, holam oy, tsere ey, segol e, shuruq/qubuts u', () => {
   assert.match(ch('דָּוִד'), /^dov/);                       // qamatz gadol
   assert.equal(ch('כָּל'), 'kˈol');                           // qamatz katan (kol)
   assert.match(ch('חָכְמָה'), /^χoχm/);                     // qamatz katan before shva
   assert.match(ch('צָהֳרַיִם'), /^tsohoʁ/);                 // hataf-qamatz
-  assert.equal(ch('תּוֹרָה'), 'tejʁˈo');                      // holam male, tav with dagesh = t
-  assert.match(ch('מֹשֶׁה'), /^mˈ?ejʃˈ?e$/);                   // holam haser
-  assert.match(ch('מִצְוֺת'), /vˈ?ejs$/);                   // MAM וֺ + tav rafe
+  assert.equal(ch('תּוֹרָה'), 'tojʁˈo');                      // holam male, tav with dagesh = t
+  assert.match(ch('מֹשֶׁה'), /^mˈ?ojʃˈ?e$/);                   // holam haser
+  assert.match(ch('מִצְוֺת'), /vˈ?ojs$/);                   // MAM וֺ + tav rafe
   assert.equal(ch('בֵּית'), 'bˈejs');                          // tsere (yud not doubled) + tav rafe
-  assert.match(ch('אֱלֹקֵינוּ'), /^elejkejnˈ?u$/);           // hataf segol e, holam ey, tsere ey, shuruq u
+  assert.match(ch('אֱלֹקֵינוּ'), /^elojkejnˈ?u$/);           // hataf segol e, holam oy, tsere ey, shuruq u
   assert.match(ch('קֻבֻּץ'), /u.*u/);
   assert.match(ch('שֶׁמֶשׁ'), /^ʃˈ?emˈ?eʃ$/);                   // segol e
-  assert.equal(ch('גּוֹי'), 'ɡˈej');                           // diphthong + yud: one j
+  assert.equal(ch('גּוֹי'), 'ɡˈoj');                           // diphthong + yud: one j
 });
 test('1.0.91 Chabad consonants: tav rafe s (vocalised words only), silent alef/ayin, sin s, no other change', () => {
   assert.match(ch('שַׁבָּת'), /^ʃabˈ?os$/);
@@ -53,7 +53,7 @@ test('1.0.91 Chabad consonants: tav rafe s (vocalised words only), silent alef/a
 test('1.0.91 Chabad stress: milel for final stress; monosyllables, hataf penult, article prefix kept; cantillation keeps the accents', () => {
   const t = 'בָּרוּךְ אַתָּה הַשֵּׁם אֱלֹקֵינוּ מֶלֶךְ הָעוֹלָם, שַׁבָּת שָׁלוֹם, אֲנִי בַּיּוֹם וּמָה עַל';
   const tr = []; const ipa = textToIPA(t, { data, havara: 'chabad', trace: tr });
-  assert.equal(ipa, 'bˈoʁuχ ˈato haʃˈejm elejkˈejnu mˈeleχ hoˈejlom, ʃˈabos ʃˈolejm, anˈi bajˈejm ʔumˈo ˈal');
+  assert.equal(ipa, 'bˈoʁuχ ˈato haʃˈejm elojkˈejnu mˈeleχ hoˈojlom, ʃˈabos ʃˈolojm, anˈi bajˈojm ʔumˈo ˈal');
   assert.equal(milelStress('בָּרוּךְ', 0), 1); assert.equal(milelStress('מֶלֶךְ', 1), 1); assert.equal(milelStress('עַל', 0), 0);
   assert.equal(milelStress('אֲנִי', 0), 0); assert.equal(milelStress('הַשֵּׁם', 0), 0); assert.equal(milelStress('בַּיּוֹם', 0), 0);
   // opt.milel=false: Chabad vowels with the original (grammatical) stress
@@ -63,7 +63,7 @@ test('1.0.91 Chabad stress: milel for final stress; monosyllables, hataf penult,
   const prepared = prepareForTTS(v, { stress: true, divineName: 'hashem' });
   assert.match(prepared, /אֱלֹקִים;/);
   const c = chunkText(prepared).join(' ');
-  assert.equal(textToIPA(c, { data, accents: accentStressMap(v), havara: 'chabad' }), 'beʁejʃˈis boʁˈo elejkˈim, ˈejs haʃomˈajim veˈejs hoˈoʁets.');
+  assert.equal(textToIPA(c, { data, accents: accentStressMap(v), havara: 'chabad' }), 'beʁejʃˈis boʁˈo elojkˈim, ˈejs haʃomˈajim veˈejs hoˈoʁets.');
 });
 test('1.0.91: Chabad output uses only phonemes every voice model knows (noa, natural) across Hayom Yom, Siddur and Torah', () => {
   const maps = ['he_IL-noa-medium', 'he_IL-ilspeech-male-medium'].map(n => new Set(Object.keys(JSON.parse(read(`site/voice/${n}.onnx.json`)).phoneme_id_map)));
@@ -81,7 +81,7 @@ test('1.0.91: the voices synthesise Chabad pronunciation in Node (default noa + 
   for (const nat of [false, true]) {
     const v = await nodeVoice({ natural: nat });
     const a = await v.synth('בָּרוּךְ אַתָּה הַשֵּׁם, שַׁבָּת שָׁלוֹם וְתוֹרָה', { havara: 'chabad' }), b = await v.synth('בָּרוּךְ אַתָּה הַשֵּׁם, שַׁבָּת שָׁלוֹם וְתוֹרָה');
-    assert.match(a.ipa, /ʃˈabos/); assert.match(a.ipa, /vesejʁo|vesˈejʁo|vesejʁˈo/); assert.match(b.ipa, /ʃabˈat/);
+    assert.match(a.ipa, /ʃˈabos/); assert.match(a.ipa, /vesojʁo|vesˈojʁo|vesojʁˈo/); assert.match(b.ipa, /ʃabˈat/);
     assert.ok(a.audio.length > v.sampleRate * 1.2, 'audio');
   }
 });
@@ -120,7 +120,7 @@ test('1.0.91 browser: "הגייה" next to the voice choice (settings + read-alo
     await p.keyboard.press('p');
     await p.waitForFunction(() => window.__piperLog.length >= 1, null, { timeout: 90000 });
     const x = await p.evaluate(() => window.__piperLog[0]);
-    assert.equal(x.havara, 'chabad'); assert.doesNotMatch(x.ipa, /ʔ/); assert.match(x.ipa, /ej/);
+    assert.equal(x.havara, 'chabad'); assert.doesNotMatch(x.ipa, /ʔ/); assert.match(x.ipa, /oj/);
     await p.click('#t-set'); await p.waitForSelector('#sheet input[name=ttsHavara]');
     assert.equal(await p.isChecked('#sheet input[name=ttsHavara][value=chabad]'), true);
     await p.locator('#sheet input[name=ttsHavara][value=israeli]').check({ force: true });

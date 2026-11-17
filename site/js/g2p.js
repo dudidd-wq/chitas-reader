@@ -35,12 +35,12 @@ const NIKUD_PHONEMES = {
   '\u05BA': 'o', '\u05BB': 'u', '\u05B3': 'o', '\u05B8': 'a', [HATAMA]: STRESS, [VSHVA]: 'e',
 };
 // 1.0.91: pronunciation traditions (havara) of the speech layer. 'israeli' = the original tables (unchanged output);
-// 'chabad' = Ashkenazi as used in Chabad (Lithuanian / White-Russian base): qamatz o, holam ey, tsere ey, tav rafe s, silent
+// 'chabad' = Ashkenazi as used in Chabad (Lithuanian / White-Russian base): qamatz o, holam oy, tsere ey, tav rafe s, silent
 // alef/ayin, penultimate stress outside cantillated / liturgical text. Sources and every choice: verification/HAVARA-CHABAD-191.md.
 // The output is plain IPA in the same inventory, so any IPA consumer (Piper voices, a future pre-generated pipeline) can use it.
 export const HAVAROT = {
   israeli: { id: 'israeli', qamatz: 'a', holam: 'o', tsere: 'e', tavRafe: 't', glottal: 'ʔ', milel: false },
-  chabad: { id: 'chabad', qamatz: 'o', holam: 'ej', tsere: 'ej', tavRafe: 's', glottal: '', milel: true },
+  chabad: { id: 'chabad', qamatz: 'o', holam: 'oj', tsere: 'ej', tavRafe: 's', glottal: '', milel: true },
 };
 let D = HAVAROT.israeli;   // the tradition of the word being converted (set by wordToIPA; all functions here are synchronous)
 const havaraOf = h => (typeof h === 'string' ? HAVAROT[h] : h) || HAVAROT.israeli;
@@ -387,6 +387,9 @@ export function wordToIPA(word, k = null, data = {}, opt = {}) {
 }
 function wordToIPA1(word, k, data, opt) {
   let L = letters(opt.raw ? word : fixShinVav(applyUnvocalLex(String(word).replace(RE_ACC_METEG, ''))));
+  // Review candidate only: no runtime caller enables this gate. Israeli stays byte-identical.
+  const afilu = D.id === 'chabad' && opt.afiluGemination === true && isAfilu(L);
+  if (afilu) { const l = L.find(x => x.ch === 'ל'); if (!has(l, DAGESH)) setAll(l, l.all + DAGESH); }
   if (!L.length) return '';
   // tav rafe and the vowels need a vocalised word: an unvocalised one keeps the Israeli consonants (we cannot tell ת from תּ)
   if (D.tavRafe !== 't' && !L.some(l => /[\u05B0-\u05BC\u05C7]/.test(l.diac))) D = { ...D, tavRafe: 't' };
@@ -400,11 +403,22 @@ function wordToIPA1(word, k, data, opt) {
   } else if (L.length) setAll(L[0], L[0].all + HATAMA);   // e.g. an unvocalised word: stress on its first letter
   // Phonikud's sort_hatama: stress on a letter that is not read moves to the next letter
   for (let i = 0; i < L.length - 1; i++) if (L[i].all.includes(HATAMA) && L[i].all.includes(HASER)) { setAll(L[i], L[i].all.replace(HATAMA, '')); setAll(L[i + 1], L[i + 1].all + HATAMA); }
-  const ipa = modern(postNormalize(phonemizeLetters(L)));
+  const spoken = phonemizeLetters(L);
+  const ipa = modern(postNormalize(afilu ? spoken.replace('l', 'll') : spoken));
   // 1.0.112: Aramaic suffix ־ֵיהּ / ־ֵהּ (לֵיהּ, מִינֵּיהּ, קַמֵּיהּ, מִנֵּהּ) is read -ej: the yod is heard, the mappiq he is silent
   return EYH.test(stressKey(word)) ? ipa.replace(/ej?$/, 'ej') : ipa;
 }
 const EYH = /[\u05D0-\u05EA](?=[\u05BC\u05C1\u05C2]*\u05B5)[\u05BC\u05C1\u05C2\u05B5]+(?:\u05D9)?\u05D4\u05BC$/;
+
+// Exact pointed אֲפִלּוּ / אֲפִילּוּ, with optional ו and ב/ש/כ prefixes.
+// Reject other vowels, unpointed stems, suffixes and lookalikes (e.g. אֲפֵלוּ).
+// Disabled until a listener validates ll in both local models and the remaining corpus forms.
+function isAfilu(L) {
+  if (!/^(?:ו)?[בשכ]?אפי?לו$/.test(skel(L))) return false;
+  const stem = L.slice(L.findIndex(l => l.ch === 'א'));
+  const expected = stem.length === 5 ? ['ֲ', 'ִ', '', '', 'ּ'] : ['ֲ', 'ִ', '', 'ּ'];
+  return stem.every((l, i) => l.diac.replace(l.ch === 'ל' ? /\u05BC/g : /$^/, '') === expected[i]);
+}
 
 /** Names of the letters (the same table as tts-prep.js – a test keeps them equal), for spelling an unexpanded token. */
 export const LETTER_NAME = { א: 'אָלֶף', ב: 'בֵּית', ג: 'גִּימֶל', ד: 'דָּלֶת', ה: 'הֵא', ו: 'וָו', ז: 'זַיִן', ח: 'חֵית', ט: 'טֵית', י: 'יוּד', כ: 'כָּף', ך: 'כָּף', ל: 'לָמֶד', מ: 'מֵם', ם: 'מֵם', נ: 'נוּן', ן: 'נוּן', ס: 'סָמֶךְ', ע: 'עַיִן', פ: 'פֵּא', ף: 'פֵּא', צ: 'צָדִי', ץ: 'צָדִי', ק: 'קוּף', ר: 'רֵישׁ', ש: 'שִׁין', ת: 'תָּו' };
@@ -432,6 +446,7 @@ export function milelStress(word, k) {
 /** Prepared TTS text (vocalised Hebrew, accents removed, divine names and numbers already expanded by tts-prep) → IPA.
  *  opt.accents: raw Tanakh string / Map, or {primary: preparedChunkWithOleTags} for compiled speech;
  *  opt.data: stress data (exc, lex, suf, qk). Compiled tags are occurrence-specific, not a distinct-word lookup.
+ *  opt.afiluGemination: disabled review candidate; only explicit true enables exact pointed Chabad forms.
  *  opt.trace: array that receives {word, ipa, k, src} per word (for tests). */
 export function textToIPA(text, opt = {}) {
   const H = havaraOf(opt.havara), milel = H.milel && opt.milel !== false;

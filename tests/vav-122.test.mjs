@@ -65,8 +65,8 @@ test('1.0.122: earlier shuruk/vav readings and internal shuruk+shva stay put', (
 
 test('1.0.122: Ashkenazi/Chabad keeps the new syllables, only the havara vowels change', () => {
   assert.equal(ash('וּבְזַרְעֶךָ'), 'ʔuvezaʁeχˈo');
-  assert.equal(ash('הוֹוֶה'), 'hejvˈe');
-  assert.equal(ash('יוֹרְדִים'), 'jejʁedˈim');
+  assert.equal(ash('הוֹוֶה'), 'hojvˈe');
+  assert.equal(ash('יוֹרְדִים'), 'jojʁedˈim');
   assert.equal(ash('וּבְכָל'), 'ʔuveχˈol');
   assert.equal(ash('הוּא'), 'hˈu');
 });

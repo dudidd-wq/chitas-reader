@@ -7,6 +7,12 @@
 הפלט הוא IPA באותו מלאי פונמות – כל צרכן IPA (ארבעת הקולות של Piper, או צינור BlueTTS מוקלט־מראש בעתיד) יכול להשתמש בו.
 קול הדפדפן/המכשיר (Web Speech) מקבל טקסט ולא פונמות, ולכן ההגדרה אינה חלה עליו.
 
+Task C v4: **holam = oy (`oj`), tsere = ey (`ej`)**. Siddur stress is **UNCHANGED** from HEAD `7d111650`: the existing blanket milel policy (including its existing exceptions) remains. Grammatical-stress for siddur (G2), all repairs/fallback tables, and source forwarding are held. Historical sources below record the earlier research, not the current holam decision.
+
+The afilu gemination experiment requires explicit boolean `true` and Chabad; no production caller enables it. Gate OFF remains identical to HEAD.
+
+The existing Chabad preview audio is stale and was not regenerated or listener-validated here; refresh it before using it to demonstrate the new holam. Israeli audio is unchanged.
+
 ## מקורות
 1. Wikipedia, *Ashkenazi Hebrew* – https://en.wikipedia.org/wiki/Ashkenazi_Hebrew (ת רפה = s; צירה = ej; קמץ גדול = ɔ, וקמץ קטן כמוהו;
    חולם בליטאית = ei; סגול = e; א/ע ללא הגייה; הטעמה מלעיל בדיבור לעומת מלרע בקריאת התורה – מסע יעב״ץ והגר״א).
@@ -29,7 +35,7 @@
 |---|---|---|---|
 | קמץ גדול | a | **o** | [ɔ] בליטאית; בקולות אין ɔ – הקרוב ביותר o (מקור 1, 6). |
 | קמץ קטן, חטף קמץ | o | o | זהה – ולכן ההבחנה קטן/גדול (שקיימת בנתונים) אינה משנה כאן. |
-| חולם (מלא, חסר, וֺ) | o | **ej** | ״תֵּיירֶה״ – מסורת חב״ד/ליטא (מקורות 2–5). ראו ״לבחירתך״ למטה. |
+| חולם (מלא, חסר, וֺ) | o | **oj** | oy; ״תורה״ → ״טוֹירוֹ״. החלטת Task C v4. |
 | צירה (עם י׳ או בלי) | e | **ej** | יו״ד אחרי צירה/חולם אינה מכפילה j (״בֵּית״ → bejs). |
 | סגול, חטף סגול, שווא נע | e | e | ללא שינוי. |
 | פתח, חטף פתח, חיריק | a, i | a, i | ללא שינוי. |
@@ -52,14 +58,14 @@
 אותם כללים בדיוק (״יִתְגַּדַּל״ → jisɡadal, ״עָלְמָא״ → olmo, ״שְׁמֵהּ״ → ʃmej). רש״י ויתר הטקסטים המהודרים עם תגי הטעמה
 מקבלים מלעיל כמו כל פרוזה.
 
-## בדיקת הקולות
+## בדיקת הקולות (תיעוד היסטורי לפני Task C)
 - המלאי: כל הפונמות של הפלט החב״די (e, j, o, s …) קיימות במפות של noa ושל הקול הטבעי (`tests/havara-191.test.mjs`).
   הדו־תנועה ej היא רצף e+j שהמודלים מכירים מעברית (״בַּיִת״, ״אֵין״). ɔ אינו במודלים – נעשה o.
 - ארבעת הקולות (גברי, עמוק, טבעי, נשי) עוברים באותו מסלול `textToIPA` → כולם מקבלים את ההגייה.
 - בדיקת ASR אוטומטית (faster-whisper small, תמלול לטיני) על הדוגמאות: נשמעו ״Bereishis״, ״shomayim״, ״es״, ״ho'ilom״, ״asurim״ –
   כלומר s של ת רפויה, o של קמץ ו-ej של החולם מופקים. noa המעובד (גברי) פחות ברור מהקול הטבעי. לא נעשתה האזנה אנושית.
 
-## לבחירתך (החלטות לא ודאיות)
+## החלטות היסטוריות (החולם הוחלף; ההטעמה נשארה ללא שינוי)
 1. **חולם: ״אֵיי״ (ey) או ״אוֹי״ (oy)** – בחרתי ey: מסורת חב״ד הליטאית־רייסנית והגיית הרבי (מקורות 3–5). אבל כיום חלק גדול
    מאנ״ש אומרים ״אוי״ (Torah Musings: רק ״Hardcore Lubavitchers״ אומרים ay). שינוי לשורה אחת: `HAVAROT.chabad.holam = 'oj'`.
 2. **הטעמה בסידור** – בחרתי מלעיל (כמו בפרוזה). אפשר לשמור בסידור הטעמה דקדוקית (`milel: false`) – יש המתפללים כך בהשפעת
