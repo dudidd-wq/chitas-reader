@@ -25,8 +25,8 @@ for (const d of ['classic', 'sefer', 'modern', 'nocturne']) test(`1.0.118: "${d}
 
 for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.118: "${d}" – changing the font in settings changes the reading AND the home screen; size works in both modes`, async () => {
   const p = await pageWith(browser, srv.url, { prefs: { design: d }, viewport: { width: 412, height: 915 } });
-  await p.goto(srv.url + '#/settings'); await p.waitForSelector('#set-display input[name=font]');
-  await p.locator('#set-display label[data-font=david]').click();
+  await p.goto(srv.url + '#/settings'); await p.waitForSelector('#set-fonts input[name=font]');
+  await p.locator('#set-fonts label[data-font=david]').click();
   assert.equal(await p.locator('html').getAttribute('data-design-font'), 'mine', 'picking a font switches to "my font"');
   assert.equal(await p.locator('#set-display input[name=designFont][value=mine]').isChecked(), true);
   await p.goto(srv.url + '#/d/' + D); await p.waitForSelector('.card .what:not(:empty)');

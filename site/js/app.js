@@ -540,42 +540,57 @@ function displayForm() {
 }
 // 1.0.113: a miniature of each design – top bar, date title, two lesson rows (drawn by CSS from data-design-prev)
 const designPreview = () => `<span class="dz" aria-hidden="true"><span class="dz-bar"></span><span class="dz-hd">ד׳ בכסלו</span><span class="dz-row"><i></i><b></b><em></em></span><span class="dz-row"><i></i><b></b><em></em></span></span>`;
-function displayGroup() {
+function displayAppearance() {
   return `
   <fieldset class="design-set"><legend>עיצוב</legend><div class="seg-ctl design-options" role="radiogroup" aria-label="עיצוב">${DESIGNS.map(([v, l]) => `<label data-design-prev="${v}"><span><input type="radio" name="design" value="${v}" ${prefs.design === v ? 'checked' : ''}>${l}</span>${designPreview()}</label>`).join('')}</div>
     <small>העיצוב משנה צבעים, מסגרות, כרטיסים וגופנים בכל המסכים. גודל האות, ההדגשה וערכת הצבע (כהה/לילה) נשמרים; בעיצוב ״לילי״ הרקע תמיד כהה. הטקסט עצמו אינו משתנה.</small></fieldset>
   <fieldset class="design-font-set"><legend>גופן הקריאה בעיצוב</legend>${radio('designFont', prefs.designFont, [['design', 'גופן העיצוב'], ['mine', 'הגופן שלי (מהרשימה למטה)']])}
     <small>חל כשנבחר עיצוב שאינו הנוכחי. גופן העיצוב: ספר קודש – כתר (Keter YG), מודרני – SBL Hebrew, לילי – טעמי אשכנז. בחירת גופן ברשימה עוברת אוטומטית ל״הגופן שלי״.</small></fieldset>
   <fieldset><legend>ערכת צבע</legend>${radio('theme', prefs.theme, [['paper', 'נייר'], ['sepia', 'ספיה'], ['dark', 'כהה'], ['night', 'לילה']])}</fieldset>
-  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
-    ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
-    <small>ב־SBL Hebrew ההדגשה וההטיה מלאכותיות (קיים משקל רגיל בלבד); לשימוש לא מסחרי. הגופן נטען בעת בחירה או תצוגה מקדימה. בפרנק־רוהל ובעזרא הטעמים מוסתרים. David Libre ו־Assistant כוללים ניקוד אך ללא טעמים; הטעמים מוסתרים בהם בלי לשנות את ההעדפה לשאר הגופנים. ב־Taamey D וב־Keter YG ההדגשה מלאכותית כדי לשמור על הטעמים. הגופנים החדשים נטענים בבחירה או בדוגמית, ונשמרים ללא רשת לאחר בחירה.</small></fieldset>
   <label class="field"><span>גודל אות: <output id="o-size">${prefs.size}</output></span><input type="range" name="size" min="16" max="44" step="1" value="${prefs.size}"></label>
   <label class="field"><span>ריווח שורות: <output id="o-lh">${prefs.lineHeight}</output></span><input type="range" name="lineHeight" min="1.4" max="2.6" step="0.1" value="${prefs.lineHeight}"></label>
   <fieldset><legend>אופן קריאה</legend>${radio('layout', prefs.layout, [['pages', 'עמודים (דפדוף)'], ['scroll', 'גלילה רציפה']])}
     ${check('spread', prefs.spread, 'שני עמודים זה לצד זה במסך רחב')}</fieldset>
+  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}`;
+}
+function displayFonts() {
+  return `
+  <fieldset><legend>גופן</legend><div class="seg-ctl font-options" role="radiogroup" aria-label="גופן">${FONT_OPTIONS.map(([v,l,hint]) => `<label data-font="${v}"><span><input type="radio" name="font" value="${v}" ${prefs.font === v ? 'checked' : ''}>${l}</span><span class="font-sample" aria-hidden="true">תּוֹרָה אוֹר וְשִׂמְחַת לֵב</span>${hint ? `<small class="font-hint">${hint}</small>` : ''}</label>`).join('')}</div>
+    ${check('readingBold', prefs.readingBold, 'הדגשת גופן הקריאה')}
+    <details class="set-more"><summary>פרטים על הגופנים והדגשה</summary>
+    <small>ב־SBL Hebrew ההדגשה וההטיה מלאכותיות (קיים משקל רגיל בלבד); לשימוש לא מסחרי. הגופן נטען בעת בחירה או תצוגה מקדימה. בפרנק־רוהל ובעזרא הטעמים מוסתרים. David Libre ו־Assistant כוללים ניקוד אך ללא טעמים; הטעמים מוסתרים בהם בלי לשנות את ההעדפה לשאר הגופנים. ב־Taamey D וב־Keter YG ההדגשה מלאכותית כדי לשמור על הטעמים. הגופנים החדשים נטענים בבחירה או בדוגמית, ונשמרים ללא רשת לאחר בחירה.</small></details></fieldset>`;
+}
+function displayText() {
+  return `
   ${check('taamim', prefs.taamim, 'הצג טעמי המקרא (בחומש ובתהילים)')}
   ${check('rashi', prefs.rashi, 'הצג פירוש רש״י בחומש')}
   <fieldset class="rashi-font-set"><legend>גופן רש״י</legend>${radio('rashiFont', prefs.rashiFont, [['rashi', 'כתב רש״י'], ['text', 'הגופן של הקריאה']])}
     <small>חל בכל מקום שבו מוצג פירוש רש״י (בחומש ובספרייה). ״כתב רש״י״ הוא ברירת המחדל; ״הגופן של הקריאה״ משתמש באותו גופן של הפסוקים.</small></fieldset>
-  <fieldset><legend>היום יום</legend>${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>ספר המצוות</legend>${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}<small>ניקוד אוטומטי של דיקטה, שלא הוגה; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset><fieldset><legend>גמרא ומשניות</legend>${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד, ביאור קצר)')}<small>ניקוד אוטומטי (דיקטה; מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
+  <fieldset><legend>ניקוד</legend>
+    ${check('hayomNiqqud', prefs.hayomNiqqud, 'הצג ניקוד בהיום יום')}
+    ${check('mitzvotNiqqud', prefs.mitzvotNiqqud, 'הצג ניקוד בספר המצוות')}
+    ${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד, ביאור קצר)')}
+    <small>ניקוד אוטומטי של דיקטה (בביאורים: מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
     <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
   ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור הרב שטיינזלץ (רמב״ם) בסוף כל קטע')}
-  <fieldset><legend>ביאור קצר</legend>${check('shortBiur', prefs.shortBiur, 'הצג ״ביאור קצר״ מקופל מתחת לפסקה (תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה)')}<small>בתניא, ברמב״ם ובספר המצוות – ביאור ממוחשב; בתורה אור ובלקוטי תורה – תמצית ממוחשבת של הביאור באנגלית באתר LikuteiTorah.com. אינם פירוש רבני, וכל ביאור מסומן כך. כרגע יש ביאור רק לחלק מהשיעורים, ושאר השיעורים יתווספו בהדרגה. הניקוד – לפי ״הצג ניקוד בביאורים״.</small></fieldset>
-  ${check('wakeLock', prefs.wakeLock, 'השאר את המסך דולק בזמן קריאה')}`;
+  <fieldset><legend>ביאור קצר</legend>${check('shortBiur', prefs.shortBiur, 'הצג ״ביאור קצר״ מקופל מתחת לפסקה (תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה)')}<small>בתניא, ברמב״ם ובספר המצוות – ביאור ממוחשב; בתורה אור ובלקוטי תורה – תמצית ממוחשבת של הביאור באנגלית באתר LikuteiTorah.com. אינם פירוש רבני, וכל ביאור מסומן כך. כרגע יש ביאור רק לחלק מהשיעורים, ושאר השיעורים יתווספו בהדרגה. הניקוד – לפי ״הצג ניקוד בביאורים״.</small></fieldset>`;
+}
+// 1.0.130: the Aא sheet still shows all display settings together, with the same controls, under the new subheadings.
+function displayGroup() {
+  return `${displayAppearance()}<h3 class="set-sub" id="sh-fonts-h">גופנים</h3>${displayFonts()}<h3 class="set-sub" id="sh-text-h">טקסט וניקוד</h3>${displayText()}`;
 }
 function siddurGroup() {
   return `
   ${kaddishField()}
   <fieldset><legend>הנחיות בסידור</legend>${check('hideSiddurInstructions', prefs.hideSiddurInstructions, 'הסתר הנחיות בסידור')}<small>הסרת הוראות התפילה מהתצוגה ומההקראה בלבד. נוסח התפילה, כותרות הניווט וסימוני הדילוג נשמרים.</small></fieldset>
   <fieldset><legend>שפת ההנחיות בסידור</legend>${radio('siddurLang', prefs.siddurLang, [['he', 'עברית'], ['en', 'אנגלית'], ['both', 'שתיהן']])}
-    </fieldset><fieldset><legend>קטעים שלא אומרים ביום שאין תחנון</legend>${radio('tachanunMode', prefs.tachanunMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
+    <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>
+  <fieldset><legend>קטעים שלא אומרים ביום שאין תחנון</legend>${radio('tachanunMode', prefs.tachanunMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
     <small>״כבוי״ – הכול מוצג. ״לפי התאריך״ – ביום שאין אומרים בו תחנון (שבת, יו״ט, ראש חודש, ניסן וכו׳ לפי מנהג חב״ד; אחרי השקיעה – לפי היום הבא, ואחרי חצות היום גם לפני יום כזה, כמו שאין אומרים תחנון במנחה שלפניו) הקטעים המסומנים ״בימים שאין אומרים תחנון״ מוסתרים ואינם מוקראים; בשאר הימים מוצגים כרגיל. ״תמיד״ – מוסתרים בכל יום.</small></fieldset>
   <fieldset><legend>קטעים שלא אומרים בשבת ויום טוב</legend>${radio('shabbatMode', prefs.shabbatMode, [['off', 'כבוי'], ['date', 'לפי התאריך'], ['always', 'תמיד']])}
-    <small>״לפי התאריך״ – בשבת וביום טוב (אחרי השקיעה – לפי היום הבא; ארץ ישראל/חו״ל לפי הלוח שנבחר) הקטעים המסומנים ״בשבת ויו״ט אין אומרים״ מוסתרים ואינם מוקראים. ״תמיד״ – מוסתרים בכל יום.</small></fieldset><fieldset><legend>הנחיות</legend>
-    <small>ההנחיות שבתעתיק (מתי לעמוד, מה מוסיפים ביום טוב וכו׳) כתובות במקור באנגלית. העברית היא תרגום שנעשה לאתר זה; נוסח התפילה עצמו אינו משתנה.</small></fieldset>`;
+    <small>״לפי התאריך״ – בשבת וביום טוב (אחרי השקיעה – לפי היום הבא; ארץ ישראל/חו״ל לפי הלוח שנבחר) הקטעים המסומנים ״בשבת ויו״ט אין אומרים״ מוסתרים ואינם מוקראים. ״תמיד״ – מוסתרים בכל יום.</small></fieldset>`;
 }
 // 1.0.88: the four voice choices of the local voice. 'natural' is a separate model, downloaded only when chosen.
 const VOICE_CHOICES = [['male', 'קול גברי (ברירת מחדל)'], ['deep', 'קול גברי עמוק'], ['natural', 'קול גברי טבעי'], ['female', 'קול נשי']];
@@ -609,7 +624,7 @@ function qvForm() {
     <small id="qv-gender-note">${voiceNote(prefs.ttsGender)}</small>
     <p class="row" id="qv-prev-row"><span>שמע דוגמה:</span> ${VOICE_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="${v}" aria-label="שמע דוגמה – ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
     ${pitchField()}
-    <p class="qv-sub" id="qv-havara-label">הגייה:</p>
+    <h3 class="set-sub qv-sub" id="qv-havara-label">הגייה</h3>
     ${radio('ttsHavara', prefs.ttsHavara, HAVARA_CHOICES)}
     <small id="qv-havara-note">${havaraNote(prefs.ttsHavara)}</small>
     <p class="row" id="qv-havara-prev"><span>שמע דוגמה:</span> ${HAVARA_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="havara-${v}" aria-label="שמע דוגמה – הגייה ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
@@ -617,7 +632,8 @@ function qvForm() {
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
-    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – <bdi dir="ltr">notmax123/piper-medium-heb (CC BY-NC 4.0)</bdi>. הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small>
+    <details class="set-more"><summary>פרטים על הקול המקומי</summary>
+    <small>הקול מורד פעם אחת מאתר זה בלבד, נשמר במכשיר ופועל בלי רשת; הטקסט אינו נשלח לשום מקום. ההטעמה נקבעת לפי הדקדוק והטעמים (בתורה ובתהילים) ולפי מודל שנלמד מהם, ועלולות להיות שגיאות. קול: noa של Piper (CC BY 4.0); הגוון הגברי והעמוק – עיבוד אות שלנו; הקול הגברי הטבעי – <bdi dir="ltr">notmax123/piper-medium-heb (CC BY-NC 4.0)</bdi>. הדוגמאות נשמעות מקובץ קצר (כ־40KB) מאתר זה. פרטים בעמוד המקורות.</small></details>
   </fieldset>`;
 }
 // a short pre-recorded sample (site/voice-samples/, ~40KB, fetched only on the click); 1.0.92: with the manual pitch applied
@@ -689,11 +705,12 @@ async function bindQv(root) {
 }
 function ttsForm() {
   return `
+  <h3 class="set-sub" id="tts-voice-h">קול</h3>
   ${qvForm()}
   <div id="voice-warn"></div>
-  <label class="field"><span>קול</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
+  <label class="field"><span>קול הדפדפן / המכשיר</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
   <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). ברירת המחדל היא תמיד קול מקומי, כשיש כזה.</small>
-  <h3 class="set-sub" id="tts-opts-h">אפשרויות הקראה</h3>
+  <h3 class="set-sub" id="tts-opts-h">מהירות ואפשרויות הקראה</h3>
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
   <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
@@ -734,9 +751,10 @@ function voiceHelp() {
   <li><b>macOS:</b> הגדרות מערכת ← נגישות ← תוכן מוקרא ← קול מערכת ← ניהול קולות ← עברית.</li></ul>
   לאחר ההתקנה יש לרענן את הדף.</div>`;
 }
-// 1.0.93: the settings page in titled cards, with a jump index at the top. The controls, their names (storage keys),
-// defaults and behaviour are the ones the sheets use. Jump buttons scroll (no #anchors – the hash is the router's).
-const SET_CARDS = [['set-daily', 'לימוד יומי'], ['set-display', 'תצוגה וגופנים'], ['set-tts', 'הקראה'], ['set-siddur', 'סידור'], ['set-tehillim', 'תהילים אישי'], ['set-backup', 'גיבוי ושחזור'], ['set-about', 'על האפליקציה']];
+// 1.0.93 / 1.0.130: the settings page in titled cards, with a jump index at the top. Display is split into
+// appearance, fonts, and text/niqqud cards; TTS has voice / pronunciation / rate headings. The controls, their
+// names (storage keys), defaults and behaviour are the ones the sheets use. Jump buttons scroll (no #anchors).
+const SET_CARDS = [['set-daily', 'לימוד יומי'], ['set-display', 'תצוגה ועיצוב'], ['set-fonts', 'גופנים'], ['set-text', 'טקסט וניקוד'], ['set-tts', 'הקראה'], ['set-siddur', 'סידור'], ['set-tehillim', 'תהילים אישי'], ['set-backup', 'גיבוי ושחזור'], ['set-about', 'על האפליקציה']];
 const setCard = (id, body, hid) => `<section class="set-card" id="${id}" aria-labelledby="${hid || id + '-h'}"><h2 id="${hid || id + '-h'}">${SET_CARDS.find(c => c[0] === id)[1]}</h2>${body}</section>`;
 function renderSettings() {
   shell('הגדרות', `<nav class="set-jump" aria-label="קפיצה לקבוצת הגדרות">${SET_CARDS.map(([id, t]) => `<button type="button" class="chip" data-jump="${id}">${t}</button>`).join('')}</nav>
@@ -745,7 +763,9 @@ function renderSettings() {
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
     <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}${check('lessonDaf', prefs.lessonDaf, 'דף היומי (בבלי) – גמרא עם ביאור שטיינזלץ')}${check('lessonAmud', prefs.lessonAmud, 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ')}${check('lessonYer', prefs.lessonYer, 'ירושלמי יומי (מהדורת וילנא)')}${check('lessonMishna', prefs.lessonMishna, 'משנה יומית – שתי משניות ליום, עם ברטנורא')}${check('lessonNach', prefs.lessonNach, 'נ״ך יומי – פרק ליום, עם מצודת דוד')}${check('lessonShnayim', prefs.lessonShnayim, 'שניים מקרא ואחד תרגום')}
     <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset><fieldset><legend>שניים מקרא</legend>${radio('shnayimSplit', prefs.shnayimSplit, [['day', 'לפי ימים – עלייה ליום, כמו החומש היומי'], ['week', 'כל הפרשה']])}</fieldset>`)}
-    ${setCard('set-display', displayGroup())}
+    ${setCard('set-display', displayAppearance())}
+    ${setCard('set-fonts', displayFonts())}
+    ${setCard('set-text', displayText())}
     ${setCard('set-tts', ttsForm())}
     ${setCard('set-siddur', siddurGroup())}
     ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}

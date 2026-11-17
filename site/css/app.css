@@ -669,6 +669,8 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 /* 1.0.82: per-option real-font previews and optional reading weight (no source/text change). */
 [data-font="noto"] { --text-font: 'Noto Serif Hebrew', 'Ezra SIL', serif; }
 .font-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+@media (min-width: 720px) { .font-options { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .font-options { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .font-options label { display: flex; flex-direction: column; align-items: stretch; gap: .4rem; min-width: 0; padding: .6rem; }
 .font-options label > span:first-child { font-family: var(--ui); }
 .font-sample { font-family: var(--text-font); font-size: 1.25rem; line-height: 1.8; font-weight: var(--reading-weight, 400); overflow-wrap: anywhere; }
@@ -708,28 +710,47 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .pitch-row input[type=range] { flex: 1; min-width: 0; min-height: 44px; }
 .pitch-end { font-size: .85em; white-space: nowrap; color: var(--muted, inherit); }
 
-/* 1.0.93: settings page – titled cards with a jump index; inside a card (and in the reader's sheets) every setting is
-   a flat row: title on the right, control below or at the left end, helper text under it, a divider between rows. */
+/* 1.0.93 / 1.0.130: settings page – titled cards with a 3-column jump index; inside a card (and in the reader's
+   sheets) every setting is a flat row: title on the right, control below or at the left end, helper text under it,
+   a divider between rows. 1.0.130 splits display into appearance / fonts / text-and-niqqud and tightens helpers. */
 .settings-page { background: none; border: 0; box-shadow: none; padding: 0; }
 .settings-page > h1 { margin-inline: .2rem; }
-.set-jump { display: flex; flex-wrap: wrap; gap: .4rem; margin: .1rem 0 1rem; }
-.set-jump .chip { min-height: 44px; padding-inline: .8rem; font-size: .92rem; }
+.set-jump { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; margin: .1rem 0 1rem; }
+.set-jump .chip { display: inline-flex; justify-content: center; align-items: center; text-align: center; width: 100%; min-width: 0; min-height: 44px; padding: .35rem .45rem; font-size: .84rem; line-height: 1.25; }
+@media (min-width: 720px) {
+  .set-jump { grid-template-columns: repeat(3, minmax(0, 10rem)); justify-content: end; }
+}
 #sf.form { gap: 1rem; }
 .set-card { display: grid; min-width: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 16px; padding: .3rem 1.1rem .7rem; box-shadow: var(--shadow); scroll-margin-top: .75rem; }
 .set-card > h2 { font-size: 1.2rem; margin: .65rem 0 .35rem; scroll-margin-top: .75rem; }
 .set-card > h2:focus:not(:focus-visible) { outline: none; }
 .set-card > p { margin: .6rem 0; }
 .set-card > :is(fieldset, .field, .check), #sheet .form > :is(fieldset, .field, .check) { border: 0; border-top: 1px solid var(--rule); border-radius: 0; margin: 0; padding: .7rem 0; min-width: 0; }
-.set-card > h2 + :is(fieldset, .field, .check) { border-top: 0; padding-top: .3rem; }
+.set-card > h2 + :is(fieldset, .field, .check, .set-sub) { border-top: 0; padding-top: .3rem; }
 .set-card fieldset > legend, #sheet .form fieldset > legend { float: inline-start; width: 100%; padding: 0; margin: 0 0 .45rem; }
 .set-card fieldset > legend + *, #sheet .form fieldset > legend + * { clear: both; }
-.set-card small, #sheet .form small { display: block; color: var(--muted); font-size: .86rem; line-height: 1.45; margin-top: .35rem; }
-.set-card .check, #sheet .form .check { justify-content: space-between; gap: .9rem; }
-.set-card .check input, #sheet .form .check input { order: 2; }
+.set-card small, #sheet .form small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.4; margin-top: .35rem; }
+.set-card .check, #sheet .form .check { justify-content: space-between; align-items: flex-start; gap: .9rem; padding-block: .7rem; }
+.set-card .check input, #sheet .form .check input { order: 2; margin-block-start: .15rem; }
 .check input { flex: none; }
 .set-card fieldset .check + .check, #sheet .form fieldset .check + .check { border-top: 1px dashed var(--rule); }
 .set-sub { font-size: 1rem; color: var(--accent); margin: 1rem 0 .1rem; padding-top: .7rem; border-top: 2px solid var(--rule); }
+.set-card > h2 + .set-sub { border-top: 0; margin-top: .15rem; padding-top: .15rem; }
 .set-card > .set-sub + :is(fieldset, .field, .check), #sheet .form > .set-sub + :is(fieldset, .field, .check) { border-top: 0; }
+/* Equal-width choice chips, wrapping cleanly; design/font pickers keep their own grids. */
+.set-card .seg-ctl:not(.design-options):not(.font-options),
+#sheet .form .seg-ctl:not(.design-options):not(.font-options) { display: flex; flex-wrap: wrap; gap: .4rem; }
+.set-card .seg-ctl:not(.design-options):not(.font-options) > label,
+#sheet .form .seg-ctl:not(.design-options):not(.font-options) > label { flex: 1 1 4.5rem; justify-content: center; text-align: center; }
+.set-more { margin-top: .25rem; }
+.set-more > summary { cursor: pointer; color: var(--muted); font-size: .78rem; line-height: 1.35; min-height: 44px; display: flex; align-items: center; list-style: none; }
+.set-more > summary::-webkit-details-marker, .set-more > summary::marker { display: none; }
+.set-more > summary::before { content: "▸ "; flex: none; }
+.set-more[open] > summary::before { content: "▾ "; }
+.set-more small { margin-top: .2rem; }
+#qv-prev-row, #qv-havara-prev { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+#qv-prev-row > span, #qv-havara-prev > span { flex: 1 0 100%; }
+#qv-prev-row .qv-prev, #qv-havara-prev .qv-prev { flex: 1 1 7rem; justify-content: center; text-align: center; }
 #sheet .form { gap: .1rem; }
 #sheet .form > #sh-play { margin-bottom: .6rem; }
 .set-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .4rem 0 .5rem; }
@@ -930,6 +951,8 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .hero .hd { font-family: var(--display-font); font-weight: 900; font-size: 3.1rem; line-height: 1; letter-spacing: -.01em; margin: .4rem 0 .4rem; max-width: calc(100% - 6.5rem); }
 [data-design="modern"] .hero .sub { font-weight: 600; color: var(--muted); }
 [data-design="modern"] .chip { border: 0; background: transparent; padding-inline: 0; color: var(--muted); font-weight: 700; }
+[data-design="modern"] .set-jump .chip { border: 1.5px solid var(--rule); background: var(--card); color: var(--ink); padding: .35rem .45rem; border-radius: 999px; font-weight: 800; }
+[data-design="modern"] .set-jump .chip:hover { border-color: var(--accent); }
 [data-design="modern"] .datebar { justify-content: flex-start; }
 [data-design="modern"] .datebar > .btn:not(.today) { background: var(--solid); color: var(--solid-ink); border: 0; border-radius: 12px; }
 [data-design="modern"] #datepick { border: 2px solid var(--ink); border-radius: 12px; font-weight: 800; background: transparent; }
@@ -1053,6 +1076,7 @@ html[data-design="nocturne"] body, html[data-design="nocturne"] #reader { backgr
 [data-design="nocturne"] .hero .hd { font-family: var(--display-font); font-weight: 300; font-size: 3rem; line-height: 1.12; background: linear-gradient(180deg, #fff1c9 10%, #d8b46a 55%, #9c7a3a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 [data-design="nocturne"] .hero .sub { letter-spacing: .04em; }
 [data-design="nocturne"] .chip { background: transparent; border-color: var(--line); color: var(--muted); font-weight: 400; }
+[data-design="nocturne"] .set-jump .chip { background: rgba(201, 164, 92, .06); color: var(--ink); }
 [data-design="nocturne"] .chip svg { color: var(--gold); }
 [data-design="nocturne"] .btn { background: transparent; border-color: var(--line); color: var(--ink); box-shadow: none; }
 [data-design="nocturne"] .btn:hover { border-color: var(--gold); }

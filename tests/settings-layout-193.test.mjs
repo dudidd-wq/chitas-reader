@@ -12,10 +12,12 @@ const mobile = async (width, height = 760) => {
   await ctx.addInitScript(p => localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: p })), PREFS);
   const p = await ctx.newPage(); p.errors = []; p.on('pageerror', e => p.errors.push(String(e))); return p;
 };
-const CARDS = ['set-daily', 'set-display', 'set-tts', 'set-siddur', 'set-tehillim', 'set-backup', 'set-about'];
+const CARDS = ['set-daily', 'set-display', 'set-fonts', 'set-text', 'set-tts', 'set-siddur', 'set-tehillim', 'set-backup', 'set-about'];
 const GROUP = {
   'set-daily': ['il', 'rambamTrack', 'lessonMitzvot', 'lessonTolt', 'lessonRavYomi', 'lessonDaf', 'lessonAmud', 'lessonYer', 'lessonMishna', 'lessonNach', 'lessonShnayim', 'shnayimSplit'],
-  'set-display': ['design', 'designFont', 'theme', 'font', 'readingBold', 'size', 'lineHeight', 'layout', 'spread', 'taamim', 'rashi', 'rashiFont', 'hayomNiqqud', 'mitzvotNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'shortBiur', 'wakeLock'],
+  'set-display': ['design', 'designFont', 'theme', 'size', 'lineHeight', 'layout', 'spread', 'wakeLock'],
+  'set-fonts': ['font', 'readingBold'],
+  'set-text': ['taamim', 'rashi', 'rashiFont', 'hayomNiqqud', 'mitzvotNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'shortBiur'],
   'set-tts': ['ttsEngine', 'ttsGender', 'ttsPitch', 'ttsHavara', 'ttsModel', 'ttsVoice', 'ttsRate', 'ttsStress', 'ttsDivine', 'ttsRashi', 'ttsBiur', 'ttsSkipCites', 'ttsContinuous', 'ttsLockscreen'],
   'set-siddur': ['siddurKaddish', 'hideSiddurInstructions', 'siddurLang', 'tachanunMode', 'shabbatMode'],
 };
@@ -94,4 +96,38 @@ test('1.0.93: home links – equal tiles, three per row, ≥ 44 px, nothing cut 
   for (const [txt, w, h, , fits, icon] of t) { assert.ok(w >= 44 && h >= 44, txt); assert.ok(fits, txt + ' cut'); assert.ok(icon, txt + ' icon'); }
   assert.equal(await p.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
   await p.context().close();
+});
+
+test('1.0.130: jump chips stay visible buttons in every design; helper text is compact; no leftover display settings', async () => {
+  for (const design of ['classic', 'modern', 'nocturne']) {
+    const p = await mobile(390);
+    await p.addInitScript(d => { const k = 'chitas-reader.v1'; const s = JSON.parse(localStorage.getItem(k) || '{"prefs":{}}'); s.prefs = { ...s.prefs, design: d }; localStorage.setItem(k, JSON.stringify(s)); }, design);
+    await p.goto(srv.url + '#/settings'); await p.waitForSelector('#qv-st');
+    const m = await p.evaluate(() => {
+      const chips = [...document.querySelectorAll('.set-jump .chip')].map(e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return { t: e.textContent, h: Math.round(r.height), w: Math.round(r.width), bg: cs.backgroundColor, bd: cs.borderTopWidth, fs: cs.fontSize }; });
+      const smalls = [...document.querySelectorAll('#sf small, #sf .set-more > summary')].map(e => parseFloat(getComputedStyle(e).fontSize));
+      const headings = [...document.querySelectorAll('#sf > section.set-card > h2, #tts-voice-h, #qv-havara-label, #tts-opts-h')].map(e => e.textContent.trim());
+      return { chips, maxSmall: Math.max(...smalls), minSmall: Math.min(...smalls), headings,
+        overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        fontInDisplay: !!document.querySelector('#set-display [name=font]'),
+        fontInFonts: !!document.querySelector('#set-fonts [name=font]'),
+        designInFonts: !!document.querySelector('#set-fonts [name=design]') };
+    });
+    assert.equal(m.chips.length, 9, design + ' chip count');
+    for (const c of m.chips) {
+      assert.ok(c.h >= 44, `${design}: chip ${c.t} height ${c.h}`);
+      assert.ok(c.w >= 40, `${design}: chip ${c.t} width ${c.w}`);
+    }
+    // jump chips must look like buttons, not a run-on sentence (modern used to strip their chrome)
+    const withBox = m.chips.filter(c => c.bd !== '0px' || (c.bg && c.bg !== 'rgba(0, 0, 0, 0)' && c.bg !== 'transparent'));
+    assert.equal(withBox.length, m.chips.length, `${design}: chips without visible box ${JSON.stringify(m.chips)}`);
+    assert.ok(m.maxSmall <= 13.5, `${design}: helper ${m.maxSmall}px too large`);
+    assert.equal(m.fontInDisplay, false);
+    assert.equal(m.fontInFonts, true);
+    assert.equal(m.designInFonts, false);
+    assert.equal(m.overflow, false);
+    assert.ok(m.headings.includes('תצוגה ועיצוב') && m.headings.includes('גופנים') && m.headings.includes('טקסט וניקוד'));
+    assert.ok(m.headings.includes('קול') && m.headings.includes('הגייה') && m.headings.includes('מהירות ואפשרויות הקראה'));
+    await p.context().close();
+  }
 });
