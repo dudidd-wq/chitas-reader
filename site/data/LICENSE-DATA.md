@@ -74,3 +74,7 @@ Round 1 transfers only single comma, semicolon, colon, en dash or em dash marks.
 All full stops, question marks, exclamation marks, ellipses, sof pasuq and
 compound punctuation gaps are rejected, even inside an exact bold quotation.
 Exact token identity does not establish sentence syntax in the commentary.
+
+## Dicta Nakdan non-commercial output permission
+
+Speech niqqud in the Metzudat David ENGINE-COV-1B pilot is attributed to **Dicta - Israel Center for Text Analysis (Nakdan)**. Non-commercial use of Dicta output is permitted per Dudi's conversation with Dicta on 2026-11-17; chitas-reader is non-commercial. This permission supplements the underlying-text licence and does not grant commercial reuse. See `verification/DICTA-PERMISSION.md` for the reported evidence and scope. Existing Sefaria/Maryles/Steinsaltz and unknown-licence exclusions remain unchanged.

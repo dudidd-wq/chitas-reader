@@ -583,3 +583,6 @@ Exact vocal shva for יֵלְכוּ/וַיֵּלְכוּ/יֵצְאוּ/אֵלְ
 ## 2026-11-17 21:45 – NPS1 Bavli punctuation rules (Stage 1) → 1.0.129
 
 - Conservative Bavli read-aloud punctuation sidecar (Chabad profile only, speech only; display text unchanged). Explicit connective/formula rule set C1–C8 (verification/NPS1-RULES.md), fail-closed. 313 imported Maryles/Sefaria commas on 245 pages; 0 Dicta niqqud fills. Reviews: 8.5, 9.4, 9.3 → rules round, independent Codex review 4: 9.7 (S1 9.7, S2 9.7, S3 9.9, S4 9.8, S5 9.7; 0/200 random, 0/179 targeted). DATA_VERSION 777efd065e20 (after npm run search).
+
+## 1.0.131 — ENGINE-COV-1B: Metzudat David speech niqqud pilot (Codex review 9.6)
+158 tokens in 70 comments (12 MD chapters, Joshua/Judges/I Samuel/Isaiah) gain Dicta niqqud in the `say` speech field only; display unchanged. Dicta: non-commercial use permitted per Dudi's conversation with Dicta, 2026-11-17 (verification/DICTA-PERMISSION.md). Packets: PC engine-cov-1b\, engine-cov-1b-review\ (S1 9.8 S2 9.9 S3 10 S4 9.6 S5 9.7).
