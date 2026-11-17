@@ -3,12 +3,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { textToIPA, wordToIPA, milelStress, HAVAROT, accentStressMap } from '../site/js/g2p.js';
 import { prepareForTTS, chunkText } from '../site/js/tts-prep.js';
 import { nodeVoice } from '../tools/voice-synth.mjs';
 import { serve, launch, pageWith, CHROME } from './helpers.mjs';
 
-const root = new URL('../', import.meta.url).pathname, read = f => fs.readFileSync(root + f, 'utf8');
+const root = fileURLToPath(new URL('../', import.meta.url)), read = f => fs.readFileSync(root + f, 'utf8');
 const data = JSON.parse(read('site/voice/stress-he.json'));
 const skip = !CHROME && 'no Chrome';
 const C = { havara: 'chabad' };

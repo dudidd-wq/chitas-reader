@@ -572,3 +572,6 @@ Tests: audit-124 (new). Samples: /workspace/plans/samples/audit-124/.
 
 ## 2026-11-17 01:40 – short biur batch 7 (20.1–2.2) → 1.0.126
 - External review r2 (Codex CLI on Dudi's PC, gpt-6-astra, same rubric as previous batches): 9.792 (faith 9.98, accuracy 9.98, clarity 9.97, niqqud 9.03, label 10.0; Mitzvot 9.73, Rambam 9.81, Tanya 9.81, tolt 9.77; fresh sample 9.778). Auto-deployed per Dudi: "ביאור: להעלות כל מנה שעוברת 9.5". Writer was also Codex CLI (ChatGPT Pro), not the Anthropic/OpenAI APIs. r1 was 9.594 overall but niqqud 8.14 and tolt 9.42, so one fix round was applied first. 1404 paragraphs (20.1–2.2.2027).
+
+## 2026-11-17 03:05 – engine leftovers (Task B) → 1.0.127
+Exact vocal shva for יֵלְכוּ/וַיֵּלְכוּ/יֵצְאוּ/אֵלְכָה/יִירְאוּ; conservative Tanya bracket omissions (duplicate/citation, vocalization-conflict protected); Yerushalmi אדרבה stress; Windows file-URL in tools. Codex review 9.8 (G1,G3,G4 round 1; G2 8.8 -> fix -> 9.8). Held: qamatz, Chabad onset, Bavli/Tanya/tolt shva, general lexicon. See verification/ENGINE-126-B.md. Speech-only; no data rebuild.

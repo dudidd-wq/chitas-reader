@@ -3,11 +3,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { textToIPA, NACH } from '../site/js/g2p.js';
 import { prepareForTTS } from '../site/js/tts-prep.js';
 import { aramWord, aramSayText, withNach } from '../tools/aramaic-speech.mjs';
 
-const root = new URL('../', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../', import.meta.url));
 const data = JSON.parse(fs.readFileSync(root + 'site/voice/stress-he.json', 'utf8'));
 const prep = t => prepareForTTS(t, { stress: true, primaryStress: true, divineName: 'hashem' }).replace(/\u05AB/g, '');
 const ipa = w => textToIPA(w.replace(/\u05AB/g, ''), { data, accents: { primary: w } });

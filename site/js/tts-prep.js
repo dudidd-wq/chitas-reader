@@ -501,6 +501,35 @@ export function insertTaamPauses(t) {
   return parts.join('');
 }
 
+// Audit B: square brackets also contain real lesson wording (IK 15: הטוחן
+// [חטים] ברחיים; LA 8: כף הקלע [לבדו]). Length alone is never evidence.
+function skipEditorialBrackets(text) {
+  const bare = s => s.normalize('NFD').replace(/[\u0591-\u05C7]/g, '').replace(/\s+/g, ' ').trim();
+  // An unpointed alternative supplies no conflicting reading. Otherwise require
+  // equal letter/mark clusters: accents and mark order are not vocalization,
+  // but vowels, dagesh and shin/sin dots are. Partial pointing stays conservative.
+  const clusters = s => s.normalize('NFD')
+    .replace(/[\u0591-\u05AF\u05BD\u05C4\u05C5]/g, '')
+    .replace(/[\u05B0-\u05BC\u05BF\u05C1\u05C2\u05C7]+/g, marks => [...marks].sort().join(''))
+    .replace(/\s+/g, ' ').trim();
+  const compatible = (previous, bracket) =>
+    !/[\u05B0-\u05BC\u05BF\u05C1\u05C2\u05C7]/.test(bracket.normalize('NFD')) ||
+    clusters(previous) === clusters(bracket);
+  return text.replace(/\[([^\[\]]*)\]/g, (whole, inner, at) => {
+    const b = bare(inner);
+    // Duplicate one/two-word alternatives; the prefixed pronouns are attested in IK 15.
+    if (/^[א-ת]+(?: [א-ת]+)?$/.test(b)) {
+      const previous = text.slice(0, at).trim().split(/\s+/).slice(-b.split(' ').length).join(' ');
+      if (bare(previous) === b && compatible(previous, inner)) return ' ';
+      if (/^(הוא|היא)$/.test(b) && bare(previous) === 'ש' + b &&
+          compatible(previous.normalize('NFD').replace(/^ש[\u0591-\u05C7]*/, ''), inner)) return ' ';
+    }
+    // A closed citation grammar, not "contains פרק": explanatory bracketed prose stays.
+    if (/^(?:(?:אבות|בבא בתרא|בבא מציעא|בבא קמא) פרק [א-ת](?:[׳']|[א-ת]?[״"][א-ת])?|(?:בסוף )?ב?פרק [א-ת](?:[׳']|[א-ת]?[״"][א-ת])? ד(?:נדה|שבועות|חגיגה))$/.test(b)) return ' ';
+    return whole;
+  });
+}
+
 export function prepareForTTS(html, opt = {}) {
   const o = { stress: true, divineName: 'hashem', ...opt };
   let t = String(html)
@@ -521,6 +550,7 @@ export function prepareForTTS(html, opt = {}) {
     .replace(/\[([^\]]*)\]\s*\(([^()]*)\)/g, (m, qere, ketiv) => (isKetivOf(qere, ketiv) ? qere : m))
     // 1.0.124: Tanya (and similar) editorial notes in brackets are not the lesson text and are not read.
     .replace(/\s*\[[^\[\]]*(?:צריך להיות|נוסח אחר|בכתב יד|ליתא)[^\[\]]*\]/g, ' ')
+    .replace(/[^]*/, skipEditorialBrackets)
     .replace(/[^]*/, x => (o.cites ? stripCitations(x) : x))
     .replace(/\u05C6/g, ' ')            // inverted nun (Ps 107, Num 10) – a scribal mark, not read
     .replace(/\u05C0/g, ' ')            // paseq

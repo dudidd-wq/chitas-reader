@@ -12,9 +12,10 @@
 // Mishnah and quotations, Onkelos) and never in its Hebrew corpus (Torah, Tehillim, Nach, Mishnah, Rambam, Sefer HaMitzvot),
 // and is not inside a quotation (״…״) or a Mishnah segment. Onkelos words are Aramaic by definition.
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { letters, nuclei, stressKey, stressFromAccents, markShvaNa, HATAMA, VSHVA, NACH } from '../site/js/g2p.js';
 
-const ROOT = new URL('../', import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
 export const CONFIG = JSON.parse(fs.readFileSync(ROOT + 'tools/data/aramaic-speech.json', 'utf8'));
 const FIN = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
 const sk = w => w.replace(/[^\u05D0-\u05EA]/g, '').replace(/[ךםןףץ]/g, c => FIN[c]);
@@ -97,6 +98,11 @@ export function codaFix(w) {
   return add ? L.map((l, i) => l.ch + l.all + (i === c ? NACH : '')).join('') : w;
 }
 const ARAM_END = /[\u05B8\u05B5]\u05BC?\u05D0$|\u05B5\u05BC?\u05D9$|\u05B5\u05BC?\u05D9?\u05D4\u05BC$|\u05D9\u05E0\u05B7\u05DF$|\u05B0\u05D4\u05D5\u05BC$/;
+// Audit B: repairs coupled to the experimental shva group, not the general
+// lexicon. Suppressing a vowel must not retain the audit's wrong stress tag.
+const SHVA_STRESS = new Map([
+  ['אִיקְּלַע', 0], ['וְאִיקְּלַע', 0], ['אַדְּרַבָּה', 1], ['וְאַדְּרַבָּה', 1],
+].map(([w, k]) => [stressKey(w), k]));
 /** לָאו (also Mishnaic Hebrew: אִם לָאו) → לָו, read lav */
 export const lav = w => /^(?:[ודבש][\u05B0-\u05BC\u05C1]*)?ל\u05B8או$/.test(stressKey(w)) ? w.replace(/א(?=[\u0591-\u05C7|]*ו[\u0591-\u05C7|]*$)/, '') : w;
 /** one vocalized speech word (may carry an ole stress tag) → the Aramaic speech word. mode: gemara | prose | onkelos */
@@ -104,6 +110,10 @@ export function aramWord(word, mode = 'gemara', G = CONFIG.groups) {
   if (!/[\u05B0-\u05BB\u05C7]/.test(word) || /['"׳״]/.test(word)) return word;
   let w = word;
   if (G.lav) w = lav(w);
+  if (G.shva && mode !== 'onkelos' && SHVA_STRESS.has(stressKey(w))) {
+    const k = SHVA_STRESS.get(stressKey(w));
+    if (stressFromAccents(w) !== k) w = stamp(w, k);
+  }
   if (mode !== 'onkelos' && (G.lexicon || G.zohar || G.rules)) {
     const core = w.replace(/\u05AB/g, ''), n = nuclei(letters(core)).length, has = w.includes(HATAMA), lx = lexGate(core, G);
     let k = lx.k;
@@ -114,9 +124,10 @@ export function aramWord(word, mode = 'gemara', G = CONFIG.groups) {
   }
   // prose (Tanya, Torah Or): the shva rule only on words with an Aramaic ending or in the lexicon – Hebrew piel forms such as
   // מְקַבְּלִים keep their vocal shva there
-  if (G.shva && (mode !== 'prose' || ARAM_END.test(stressKey(w)) || lexK(w.replace(/\u05AB/g, '')) !== null)) w = withNach(w);
+  const shvaCandidate = mode !== 'prose' || SHVA_STRESS.has(stressKey(w)) || ARAM_END.test(stressKey(w)) || lexK(w.replace(/\u05AB/g, '')) !== null;
+  if (G.shva && shvaCandidate) w = withNach(w);
   // round 3: מִן assimilated before a non-בגדכפת letter (מִשְּׁמֵיהּ mish-MEIH): the doubled letter's shva is quiescent in Aramaic
-  if (G.shva && mode !== 'onkelos') { const L = letters(w), i = L.findIndex(l => !/^[וד]$/.test(l.ch) || !/^[\u05B0\u05BC\u05B4]*$/.test(l.diac.replace(/\u05BC/g, '')));
+  if (G.shva && shvaCandidate && mode !== 'onkelos') { const L = letters(w), i = L.findIndex(l => !/^[וד]$/.test(l.ch) || !/^[\u05B0\u05BC\u05B4]*$/.test(l.diac.replace(/\u05BC/g, '')));
     if (i >= 0 && L[i].ch === 'מ' && /\u05B4/.test(L[i].diac) && L[i + 1] && /\u05BC/.test(L[i + 1].diac) && /\u05B0/.test(L[i + 1].diac) && !/[בגדכפת]/.test(L[i + 1].ch) && L[i + 2] && !L[i + 1].all.includes(NACH))
       w = L.map((l, j) => l.ch + l.all + (j === i + 1 ? NACH : '')).join(''); }
   return w;
@@ -180,6 +191,11 @@ export function aramSayText(say, mode = 'gemara', { mishnah = false, source = mo
     if (/^["״“”]$/.test(tok)) { q = !q; return tok; }
     if (q && mode === 'gemara') return tok;   // Gemara: a quotation is a verse / Mishnah. Prose: also Zohar quotations (ARAM ∖ HEB still decides)
     if (mode !== 'onkelos' && !ARAM.has(formKey(tok))) {
+      if (groups.shva && SHVA_STRESS.has(stressKey(tok))) {
+        const w = same(aramWord(tok, mode, { shva: true }), tok);
+        if (w !== tok && stats) stats.changed = (stats.changed || 0) + 1;
+        return w;
+      }
       let w = groups.lav && !/['"׳״]/.test(tok) ? lav(tok) : tok;
       if (!/['"׳״]/.test(w) && lexGate(w.replace(/\u05AB/g, ''), groups).k !== null && !(mode === 'prose' && proseSkip(w))) w = same(aramWord(w, mode, { lexicon: groups.lexicon, zohar: groups.zohar }), w); if (w !== tok && stats) stats.changed = (stats.changed || 0) + 1; return w; }
     const w = mode === 'prose' && proseSkip(tok) ? tok : same(aramWord(tok, mode, groups), tok);

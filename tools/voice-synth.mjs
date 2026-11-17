@@ -2,13 +2,14 @@
 // site/voice/*.onnx, site/js/g2p.js, site/js/piper-core.js). Used by tests and for measurements.
 // Usage: node tools/voice-synth.mjs "<vocalised text>" out.wav [--int8] [--rate 1]
 import fs from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { prepareForTTS, chunkText } from '../site/js/tts-prep.js';
 import { createVoice } from '../site/js/piper-core.js';
 
-const SITE = new URL('../site/', import.meta.url).pathname;
+const SITE = fileURLToPath(new URL('../site/', import.meta.url));
 /** natural (1.0.88): the real male voice (he_IL-ilspeech-male-medium) instead of noa. */
 export async function nodeVoice({ int8 = false, natural = false } = {}) {
-  const ort = await import(SITE + 'voice/ort/ort.wasm.bundle.min.mjs');
+  const ort = await import(pathToFileURL(SITE + 'voice/ort/ort.wasm.bundle.min.mjs'));
   const file = n => new Uint8Array(fs.readFileSync(SITE + 'voice/' + n));
   const name = natural ? 'he_IL-ilspeech-male-medium' : 'he_IL-noa-medium';
   return createVoice(ort, {

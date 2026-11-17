@@ -209,15 +209,21 @@ export function accentStressMap(text) {
 const NO_SHVA_NA = new Set(['שתים', 'שתי', 'שתיים', 'בשתי', 'ושתי', 'ושתים', 'לשתי', 'משתי']);  // shtayim: the shva is quiescent by tradition
 const skel = L => L.map(l => l.ch).join('');
 const BASE = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+// Audit B: exact pointed verbs, not a long-vowel heuristic. קדמה / חטא and
+// possessives עירך / ימינך close the preceding syllable. No qamatz inference.
+const VERBAL_SHVA = new Map([
+  ['יֵלְכוּ', 1], ['וַיֵּלְכוּ', 2], ['יֵצְאוּ', 1], ['אֵלְכָה', 1], ['יִירְאוּ', 2],
+].map(([w, i]) => [stressKey(w), i]));
 /** Mark vocal shva (meteg, as Phonikud) by grammar rules that need no guessing:
  *  1. on the first letter of the word; 2. the second of two shvas in a row (not at the word's end);
  *  3. under the first of two identical letters (הַלְלוּ, הִנְנִי); 4. under a letter with dagesh forte (dagesh after a vowel).
- *  The rule of a shva after a long vowel (Tiberian, needs the meteg of the edition) is not applied. */
+ *  After a long vowel only the exact pointed verbs in VERBAL_SHVA are admitted. */
 export function markShvaNa(L, opt = {}) {
   const n = L.length;
   if (NO_SHVA_NA.has(skel(L))) return L;
   const isShva = i => !!L[i] && L[i].diac.includes(SHVA) && !L[i].diac.includes(VSHVA);
   const aram = !!opt.aram;
+  const verbal = VERBAL_SHVA.get(stressKey(L.map(l => l.ch + l.all).join('')));
   for (let i = 0; i < n; i++) {
     if (!isShva(i) || L[i].ch === 'ו') continue;            // vav + shva is read "ve" by the vav rules
     if (L[i].all.includes(NACH)) continue;                    // 1.0.112: speech-only mark – this shva is quiescent (Aramaic)
@@ -225,6 +231,7 @@ export function markShvaNa(L, opt = {}) {
     if (last) continue;                                       // final ךְ / תְּ / -שְׁתְּ: quiescent
     let na = false;
     if (i === 0) na = true;
+    else if (i === verbal) na = true;
     else if (isShva(i - 1) && !(i - 1 === 0)) na = true;      // second of two (the first one is not the word's first letter)
     else if (i - 1 === 0 && isShva(0)) na = false;            // שְׁמְ… cannot start a word; leave as written
     if (!na && L[i + 1] && (BASE[L[i].ch] || L[i].ch) === (BASE[L[i + 1].ch] || L[i + 1].ch)) na = true;

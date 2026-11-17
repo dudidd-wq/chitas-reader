@@ -4,8 +4,9 @@
 // Idempotent: running it again changes nothing (a test checks this), so it is re-run after any rebuild of those files.
 //   node tools/aramaic-say-pass.mjs [--dry] [--report out.tsv]
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { aramSayText, segMishnah, amudOrder } from './aramaic-speech.mjs';
-const D = new URL('../site/data/', import.meta.url).pathname;
+const D = fileURLToPath(new URL('../site/data/', import.meta.url));
 const dry = process.argv.includes('--dry'), rep = process.argv.includes('--report') ? process.argv[process.argv.indexOf('--report') + 1] : null;
 const stats = {}, changes = new Map();
 const read = f => JSON.parse(fs.readFileSync(D + f, 'utf8'));
