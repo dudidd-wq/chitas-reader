@@ -414,7 +414,7 @@ async function gemaraDoc(plan, unit) {
       const [fp, sp] = gemaraFiles({ ...spec, amudim: [a] }, idx), f = await data(fp), s = await optional(sp);
       if (T.yer) { if (!blocks.includes(pmNote)) blocks.push({ type: 'note', text: 'במחזור הדף היומי, מסכת שקלים נלמדת מן התלמוד הירושלמי (בעמודי הש״ס של וילנא).' }, pmNote); yerBlocks(f, s, a, blocks); partial += s?.partial || 0; continue; }
       partial += s ? s.partial || 0 : f.segs.length;
-      f.segs.forEach(([g, st], i) => blocks.push({ type: 'p', id: `${a}.${i + 1}`, ref: `${spec.t} ${a}:${i + 1}`, text: g, biur: st ? [st] : [], biurV: s?.v?.[i] ? [s.v[i]] : undefined, biurLabel: 'ביאור', say: s?.say?.[i] || undefined, src: 'gemara', pause: true }));
+      f.segs.forEach(([g, st], i) => blocks.push({ type: 'p', id: `${a}.${i + 1}`, ref: `${spec.t} ${a}:${i + 1}`, text: g, biur: st ? [st] : [], biurV: s?.v?.[i] ? [s.v[i]] : undefined, biurLabel: 'ביאור', say: s?.say?.[i] || undefined, nps1: s?.nps1?.[i]?.source === g && s?.nps1?.[i]?.commentary === st ? s.nps1[i] : undefined, nps1Corpus: 'bavli', src: 'gemara', pause: true }));
     }
     if (partial) blocks.unshift(partialNote(partial));
     return { title, subtitle, blocks, raw: true, gemara: 'bavli', credits: gemaraCredits(idx, T?.yer ? [['תלמוד ירושלמי', 'yerushalmi'], ['פני משה', 'peneimoshe']] : [['גמרא (מנוקדת)', 'gemara'], ['ביאור שטיינזלץ', 'steinsaltz']]) };

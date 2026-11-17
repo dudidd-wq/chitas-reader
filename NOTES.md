@@ -579,3 +579,7 @@ Exact vocal shva for יֵלְכוּ/וַיֵּלְכוּ/יֵצְאוּ/אֵלְ
 ## 2026-11-17 07:35 – Task C (holam oy, reduced) → 1.0.128
 
 - Chabad holam = oy; siddur stress unchanged from HEAD (G2 held); afilu gate OFF. Codex review 4: G1 9.6, G3 9.9, G4 9.9, G5 10.0. See verification/HAVARA-CHABAD-191.md.
+
+## 2026-11-17 21:45 – NPS1 Bavli punctuation rules (Stage 1) → 1.0.129
+
+- Conservative Bavli read-aloud punctuation sidecar (Chabad profile only, speech only; display text unchanged). Explicit connective/formula rule set C1–C8 (verification/NPS1-RULES.md), fail-closed. 313 imported Maryles/Sefaria commas on 245 pages; 0 Dicta niqqud fills. Reviews: 8.5, 9.4, 9.3 → rules round, independent Codex review 4: 9.7 (S1 9.7, S2 9.7, S3 9.9, S4 9.8, S5 9.7; 0/200 random, 0/179 targeted). DATA_VERSION 777efd065e20 (after npm run search).

@@ -39,3 +39,38 @@ without asking Chassidut Behirah and Kehot.
 
 עברית: הקוד ב-GPL; הטקסטים – לפי רישיון המקור. **התניא ב-CC BY-NC – שימוש לא מסחרי בלבד**, ומי שמעתיק את המאגר לשימוש מסחרי צריך להסיר אותו או להחליפו.
 תורה אור ולקוטי תורה: נוסח מנוקד: חסידות בהירה, על פי מהדורת קה״ת ה׳תשע״ה; באישור, לשימוש לא מסחרי בלבד. לפי דיווח בעל האתר, אושר ע״י חסידות בהירה וקה״ת, לשימוש לא מסחרי בלבד. אין בידינו מסמך רישיון בכתב. מי שמעתיק את המאגר צריך להסיר את הניקוד (להריץ מחדש את tools/build-tolt.mjs), אלא אם קיבל רשות בעצמו.
+
+## Bavli NPS1 read-aloud sidecar
+
+The optional `nps1` field in `gemara/bsay/` is used only by the Chabad speech
+profile. Original `say` and display fields are unchanged. Each edit carries
+source token coordinates (JavaScript UTF-16 indices), a source SHA-256 and its
+own witness and licence. Punctuation is copied from the existing William
+Davidson Edition – Vocalized Aramaic (Sefaria), **CC BY-NC**, with no inferred
+boundaries. This repository already distributes that noncommercial edition.
+
+Unpointed-word fill support uses **Dicta – Israel Center for Text Analysis,
+Talmud Bavli with Nikud**, plene edition, revision
+`8772e90fac22060ea423c168c0f95868653f6ef1`:
+https://github.com/Dicta-Israel-Center-for-Text-Analysis/Talmud-Bavli-with-Nikud/tree/8772e90fac22060ea423c168c0f95868653f6ef1
+The pinned README grants **CC BY-SA**, without a version number. Any transferred
+pointing is attributed to Dicta and remains subject to that licence, including
+ShareAlike for adaptations; it is not relicensed as GPL or CC BY-NC. The sidecar
+keeps the independent witnesses distinct. This build emits no Dicta fills
+because no unpointed word passes all gates. Do not treat the combination as a
+blanket redistribution licence or as clearance for a commercial derivative.
+
+Rebuild offline: `node tools/build-bavli-nps1.mjs <pinned-input-directory>` then
+`node tools/data-version.mjs`. The input directory contains the three pinned
+`dicta-{Berakhot,Taanit,Bava_Metzia}-maleh.txt` witnesses and `dicta_tree.json`
+from the NPS research packet; SHA-256 pins and Git blob checks reject changes.
+No API or API key is used. Additional tractates remain unknown until explicitly
+added and pinned. Re-run the sidecar builder after regenerating base speech;
+stale source/commentary/base speech causes the reader to bypass the layer.
+
+Punctuation attribution: **Rabbi Shimon Maryles**, as credited in the applicable
+[Sefaria edition metadata](https://www.sefaria.org/Gittin?tab=versions).
+Round 1 transfers only single comma, semicolon, colon, en dash or em dash marks.
+All full stops, question marks, exclamation marks, ellipses, sof pasuq and
+compound punctuation gaps are rejected, even inside an exact bold quotation.
+Exact token identity does not establish sentence syntax in the commentary.

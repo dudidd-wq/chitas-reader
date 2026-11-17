@@ -1,3 +1,4 @@
+import { nps1Speech } from './bavli-nps1.js';
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
@@ -825,6 +826,7 @@ async function renderSources() {
     <li>קול: <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">Piper Hebrew – noa (medium)</a> מאת thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>. הגרסה הקלה (int8) היא שינוי שלנו: כימות המשקולות ל־int8.</li>
     <li>הקול הגברי (ברירת המחדל מגרסה 1.0.60) הוא שינוי שלנו של הקול noa, בעיבוד אות במכשיר (קוד שלנו, בלי ספרייה חיצונית): זיהוי גובה הצליל בשיטת YIN, הורדתו בכ־6 חצאי טון בשיטת TD-PSOLA (שומרת על הפורמנטים) והורדת הפורמנטים בכ־12% (מגרסה 1.0.69, במקום 6%). עיצורים לא־קוליים נשמרים ללא פירוק לגרגרי צליל, עם מעבר הדרגתי בגבולות הקטעים הקוליים. אין זה קול של דובר גבר ואין הורדה נוספת. לא מצאנו קול עברי גברי שרישיון המשקולות <i>וגם</i> רישיון ההקלטות שעליהן אומן מתירים שימוש חופשי; הפירוט ב־<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VOICE.md#male" target="_blank" rel="noopener" dir="ltr">verification/VOICE.md</a>.</li>
     <li>הקול הגברי העמוק (מגרסה 1.0.88): אותו עיבוד אות שלנו של noa, בהורדה של כ־8 חצאי טון ופורמנטים ×0.82. גם הוא אינו קול של דובר גבר.</li>
+    <li id="credit-nps1">ניקוד משלים להקראת הבבלי: <a href="https://github.com/Dicta-Israel-Center-for-Text-Analysis/Talmud-Bavli-with-Nikud">דיקטה – תלמוד בבלי המנוקד</a>, CC BY-SA (גרסה לא צוינה במקור). הועתק רק בהתאמה מדויקת למילים חסרות ניקוד. פיסוק: הרב שמעון מרילס (Rabbi Shimon Maryles), <a href="https://www.sefaria.org/Gittin?tab=versions">מהדורת ויליאם דייוידסון בספריא — פרטי המהדורה</a>, CC BY-NC, לשימוש לא מסחרי בלבד. שכבות ההקראה נשמרות בנפרד עם ייחוס לכל שינוי.</li>
     <li id="credit-natural">הקול הגברי הטבעי (מגרסה 1.0.88, מורד רק כשבוחרים בו): המודל <span dir="ltr">piper_medium_male.onnx</span> מתוך <a href="https://huggingface.co/notmax123/piper-medium-heb" target="_blank" rel="noopener" dir="ltr">notmax123/piper-medium-heb</a> מאת notmax123, רישיון <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.he" target="_blank" rel="noopener">CC BY-NC 4.0</a> (ייחוס, שימוש לא מסחרי בלבד). המודל אומן על הקלטות ILSpeech של פרויקט <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (CC BY-NC 4.0). המשקולות לא שונו; לקובץ ההגדרות הוספנו שדה אחד (<span dir="ltr">chitas_pad</span>) שמציין שהמודל מקבל את הצלילים בלי מפריד ביניהם. האפליקציה חינמית ולא מסחרית.</li>
     <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
@@ -1824,7 +1826,7 @@ document.addEventListener('keydown', e => {
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
-  const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), b.say]));
+  const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), nps1Speech(b.say, b.nps1, { havara: prefs.ttsHavara, corpus: b.nps1Corpus })]));
   const sbm = prefs.ttsBiur && prefs.shortBiur !== false ? new Map(R.doc.blocks.filter(b => b.sb).map(b => [String(b.id), b.sb.v])) : null; // 1.0.100
   // 1.0.101: every source uses pauseChunks (0.18 s / 0.38 s). 1.0.96 introduced this for Gemara.
   // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen

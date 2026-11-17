@@ -4,13 +4,14 @@
 // tests/sw-data.test.mjs fails if either is stale, so changed texts can never be served from an old cache.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
-const root = new URL('../site/', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../site/', import.meta.url));
 export function dataHash() {
   const h = crypto.createHash('sha256');
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
     const p = path.join(d, e.name);
-    if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) { h.update(path.relative(root, p)); h.update(fs.readFileSync(p)); }
+    if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) { h.update(path.relative(root, p).replace(/\\/g, '/')); h.update(fs.readFileSync(p)); }
   });
   for (const d of ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'hayomyom', 'siddur', 'notes', 'search', 'gemara', 'nach', 'nachv', 'onkelos', 'mitzvot-voc', 'sbiur']) walk(path.join(root, 'data', d));
   return h.digest('hex').slice(0, 12);
@@ -20,7 +21,7 @@ export function dataManifest() {
   const files = {};
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)).forEach(e => {
     const p = path.join(d, e.name);
-    if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) files[path.relative(path.join(root, 'data'), p)] = crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex').slice(0, 16);
+    if (e.isDirectory()) walk(p); else if (e.name.endsWith('.json')) files[path.relative(path.join(root, 'data'), p).replace(/\\/g, '/')] = crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex').slice(0, 16);
   });
   for (const d of ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'hayomyom', 'siddur', 'notes', 'search', 'gemara', 'nach', 'nachv', 'onkelos', 'mitzvot-voc', 'sbiur']) walk(path.join(root, 'data', d));
   return { version: dataHash(), files };
