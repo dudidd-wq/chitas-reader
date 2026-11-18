@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { letters, nuclei, stressKey, stressFromAccents, markShvaNa, HATAMA, VSHVA, NACH } from '../site/js/g2p.js';
+import { aramLexText } from './aram-lexicon.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 export const CONFIG = JSON.parse(fs.readFileSync(ROOT + 'tools/data/aramaic-speech.json', 'utf8'));
@@ -187,7 +188,7 @@ export function aramSayText(say, mode = 'gemara', { mishnah = false, source = mo
   if (!say || mishnah) return say;
   const { ARAM } = corpusForms();
   let q = false;
-  return say.replace(/["״“”]|[\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05BD\u05BF-\u05C7|'׳]*(?:["״][\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05BD\u05BF-\u05C7|]*)?/g, tok => {
+  const out = say.replace(/["״“”]|[\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05BD\u05BF-\u05C7|'׳]*(?:["״][\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05BD\u05BF-\u05C7|]*)?/g, tok => {
     if (/^["״“”]$/.test(tok)) { q = !q; return tok; }
     if (q && mode === 'gemara') return tok;   // Gemara: a quotation is a verse / Mishnah. Prose: also Zohar quotations (ARAM ∖ HEB still decides)
     if (mode !== 'onkelos' && !ARAM.has(formKey(tok))) {
@@ -202,4 +203,8 @@ export function aramSayText(say, mode = 'gemara', { mishnah = false, source = mo
     if (w !== tok && stats) stats.changed = (stats.changed || 0) + 1;
     return w;
   });
+  // ARAM-4: the exact-form stress lexicon, addition only, on for the Bavli Gemara only (tools/data/aram-lexicon.json).
+  // Runs after the rules above; a Mishnah segment never reaches here; the lexicon scans the whole string itself and
+  // fails closed on any uncertain quotation / bracket structure.
+  return mode === 'gemara' && source ? aramLexText(out, { source, stats }) : out;
 }
