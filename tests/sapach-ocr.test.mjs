@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { serve, launch, pageWith, CHROME } from './helpers.mjs';
 const skip = !CHROME && 'no Chrome';
-const SHOTS = '/workspace/tehillim-shots';
 
 async function syntheticSapachPng(page) {
   return Buffer.from(await page.evaluate(async () => {
@@ -51,8 +50,6 @@ test('OCR of a synthetic appendix stays on-device and fills a review list', { sk
     const foreign = []; p.on('request', r => { const u = r.url(); if (!u.startsWith(srv.url) && !u.startsWith('blob:')) foreign.push(u); });
     await p.goto(srv.url + '#/tehillim'); await p.waitForSelector('#pt-sapach-btn');
     const png = await syntheticSapachPng(p);
-    fs.mkdirSync(SHOTS, { recursive: true });
-    fs.writeFileSync(SHOTS + '/synthetic-sapach.png', png);
     await p.setInputFiles('#pt-sapach-file', { name: 'sapach.png', mimeType: 'image/png', buffer: png });
     await p.waitForFunction(() => document.querySelectorAll('.pt-rev-item').length > 0 || /נכשלה|לא זוהו/.test(document.querySelector('#pt-sapach-st')?.textContent || ''), { timeout: 150000 });
     const status = await p.textContent('#pt-sapach-st');
