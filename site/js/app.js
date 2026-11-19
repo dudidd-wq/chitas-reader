@@ -1,4 +1,5 @@
 import { nps1Speech } from './bavli-nps1.js';
+import { speechTextForBlock } from './gemara-speech.js';
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, formatDmyInput, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
@@ -738,6 +739,8 @@ function ttsForm() {
   ${R.sid ? kaddishField() : ''}
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
   ${check('ttsBiur', prefs.ttsBiur, 'הקרא גם את ה״ביאור הקצר״ אחרי כל פסקה')}
+  ${check('ttsVocalizedGemara', prefs.ttsVocalizedGemara, 'הקרא את הגמרא המנוקדת במקום הביאור')}
+  <small>בדף היומי ובעמוד היומי, ובירושלמי במקום ״פני משה״. ברירת המחדל נשארת הקראת הביאור. התצוגה לא משתנה: רואים גמרא וביאור כמו היום. כשהאפשרות מסומנת שומעים את נוסח הגמרא המנוקד שכבר במאגר (מהדורת דייוידסון בבבלי, גוגנהיימר בירושלמי), לא את הביאור.</small>
   ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}`;
@@ -1978,7 +1981,7 @@ document.addEventListener('keydown', e => {
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
   const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
-  const say = new Map(R.doc.blocks.filter(b => b.say).map(b => [String(b.id), nps1Speech(b.say, b.nps1, { havara: prefs.ttsHavara, corpus: b.nps1Corpus })]));
+  const say = new Map(R.doc.blocks.map(b => [String(b.id), speechTextForBlock(b, prefs, { nps1Speech, fallback: '' })]).filter(([, t]) => t));
   const sbm = prefs.ttsBiur && prefs.shortBiur !== false ? new Map(R.doc.blocks.filter(b => b.sb).map(b => [String(b.id), b.sb.v])) : null; // 1.0.100
   // 1.0.101: every source uses pauseChunks (0.18 s / 0.38 s). 1.0.96 introduced this for Gemara.
   // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen

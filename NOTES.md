@@ -589,3 +589,5 @@ Exact vocal shva for יֵלְכוּ/וַיֵּלְכוּ/יֵצְאוּ/אֵלְ
 
 ## 1.0.132 — ARAM-4: conservative Bavli Aramaic stress lexicon (review 9.6)
 125 exact forms, Bavli Gemara only; 6,766 addition-only stress tags (3,284 audible Israeli tokens). Hebrew homographs, כולא/כולה, מילי and already-stressed tokens skipped. Chabad IPA unchanged. Independent review 8.5 (CRLF cache) then fix on LF: 9.6 (S1 9.6 S2 9.7 S3 9.7 S4 9.7 S5 9.6). DATA_VERSION 7f93a4ea40e9. See verification/ARAM-4.md.
+## 1.0.134 — opt-in vocalized Gemara read-aloud toggle (review 9.6)
+New settings checkbox `ttsVocalizedGemara` (default off): when enabled, Bavli Daf/Amud Yomi and Yerushalmi read-aloud speak the already-vocalized Gemara text (Davidson / Guggenheimer) instead of the Steinsaltz or Pnei Moshe biur. Display is unchanged. Mishnah+Bartenura is unchanged. NPS1 punctuation (aligned to the biur) is not applied on the Gemara path. Speech routing only; DATA_VERSION unchanged. Independent review 9.6 (S1 9.7 S2 9.8 S3 9.7 S4 9.6 S5 9.7; 0 harmful). See verification/GEMARA-TOGGLE.md.
