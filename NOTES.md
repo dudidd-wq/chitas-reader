@@ -600,3 +600,6 @@ Exact-form addition-only tag on unstressed לְכוּלֵּיהּ in Bavli Gemar
 
 ## 1.0.137 — Steinsaltz speech niqqud batch 2: Tamid, Horayot, Makkot (review 9.7)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for תמיד, הוריות ומכות (88 pages): 4,173 / 52,904 bare tokens (1,498 forms, 7.89% yield). Display `v` unchanged. Same 1.0.135 method (denylist, `checkOniVavGuard`, inherited Taanit quarantine). Independent Gemini review 9.7 (S1 9.8 S2 9.7 S3 9.9 S4 9.8 S5 9.9; 650 tokens, harmful_error_count 0). See `verification/STEINSALTZ-BATCH2.md`.
+
+## 1.0.138 — Steinsaltz speech niqqud batch 3: Chagigah, Moed Katan, Megillah (review 9.8)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for חגיגה, מועד קטן ומגילה (167 pages): 7,018 / 91,135 bare tokens (2,191 forms, 7.7% yield). Display `v` unchanged. Same 1.0.135 method. Independent Gemini review 9.8 (S1–S5 9.8; 650 tokens, 1 non-harmful uncertain, harmful_error_count 0). See `verification/STEINSALTZ-BATCH3.md`.
