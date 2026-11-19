@@ -597,3 +597,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field (`gema
 
 ## 1.0.136 — context-based kula/millei stress, K1 only (review 9.8)
 Exact-form addition-only tag on unstressed לְכוּלֵּיהּ in Bavli Gemara speech (`tools/aram-kula.mjs`, hooked after ARAM-4). All other kula forms and all מִילֵּי rules remain OFF because the common contexts are mixed or fail Hebrew gates; no corpus data patch (live yield 0). Independent Gemini review 9.8 (S1 9.8 S2 9.9 S3 9.8 S4 9.8 S5 9.9; 560 tokens, harmful_error_count 0). See `verification/ARAM-KULA.md`.
+
+## 1.0.137 — Steinsaltz speech niqqud batch 2: Tamid, Horayot, Makkot (review 9.7)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for תמיד, הוריות ומכות (88 pages): 4,173 / 52,904 bare tokens (1,498 forms, 7.89% yield). Display `v` unchanged. Same 1.0.135 method (denylist, `checkOniVavGuard`, inherited Taanit quarantine). Independent Gemini review 9.7 (S1 9.8 S2 9.7 S3 9.9 S4 9.8 S5 9.9; 650 tokens, harmful_error_count 0). See `verification/STEINSALTZ-BATCH2.md`.
