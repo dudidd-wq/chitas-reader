@@ -78,3 +78,7 @@ Exact token identity does not establish sentence syntax in the commentary.
 ## Dicta Nakdan non-commercial output permission
 
 Speech niqqud in the Metzudat David ENGINE-COV-1B pilot is attributed to **Dicta - Israel Center for Text Analysis (Nakdan)**. Non-commercial use of Dicta output is permitted per Dudi's conversation with Dicta on 2026-11-17; chitas-reader is non-commercial. This permission supplements the underlying-text licence and does not grant commercial reuse. See `verification/DICTA-PERMISSION.md` for the reported evidence and scope. Existing Sefaria/Maryles/Steinsaltz and unknown-licence exclusions remain unchanged.
+
+## Steinsaltz biur vocalization permission (owner report)
+
+Per Dudi's owner report (2026-11-19 01:36 Israel time; not a written licence document inspected in the repo), vocalizing the Steinsaltz biur (`gemara/bsay/`, underlying text CC BY-NC, Koren – William Davidson Edition) with cached **Dicta - Israel Center for Text Analysis (Nakdan)** output (also non-commercial only per Dudi's 2026-11-17 owner report, `verification/DICTA-PERMISSION.md`) is permitted for this non-commercial app on the condition that a visible **"לשימוש לא מסחרי בלבד"** notice is displayed in the app UI (About `#noncommercial` and Sources row `ביאור שטיינזלץ לבבלי`). See `verification/STEINSALTZ-PERMISSION.md`.
