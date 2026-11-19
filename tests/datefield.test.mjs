@@ -2,7 +2,7 @@
 // all-Hebrew UI. It now shows and accepts dd/mm/yyyy regardless of locale, with the native calendar behind a button.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fmtDmy, parseDmy } from '../site/js/calendar.js';
+import { fmtDmy, parseDmy, formatDmyInput } from '../site/js/calendar.js';
 import { serve, launch, pageWith, CHROME } from './helpers.mjs';
 
 const skip = !CHROME && 'no Chrome';
@@ -16,6 +16,14 @@ test('dd/mm/yyyy formatting and parsing', () => {
   assert.equal(parseDmy('05/24/2026'), null, 'US order is rejected, not silently swapped');
   assert.equal(parseDmy('24/05/26'), null);
   assert.equal(parseDmy(''), null);
+  assert.equal(parseDmy('24052026'), '2026-05-24');
+  assert.equal(parseDmy('2026-05-24'), '2026-05-24', 'ISO is accepted (paste / native picker)');
+  assert.equal(formatDmyInput('24052026'), '24/05/2026');
+  assert.equal(formatDmyInput('24'), '24');
+  assert.equal(formatDmyInput('2405'), '24/05');
+  assert.equal(formatDmyInput('24/05/2026'), '24/05/2026');
+  assert.equal(formatDmyInput('2026-05-24'), '24/05/2026');
+  assert.equal(formatDmyInput('24.5.2026'), '24/05/2026');
 });
 
 for (const locale of ['en-US', 'he-IL']) {
@@ -31,7 +39,11 @@ for (const locale of ['en-US', 'he-IL']) {
       await p.fill('#datepick', '03/06/2026'); await p.press('#datepick', 'Enter');
       await p.waitForFunction(() => location.hash === '#/d/2026-06-03');
       await p.waitForFunction(() => document.querySelector('#datepick')?.value === '03/06/2026');
-      await p.fill('#datepick', '06/31/2026'); await p.press('#datepick', 'Enter');
+      await p.waitForTimeout(200);
+      await p.evaluate(() => { const t = document.querySelector('#datepick'); t.focus(); t.value = '06/31/2026'; t.dispatchEvent(new Event('input', { bubbles: true })); t.dispatchEvent(new Event('change', { bubbles: true })); });
+      await p.waitForFunction(() => document.querySelector('#datepick')?.value === '06/31/2026');
+      assert.equal(await p.inputValue('#datepick'), '06/31/2026');
+      await p.waitForFunction(() => document.querySelector('#datepick')?.getAttribute('aria-invalid') === 'true');
       assert.equal(await p.getAttribute('#datepick', 'aria-invalid'), 'true');
       assert.match(await p.textContent('#dateerr'), /יום\/חודש\/שנה/);
       assert.equal(await p.evaluate(() => location.hash), '#/d/2026-06-03');

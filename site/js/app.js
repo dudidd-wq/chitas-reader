@@ -1,6 +1,6 @@
 import { nps1Speech } from './bavli-nps1.js';
 import { CHOL } from './chol.js';
-import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, gregLongHe, hashPinsDate } from './calendar.js';
+import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, formatDmyInput, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } from './tefila.js';
@@ -17,8 +17,9 @@ import { hayomVocalizedHtml } from './hayomyom-display.js';
 import { CITIES, cityById, computeZmanim, fmtTime } from './zmanim.js';
 import { hebDateHe } from './calendar.js';
 import { renderKivun, stopKivun, COMPASS } from './kivun-ui.js';
-import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH } from './personal.js';
+import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH, HEB_MONTHS } from './personal.js';
 import { libNode, libDoc, FAMILIES } from './library.js';
+import { parseSapachText } from './sapach.js';
 import { renderLibrary, renderSearch, SEARCH_ICON, LIB_ICON } from './library-ui.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -224,7 +225,8 @@ function route() {
   libSeq++; // a pending library lookup is stale once the address changes
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
-  if (view !== 'r' && view !== 's' && view !== 'lib') closeReader();
+  const ptCh = view === 'tehillim' && /^\d{1,3}$/.test(a || '') ? +a : 0;
+  if (view !== 'r' && view !== 's' && view !== 'lib' && !(ptCh >= 1 && ptCh <= MAX_CHAPTER)) closeReader();
   stopKivun();
   autoPrefetch();
   if (view === 'r' && UNITS[a] && a !== 'siddur') { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
@@ -236,7 +238,11 @@ function route() {
   if (view === 'settings') return renderSettings();
   if (view === 'sources') return renderSources();
   if (view === 'about') return renderAbout();
-  if (view === 'tehillim') return renderPersonal(/^\d{1,3}$/.test(a || '') ? +a : 0);
+  if (view === 'tehillim') {
+    if (ptCh >= 1 && ptCh <= MAX_CHAPTER) return openPersonalChapter(ptCh);
+    closeReader();
+    return renderPersonal(0);
+  }
   if (view === 'zmanim') { if (/^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a; return renderZmanim(); }
   if (view === 'd' && /^\d{4}-\d\d-\d\d$/.test(a)) currentDate = a;
   renderHome();
@@ -298,8 +304,23 @@ function locationPanel(first) {
 }
 // Date field: typed as dd/mm/yyyy whatever the browser locale; the calendar button opens the native picker
 // (hidden input) and its choice is shown back in dd/mm/yyyy.
+/** Keep a dd/mm/yyyy field usable on a numeric mobile keyboard (no slash key): slashes are inserted as digits are typed. */
+function bindDmyInput(el) {
+  if (!el) return;
+  el.addEventListener('input', () => {
+    const start = el.selectionStart ?? el.value.length;
+    const digitsBefore = el.value.slice(0, start).replace(/\D/g, '').length;
+    const next = formatDmyInput(el.value);
+    if (next === el.value) return;
+    el.value = next;
+    let i = 0, seen = 0;
+    while (i < next.length && seen < digitsBefore) { if (/\d/.test(next[i])) seen++; i++; }
+    try { el.setSelectionRange(i, i); } catch { /* not all input types */ }
+  });
+}
 function bindDateField() {
   const t = $('#datepick'), n = $('#datenative'), err = $('#dateerr');
+  bindDmyInput(t);
   const go = () => {
     const iso = parseDmy(t.value);
     if (!iso) { t.setAttribute('aria-invalid', 'true'); err.innerHTML = 'תאריך בתבנית יום/חודש/שנה, למשל <bdi dir="ltr">24/05/2026</bdi>'; return; }
@@ -768,7 +789,7 @@ function renderSettings() {
     ${setCard('set-text', displayText())}
     ${setCard('set-tts', ttsForm())}
     ${setCard('set-siddur', siddurGroup())}
-    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
+    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
     ${setCard('set-backup', `<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
     <div class="set-actions"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
     <label class="btn" for="imp">ייבוא קובץ גיבוי</label><input type="file" id="imp" accept="application/json,.json" class="sr">
@@ -907,7 +928,8 @@ function renderAbout() {
     <li>החיפוש נעשה כולו במכשיר: האינדקס נבנה מראש מהטקסטים שבאתר, מחולק לפי ספר (כ־12 מגה־בייט בסך הכול, כ־4.3 מגה־בייט בהעברה דחוסה) ונטען רק כשמחפשים; אחרי חיפוש ראשון הוא נשמר במכשיר ועובד גם בלי רשת. <b>מה שמחפשים לא נשלח לשום מקום.</b></li></ul>
   <h2>תהילים אישי</h2><ul>
     <li>מנהג חב״ד לומר בכל יום את פרק התהילים של שנות החיים – מספר השנים שמלאו ועוד אחת – ולהתחיל פרק חדש ביום ההולדת העברי. הורים אומרים גם את פרקי ילדיהם.</li>
-    <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה או גיל), לראות את הפרק של היום המוצג ולקרוא אותו מנוקד; שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
+    <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה לועזי או עברי, או גיל), לראות את הפרק של היום ולקרוא אותו באותו קורא של התהילים הרגיל – אותם גופנים, ניקוד, עיצוב והקראה. שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
+    <li>אפשר גם להעלות תצלום של ספח תעודת זהות: הקריאה נעשית במכשיר בלבד, התמונה ומספרי הזהות אינם נשמרים, ורק אחרי בדיקה ועריכה נוספים השמות ותאריכי הלידה.</li>
     <li>השמות ותאריכי הלידה נשמרים במכשיר בלבד ולא נשלחים לשום מקום.</li></ul>
   <h2>זמני היום</h2><ul>
   <li>בעמוד <a href="#/zmanim/${currentDate}">זמני היום</a>: עלות השחר, משיכיר, הנץ, סוף זמן ק״ש ותפילה, חצות, מנחה גדולה וקטנה, פלג, שקיעה, צאת הכוכבים וחצות הלילה, ובערב שבת ויום טוב – הדלקת נרות וצאת השבת/החג. לכל זמן מצוינת השיטה; השורה הראשונה היא שיטת אדמו״ר הזקן כפי שמפרסם Chabad.org.</li>
@@ -992,7 +1014,16 @@ function personalTeaser() {
   return `<a class="zm-teaser pt-teaser" id="pt-teaser" href="#/tehillim"><span class="zt-h">תהילים אישי</span><span class="zt-next">${items}</span><span class="go">פתח</span></a>`;
 }
 let ptKind = 'date';
-async function renderPersonal(ch = 0) {
+async function openPersonalChapter(ch) {
+  const path = `tehillim/${ch}`;
+  const my = libSeq;
+  let r = null;
+  try { r = await libNode(path); } catch { /* offline, chapter not cached */ }
+  if (my !== libSeq) return;
+  if (!r?.node.leaf) { closeReader(); return renderPersonal(); }
+  return openReader('tehillim', currentDate, null, { path, info: r, personal: true });
+}
+function renderPersonal() {
   const iso = currentDate, plan = dayPlan(iso, { il: prefs.il }), ps = ptProfiles();
   document.title = `תהילים אישי – ${plan.hebDate} (${fmtDmy(iso)})`;
   const rb = rebbeChapter(iso);
@@ -1004,19 +1035,11 @@ async function renderPersonal(ch = 0) {
       ${facts.filter(Boolean).length ? `<small>${facts.filter(Boolean).join(' · ')}</small>` : ''}
       <button type="button" class="btn pt-del" data-del="${esc(p.id)}" aria-label="מחיקה – ${esc(p.name)}">מחיקה</button></li>`;
   };
-  let text = '';
-  if (ch >= 1 && ch <= MAX_CHAPTER) {
-    try {
-      const d = await data(`tehillim/${ch}.json`);
-      text = `<section class="pt-text" id="pt-text" aria-labelledby="pt-text-h"><h2 id="pt-text-h">תהילים פרק ${gem(ch)}</h2>
-        <div class="pt-verses" lang="he">${d.v.map((v, i) => `<p class="pt-v"><span class="pt-n" aria-hidden="true">${gem(i + 1)}</span> ${fmt(v, true)}</p>`).join('')}</div>
-        <p class="note">נוסח: <span id="pt-ver">כמו בתהילים היומי</span> – אותו נוסח של התהילים היומי באתר (<a href="#/sources">מקורות ורישיונות</a>). <a href="https://www.sefaria.org/Psalms.${ch}?lang=he" target="_blank" rel="noopener">הפרק בספריא</a></p></section>`;
-    } catch { text = '<p class="warn" role="alert">לא ניתן לטעון את הפרק (אין חיבור?). </p>'; }
-  }
+  const hebMonths = HEB_MONTHS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
   shell('תהילים אישי', `
   <p>מנהג חב״ד: בכל יום אומרים, נוסף על התהילים היומי, את הפרק המתאים לשנות החיים – <b>מספר השנים שמלאו ועוד אחת</b> (בן 13 אומר פרק יד; בשנה הראשונה – פרק א). הפרק החדש מתחיל ביום ההולדת העברי. הורים נוהגים לומר גם את הפרקים של ילדיהם. <a href="#/tehillim" id="pt-src-link">מקורות ומה לא אומת</a></p>
   <p class="pt-day">ליום: <b>${esc(plan.hebDate)}</b> · <bdi dir="ltr">${fmtDmy(iso)}</bdi>${iso === todayIso() ? '' : ` · <a href="#/d/${todayIso()}">חזרה להיום</a>`}</p>
-  <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח.</p>
+  <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח. תצלום ספח מעובד במכשיר בלבד; התמונה ומספרי הזהות אינם נשמרים.</p>
   <h2>הפרקים שלי</h2>
   ${ps.length ? `<ul class="pt-list">${ps.map(row).join('')}</ul>` : '<p id="pt-empty">עדיין לא נוספו אנשים. הוסיפו את עצמכם ואת בני המשפחה בטופס שלמטה.</p>'}
   <label class="check"><input type="checkbox" id="pt-rebbe" ${prefs.tehillimRebbe ? 'checked' : ''}>הצג גם את פרק הרבי (נולד י״א בניסן תרס״ב) – כיום <a href="#/tehillim/${rb.chapter}">פרק ${gem(rb.chapter)}</a></label>
@@ -1024,17 +1047,43 @@ async function renderPersonal(ch = 0) {
     <h2 id="pt-add-h">הוספת אדם</h2>
     <label class="field"><span>שם</span><input type="text" id="pt-name" maxlength="40" autocomplete="off" aria-required="true"></label>
     <fieldset><legend>לפי</legend><div class="seg-ctl" role="radiogroup">
-      <label><input type="radio" name="pt-kind" value="date" ${ptKind === 'date' ? 'checked' : ''}>תאריך לידה</label><label><input type="radio" name="pt-kind" value="age" ${ptKind === 'age' ? 'checked' : ''}>גיל</label></div></fieldset>
-    <div id="pt-date-f" ${ptKind === 'date' ? '' : 'hidden'}><label class="field"><span>תאריך לידה לועזי (יום/חודש/שנה)</span><input type="text" id="pt-greg" dir="ltr" inputmode="numeric" maxlength="10" placeholder="יי/חח/שששש" autocomplete="off"></label>
+      <label><input type="radio" name="pt-kind" value="date" ${ptKind === 'date' ? 'checked' : ''}>תאריך לועזי</label>
+      <label><input type="radio" name="pt-kind" value="hebrew" ${ptKind === 'hebrew' ? 'checked' : ''}>תאריך עברי</label>
+      <label><input type="radio" name="pt-kind" value="age" ${ptKind === 'age' ? 'checked' : ''}>גיל</label></div></fieldset>
+    <div id="pt-date-f" ${ptKind === 'date' ? '' : 'hidden'}><label class="field" for="pt-greg"><span>תאריך לידה לועזי (יום/חודש/שנה)</span></label>
+      <span class="datefield">
+        <input type="text" id="pt-greg" dir="ltr" inputmode="numeric" maxlength="10" placeholder="יי/חח/שששש" autocomplete="off" spellcheck="false" enterkeyhint="done">
+        <button type="button" class="btn icon" id="pt-cal" aria-label="פתיחת לוח שנה">${ICON.cal}</button>
+        <input type="date" id="pt-greg-native" tabindex="-1" aria-hidden="true">
+      </span>
+      <small>אפשר להקליד ספרות בלבד – הלוכסנים נוספים מאליהם – או לבחור בלוח.</small>
       <label class="check"><input type="checkbox" id="pt-sunset">נולד/ה אחרי השקיעה (התאריך העברי כבר התחלף)</label></div>
+    <div id="pt-heb-f" ${ptKind === 'hebrew' ? '' : 'hidden'}><div class="pt-heb">
+      <label class="field"><span>יום</span><input type="number" id="pt-hd" min="1" max="30" inputmode="numeric"></label>
+      <label class="field"><span>חודש</span><select id="pt-hm">${hebMonths}</select></label>
+      <label class="field"><span>שנה</span><input type="text" id="pt-hy" dir="ltr" inputmode="numeric" maxlength="4" placeholder="5773" autocomplete="off" spellcheck="false"></label>
+    </div></div>
     <div id="pt-age-f" ${ptKind === 'age' ? '' : 'hidden'}><label class="field"><span>גיל (שנים מלאות)</span><input type="number" id="pt-age" min="0" max="199" inputmode="numeric"></label>
       <small>בלי תאריך לידה הפרק אינו מתחלף לבד ביום ההולדת.</small></div>
     <p class="dateerr" id="pt-err" role="alert"></p>
     <button class="btn" type="submit" id="pt-add">הוספה</button>
   </form>
+  <section class="pt-sapach" aria-labelledby="pt-sapach-h">
+    <h2 id="pt-sapach-h">הוספה מתצלום ספח תעודת זהות</h2>
+    <p class="note pt-privacy">העיבוד נעשה במכשיר הזה בלבד. התמונה ומספרי הזהות אינם נשלחים ואינם נשמרים – רק השמות ותאריכי הלידה שתאשרו אחרי בדיקה. הקריאה מתצלום עלולה לטעות, לכן חובה לעבור על הרשימה.</p>
+    <input type="file" id="pt-sapach-file" accept="image/*" capture="environment" hidden>
+    <button type="button" class="btn" id="pt-sapach-btn">בחירת תצלום או צילום</button>
+    <p id="pt-sapach-st" class="note" aria-live="polite"></p>
+    <div id="pt-sapach-review" hidden>
+      <h3>בדקו ותקנו לפני ההוספה</h3>
+      <ul class="pt-review" id="pt-review-list"></ul>
+      <div class="pt-review-actions"><button type="button" class="btn primary" id="pt-review-add">הוספת המסומנים</button>
+      <button type="button" class="btn" id="pt-review-cancel">ביטול</button></div>
+    </div>
+  </section>
   <h2>פתיחת פרק</h2>
-  <div class="zm-place"><label for="pt-go-n">פרק (1–150)</label><input type="number" id="pt-go-n" min="1" max="150" inputmode="numeric" value="${ch || ''}"><button class="btn" type="button" id="pt-go">פתיחה</button></div>
-  ${text}
+  <p class="note">הפרק נפתח באותו קורא של התהילים הרגיל, עם אותם גופנים, ניקוד, עיצוב והקראה.</p>
+  <div class="zm-place"><label for="pt-go-n">פרק (1–150)</label><input type="number" id="pt-go-n" min="1" max="150" inputmode="numeric"><button class="btn" type="button" id="pt-go">פתיחה</button></div>
   <h2 id="pt-sources" tabindex="-1">מקורות ומה לא אומת</h2><ul class="pt-src">
   <li><b>אומת בשני מקורות לפחות:</b> אומרים את הפרק של השנה הנוכחית – מספר השנים שמלאו ועוד אחת (אגרות קודש אדמו״ר הריי״צ ח״י עמ׳ נג; ספר המנהגים עמ׳ 17 – כפי שהובאו ב<a href="https://www.chabad.org/library/article_cdo/aid/4779124/jewish/Saying-Psalms-According-to-Your-Loved-Ones-Age.htm" target="_blank" rel="noopener">Chabad.org</a> וב<a href="https://chabadpedia.co.il/index.php/%D7%AA%D7%94%D7%99%D7%9C%D7%99%D7%9D_%D7%94%D7%9E%D7%AA%D7%90%D7%99%D7%9D_%D7%9C%D7%A9%D7%A0%D7%95%D7%AA%D7%99%D7%95" target="_blank" rel="noopener">חב״דפדיה</a>).</li>
   <li><b>אומת:</b> הפרק החדש מתחיל ביום ההולדת, וביום ההולדת עצמו אומרים רק את החדש (חב״דפדיה; <a href="https://www.chabad.org/therebbe/article_cdo/aid/2539406/jewish/" target="_blank" rel="noopener">שיחת כ׳ מרחשוון תשמ״ב</a>). יום ההולדת הוא התאריך העברי.</li>
@@ -1044,29 +1093,104 @@ async function renderPersonal(ch = 0) {
   <li><b>לא מנהג גיל:</b> אמירת פסוקי פרק קיט לפי אותיות השם היא מנהג כללי (מובא בספרי תהילים בשם החיד״א) ואינה קשורה לגיל; לא מצאנו שהיא חלק ממנהג זה, ולכן היא אינה מוצגת כאן.</li>
   <li>זהו כלי עזר ואינו פסק הלכה.</li></ul>`);
   const f = $('#pt-form'), kind = () => f.querySelector('[name="pt-kind"]:checked').value;
-  f.addEventListener('change', e => { if (e.target.name === 'pt-kind') { ptKind = kind(); $('#pt-date-f').hidden = kind() !== 'date'; $('#pt-age-f').hidden = kind() !== 'age'; } });
+  const showKind = () => { const k = kind(); ptKind = k; $('#pt-date-f').hidden = k !== 'date'; $('#pt-heb-f').hidden = k !== 'hebrew'; $('#pt-age-f').hidden = k !== 'age'; };
+  f.addEventListener('change', e => { if (e.target.name === 'pt-kind') showKind(); });
+  bindDmyInput($('#pt-greg'));
+  $('#pt-cal')?.addEventListener('click', () => { const n = $('#pt-greg-native'); try { n.showPicker(); } catch { $('#pt-greg').focus(); $('#pt-greg').select(); } });
+  $('#pt-greg-native')?.addEventListener('change', () => { if ($('#pt-greg-native').value) $('#pt-greg').value = fmtDmy($('#pt-greg-native').value); });
   f.addEventListener('submit', () => {
     const err = $('#pt-err'), name = $('#pt-name').value.trim();
     if (!name) { err.textContent = 'יש לכתוב שם.'; $('#pt-name').focus(); return; }
     let p = { name };
-    if (kind() === 'date') { const g = parseDmy($('#pt-greg').value); if (!g) { err.textContent = 'תאריך לא תקין – יש לכתוב יום/חודש/שנה, למשל 21/05/2015.'; $('#pt-greg').focus(); return; } if (g > todayIso()) { err.textContent = 'תאריך הלידה בעתיד.'; return; } p = { name, greg: g, afterSunset: $('#pt-sunset').checked }; }
+    if (kind() === 'date') { const g = parseDmy($('#pt-greg').value); if (!g) { err.textContent = 'תאריך לא תקין – יש לכתוב יום/חודש/שנה, למשל 21/05/2015. אפשר להקליד ספרות בלבד.'; $('#pt-greg').focus(); return; } if (g > todayIso()) { err.textContent = 'תאריך הלידה בעתיד.'; return; } p = { name, greg: g, afterSunset: $('#pt-sunset').checked }; }
+    else if (kind() === 'hebrew') {
+      const hd = Math.floor(Number($('#pt-hd').value)), hm = Math.floor(Number($('#pt-hm').value)), hy = Math.floor(Number($('#pt-hy').value));
+      if (![hd, hm, hy].every(Number.isInteger) || hy <= 3000 || hy >= 7000 || hm < 1 || hm > 13 || hd < 1 || hd > 30) { err.textContent = 'תאריך עברי לא תקין – יום, חודש ושנה (למשל 21 אייר 5773).'; $('#pt-hd').focus(); return; }
+      try { if (isoDate(new HDate(hd, hm, hy)) > todayIso()) { err.textContent = 'תאריך הלידה בעתיד.'; return; } } catch { err.textContent = 'תאריך עברי לא תקין.'; return; }
+      p = { name, hy, hm, hd };
+    }
     else p = { name, age: $('#pt-age').value };
     const c = cleanProfile(p);
-    if (!c) { err.textContent = 'יש להזין גיל (0–199).'; $('#pt-age').focus(); return; }
-    setPref('tehillimProfiles', [...ps, c]); renderPersonal(ch); toast(`נוסף: ${c.name}`);
+    if (!c) { err.textContent = kind() === 'age' ? 'יש להזין גיל (0–199).' : 'תאריך לא תקין.'; (kind() === 'age' ? $('#pt-age') : $('#pt-greg'))?.focus(); return; }
+    setPref('tehillimProfiles', [...ps, c]); renderPersonal(); toast(`נוסף: ${c.name}`);
     $(`.pt-item[data-id="${CSS.escape(c.id)}"] a`)?.focus();
   });
   $('#view').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
     const p = ps.find(x => x.id === b.dataset.del);
-    if (p && confirm(`למחוק את ${p.name}?`)) { setPref('tehillimProfiles', ps.filter(x => x.id !== p.id)); renderPersonal(ch); toast('נמחק'); $('#pt-name')?.focus(); }
+    if (p && confirm(`למחוק את ${p.name}?`)) { setPref('tehillimProfiles', ps.filter(x => x.id !== p.id)); renderPersonal(); toast('נמחק'); $('#pt-name')?.focus(); }
   }));
   $('#pt-rebbe').onchange = e => setPref('tehillimRebbe', e.target.checked);
   const go = () => { const n = Math.floor(Number($('#pt-go-n').value)); if (n >= 1 && n <= MAX_CHAPTER) location.hash = `#/tehillim/${n}`; else toast('מספר פרק בין 1 ל־150'); };
   $('#pt-go').onclick = go; $('#pt-go-n').onkeydown = e => { if (e.key === 'Enter') go(); };
   $('#pt-src-link').onclick = e => { e.preventDefault(); const h = $('#pt-sources'); h.scrollIntoView({ block: 'start' }); h.focus(); };
-  data('sources.json').then(s => { const el = $('#pt-ver'); if (el && s.tanakh) el.textContent = s.tanakh.versionTitleInHebrew || s.tanakh.versionTitle; }).catch(() => {});
-  if (ch) $('#pt-text-h')?.scrollIntoView({ block: 'start' });
+  bindSapachUi();
 }
+function showPtReview(people) {
+  const box = $('#pt-sapach-review'), list = $('#pt-review-list');
+  if (!box || !list) return;
+  list.innerHTML = people.map((p, i) => `<li class="pt-rev-item" data-i="${i}">
+    <label class="check"><input type="checkbox" class="pt-rev-on" checked> להוסיף${p.roleHe ? ` <small>(${esc(p.roleHe)})</small>` : ''}</label>
+    <label class="field"><span>שם</span><input type="text" class="pt-rev-name" maxlength="40" value="${esc(p.name)}" autocomplete="off"></label>
+    <label class="field"><span>תאריך לידה (יום/חודש/שנה)</span>
+      <span class="datefield"><input type="text" class="pt-rev-greg" dir="ltr" inputmode="numeric" maxlength="10" placeholder="יי/חח/שששש" value="${esc(p.dateRaw || (p.greg ? fmtDmy(p.greg) : ''))}" autocomplete="off" spellcheck="false"></span>
+    </label>
+  </li>`).join('');
+  list.querySelectorAll('.pt-rev-greg').forEach(bindDmyInput);
+  box.hidden = false;
+  box.scrollIntoView({ block: 'nearest' });
+}
+function addReviewedPeople() {
+  const err = $('#pt-sapach-st'), existing = ptProfiles(), added = [];
+  const same = (a, b) => a.name === b.name && ((a.greg && a.greg === b.greg) || (a.hy && a.hy === b.hy && a.hm === b.hm && a.hd === b.hd));
+  for (const li of document.querySelectorAll('.pt-rev-item')) {
+    if (!li.querySelector('.pt-rev-on')?.checked) continue;
+    const name = li.querySelector('.pt-rev-name')?.value.trim();
+    const g = parseDmy(li.querySelector('.pt-rev-greg')?.value || '');
+    if (!name || !g) { if (err) err.textContent = 'יש לתקן את השם ואת התאריך בכל שורה מסומנת (יום/חודש/שנה).'; (name ? li.querySelector('.pt-rev-greg') : li.querySelector('.pt-rev-name'))?.focus(); return; }
+    if (g > todayIso()) { if (err) err.textContent = `תאריך הלידה של ${name} בעתיד.`; return; }
+    const c = cleanProfile({ name, greg: g });
+    if (!c) continue;
+    if (existing.concat(added).some(p => same(p, c))) continue;
+    added.push(c);
+  }
+  if (!added.length) { if (err) err.textContent = 'לא סומן אף אדם להוספה, או שכולם כבר ברשימה.'; return; }
+  setPref('tehillimProfiles', [...existing, ...added]);
+  renderPersonal();
+  toast(added.length === 1 ? `נוסף: ${added[0].name}` : `נוספו ${added.length} אנשים`);
+}
+function bindSapachUi() {
+  const btn = $('#pt-sapach-btn'), inp = $('#pt-sapach-file'), st = $('#pt-sapach-st');
+  if (!btn || !inp) return;
+  btn.addEventListener('click', () => inp.click());
+  inp.addEventListener('change', async () => {
+    const file = inp.files && inp.files[0];
+    inp.value = '';
+    const review = $('#pt-sapach-review');
+    if (review) review.hidden = true;
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { st.textContent = 'יש לבחור תצלום (תמונה).'; return; }
+    st.textContent = 'טוען את מנגנון הקריאה במכשיר (פעם ראשונה זה עשוי לקחת רגע)…';
+    const url = URL.createObjectURL(file);
+    try {
+      const { recognizeSapachImage } = await import('./sapach-ocr.js');
+      const text = await recognizeSapachImage(url, m => {
+        if (m?.status === 'recognizing text' && m.progress != null) st.textContent = `קורא את התצלום במכשיר… ${Math.round(m.progress * 100)}%`;
+        else if (m?.status === 'loading language traineddata' || m?.status === 'initializing tesseract') st.textContent = 'טוען את מודל העברית במכשיר…';
+      });
+      const { people } = parseSapachText(text);
+      if (!people.length) { st.textContent = 'לא זוהו שמות ותאריכי לידה. אפשר להוסיף ידנית בטופס למעלה, או לנסות תצלום חד וברור יותר.'; return; }
+      st.textContent = `זוהו ${people.length} אנשים. בדקו ותקנו לפני ההוספה. התמונה לא נשמרה.`;
+      showPtReview(people);
+    } catch (err) {
+      console.error('sapach-ocr', err && err.message ? err.message : err);
+      st.textContent = 'הקריאה במכשיר נכשלה. אפשר להוסיף ידנית, או לנסות תצלום חד יותר.';
+    } finally { URL.revokeObjectURL(url); }
+  });
+  $('#pt-review-add')?.addEventListener('click', addReviewedPeople);
+  $('#pt-review-cancel')?.addEventListener('click', () => { const r = $('#pt-sapach-review'); if (r) r.hidden = true; if (st) st.textContent = ''; });
+}
+document.addEventListener('chitas-pt-review', ev => { if (Array.isArray(ev.detail)) { showPtReview(ev.detail); const st = document.querySelector('#pt-sapach-st'); if (st) st.textContent = 'רשימה לבדיקה.'; } });
+
 /** Names (Hebrew) of the Rambam texts that are shown without niqqud, from sources.json. */
 function unvocalizedList(s) {
   const n = k => Locale.gettext(k, 'he-x-NoNikud');
@@ -1129,7 +1253,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   const auto = R.autoplay; R.autoplay = false;
   if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
-  R.doc = null; R.segs = []; R.ttsShown = false;
+  R.doc = null; R.segs = []; R.ttsShown = false; R.personal = !!lib?.personal;
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
@@ -1138,8 +1262,8 @@ async function openReader(unit, iso, sid = null, lib = null) {
   R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
   const lparent = R.libInfo?.crumbs.at(-1);
   const dayFocus = R.dayFocus; R.dayFocus = null;
-  const backHref = lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
-  const backLbl = lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
+  const backHref = R.personal ? '#/tehillim' : lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
+  const backLbl = R.personal ? 'חזרה לתהילים אישי' : lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
   el.innerHTML = `
   <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
   <button type="button" class="r-fab" id="b-fab" aria-label="ניווט" aria-expanded="false" aria-controls="rchrome">${ICON.fab}</button>
@@ -1198,7 +1322,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   if (R.unit !== unit || R.iso !== iso || R.sid !== sid || R.lib !== lpath) return;
   if (lpath) {
     $('#r-t').textContent = R.doc.title; $('#r-s').textContent = R.doc.subtitle;
-    document.title = `${R.doc.subtitle} – ספרייה`;
+    document.title = R.personal ? `${R.doc.subtitle} – תהילים אישי` : `${R.doc.subtitle} – ספרייה`;
     await renderDoc();
     const p = getProgress('lib', lpath);
     if (seek && seekSeg(seek)) { /* a search result or a shared link to a verse */ }
@@ -1242,14 +1366,22 @@ function dayNavHtml(pos) {
   </nav>`;
 }
 // Library: the previous / next chapter of the same book (across parts and books: Genesis 50 → Exodus 1)
+function libChapterHref(node) {
+  if (R.personal) {
+    const n = String(node?.id || '').split('/')[1];
+    return /^\d+$/.test(n || '') ? `#/tehillim/${n}` : '#/tehillim';
+  }
+  return node ? `#/lib/${node.id}` : '#/lib';
+}
 function libNavHtml(pos) {
   const { prev, next } = R.libInfo || {};
   return `<nav class="daynav libnav daynav-${pos}" aria-label="${pos === 'top' ? 'מעבר בין פרקים' : 'מעבר בין פרקים – סוף הפרק'}">
-    ${prev ? `<a class="btn" data-day="prev" href="#/lib/${prev.id}" aria-label="הקודם – ${esc(prev.label)}" aria-keyshortcuts="Shift+ArrowRight">${ICON.prev}<span>הקודם</span></a>` : ''}
-    ${next ? `<a class="btn" data-day="next" href="#/lib/${next.id}" aria-label="הבא – ${esc(next.label)}" aria-keyshortcuts="Shift+ArrowLeft"><span>הבא</span>${ICON.next}</a>` : ''}
+    ${prev ? `<a class="btn" data-day="prev" href="${libChapterHref(prev)}" aria-label="הקודם – ${esc(prev.label)}" aria-keyshortcuts="Shift+ArrowRight">${ICON.prev}<span>הקודם</span></a>` : ''}
+    ${next ? `<a class="btn" data-day="next" href="${libChapterHref(next)}" aria-label="הבא – ${esc(next.label)}" aria-keyshortcuts="Shift+ArrowLeft"><span>הבא</span>${ICON.next}</a>` : ''}
   </nav>`;
 }
 function libCrumbsHtml() {
+  if (R.personal) return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום"><a href="#/tehillim">תהילים אישי</a> <i aria-hidden="true">›</i> <span>${esc(R.libInfo?.node.label || R.doc?.subtitle || '')}</span></nav>`;
   const c = R.libInfo?.crumbs || [];
   return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום בספרייה"><a href="#/lib">ספרייה</a>${c.map(x => ` <i aria-hidden="true">›</i> <a href="#/lib/${x.id}">${esc(x.he)}</a>`).join('')}</nav>`;
 }
@@ -1292,7 +1424,7 @@ function fillLessonNav() {
   apply(prev, pL, 'prev'); apply(next, nL, 'next');
 }
 function goDay(which) {
-  if (R.lib) { const t = which === 'prev' ? R.libInfo?.prev : which === 'next' ? R.libInfo?.next : null; if (t) { R.dayFocus = which; location.hash = `#/lib/${t.id}`; } return; }
+  if (R.lib) { const t = which === 'prev' ? R.libInfo?.prev : which === 'next' ? R.libInfo?.next : null; if (t) { R.dayFocus = which; location.hash = libChapterHref(t); } return; }
   if (!R.unit || R.sid || !R.iso) return;
   R.dayFocus = which;
   location.hash = `#/r/${R.unit}/${which === 'today' ? todayIso() : shiftIso(R.iso, which === 'prev' ? -1 : 1)}`;
@@ -1477,7 +1609,7 @@ function nextUnit(autoplay) {
   // the end of a seder is the end of its last section
   if (R.sid && R.doc?.siddur) setProgress('siddur', `${R.sid.split('/')[0]}/${R.doc.siddur.secs.length}`, { done: true, frac: 1 });
   if (R.sid) { const nx = nextSid(); R.autoplay = !!nx && autoplay; location.hash = nx ? `#/s/${nx.book}/${nx.n}` : '#/siddur'; return; }
-  if (R.lib) { const nx = R.libInfo?.next; R.autoplay = !!nx && autoplay; location.hash = nx ? `#/lib/${nx.id}` : `#/lib/${R.libInfo?.crumbs.at(-1)?.id || ''}`; return; }
+  if (R.lib) { const nx = R.libInfo?.next; R.autoplay = !!nx && autoplay; location.hash = nx ? libChapterHref(nx) : (R.personal ? '#/tehillim' : `#/lib/${R.libInfo?.crumbs.at(-1)?.id || ''}`); return; }
   const n = nextUnitId();
   if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
   R.autoplay = autoplay;
@@ -1957,7 +2089,7 @@ function closeReader() {
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   $('#app').hidden = false;
   syncNav();
-  R.unit = null; R.sid = null; R.lib = null; R.libInfo = null; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
+  R.unit = null; R.sid = null; R.lib = null; R.libInfo = null; R.personal = false; R.doc = null; document.title = 'חת״ת ורמב״ם – קריאה יומית';
   if (R.wake) { R.wake.release().catch(() => {}); R.wake = null; }
   if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
 }

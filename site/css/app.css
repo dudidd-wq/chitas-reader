@@ -59,9 +59,10 @@ button, select, input { font: inherit; color: inherit; }
 .locq-btns .btn { min-height: 52px; font-weight: 600; font-size: 1.05rem; }
 .datebar { display: flex; align-items: center; justify-content: center; gap: .5rem; margin: .5rem 0 1.2rem; flex-wrap: wrap; }
 .datefield { position: relative; display: inline-flex; align-items: center; gap: .25rem; flex: 0 1 auto; min-width: 0; }
-.datefield #datepick { flex: 0 1 auto; min-width: 0; width: 7rem; text-align: center; font-variant-numeric: tabular-nums; }
-.datefield #datepick[aria-invalid="true"] { border-color: var(--err); }
-.datefield #datenative { position: absolute; inset-inline-start: 0; bottom: 0; width: 1px; height: 1px; min-height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
+.datefield input[type="text"], .datefield #datepick { flex: 0 1 auto; min-width: 0; width: 8rem; text-align: center; font-variant-numeric: tabular-nums; min-height: 44px; padding: .3rem .6rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
+.datefield #datepick { width: 7rem; }
+.datefield input[aria-invalid="true"], .datefield #datepick[aria-invalid="true"] { border-color: var(--err); }
+.datefield input[type="date"], .datefield #datenative { position: absolute; inset-inline-start: 0; bottom: 0; width: 1px; height: 1px; min-height: 0; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 .btn.icon { min-width: 44px; min-height: 44px; padding: 0; justify-content: center; }
 .btn.icon svg { width: 22px; height: 22px; }
 .dateerr { flex-basis: 100%; margin: 0; text-align: center; color: var(--err); font-size: .9rem; }
@@ -572,8 +573,19 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .pt-item a, .pt-src a, .pt-privacy a { overflow-wrap: anywhere; }
 .pt-bd { font-weight: bold; }
 .pt-form fieldset { border: 0; padding: 0; margin: .4em 0; }
-.pt-form input[type=text], .pt-form input[type=number], #pt-go-n { min-height: 44px; font-size: 1em; max-width: 100%; }
+.pt-form input[type=text], .pt-form input[type=number], .pt-form select, #pt-go-n { min-height: 44px; font-size: 1em; max-width: 100%; }
 #pt-go-n { width: 6em; }
+.pt-form .datefield { display: flex; max-width: 20rem; }
+.pt-heb { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: end; }
+.pt-heb .field { display: grid; gap: .2rem; }
+.pt-heb input, .pt-heb select { min-height: 44px; padding: .3rem .6rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
+.pt-heb #pt-hd { width: 4.5rem; } .pt-heb #pt-hy { width: 6rem; }
+.pt-sapach { margin: 1.4em 0; padding: 1em; border: 1px solid var(--rule); border-radius: 16px; background: var(--card); }
+.pt-sapach h2, .pt-sapach h3 { margin: 0 0 .4em; }
+.pt-review { list-style: none; padding: 0; margin: .6em 0; }
+.pt-rev-item { display: grid; gap: .35em; padding: .7em 0; border-bottom: 1px solid var(--line, #ccc6); }
+.pt-review-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6em; }
+#pt-sapach-st:empty { display: none; }
 .pt-teaser .zt-next { display: flex; flex-wrap: wrap; gap: .2em .8em; }
 .pt-chip { white-space: nowrap; }
 .pt-verses { line-height: var(--lh, 1.9); font-size: var(--size, 1.2em); }

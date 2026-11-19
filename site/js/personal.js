@@ -72,3 +72,10 @@ export function cleanProfile(p) {
   else return null;
   return out;
 }
+
+/** Hebrew months in calendar order, using Hebcal numbers (Nisan=1 … Adar I=12, Adar II=13). */
+export const HEB_MONTHS = [
+  [7, 'תשרי'], [8, 'חשוון'], [9, 'כסלו'], [10, 'טבת'], [11, 'שבט'],
+  [12, 'אדר / אדר א׳'], [13, 'אדר ב׳'],
+  [1, 'ניסן'], [2, 'אייר'], [3, 'סיוון'], [4, 'תמוז'], [5, 'אב'], [6, 'אלול'],
+];

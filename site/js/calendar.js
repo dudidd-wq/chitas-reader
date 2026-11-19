@@ -21,12 +21,34 @@ export function toHDate(date) {
 // Day/month/year as used in Israel, independent of the browser locale (the native date field follows the OS locale,
 // e.g. mm/dd/yyyy on an English system).
 export function fmtDmy(iso) { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; }
-// Accepts d/m/yyyy with '/', '.' or '-' separators; returns an ISO date or null for an impossible date.
+// Accepts d/m/yyyy with '/', '.' or '-' separators, an 8-digit ddmmyyyy string, or ISO yyyy-mm-dd.
+// Returns an ISO date or null for an impossible date. US order (mm/dd) is not swapped.
 export function parseDmy(str) {
-  const m = String(str).trim().match(/^(\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{4})$/); if (!m) return null;
-  const [d, mo, y] = [+m[1], +m[2], +m[3]], g = new Date(Date.UTC(y, mo - 1, d));
+  const s = String(str).trim();
+  if (!s) return null;
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (iso) return ymd(+iso[1], +iso[2], +iso[3]);
+  if (/^\d{8}$/.test(s) || (/^\d{8}$/.test(s.replace(/\D/g, '')) && !/[\/.\-]/.test(s))) {
+    const d = s.replace(/\D/g, '');
+    return ymd(+d.slice(4), +d.slice(2, 4), +d.slice(0, 2));
+  }
+  const m = s.match(/^(\d{1,2})\s*[\/.\-]\s*(\d{1,2})\s*[\/.\-]\s*(\d{4})$/); if (!m) return null;
+  return ymd(+m[3], +m[2], +m[1]);
+}
+function ymd(y, mo, d) {
+  const g = new Date(Date.UTC(y, mo - 1, d));
   if (g.getUTCFullYear() !== y || g.getUTCMonth() !== mo - 1 || g.getUTCDate() !== d) return null;
   return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+/** As-you-type display: digits become dd/mm/yyyy. A complete pasted date (ISO or d.m.yyyy) is normalised. */
+export function formatDmyInput(raw) {
+  const s = String(raw ?? '');
+  const done = parseDmy(s.trim());
+  if (done) return fmtDmy(done);
+  const digits = s.replace(/\D/g, '').slice(0, 8);
+  if (digits.length > 4) return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  if (digits.length > 2) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return digits;
 }
 export function isoDate(hd) {
   const g = hd.greg();

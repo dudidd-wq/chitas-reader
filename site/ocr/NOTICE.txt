@@ -1,0 +1,19 @@
+On-device OCR for the personal-Tehillim ID-appendix feature (ספח תעודת זהות).
+These files are loaded only when the reader opens that feature. They are never
+precached in the app shell. Images are processed in the browser and are not
+uploaded.
+
+Vendored as of 2026-11-19:
+
+- tesseract.js 5.1.1 (Apache-2.0) – tesseract.esm.min.js, worker.min.js
+  https://github.com/naptha/tesseract.js
+  License: LICENSE-tesseract-js.md
+- tesseract.js-core 5.1.1 (Apache-2.0) – tesseract-core*.wasm.js
+  https://github.com/naptha/tesseract.js-core
+  License: LICENSE-tesseract-core.txt
+- tesstrain / tessdata_fast Hebrew model heb.traineddata (Apache-2.0)
+  https://github.com/tesseract-ocr/tessdata_fast
+  License: LICENSE-tessdata.txt
+
+Tesseract and the traineddata are also Apache-2.0
+(https://github.com/tesseract-ocr/tesseract).

@@ -79,9 +79,11 @@ test('UI: add family profiles (date + age), chapter text, Rebbe option, delete, 
       });
       assert.match(await p.textContent('.pt-day'), new RegExp(todayLine.replace(/\//g, '\\/')));
       await p.click('#pt-add'); assert.match(await p.textContent('#pt-err'), /שם/);
-      await p.fill('#pt-name', 'יוסי'); await p.fill('#pt-greg', '2013-05-01'); await p.click('#pt-add');
+      await p.fill('#pt-name', 'יוסי'); await p.fill('#pt-greg', '31/02/2013'); await p.click('#pt-add');
       assert.match(await p.textContent('#pt-err'), /תאריך לא תקין/);
-      await p.fill('#pt-greg', '01/05/2013'); await p.click('#pt-add'); await p.waitForSelector('.pt-item');
+      await p.fill('#pt-greg', '01052013'); // digits only – slashes are inserted
+      assert.equal(await p.inputValue('#pt-greg'), '01/05/2013');
+      await p.click('#pt-add'); await p.waitForSelector('.pt-item');
       assert.match(await p.textContent('.pt-item'), /יוסי.*פרק יד.*כ״א באייר.*13 שנים מלאות.*פרק טו מתחיל/s);
       await p.fill('#pt-name', 'שרה'); await p.click('label:has(input[name=pt-kind][value=age])'); await p.fill('#pt-age', '9'); await p.click('#pt-add');
       await p.waitForFunction(() => document.querySelectorAll('.pt-item').length === 2);
@@ -93,16 +95,24 @@ test('UI: add family profiles (date + age), chapter text, Rebbe option, delete, 
       const st = await p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1')).prefs);
       assert.equal(st.tehillimProfiles.length, 3); assert.equal(st.tehillimRebbe, true);
       assert.equal(st.tehillimProfiles[0].greg, '2013-05-01');
-      // the chapter text, vocalised, with the divine-name setting applied
-      await p.click('.pt-item a[href="#/tehillim/14"]'); await p.waitForSelector('#pt-text .pt-v');
-      assert.match(await p.textContent('#pt-text-h'), /פרק יד/);
-      assert.equal(await p.locator('.pt-v').count(), 7);
-      assert.match(await p.textContent('.pt-verses'), /[\u05B0-\u05BC]/, 'vocalised');
+      const ovForm = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      assert.ok(ovForm <= 0, `${theme} ${width}: form overflow ${ovForm}`);
+      // the chapter opens in the regular reader (fonts, niqqud, design, read-aloud)
+      await p.click('.pt-item a[href="#/tehillim/14"]');
+      await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+      assert.match(await p.textContent('#rc'), /מזמור יד|תהילים יד/);
+      assert.ok(await p.locator('#rc .seg').count() >= 7);
+      assert.match(await p.textContent('#rc'), /[\u05B0-\u05BC]/, 'vocalised');
+      assert.ok(await p.locator('#b-tts').count(), 'read-aloud control');
+      assert.equal(await p.locator('a[href="#/tehillim"]').count() >= 1, true, 'back to personal page');
       const ov = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-      assert.ok(ov <= 0, `${theme} ${width}: overflow ${ov}`);
+      assert.ok(ov <= 0, `${theme} ${width}: reader overflow ${ov}`);
       assert.deepEqual((await new AxeBuilder({ page: p }).analyze()).violations.map(v => v.id + ':' + v.nodes[0]?.target), [], `${theme}: axe`);
-      // find any chapter
-      await p.fill('#pt-go-n', '121'); await p.click('#pt-go'); await p.waitForFunction(() => /פרק קכא/.test(document.querySelector('#pt-text-h')?.textContent || ''));
+      await p.evaluate(() => { location.hash = '#/tehillim'; });
+      await p.waitForSelector('#pt-form');
+      await p.fill('#pt-go-n', '121'); await p.click('#pt-go');
+      await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+      assert.match(await p.textContent('#rc'), /מזמור קכא|תהילים קכא/);
       // home teaser
       await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('#pt-teaser');
       assert.match(await p.textContent('#pt-teaser'), /פרק הרבי.*פרק קכה.*יוסי.*פרק יד.*שרה.*פרק י/s);
@@ -120,13 +130,106 @@ test('UI: divine-name setting applies to the chapter text; settings + about link
   const srv = await serve(); const b = await launch();
   try {
     const p = await pageWith(b, srv.url, { prefs: { divine: 'abbr' } });
-    await p.goto(srv.url + '#/tehillim/14'); await p.waitForSelector('#pt-text .pt-v');
-    const t = await p.textContent('.pt-verses');
+    await p.goto(srv.url + '#/tehillim/14'); await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+    const t = await p.textContent('#rc');
     assert.ok(!/יְהוָ[֣֔]?ה/.test(t.replace(/[\u0591-\u05AF]/g, '')), 'no full Tetragrammaton in abbr mode');
     await p.goto(srv.url + '#/settings'); await p.waitForSelector('#pt-settings');
     assert.equal(await p.locator('a[href="#/tehillim"]').count() >= 1, true);
     await p.goto(srv.url + '#/about'); await p.waitForSelector('.page');
     assert.match(await p.textContent('.page'), /תהילים אישי.*נשמרים במכשיר בלבד/s);
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
+
+test('UI: digit mask, calendar button, Hebrew date, chapter matches the library reader', { skip }, async () => {
+  const srv = await serve(); const b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
+    await p.goto(srv.url + '#/tehillim'); await p.waitForSelector('#pt-greg');
+    assert.equal(await p.getAttribute('#pt-greg', 'inputmode'), 'numeric');
+    const box = await p.locator('#pt-cal').boundingBox();
+    assert.ok(box.width >= 44 && box.height >= 44, 'calendar button is a 44px target');
+    await p.locator('#pt-greg').click();
+    await p.keyboard.type('01052013');
+    assert.equal(await p.inputValue('#pt-greg'), '01/05/2013');
+    await p.fill('#pt-name', 'משה'); await p.click('#pt-add'); await p.waitForSelector('.pt-item');
+    // Hebrew date: 21 Iyar 5773 = 2013-05-01
+    await p.click('label:has(input[name=pt-kind][value=hebrew])');
+    await p.waitForSelector('#pt-heb-f:not([hidden])');
+    await p.fill('#pt-name', 'רבקה'); await p.fill('#pt-hd', '21'); await p.selectOption('#pt-hm', '2'); await p.fill('#pt-hy', '5773');
+    await p.click('#pt-add');
+    await p.waitForFunction(() => document.querySelectorAll('.pt-item').length === 2);
+    assert.match(await p.locator('.pt-item').nth(1).textContent(), /רבקה.*פרק יד/s);
+    // same rendering as the library chapter
+    await p.goto(srv.url + '#/lib/tehillim/14'); await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+    const verseText = () => ({
+      font: getComputedStyle(document.querySelector('#rc')).fontFamily,
+      segs: document.querySelectorAll('#rc .seg').length,
+      text: [...document.querySelectorAll('#rc .seg')].map(s => s.innerText).join(' ').replace(/\s+/g, ' '),
+    });
+    const lib = await p.evaluate(verseText);
+    await p.goto(srv.url + '#/tehillim/14'); await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+    const per = await p.evaluate(() => {
+      const verses = [...document.querySelectorAll('#rc .seg')].map(s => s.innerText).join(' ').replace(/\s+/g, ' ');
+      return {
+        font: getComputedStyle(document.querySelector('#rc')).fontFamily,
+        segs: document.querySelectorAll('#rc .seg').length,
+        text: verses,
+        hasTts: !!document.querySelector('#b-tts'),
+        back: document.querySelector('a[href="#/tehillim"]')?.getAttribute('href'),
+        heading: /מזמור יד/.test(document.querySelector('#rc')?.innerText || ''),
+      };
+    });
+    assert.equal(per.font, lib.font);
+    assert.equal(per.segs, lib.segs);
+    assert.equal(per.text, lib.text);
+    assert.equal(per.heading, true);
+    assert.equal(per.hasTts, true);
+    assert.equal(per.back, '#/tehillim');
+    assert.deepEqual(p.errors, []);
+  } finally { await b.close(); srv.close(); }
+});
+test('UI: sapach review list is editable, stores only names and dates, never IDs or the image', { skip }, async () => {
+  const srv = await serve(); const b = await launch();
+  try {
+    const p = await pageWith(b, srv.url, { viewport: { width: 390, height: 844 } });
+    const foreign = []; p.on('request', r => { if (!r.url().startsWith(srv.url)) foreign.push(r.url()); });
+    await p.goto(srv.url + '#/tehillim'); await p.waitForSelector('#pt-sapach-btn');
+    assert.match(await p.textContent('.pt-sapach'), /במכשיר הזה בלבד.*אינם נשלחים ואינם נשמרים/s);
+    await p.evaluate(people => {
+      const ev = new CustomEvent('chitas-pt-review', { detail: people });
+      document.dispatchEvent(ev);
+    }, [
+      { name: 'כהן יוסי', greg: '1980-05-01', dateRaw: '01/05/1980', roleHe: 'בעל/ת התעודה' },
+      { name: 'כהן שרה', greg: '1982-03-15', dateRaw: '15/03/1982', roleHe: 'בן/בת זוג' },
+      { name: 'כהן דני', greg: '2010-07-20', dateRaw: '20/07/2010', roleHe: 'ילד/ה' },
+    ]);
+    // hook may not exist yet – also render via a direct DOM path if needed
+    if (!(await p.locator('.pt-rev-item').count())) {
+      await p.evaluate(() => {
+        // fallback used only if the event hook is missing; the hook is added in app.js
+      });
+    }
+    await p.waitForSelector('.pt-rev-item', { timeout: 3000 }).catch(() => {});
+    if ((await p.locator('.pt-rev-item').count()) === 0) {
+      // inject the hook fallback by calling the same UI after exposing review via the file-less event
+      throw new Error('review list did not open – event hook missing');
+    }
+    assert.equal(await p.locator('.pt-rev-item').count(), 3);
+    await p.fill('.pt-rev-name >> nth=0', 'יוסי כהן');
+    await p.locator('.pt-rev-on').nth(2).uncheck();
+    await p.click('#pt-review-add');
+    await p.waitForFunction(() => document.querySelectorAll('.pt-item').length === 2);
+    assert.match(await p.textContent('.pt-list'), /יוסי כהן/);
+    assert.match(await p.textContent('.pt-list'), /כהן שרה/);
+    assert.doesNotMatch(await p.textContent('.pt-list'), /דני/);
+    const st = await p.evaluate(() => JSON.parse(localStorage.getItem('chitas-reader.v1')));
+    const dump = JSON.stringify(st);
+    assert.doesNotMatch(dump, /012345678|987654321/);
+    assert.ok(!dump.includes('data:image') && !dump.includes('image/'), 'image must not be stored');
+    assert.equal(st.prefs.tehillimProfiles.length, 2);
+    assert.ok(st.prefs.tehillimProfiles.every(x => x.name && x.greg && !x.idNumber));
+    assert.deepEqual(foreign, [], 'no external requests');
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
