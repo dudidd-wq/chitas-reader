@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { letters, nuclei, stressKey, stressFromAccents, markShvaNa, HATAMA, VSHVA, NACH } from '../site/js/g2p.js';
 import { aramLexText } from './aram-lexicon.mjs';
+import { aramKulaText } from './aram-kula.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 export const CONFIG = JSON.parse(fs.readFileSync(ROOT + 'tools/data/aramaic-speech.json', 'utf8'));
@@ -206,5 +207,8 @@ export function aramSayText(say, mode = 'gemara', { mishnah = false, source = mo
   // ARAM-4: the exact-form stress lexicon, addition only, on for the Bavli Gemara only (tools/data/aram-lexicon.json).
   // Runs after the rules above; a Mishnah segment never reaches here; the lexicon scans the whole string itself and
   // fails closed on any uncertain quotation / bracket structure.
-  return mode === 'gemara' && source ? aramLexText(out, { source, stats }) : out;
+  // Stage 8 (kula/millei): exact K1 (לְכוּלֵּיהּ, final) only, addition-only, Bavli non-Mishnah. All millei rules OFF.
+  const exact = mode === 'gemara' && source ? aramLexText(out, { source, stats }) : out;
+  return mode === 'gemara' && source === 'bavli'
+    ? aramKulaText(exact, { source, mishnah, stats }) : exact;
 }

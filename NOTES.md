@@ -594,3 +594,6 @@ New settings checkbox `ttsVocalizedGemara` (default off): when enabled, Bavli Da
 
 ## 1.0.135 — Steinsaltz Taanit speech niqqud pilot (review 9.6)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field (`gemara/bsay/Taanit` only, 59 pages): 2,223 / 29,099 bare tokens (1,022 forms, 7.64% yield). Display `v` unchanged. `סבוני` in 13b left bare; `ורשאי`/`האמיתי` quarantined. Visible in-app notice «לשימוש לא מסחרי בלבד» on About `#noncommercial` and the Sources row for ביאור שטיינזלץ לבבלי. Independent Claude review 9.6 (S1 9.7 S2 9.7 S3 9.6 S4 9.7 S5 9.6; harmful_error_count 0). See `verification/STEINSALTZ-PERMISSION.md` and `verification/STEINSALTZ-TAANIT.md`.
+
+## 1.0.136 — context-based kula/millei stress, K1 only (review 9.8)
+Exact-form addition-only tag on unstressed לְכוּלֵּיהּ in Bavli Gemara speech (`tools/aram-kula.mjs`, hooked after ARAM-4). All other kula forms and all מִילֵּי rules remain OFF because the common contexts are mixed or fail Hebrew gates; no corpus data patch (live yield 0). Independent Gemini review 9.8 (S1 9.8 S2 9.9 S3 9.8 S4 9.8 S5 9.9; 560 tokens, harmful_error_count 0). See `verification/ARAM-KULA.md`.
