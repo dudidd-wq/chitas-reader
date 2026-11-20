@@ -611,3 +611,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for כ
 
 ## 1.0.141 — Steinsaltz speech niqqud batch 5: Beitzah and Shevuot (review 9.9)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ביצה ושבועות (174 pages): 4,886 / 71,283 bare tokens (1,559 forms, 6.85% yield). Display `v` unchanged. Fix round 1 left the homographs `שיכפרו` and `שירשו` bare. Independent Gemini review of the fix: 9.9 (S1 10.0, S2–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH5.md`.
+
+## 1.0.142 — Steinsaltz speech niqqud batch 6: Sotah and Sukkah (review 9.9)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for סוטה וסוכה (206 pages): 3,758 / 50,673 bare tokens (1,459 forms, 7.42% yield). Display `v` unchanged. Fix round 1 left the homographs `תרגם` and `שהזהירה` bare. Independent Gemini review of the fix: 9.9 (S1 10.0, S2–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH6.md`.
