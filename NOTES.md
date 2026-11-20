@@ -631,3 +631,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ג
 
 ## 1.0.150 — Steinsaltz speech niqqud batch 13: Nedarim (review 9.8)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for נדרים (180 pages, 179 changed): 3,608 / 53,218 bare tokens (1,224 forms, 6.78% yield). Display `v` unchanged. No new denylist stem; earlier gates including `השליחות`, `המלכות`, exact-only `סדרו`, `לתיתה`, exact-only `ושרוף`, `סמנים`, `לנוד` and exact-only `רוקם` were kept. Independent Gemini review: 9.8 (S1 9.9, S2 9.8, S3 9.9, S4 9.8, S5 9.9; harmful_error_count 0). No new ARAM-4 ole was needed. See `verification/STEINSALTZ-BATCH13.md`.
+
+## 1.0.151 — Steinsaltz speech niqqud batch 14: Eruvin (review 9.8)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for עירובין (207 pages, 152 changed): 5,413 / 77,166 bare tokens (1,531 forms, 7.01% yield). Display `v` unchanged. No new denylist stem; earlier gates including `השליחות`, `המלכות`, exact-only `סדרו`, `לתיתה`, exact-only `ושרוף`, `סמנים`, `לנוד` and exact-only `רוקם` were kept. Independent Gemini review: 9.8 (S1 10.0, S2 10.0, S3 9.8, S4 9.8, S5 10.0; harmful_error_count 0). Sixteen already-present ARAM-4 ole rows were recorded (tokens 6,779 → 6,798). See `verification/STEINSALTZ-BATCH14.md`.
