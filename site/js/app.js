@@ -791,7 +791,7 @@ function renderSettings() {
     ${setCard('set-text', displayText())}
     ${setCard('set-tts', ttsForm())}
     ${setCard('set-siddur', siddurGroup())}
-    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
+    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
     ${setCard('set-backup', `<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
     <div class="set-actions"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
     <label class="btn" for="imp">ייבוא קובץ גיבוי</label><input type="file" id="imp" accept="application/json,.json" class="sr">
@@ -874,6 +874,7 @@ async function renderSources() {
     <li>כללי המרת הניקוד להגייה: עיבוד ל־JavaScript של <a href="https://github.com/thewh1teagle/phonikud" target="_blank" rel="noopener">Phonikud</a> (thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>), בשינויים: הטעמה לפי טעמי המקרא ומודל סיומות, שווא נע וקמץ קטן. מוסכמת הפונמות לפי <a href="https://renikud.github.io" target="_blank" rel="noopener">renikud</a>.</li>
     <li>מנוע ההרצה: <a href="https://github.com/microsoft/onnxruntime" target="_blank" rel="noopener">ONNX Runtime Web</a> 1.31.1 (Microsoft, רישיון MIT). לא נעשה שימוש בקוד Piper (GPL).</li>
     <li>נוסח הרישיונות וההודעות: <a href="voice/NOTICE.txt">voice/NOTICE.txt</a>, <a href="voice/ort/LICENSE">voice/ort/LICENSE</a>, <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</li></ul>
+  <h2 id="sapach-src">קריאת ספח תעודת זהות</h2><p>תצלום או קובץ (תמונה או PDF) מעובדים במכשיר בלבד, ואינם מועלים לשום שרת. זיהוי הטקסט מתמונה: <a href="https://github.com/naptha/tesseract.js" target="_blank" rel="noopener">Tesseract.js</a> ומודל עברית של tessdata_fast (Apache-2.0), נטענים רק בשימוש בתכונה; ראו <a href="ocr/NOTICE.txt">ocr/NOTICE.txt</a>. קריאת קובץ PDF: <a href="https://github.com/mozilla/pdf.js" target="_blank" rel="noopener">PDF.js</a> 6.5.438 מאת Mozilla Foundation (Apache-2.0), נטען רק בבחירת PDF; ראו <a href="vendor/pdfjs/NOTICE.txt">vendor/pdfjs/NOTICE.txt</a> ו<a href="vendor/pdfjs/LICENSE">vendor/pdfjs/LICENSE</a>. גם <a href="THIRD-PARTY-NOTICES.txt">THIRD-PARTY-NOTICES.txt</a>.</p>
   <h2>גופנים</h2><p>Noto Serif Hebrew (ברירת מחדל; כולל טעמי מקרא), Frank Ruhl Libre, Ezra SIL – כולם ברישיון SIL Open Font License 1.1 (<a href="fonts/licenses/NotoSerifHebrew-OFL.txt">נוטו</a>, <a href="fonts/licenses/FrankRuhlLibre-OFL.txt">פרנק־רוהל</a>, <a href="fonts/licenses/EzraSIL-OFL.txt">עזרא</a>). בגופני פרנק ועזרא טעמי המקרא מוסתרים, כי בגופנים האלה אין גליפים לטעמים.</p>
   <p>טעמי אשכנז (Taamey Ashkenaz) מאת Yoram Gnat, ‏© 2012–2014, מ<a href="https://culmus.sourceforge.net/" target="_blank" rel="noopener">פרויקט Culmus</a>: הגופן המקורי ללא שינוי בצורות האותיות, במשקלים Medium ו־Bold, כולל ניקוד וטעמי מקרא. אריזה ל־WOFF2 בלבד. רישיון <a href="fonts/GPL-2.0.txt" dir="ltr">GPLv2</a> עם <a href="fonts/TaameyAshkenaz-LICENSE.txt">חריגת הטמעת גופן</a>. <a href="https://culmus.sourceforge.net/taamim/index.html" target="_blank" rel="noopener">המקור וקובצי הגופן</a>. סימני §, ¯, – , — ו־… מוצגים בנוטו כגופן גיבוי; האותיות, הניקוד והטעמים בטעמי אשכנז.</p>
   <h3 id="sbl-font-src">SBL Hebrew</h3><p>עיצוב: John Hudson / Tiro Typeworks, עבור Society of Biblical Literature (SBL). קובץ TrueType מקורי ללא שינוי, ללא חיתוך או המרה. © John Hudson / Tiro Typeworks; SBL Hebrew הוא סימן מסחר של SBL. <a href="https://www.sbl-site.org/resources/fonts/" target="_blank" rel="noopener">מקור רשמי</a> · <a href="fonts/SBL_Font_End_User_License_Agreement.pdf" target="_blank" rel="noopener">רישיון SBL המקורי</a> · <a href="fonts/SBL-LICENSE.txt" target="_blank" rel="noopener">זכויות ורישיון הקובץ</a>. חינם לשימוש לא מסחרי בלבד, ואינו כלול ברישיון קוד האפליקציה. קיים משקל רגיל בלבד; ההדגשה וההטיה באפליקציה מלאכותיות. הגופן נשמר לשימוש ללא רשת לאחר בחירה בו.</p>
@@ -930,7 +931,7 @@ function renderAbout() {
   <h2>תהילים אישי</h2><ul>
     <li>מנהג חב״ד לומר בכל יום את פרק התהילים של שנות החיים – מספר השנים שמלאו ועוד אחת – ולהתחיל פרק חדש ביום ההולדת העברי. הורים אומרים גם את פרקי ילדיהם.</li>
     <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה לועזי או עברי, או גיל), לראות את הפרק של היום ולקרוא אותו באותו קורא של התהילים הרגיל – אותם גופנים, ניקוד, עיצוב והקראה. שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
-    <li>אפשר גם להעלות תצלום של ספח תעודת זהות: הקריאה נעשית במכשיר בלבד, התמונה ומספרי הזהות אינם נשמרים, ורק אחרי בדיקה ועריכה נוספים השמות ותאריכי הלידה.</li>
+    <li>אפשר גם לצלם או לטעון קובץ (תמונה או PDF) של ספח תעודת זהות: הקריאה נעשית במכשיר בלבד, התמונה, הקובץ ומספרי הזהות אינם נשמרים, ורק אחרי בדיקה ועריכה נוספים השמות ותאריכי הלידה.</li>
     <li>השמות ותאריכי הלידה נשמרים במכשיר בלבד ולא נשלחים לשום מקום.</li></ul>
   <h2>זמני היום</h2><ul>
   <li>בעמוד <a href="#/zmanim/${currentDate}">זמני היום</a>: עלות השחר, משיכיר, הנץ, סוף זמן ק״ש ותפילה, חצות, מנחה גדולה וקטנה, פלג, שקיעה, צאת הכוכבים וחצות הלילה, ובערב שבת ויום טוב – הדלקת נרות וצאת השבת/החג. לכל זמן מצוינת השיטה; השורה הראשונה היא שיטת אדמו״ר הזקן כפי שמפרסם Chabad.org.</li>
@@ -1040,7 +1041,7 @@ function renderPersonal() {
   shell('תהילים אישי', `
   <p>מנהג חב״ד: בכל יום אומרים, נוסף על התהילים היומי, את הפרק המתאים לשנות החיים – <b>מספר השנים שמלאו ועוד אחת</b> (בן 13 אומר פרק יד; בשנה הראשונה – פרק א). הפרק החדש מתחיל ביום ההולדת העברי. הורים נוהגים לומר גם את הפרקים של ילדיהם. <a href="#/tehillim" id="pt-src-link">מקורות ומה לא אומת</a></p>
   <p class="pt-day">ליום: <b>${esc(plan.hebDate)}</b> · <bdi dir="ltr">${fmtDmy(iso)}</bdi>${iso === todayIso() ? '' : ` · <a href="#/d/${todayIso()}">חזרה להיום</a>`}</p>
-  <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח. תצלום ספח מעובד במכשיר בלבד; התמונה ומספרי הזהות אינם נשמרים.</p>
+  <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח. תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד; התמונה, הקובץ ומספרי הזהות אינם נשמרים.</p>
   <h2>הפרקים שלי</h2>
   ${ps.length ? `<ul class="pt-list">${ps.map(row).join('')}</ul>` : '<p id="pt-empty">עדיין לא נוספו אנשים. הוסיפו את עצמכם ואת בני המשפחה בטופס שלמטה.</p>'}
   <label class="check"><input type="checkbox" id="pt-rebbe" ${prefs.tehillimRebbe ? 'checked' : ''}>הצג גם את פרק הרבי (נולד י״א בניסן תרס״ב) – כיום <a href="#/tehillim/${rb.chapter}">פרק ${gem(rb.chapter)}</a></label>
@@ -1070,10 +1071,14 @@ function renderPersonal() {
     <button class="btn" type="submit" id="pt-add">הוספה</button>
   </form>
   <section class="pt-sapach" aria-labelledby="pt-sapach-h">
-    <h2 id="pt-sapach-h">הוספה מתצלום ספח תעודת זהות</h2>
-    <p class="note pt-privacy">העיבוד נעשה במכשיר הזה בלבד. התמונה ומספרי הזהות אינם נשלחים ואינם נשמרים – רק השמות ותאריכי הלידה שתאשרו אחרי בדיקה. הקריאה מתצלום עלולה לטעות, לכן חובה לעבור על הרשימה.</p>
+    <h2 id="pt-sapach-h">הוספה מתצלום או מקובץ ספח תעודת זהות</h2>
+    <p class="note pt-privacy">העיבוד נעשה במכשיר הזה בלבד. התמונה, הקובץ ומספרי הזהות אינם נשלחים ואינם נשמרים – רק השמות ותאריכי הלידה שתאשרו אחרי בדיקה. הקריאה מתצלום או מקובץ עלולה לטעות, לכן חובה לעבור על הרשימה.</p>
+    <div class="pt-sapach-actions">
     <input type="file" id="pt-sapach-file" accept="image/*" capture="environment" hidden>
-    <button type="button" class="btn" id="pt-sapach-btn">בחירת תצלום או צילום</button>
+    <button type="button" class="btn" id="pt-sapach-btn">צילום במצלמה</button>
+    <input type="file" id="pt-sapach-upload" accept="image/*,application/pdf,.pdf" hidden>
+    <button type="button" class="btn" id="pt-sapach-upload-btn">טעינת קובץ (תמונה או PDF)</button>
+    </div>
     <p id="pt-sapach-st" class="note" aria-live="polite"></p>
     <div id="pt-sapach-review" hidden>
       <h3>בדקו ותקנו לפני ההוספה</h3>
@@ -1159,34 +1164,78 @@ function addReviewedPeople() {
   renderPersonal();
   toast(added.length === 1 ? `נוסף: ${added[0].name}` : `נוספו ${added.length} אנשים`);
 }
-function bindSapachUi() {
-  const btn = $('#pt-sapach-btn'), inp = $('#pt-sapach-file'), st = $('#pt-sapach-st');
-  if (!btn || !inp) return;
-  btn.addEventListener('click', () => inp.click());
-  inp.addEventListener('change', async () => {
-    const file = inp.files && inp.files[0];
-    inp.value = '';
-    const review = $('#pt-sapach-review');
-    if (review) review.hidden = true;
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { st.textContent = 'יש לבחור תצלום (תמונה).'; return; }
-    st.textContent = 'טוען את מנגנון הקריאה במכשיר (פעם ראשונה זה עשוי לקחת רגע)…';
-    const url = URL.createObjectURL(file);
-    try {
+function isSapachPdf(file) {
+  return (file.type === 'application/pdf' || /\.pdf$/i.test(file.name || ''));
+}
+function isSapachImage(file) {
+  return (file.type || '').startsWith('image/') || /\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?)$/i.test(file.name || '');
+}
+function sapachOcrProgress(st, extra) {
+  return m => {
+    const note = extra ? ` ${extra}` : '';
+    if (m?.status === 'recognizing text' && m.progress != null) st.textContent = `קורא את הספח במכשיר${note}… ${Math.round(m.progress * 100)}%`;
+    else if (m?.status === 'loading language traineddata' || m?.status === 'initializing tesseract') st.textContent = 'טוען את מודל העברית במכשיר…';
+  };
+}
+async function processSapachFile(file, st, { allowPdf }) {
+  const review = $('#pt-sapach-review');
+  if (review) review.hidden = true;
+  const pdf = isSapachPdf(file), image = isSapachImage(file);
+  if (pdf && !allowPdf) { st.textContent = 'יש לבחור תצלום (תמונה).'; return; }
+  if (!pdf && !image) { st.textContent = 'יש לבחור תמונה או קובץ PDF.'; return; }
+  const revoke = [];
+  try {
+    let text = '';
+    if (pdf) {
+      st.textContent = 'קורא את קובץ ה־PDF במכשיר…';
+      const { readSapachPdf } = await import('./sapach-pdf.js');
+      const result = await readSapachPdf(file, msg => { if (msg) st.textContent = msg; });
+      text = result.text || '';
+      const images = result.images || [];
+      if (images.length) {
+        const { recognizeSapachImage } = await import('./sapach-ocr.js');
+        const parts = [text];
+        for (let i = 0; i < images.length; i++) {
+          const extra = images.length > 1 ? `(עמוד ${i + 1} מתוך ${images.length})` : '';
+          parts.push(await recognizeSapachImage(images[i], sapachOcrProgress(st, extra)));
+          if (typeof images[i] === 'string' && images[i].startsWith('blob:')) revoke.push(images[i]);
+        }
+        text = parts.filter(Boolean).join('\n\n');
+      }
+    } else {
+      st.textContent = 'טוען את מנגנון הקריאה במכשיר (פעם ראשונה זה עשוי לקחת רגע)…';
+      const url = URL.createObjectURL(file);
+      revoke.push(url);
       const { recognizeSapachImage } = await import('./sapach-ocr.js');
-      const text = await recognizeSapachImage(url, m => {
-        if (m?.status === 'recognizing text' && m.progress != null) st.textContent = `קורא את התצלום במכשיר… ${Math.round(m.progress * 100)}%`;
-        else if (m?.status === 'loading language traineddata' || m?.status === 'initializing tesseract') st.textContent = 'טוען את מודל העברית במכשיר…';
-      });
-      const { people } = parseSapachText(text);
-      if (!people.length) { st.textContent = 'לא זוהו שמות ותאריכי לידה. אפשר להוסיף ידנית בטופס למעלה, או לנסות תצלום חד וברור יותר.'; return; }
-      st.textContent = `זוהו ${people.length} אנשים. בדקו ותקנו לפני ההוספה. התמונה לא נשמרה.`;
-      showPtReview(people);
-    } catch (err) {
-      console.error('sapach-ocr', err && err.message ? err.message : err);
-      st.textContent = 'הקריאה במכשיר נכשלה. אפשר להוסיף ידנית, או לנסות תצלום חד יותר.';
-    } finally { URL.revokeObjectURL(url); }
-  });
+      text = await recognizeSapachImage(url, sapachOcrProgress(st));
+    }
+    const { people } = parseSapachText(text);
+    if (!people.length) { st.textContent = 'לא זוהו שמות ותאריכי לידה. אפשר להוסיף ידנית בטופס למעלה, או לנסות תצלום או קובץ חד וברור יותר.'; return; }
+    st.textContent = `זוהו ${people.length} אנשים. בדקו ותקנו לפני ההוספה. התמונה והקובץ לא נשמרו.`;
+    showPtReview(people);
+  } catch (err) {
+    console.error('sapach-ocr', err && err.message ? err.message : err);
+    st.textContent = pdf
+      ? 'קריאת הקובץ במכשיר נכשלה. אפשר להוסיף ידנית, או לנסות קובץ אחר.'
+      : 'הקריאה במכשיר נכשלה. אפשר להוסיף ידנית, או לנסות תצלום חד יותר.';
+  } finally { for (const u of revoke) try { URL.revokeObjectURL(u); } catch { /* ignore */ } }
+}
+function bindSapachUi() {
+  const camBtn = $('#pt-sapach-btn'), camInp = $('#pt-sapach-file');
+  const fileBtn = $('#pt-sapach-upload-btn'), fileInp = $('#pt-sapach-upload');
+  const st = $('#pt-sapach-st');
+  if (!camBtn || !camInp) return;
+  camBtn.addEventListener('click', () => camInp.click());
+  fileBtn?.addEventListener('click', () => fileInp?.click());
+  const onPick = (inp, allowPdf) => {
+    inp.addEventListener('change', async () => {
+      const file = inp.files && inp.files[0];
+      inp.value = '';
+      if (file) await processSapachFile(file, st, { allowPdf });
+    });
+  };
+  onPick(camInp, false);
+  if (fileInp) onPick(fileInp, true);
   $('#pt-review-add')?.addEventListener('click', addReviewedPeople);
   $('#pt-review-cancel')?.addEventListener('click', () => { const r = $('#pt-sapach-review'); if (r) r.hidden = true; if (st) st.textContent = ''; });
 }

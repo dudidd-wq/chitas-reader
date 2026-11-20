@@ -1,0 +1,112 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 4 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 9 0 R >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 10 0 R >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type0 /BaseFont /SyntheticSapach /Encoding /Identity-H /DescendantFonts [6 0 R] /ToUnicode 8 0 R >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /CIDFontType2 /BaseFont /SyntheticSapach /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor 7 0 R /DW 500 /W [0 [500]] >>
+endobj
+7 0 obj
+<< /Type /FontDescriptor /FontName /SyntheticSapach /Flags 4 /FontBBox [0 -200 1000 800] /ItalicAngle 0 /Ascent 800 /Descent -200 /CapHeight 700 /StemV 80 >>
+endobj
+8 0 obj
+<< /Length 347 >>
+stream
+/CIDInit /ProcSet findresource begin
+12 dict begin
+begincmap
+/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def
+/CMapName /Adobe-Identity-UCS def
+/CMapType 2 def
+1 begincodespacerange
+<0000> <FFFF>
+endcodespacerange
+1 beginbfrange
+<0000> <FFFF> <0000>
+endbfrange
+endcmap
+CMapName currentdict /CMap defineresource pop
+end
+end
+endstream
+endobj
+9 0 obj
+<< /Length 747 >>
+stream
+BT
+/F1 18 Tf
+2 Tr
+50 800 Td
+<05DE05E905E805D3002005D405E405E005D905DD> Tj
+0 -28 Td
+<05E105E405D7002005EA05E205D505D305EA002005D605D405D505EA> Tj
+0 -28 Td
+<05DE05E105E405E8002005D605D405D505EA0020003000310032003300340035003600370038> Tj
+0 -28 Td
+<05E905DD002005DE05E905E405D705D4002005DB05D405DF> Tj
+0 -28 Td
+<05E905DD002005E405E805D805D9002005D905D505E105D9> Tj
+0 -28 Td
+<05EA05D005E805D905DA002005DC05D905D305D4002000300031002E00300035002E0031003900380030> Tj
+0 -28 Td
+() Tj
+0 -28 Td
+<05E905DD002005DE05E905E405D705D4002005DB05D405DF> Tj
+0 -28 Td
+<05E905DD002005E405E805D805D9002005E905E805D4> Tj
+0 -28 Td
+<05EA05D005E805D905DA002005DC05D905D305D4002000310035002E00300033002E0031003900380032> Tj
+0 -28 Td
+<05E705E805D105D4002005D005E905D4> Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Length 393 >>
+stream
+BT
+/F1 18 Tf
+2 Tr
+50 800 Td
+<05E105E405D7002005EA05E205D505D305EA002005D605D405D505EA00202013002005E205DE05D505D300200032> Tj
+0 -28 Td
+<05E905DD002005DE05E905E405D705D4002005DB05D405DF> Tj
+0 -28 Td
+<05E905DD002005E405E805D805D9002005D305E005D9> Tj
+0 -28 Td
+<05EA05D005E805D905DA002005DC05D905D305D4002000320030002E00300037002E0032003000310030> Tj
+0 -28 Td
+<05E705E805D105D4002005D105DF> Tj
+ET
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000253 00000 n 
+0000000380 00000 n 
+0000000520 00000 n 
+0000000720 00000 n 
+0000000893 00000 n 
+0000001290 00000 n 
+0000002087 00000 n 
+trailer
+<< /Size 11 /Root 1 0 R >>
+startxref
+2531
+%%EOF

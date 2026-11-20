@@ -581,6 +581,7 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 .pt-heb input, .pt-heb select { min-height: 44px; padding: .3rem .6rem; border-radius: 12px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; }
 .pt-heb #pt-hd { width: 4.5rem; } .pt-heb #pt-hy { width: 6rem; }
 .pt-sapach { margin: 1.4em 0; padding: 1em; border: 1px solid var(--rule); border-radius: 16px; background: var(--card); }
+.pt-sapach-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: .6em 0; }
 .pt-sapach h2, .pt-sapach h3 { margin: 0 0 .4em; }
 .pt-review { list-style: none; padding: 0; margin: .6em 0; }
 .pt-rev-item { display: grid; gap: .35em; padding: .7em 0; border-bottom: 1px solid var(--line, #ccc6); }

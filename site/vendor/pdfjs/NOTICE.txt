@@ -1,0 +1,14 @@
+PDF.js (Mozilla Foundation) is used only to read an ID-appendix PDF in the
+browser, on this device. It is loaded only when the reader chooses a PDF file.
+The file is never uploaded or stored.
+
+Vendored as of 2026-11-20, from the pdfjs-dist 6.5.438 "legacy" build
+(no remote wasm/CMap/font fetches; those URLs are left unset):
+
+- PDF.js 6.5.438 (Apache-2.0) – pdf.min.mjs, pdf.worker.min.mjs
+  https://github.com/mozilla/pdf.js
+  https://www.npmjs.com/package/pdfjs-dist
+  License: LICENSE (Apache License 2.0)
+  Copyright 2024 Mozilla Foundation
+
+The library is unmodified except for being copied into this folder.
