@@ -1,0 +1,12 @@
+# STEINSALTZ-BATCH11 — Yoma speech niqqud (1.0.147)
+
+Conservative fail-closed niqqud of the Steinsaltz biur speech sidecar for Yoma, using the shipped 1.0.135 Taanit method plus later denylist gates. Two fix rounds were required.
+
+- Corpus: `site/data/gemara/bsay/Yoma/` — 173 pages, flat `say` string[], CC BY-NC. 52 of 173 pages changed (most of the tractate was already pointed in the source). Display `v` and all non-`say` fields unchanged. Previously shipped tractates were not modified. Meilah, Bekhorot and Pesachim remain skipped.
+- Counts after fix round 2: 1,901 / 26,076 bare tokens changed (936 forms, 7.29% yield); gzip +4,393 bytes. Local Dicta cache only (`dseg/modern` 2,252, rabbinic 0, miss 11); no network; Stage-1 lexicon not applied.
+- Gates retained from batches 4–10, including `נמלים`/`נמלי`, ק-divine stems, `שיכפרו`, `שירשו`, `תרגם`, `הזהירה`/`שהזהירה`, `כינה`, `הנפה`, `לשנותה`/`לשנותו`, `עובר`/`העובר`, `למדוה`, `עקרון`, `דודים`, exact-only `רוקם`, `לנוד`, and `סמנים`.
+- Fix round 1 left `הפחה` bare (Yoma 68b#18, "מפני חשש הפחה": flatulence, not governor `הַפֶּחָה`) and `הסנה` bare (Yoma 82a#3, a source typo for `השנה`, not the burning bush `הַסְּנֶה`).
+- Fix round 2 left `לתיתה` bare (Yoma 36b#1, "to give it to the stranger", not soaking wheat `לְתִיתָה`) and exact-only `ושרוף` bare (Yoma 84a#5, imperative "burn them" translating `וּקְלִ֫ינְהוּ`, not participle `וְשָׂרוּף`). `לתת` / `תיתה` / `לשרוף` / `שרוף` were not over-blocked. The global `refCount >= 10` bypass was not changed.
+- Independent review of fix round 2: `engine-cov-steinsaltz-bsay-b11-fix2-review`, agy **gemini-4-hydrogen-high**, 2026-11-20 14:42 שעון ישראל (Asia/Jerusalem). Verdict **SHIP**, overall **9.8**, harmful_error_count **0**. S1 10.0, S2 10.0, S3 10.0, S4 9.8, S5 9.9. 650/650 changed samples, 240 controls, and all 936 accepted forms audited. Builder: Codex in `engine-cov-steinsaltz-bsay-b11-fix2` (27/27 tests). Earlier reviews of the unfixed packet and fix round 1 were both HOLD 8.8 with two harmful errors each.
+- The in-app notice «לשימוש לא מסחרי בלבד» was already shipped in 1.0.135. See `verification/STEINSALTZ-PERMISSION.md`.
+- After apply, no additional ole had to be inserted into packet bytes (lexicon ole was already present on the newly matching tokens). The additions fixture gained 8 Yoma rows and 11 tokens (6,768 → 6,779; 175 → 183 Yoma rows, in amud order; 56 hashes refreshed, 119 unchanged). No Yoma rows exist in `tests/fixtures/aram4-identity.json` or `aram4-builder.json`.
