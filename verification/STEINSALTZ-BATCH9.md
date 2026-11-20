@@ -1,0 +1,10 @@
+# STEINSALTZ-BATCH9 — Avodah Zarah speech niqqud (1.0.145)
+
+Conservative fail-closed niqqud of the Steinsaltz biur speech sidecar for Avodah Zarah, using the shipped 1.0.135 Taanit method plus later denylist gates. No fix round was required.
+
+- Corpus: `site/data/gemara/bsay/Avodah_Zarah/` — 150 pages, flat `say` string[], CC BY-NC. Display `v` and all non-`say` fields unchanged. Previously shipped tractates were not modified. Meilah, Bekhorot and Pesachim remain skipped (~99% already pointed in the source).
+- Counts: 4,486 / 63,492 bare tokens changed (1,586 forms, 7.07% yield); gzip +11,416 bytes. All 150 pages changed. Local Dicta cache only (`dseg/modern` 2,036, rabbinic 0, miss 90); no network; Stage-1 lexicon not applied.
+- Gates retained from batches 4–8, including `נמלים`/`נמלי`, ק-divine stems, `שיכפרו`, `שירשו`, `תרגם`, `הזהירה`/`שהזהירה`, `כינה`, `הנפה`, `לשנותה`/`לשנותו`, `עובר`/`העובר`, `למדוה`, `עקרון`, `דודים`, and exact-only `רוקם`. The builder also added `לנוד` after spotting Avodah Zarah 33a "שופך את היין לנוד" (into the flask `לַנּוֹד` vs wander `לָנוּד`).
+- Independent review: `engine-cov-steinsaltz-bsay-b9-review`, agy **gemini-4-hydrogen-high**, 2026-11-20 12:57 שעון ישראל (Asia/Jerusalem). Verdict **SHIP**, overall **9.9**, harmful_error_count **0**. S1 10.0, S2 9.9, S3 10.0, S4 9.9, S5 10.0. 650/650 changed samples, 240 controls, and all 1,586 accepted forms audited. Builder: Claude Opus via agy (`claude-opus-5-5-medium`) in `engine-cov-steinsaltz-bsay-b9` (23/23 tests). Codex was not used; Chavruta had `codex exec` workers running at the time.
+- The in-app notice «לשימוש לא מסחרי בלבד» was already shipped in 1.0.135. See `verification/STEINSALTZ-PERMISSION.md`.
+- After apply, no new ARAM-4 ole was required. The additions fixture base hashes for Avodah Zarah were updated (6,768 tokens unchanged; 164 hashes refreshed, 43 unchanged, 207 rows). Twenty-one frozen Mishnah samples in `tests/fixtures/aram4-identity.json` had their say/pass/IPA hashes refreshed because niqqud was added; pass still equals say (no lexicon ole on Mishnah). Eight other AZ identity rows were unchanged.
