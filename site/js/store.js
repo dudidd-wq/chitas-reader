@@ -24,6 +24,7 @@ function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
     for (const k of ['readingBold', 'hideSiddurInstructions', 'ttsVocalizedGemara']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
+    if (prefs.font === 'cardo') prefs.font = 'noto'; // 1.0.139: Cardo removed – its Hebrew marks are misplaced
     if (typeof prefs.hayomNiqqud !== 'boolean') prefs.hayomNiqqud = true;
     if (typeof prefs.biurNiqqud !== 'boolean') prefs.biurNiqqud = true;
     if (typeof prefs.mitzvotNiqqud !== 'boolean') prefs.mitzvotNiqqud = true;

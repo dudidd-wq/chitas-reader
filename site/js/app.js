@@ -55,13 +55,12 @@ const NAV_ICON = {
 
 // Optional reading fonts are never install-preloaded. Real previews request their faces;
 // selecting a family also retains its bold face and license for future offline use.
-const FONT_OPTIONS = [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew'], ['noto-rashi', 'Noto Rashi Hebrew', 'כתב רש״י · כולל טעמים'], ['taamey-d', 'Taamey D', 'כולל טעמים · הדגשה מלאכותית'], ['keter-yg', 'Keter YG', 'כולל טעמים · הדגשה מלאכותית'], ['cardo', 'Cardo', 'כולל טעמים'], ['david', 'David Libre', 'ללא טעמים'], ['assistant', 'Assistant', 'ללא טעמים']];
+const FONT_OPTIONS = [['noto', 'נוטו סריף'], ['ezra', 'עזרא'], ['frank', 'פרנק־רוהל'], ['ashkenaz', 'טעמי אשכנז'], ['sbl', 'SBL Hebrew'], ['noto-rashi', 'Noto Rashi Hebrew', 'כתב רש״י · כולל טעמים'], ['taamey-d', 'Taamey D', 'כולל טעמים · הדגשה מלאכותית'], ['keter-yg', 'Keter YG', 'כולל טעמים · הדגשה מלאכותית'], ['david', 'David Libre', 'ללא טעמים'], ['assistant', 'Assistant', 'ללא טעמים']];
 const OPTIONAL_FONTS = {
   sbl: ['SBL_Hbrw.ttf', 'SBL-LICENSE.txt'],
   'noto-rashi': ['noto-rashi/NotoRashiHebrew.woff2', 'noto-rashi/OFL.txt'],
   'taamey-d': ['taamey-d/Taamey_D.ttf', 'taamey-d/LICENSE.txt', 'taamey-d/GPL-2.0.txt'],
   'keter-yg': ['keter-yg/KeterYG-Medium.ttf', 'keter-yg/LICENSE.txt', 'keter-yg/GPL-2.0.txt'],
-  cardo: ['cardo/Cardo-Regular.woff2', 'cardo/Cardo-Bold.woff2', 'cardo/OFL.txt'],
   david: ['david-libre/DavidLibre-Regular.woff2', 'david-libre/DavidLibre-Bold.woff2', 'david-libre/OFL.txt'],
   assistant: ['assistant/Assistant.woff2', 'assistant/OFL.txt'],
 };
@@ -882,7 +881,6 @@ async function renderSources() {
     <li>Noto Rashi Hebrew — Google / Noto Project; כתב רש״י, כולל ניקוד וטעמים. משקל משתנה 100–900. <a href="https://github.com/notofonts/hebrew" target="_blank" rel="noopener">מקור</a> · <a href="fonts/noto-rashi/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
     <li>Taamey D 1.2 — Ben Denckla, על בסיס אותיות Yoram Gnat; ‏GPLv2 עם חריגת הטמעת גופן. קובץ TTF מקורי ללא שינוי; הדגשה מלאכותית. <a href="https://bdenckla.github.io/MAM-basics/taamey-d/downloads/" target="_blank" rel="noopener">מקור ומהדורה</a> · <a href="fonts/taamey-d/LICENSE.txt">רישיון והודעות זכויות</a> · <a href="fonts/taamey-d/GPL-2.0.txt">GPLv2</a>.</li>
     <li>Keter YG — Yoram Gnat / Culmus; ‏GPLv2 עם חריגת הטמעה. קובץ Medium TTF מקורי ללא שינוי; משתמשים בהדגשה מלאכותית במקום Bold המקורי, שבו הטעמים שקופים. <a href="https://culmus.sourceforge.io/taamim/index.html" target="_blank" rel="noopener">מקור</a> · <a href="fonts/keter-yg/LICENSE.txt">רישיון והודעות זכויות</a> · <a href="fonts/keter-yg/GPL-2.0.txt">GPLv2</a>.</li>
-    <li>Cardo — David J. Perry; רגיל ומודגש אמיתיים, ניקוד וטעמים. <a href="https://github.com/googlefonts/CardoFont" target="_blank" rel="noopener">מקור</a> · <a href="fonts/cardo/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
     <li>David Libre — Monotype Imaging, SIL International, Meir Sadan; רגיל ומודגש אמיתיים, ניקוד ללא טעמים. <a href="https://github.com/meirsadan/david-libre" target="_blank" rel="noopener">מקור</a> · <a href="fonts/david-libre/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
     <li>Assistant — Adobe Systems, Ben Nathan / הפרויקט; משקל משתנה 200–800, ניקוד ללא טעמים. <a href="https://github.com/TypeNetwork/Assistant" target="_blank" rel="noopener">מקור</a> · <a href="fonts/assistant/OFL.txt">OFL 1.1 והודעות זכויות</a>.</li>
   </ul><p>גופני OFL נארזו כ־WOFF2 ללא חיתוך גליפים או שינוי צורות האותיות. קובצי המקור המלאים והוראות הבנייה של גופני GPL זמינים <a href="https://github.com/dudidd-wq/chitas-reader/tree/main/font-sources" target="_blank" rel="noopener">לצד הקבצים הבינאריים במאגר הציבורי</a>. רישיונות הגופנים נפרדים מקוד האפליקציה.</p>

@@ -603,3 +603,5 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ת
 
 ## 1.0.138 — Steinsaltz speech niqqud batch 3: Chagigah, Moed Katan, Megillah (review 9.8)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for חגיגה, מועד קטן ומגילה (167 pages): 7,018 / 91,135 bare tokens (2,191 forms, 7.7% yield). Display `v` unchanged. Same 1.0.135 method. Independent Gemini review 9.8 (S1–S5 9.8; 650 tokens, 1 non-harmful uncertain, harmful_error_count 0). See `verification/STEINSALTZ-BATCH3.md`.
+
+- 1.0.139: Cardo font removed from the font choices. Its Hebrew mark positioning is broken (dagesh, niqqud and taamim drift and collide in Chumash and Tanya). A saved "cardo" choice migrates to Noto Serif Hebrew.

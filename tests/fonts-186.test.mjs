@@ -8,7 +8,6 @@ const fonts=[
  ['noto-rashi','Noto Rashi Hebrew','noto-rashi',['NotoRashiHebrew.woff2','OFL.txt'],true],
  ['taamey-d','Taamey D','taamey-d',['Taamey_D.ttf','LICENSE.txt','GPL-2.0.txt'],true],
  ['keter-yg','Keter YG','keter-yg',['KeterYG-Medium.ttf','LICENSE.txt','GPL-2.0.txt'],true],
- ['cardo','Cardo','cardo',['Cardo-Regular.woff2','Cardo-Bold.woff2','OFL.txt'],true],
  ['david','David Libre','david-libre',['DavidLibre-Regular.woff2','DavidLibre-Bold.woff2','OFL.txt'],false],
  ['assistant','Assistant','assistant',['Assistant.woff2','OFL.txt'],false],
 ];
@@ -30,7 +29,7 @@ test('1.0.86: original GPL fonts, corresponding sources, adjacent licenses and u
 
 test('1.0.86: no optional font requested on default reading; eleven real previews and per-font hints',async()=>{
  const p=await pageWith(browser,srv.url,{prefs:{layout:'scroll'},viewport:{width:1100,height:1900}}),req=[];p.on('request',r=>{if(/\/fonts\/(taamey-d|keter-yg|cardo|david-libre|assistant)\//.test(r.url()))req.push(r.url());});
- await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');assert.equal(req.length,0);await openChrome(p);await p.click('#b-aa', { force: true });assert.equal(await p.locator('.font-sample').count(),11);await p.evaluate(()=>document.fonts.ready);
+ await p.goto(srv.url+'#/s/boker/1');await p.waitForSelector('#rc .seg .t');assert.equal(req.length,0);await openChrome(p);await p.click('#b-aa', { force: true });assert.equal(await p.locator('.font-sample').count(),10);await p.evaluate(()=>document.fonts.ready);
  for(const[id,name,,,taamim]of fonts){const l=p.locator(`label:has(input[name=font][value="${id}"])`);assert.match(await l.locator('.font-sample').evaluate(e=>getComputedStyle(e).fontFamily),new RegExp(name));if(!taamim)assert.match(await l.textContent(),/ללא טעמים/);}
  if(process.env.CHITAS_FONT_SHOTS)await p.screenshot({path:process.env.CHITAS_FONT_SHOTS+'/chitas-fonts-picker.png'});
  assert.deepEqual(p.errors,[]);await p.context().close();
