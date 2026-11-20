@@ -608,3 +608,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ח
 
 ## 1.0.140 — Steinsaltz speech niqqud batch 4: Keritot, Arakhin, Temurah, Rosh Hashanah (review 9.8)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for כריתות, ערכין, תמורה וראש השנה (251 pages). All 2,550 changes are in ראש השנה (2,550 / 33,402 bare tokens, 7.63%); כריתות, ערכין ותמורה were already pointed in the source and are unchanged. Display `v` unchanged. Fix round 1 left the ports/ants homograph `נמלים` and the divine-name variant `אלקיך` bare. Independent Gemini review of the fix: 9.8 (S1 9.9, S2 9.8, S3–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH4.md`.
+
+## 1.0.141 — Steinsaltz speech niqqud batch 5: Beitzah and Shevuot (review 9.9)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ביצה ושבועות (174 pages): 4,886 / 71,283 bare tokens (1,559 forms, 6.85% yield). Display `v` unchanged. Fix round 1 left the homographs `שיכפרו` and `שירשו` bare. Independent Gemini review of the fix: 9.9 (S1 10.0, S2–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH5.md`.
