@@ -51,7 +51,7 @@ test('aramaic gate: only the groups reviewed above 9.5 are on, per source (tools
 });
 
 test('aramaic pass: idempotent, display letters and niqqud unchanged, Mishnah and Gemara quotations untouched', () => {
-  const bsay = JSON.parse(fs.readFileSync(root + 'site/data/gemara/bsay/Bava_Metzia/76a.json', 'utf8')).say;
+  const bsay = JSON.parse(fs.readFileSync(root + 'site/data/gemara/bsay/Bava_Batra/76a.json', 'utf8')).say;
   for (const s of bsay) { assert.equal(aramSayText(s), s, 'compiled data already carries the pass'); }
   const raw = 'אָמַר רַבָּה הָכִי אִיתְּמַר לָאו מִילְּתָא ״וְאָמַר הָכִי״';
   const once = aramSayText(raw);
