@@ -605,3 +605,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ת
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for חגיגה, מועד קטן ומגילה (167 pages): 7,018 / 91,135 bare tokens (2,191 forms, 7.7% yield). Display `v` unchanged. Same 1.0.135 method. Independent Gemini review 9.8 (S1–S5 9.8; 650 tokens, 1 non-harmful uncertain, harmful_error_count 0). See `verification/STEINSALTZ-BATCH3.md`.
 
 - 1.0.139: Cardo font removed from the font choices. Its Hebrew mark positioning is broken (dagesh, niqqud and taamim drift and collide in Chumash and Tanya). A saved "cardo" choice migrates to Noto Serif Hebrew.
+
+## 1.0.140 — Steinsaltz speech niqqud batch 4: Keritot, Arakhin, Temurah, Rosh Hashanah (review 9.8)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for כריתות, ערכין, תמורה וראש השנה (251 pages). All 2,550 changes are in ראש השנה (2,550 / 33,402 bare tokens, 7.63%); כריתות, ערכין ותמורה were already pointed in the source and are unchanged. Display `v` unchanged. Fix round 1 left the ports/ants homograph `נמלים` and the divine-name variant `אלקיך` bare. Independent Gemini review of the fix: 9.8 (S1 9.9, S2 9.8, S3–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH4.md`.
