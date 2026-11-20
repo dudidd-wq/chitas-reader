@@ -614,3 +614,6 @@ Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ב
 
 ## 1.0.142 — Steinsaltz speech niqqud batch 6: Sotah and Sukkah (review 9.9)
 Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for סוטה וסוכה (206 pages): 3,758 / 50,673 bare tokens (1,459 forms, 7.42% yield). Display `v` unchanged. Fix round 1 left the homographs `תרגם` and `שהזהירה` bare. Independent Gemini review of the fix: 9.9 (S1 10.0, S2–S5 9.9; harmful_error_count 0). See `verification/STEINSALTZ-BATCH6.md`.
+
+## 1.0.143 — Steinsaltz speech niqqud batch 7: Berakhot and Nazir (review 9.9)
+Conservative fail-closed Dicta niqqud on the Steinsaltz biur speech field for ברכות ונזיר (254 pages): 9,839 / 132,751 bare tokens (2,412 forms, 7.41% yield). Display `v` unchanged. The builder left the new homograph `כינה` bare, and kept earlier gates (`נמלים`, `אלקיך`, `שיכפרו`, `שירשו`, `תרגם`, `שהזהירה`). Independent Gemini review: 9.9 (S1 10.0, S2–S5 9.9; harmful_error_count 0). One ARAM-4 ole was added on Nazir 52b `וְאִיבָּעֵית`. See `verification/STEINSALTZ-BATCH7.md`.
