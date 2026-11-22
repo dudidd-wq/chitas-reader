@@ -5,7 +5,7 @@ import { serve, launch, pageWith } from './helpers.mjs';
 const read = p => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 test('Taamey Ashkenaz is an additional, licensed, precached option, never the default', () => {
   const app = read('site/js/app.js'), css = read('site/css/app.css'), sw = read('site/sw.js');
-  assert.match(app, /\['ashkenaz', 'טעמי אשכנז'\]/);
+  assert.match(app, /\['ashkenaz', 'טעמי אשכנז'/);
   assert.match(read('site/js/store.js'), /font: 'noto'/);
   assert.match(css, /--text-font: 'Noto Serif Hebrew', 'Ezra SIL', serif/);
   assert.match(css, /\[data-font="ashkenaz"\].*'Taamey Ashkenaz', 'Noto Serif Hebrew'/);

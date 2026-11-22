@@ -708,7 +708,26 @@ body:has(#sheet:not([hidden])) #toast { bottom: auto; top: max(.75rem, env(safe-
 [data-font="assistant"] { --text-font: 'Assistant', 'Noto Serif Hebrew', sans-serif; }
 [data-font="taamey-d"] .r-content, [data-font="keter-yg"] .r-content,
 [data-font="taamey-d"] .font-sample, [data-font="keter-yg"] .font-sample { font-synthesis: weight style; }
-.font-options .font-hint { font-family: var(--ui); font-size: .75rem; line-height: 1.35; }
+.font-options .font-hint { font-family: var(--ui); font-size: .75rem; line-height: 1.35; overflow-wrap: anywhere; }
+.font-options label:has(input:checked) .font-hint { color: inherit; opacity: .9; }
+.set-more, .font-cov { clear: both; min-width: 0; width: 100%; }
+.font-cov { margin-top: .35rem; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.font-cov-title { margin: 0 0 .3rem; font-weight: 600; font-size: .8rem; }
+.font-cov-table { width: 100%; border-collapse: collapse; font-family: var(--ui); font-size: .75rem; line-height: 1.4; }
+.font-cov-table th, .font-cov-table td { border: 1px solid var(--rule); padding: .35rem .4rem; text-align: start; vertical-align: top; overflow-wrap: anywhere; }
+.font-cov-table thead th { background: var(--paper2); font-weight: 600; }
+.font-cov-table tbody th { font-weight: 600; background: var(--card); }
+@media (max-width: 560px) {
+  .font-cov { overflow-x: visible; }
+  .font-cov-table, .font-cov-table thead, .font-cov-table tbody, .font-cov-table tr, .font-cov-table th, .font-cov-table td { display: block; }
+  .font-cov-table thead { display: none; }
+  .font-cov-table tr { border: 1px solid var(--rule); margin-bottom: .45rem; padding: .25rem .35rem; background: var(--card); }
+  .font-cov-table tbody th { border: 0; background: transparent; padding-bottom: .15rem; font-size: .8rem; }
+  .font-cov-table td { border: 0; border-top: 1px solid var(--rule); display: flex; gap: .5rem; align-items: baseline; padding: .2rem 0; }
+  .font-cov-table td::before { content: attr(data-label); flex: 0 0 6.2em; font-weight: 600; color: var(--muted); }
+  .font-cov-table td > .font-cov-val { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+}
+
 
 /* 1.0.89: the voice choice is its own group, set apart from the engine choice above it */
 #qv .qv-sub { margin: .9rem 0 .3rem; font-weight: 600; }
