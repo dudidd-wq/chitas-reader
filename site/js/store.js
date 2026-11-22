@@ -14,6 +14,7 @@ export const DEFAULT_PREFS = {
   // 1.0.73: 'off' | 'date' | 'always' (1.0.72 boolean hideNoTachanun true → 'date')
   // round 7: language of the siddur's instructions – 'he' | 'en' | 'both'
   tehillimProfiles: [], tehillimRebbe: false,
+  tehillimPre20: false, tehillimPrePersonal: false, tehillimPreRebbe: false, // 1.0.187: chapters said before the daily Tehillim
   shortBiur: true, // 1.0.100: the folded "ביאור קצר" under a paragraph (texts.js sbAi/sbLt)
   studyNotes: true, // round 8: "מראי מקומות" / short-explanation link after the text (texts.js 'notes' blocks) // round 8: personal Tehillim [{id, name, greg|hy/hm/hd|age, afterSunset}] – on this device only
 };

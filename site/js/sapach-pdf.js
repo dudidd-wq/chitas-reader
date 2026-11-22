@@ -6,8 +6,8 @@ const DIR = new URL('../vendor/pdfjs/', import.meta.url).href;
 const MAX_PAGES = 4;
 const TARGET_WIDTH = 1800;
 
-/** PDF.js marks Hebrew lines as dir=rtl and stores them in visual order. Turn that back into logical order so the parser sees כהן, not ןהכ. */
-function logicalFromRtl(s) {
+/** Reverse one RTL run into the other order (visual ↔ logical): Hebrew letters reversed, number runs kept. */
+function flipRtl(s) {
   const runs = [];
   for (const ch of String(s)) {
     const k = /\s/.test(ch) ? 'sp' : /[\u0590-\u05FF]/.test(ch) ? 'he' : 'other';
@@ -17,28 +17,38 @@ function logicalFromRtl(s) {
   }
   return runs.reverse().map(r => r.k === 'he' ? [...r.t].reverse().join('') : r.t).join('');
 }
-function itemStr(it) {
-  const s = it?.str || '';
-  return it?.dir === 'rtl' ? logicalFromRtl(s) : s;
+// 1.0.187: PDF.js already returns Hebrew in logical order for normal PDFs (gov.il, Word, Chrome, LibreOffice: "כהן"),
+// but some generators store the glyphs reversed ("ןהכ"). 1.0.15x always flipped, so a real appendix PDF came out
+// backwards and nothing was recognised. Now both readings are built and the one with more known appendix words wins.
+const KNOWN = ['שם', 'משפחה', 'פרטי', 'תאריך', 'לידה', 'זהות', 'מספר', 'ספח', 'משרד', 'הפנים', 'תעודת', 'לתעודת', 'ילדים', 'זוג', 'מען', 'מין', 'זכר', 'נקבה', 'הנפקה', 'מדינת', 'ישראל', 'אישי', 'מצב', 'קרבה', 'רחוב'];
+function knownScore(text) {
+  const words = String(text).split(/[^\u05D0-\u05EA]+/);
+  return words.reduce((n, w) => n + (KNOWN.includes(w) ? 1 : 0), 0);
 }
-function itemsToText(items) {
+function itemsToLines(items, flip) {
   const rows = (items || []).filter(it => it && it.str);
   if (!rows.length) return '';
-  const sorted = [...rows].sort((a, b) => {
-    const ya = a.transform?.[5] ?? 0, yb = b.transform?.[5] ?? 0;
-    if (Math.abs(ya - yb) > 4) return yb - ya;
-    return (a.transform?.[4] ?? 0) - (b.transform?.[4] ?? 0);
-  });
+  const sorted = [...rows].sort((a, b) => (b.transform?.[5] ?? 0) - (a.transform?.[5] ?? 0));
   const lines = [];
   let cur = [], curY = null;
   for (const it of sorted) {
     const y = it.transform?.[5] ?? 0;
     if (curY != null && Math.abs(y - curY) > 4) { lines.push(cur); cur = []; }
-    cur.push({ ...it, str: itemStr(it) });
+    cur.push(it);
     curY = y;
   }
   if (cur.length) lines.push(cur);
-  return lines.map(line => line.map(it => it.str).join(' ').replace(/\s+/g, ' ').trim()).filter(Boolean).join('\n');
+  return lines.map(line => {
+    const joined = line.map(it => it.str).join('');
+    const rtl = (joined.match(/[\u05D0-\u05EA]/g) || []).length > (joined.match(/[A-Za-z]/g) || []).length;
+    // a Hebrew line reads right to left: the rightmost item first
+    const ordered = [...line].sort((a, b) => ((a.transform?.[4] ?? 0) - (b.transform?.[4] ?? 0)) * (rtl ? -1 : 1));
+    return ordered.map(it => (flip && (it.dir === 'rtl' || /[\u05D0-\u05EA]/.test(it.str)) ? flipRtl(it.str) : it.str)).join(' ').replace(/\s+/g, ' ').trim();
+  }).filter(Boolean).join('\n');
+}
+export function itemsToText(items) {
+  const asIs = itemsToLines(items, false), flipped = itemsToLines(items, true);
+  return knownScore(flipped) > knownScore(asIs) ? flipped : asIs;
 }
 
 function usefulText(s) {

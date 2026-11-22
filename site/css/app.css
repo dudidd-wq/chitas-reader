@@ -1275,3 +1275,12 @@ html[data-rashi-font="text"][data-design] .r-content .rashi { font-family: var(-
 [data-design="modern"] .lnav { background: var(--bar-bg, #17130f); color: #fff; border: 0; }
 [data-design="nocturne"] .lnav { background: #15120e; border-top: 1px solid rgba(201, 164, 92, .5); }
 [data-design="nocturne"][data-theme="night"] .lnav { background: #070604; }
+/* 1.0.187: personal Tehillim – read the chapters in one sequence; edit link under the home card; review notes */
+.pt-teaser:has(+ .pt-manage) { border-end-start-radius: 0; border-end-end-radius: 0; }
+.pt-manage { margin: 0; padding: .1rem 1rem .45rem; border: 1px solid var(--rule); border-top: 1px dashed var(--rule); border-radius: 0 0 14px 14px; background: var(--card); font-size: .9rem; box-shadow: var(--shadow); }
+.pt-manage a { display: inline-block; min-height: 44px; line-height: 44px; }
+.pt-seq { margin: .8rem 0; }
+.pt-pre { margin: 1rem 0; }
+.pt-pre .hint { margin: .3rem 0 0; }
+.pt-rev-why { margin: .2rem 0 .4rem; font-size: .88rem; }
+.check a[href^="#/tehillim/"] { white-space: nowrap; }

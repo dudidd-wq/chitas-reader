@@ -116,8 +116,15 @@ test('UI: add family profiles (date + age), chapter text, Rebbe option, delete, 
       // home teaser
       await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('#pt-teaser');
       assert.match(await p.textContent('#pt-teaser'), /פרק הרבי.*פרק קכה.*יוסי.*פרק יד.*שרה.*פרק י/s);
+      // 1.0.187: the teaser opens the chapters one after another (not the profiles page); "עריכת הרשימה" opens the page
+      assert.equal(await p.getAttribute('#pt-teaser', 'href'), '#/tehillim/seq');
+      await p.click('#pt-teaser'); await p.waitForSelector('#reader:not([hidden]) #rc .seg');
+      const seqHeads = await p.locator('#rc h2, #rc h3, #rc .h').allTextContents();
+      const seqText = seqHeads.join(' | ') || await p.textContent('#rc');
+      assert.equal(seqText, 'מזמור יד – יוסי | מזמור י – שרה | מזמור קכה – פרק הרבי');
+      await p.goto(srv.url + `#/d/${D}`); await p.waitForSelector('.pt-manage a');
       // delete
-      await p.click('#pt-teaser'); await p.waitForSelector('.pt-item');
+      await p.click('.pt-manage a'); await p.waitForSelector('.pt-item');
       p.once('dialog', d => d.accept()); await p.click('.pt-del >> nth=1');
       await p.waitForFunction(() => document.querySelectorAll('.pt-item').length === 2);
       assert.doesNotMatch(await p.textContent('.pt-list'), /שרה/);

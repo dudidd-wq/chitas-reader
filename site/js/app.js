@@ -20,7 +20,7 @@ import { hebDateHe } from './calendar.js';
 import { renderKivun, stopKivun, COMPASS } from './kivun-ui.js';
 import { personalChapter, rebbeChapter, cleanProfile, MAX_CHAPTER, REBBE_BIRTH, HEB_MONTHS } from './personal.js';
 import { libNode, libDoc, FAMILIES } from './library.js';
-import { parseSapachText } from './sapach.js';
+import { parseSapachText, pickReading } from './sapach.js';
 import { renderLibrary, renderSearch, SEARCH_ICON, LIB_ICON } from './library-ui.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -226,7 +226,8 @@ function route() {
   clearToast();
   if (toastAfterNav) { toast(toastAfterNav); toastAfterNav = ''; }
   const ptCh = view === 'tehillim' && /^\d{1,3}$/.test(a || '') ? +a : 0;
-  if (view !== 'r' && view !== 's' && view !== 'lib' && !(ptCh >= 1 && ptCh <= MAX_CHAPTER)) closeReader();
+  const ptSeq = view === 'tehillim' && a === 'seq';
+  if (view !== 'r' && view !== 's' && view !== 'lib' && !(ptCh >= 1 && ptCh <= MAX_CHAPTER) && !ptSeq) closeReader();
   stopKivun();
   autoPrefetch();
   if (view === 'r' && UNITS[a] && a !== 'siddur') { openReader(a, /^\d{4}-\d\d-\d\d$/.test(b) ? b : currentDate); return; }
@@ -240,6 +241,7 @@ function route() {
   if (view === 'about') return renderAbout();
   if (view === 'tehillim') {
     if (ptCh >= 1 && ptCh <= MAX_CHAPTER) return openPersonalChapter(ptCh);
+    if (ptSeq) return openPersonalSeq();
     closeReader();
     return renderPersonal(0);
   }
@@ -380,7 +382,7 @@ async function renderHome(showLoc = false) {
       <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
-        ${[['#/lib', LIB_ICON, 'ספרייה'], ['#/search', SEARCH_ICON, 'חיפוש בספרים'], ['#/zmanim/' + currentDate, NAV_ICON.clock, 'זמני היום'], ['#/siddur', NAV_ICON.book, 'סידור'], ['#/kivun', NAV_ICON.compass, 'כיוון התפילה'], ['#/tehillim', NAV_ICON.heart, 'תהילים אישי'], ['#/settings', ICON.gear, 'הגדרות'], ['#/sources', NAV_ICON.doc, 'מקורות ורישיונות'], ['#/about', NAV_ICON.info, 'אודות ומגבלות']].map(([h, i, t]) => `<a href="${h}">${i}<span>${t}</span></a>`).join('')}
+        ${[['#/lib', LIB_ICON, 'ספרייה'], ['#/search', SEARCH_ICON, 'חיפוש בספרים'], ['#/zmanim/' + currentDate, NAV_ICON.clock, 'זמני היום'], ['#/siddur', NAV_ICON.book, 'סידור'], ['#/kivun', NAV_ICON.compass, 'כיוון התפילה'], [ptHomeHref(), NAV_ICON.heart, 'תהילים אישי'], ['#/settings', ICON.gear, 'הגדרות'], ['#/sources', NAV_ICON.doc, 'מקורות ורישיונות'], ['#/about', NAV_ICON.info, 'אודות ומגבלות']].map(([h, i, t]) => `<a href="${h}">${i}<span>${t}</span></a>`).join('')}
       </nav>
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
@@ -401,7 +403,7 @@ async function renderHome(showLoc = false) {
     card.querySelector('.ring').setAttribute('stroke-dasharray', `${Math.round(frac * 100)} 100`);
     if (p?.done) { done++; card.classList.add('done'); meta.textContent = 'נלמד'; btn.textContent = 'קרא שוב'; }
     else if (p && p.frac > 0.01) { card.classList.add('started'); meta.textContent = `נקרא ${Math.round(p.frac * 100)}%`; btn.textContent = 'המשך'; }
-    describe(plan, u).then(t => { card.querySelector('[data-what]').textContent = t; })
+    describePre(plan, u).then(t => { card.querySelector('[data-what]').textContent = t; })
       .catch(() => { card.querySelector('[data-what]').textContent = 'שגיאה בטעינה – בדקו חיבור'; });
   }
   $('#daysum').textContent = done === units.length ? 'כל השיעורים נלמדו · יישר כח!' : `${done} מתוך ${units.length} נלמדו`;
@@ -425,7 +427,7 @@ function autoPrefetch() {
   const day = prefetched = currentDate;
   swControlled().then(async ok => {
     if (!ok) { if (prefetched === day) prefetched = ''; return; }   // try again on the next navigation
-    for (let i = 0; i < 3; i++) { const plan = dayPlan(shiftIso(day, i), { il: prefs.il }); for (const u of unitsFor()) await Promise.all((await filesFor(plan, u).catch(() => [])).map(f => fetch('data/' + f).catch(() => {}))); }
+    for (let i = 0; i < 3; i++) { const plan = dayPlan(shiftIso(day, i), { il: prefs.il }); for (const u of unitsFor()) await Promise.all((await filesForPre(plan, u).catch(() => [])).map(f => fetch('data/' + f).catch(() => {}))); }
     document.documentElement.dataset.prefetched = day;   // for tests
   });
 }
@@ -435,7 +437,7 @@ async function downloadAhead() {
     const files = new Set(['tanya/index.json', 'rambam/index.json', 'glossary.json', 'sources.json']);
     for (let i = 0; i < 30; i++) {
       const plan = dayPlan(shiftIso(currentDate, i), { il: prefs.il });
-      for (const u of unitsFor()) (await filesFor(plan, u)).forEach(f => files.add(f));
+      for (const u of unitsFor()) (await filesForPre(plan, u)).forEach(f => files.add(f));
     }
     let n = 0, ok = 0;
     for (const f of files) { if (await fetch('data/' + f).then(r => r.ok).catch(() => false)) ok++; n++; if (n % 10 === 0) btn.textContent = `מוריד… ${Math.round(100 * n / files.size)}%`; }
@@ -791,7 +793,9 @@ function renderSettings() {
     ${setCard('set-text', displayText())}
     ${setCard('set-tts', ttsForm())}
     ${setCard('set-siddur', siddurGroup())}
-    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>`, 'pt-settings')}
+    ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>
+    <fieldset><legend>לפני תהילים היומי (בשיעור היומי, ברצף אחד)</legend>${check('tehillimPre20', prefs.tehillimPre20, 'פרק כ׳')}${check('tehillimPrePersonal', prefs.tehillimPrePersonal, 'הפרקים האישיים (של כל מי שברשימה)')}${check('tehillimPreRebbe', prefs.tehillimPreRebbe, 'פרק הרבי (נולד י״א בניסן תרס״ב)')}
+    <p class="hint">הסדר: פרק כ׳, הפרקים האישיים, פרק הרבי – ואחריהם התהילים של היום, באותו קורא ובאותה הקראה.</p></fieldset>`, 'pt-settings')}
     ${setCard('set-backup', `<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
     <div class="set-actions"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
     <label class="btn" for="imp">ייבוא קובץ גיבוי</label><input type="file" id="imp" accept="application/json,.json" class="sr">
@@ -1013,7 +1017,9 @@ function personalTeaser() {
     const { r } = ptLine(p, currentDate);
     return `<span class="pt-chip"><b>${esc(n)}</b> ${r.chapter ? `פרק ${gem(r.chapter)}` : '—'}${r.isBirthday ? ' <span class="pt-bd">(יום הולדת – פרק חדש)</span>' : ''}</span>`;
   }).join('');
-  return `<a class="zm-teaser pt-teaser" id="pt-teaser" href="#/tehillim"><span class="zt-h">תהילים אישי</span><span class="zt-next">${items}</span><span class="go">פתח</span></a>`;
+  // 1.0.187 (Dudi: the button opened the profiles page, not the chapters): it opens the chapters one after another
+  return `<a class="zm-teaser pt-teaser" id="pt-teaser" href="#/tehillim/seq" aria-label="תהילים אישי – קריאת הפרקים ברצף"><span class="zt-h">תהילים אישי</span><span class="zt-next">${items}</span><span class="go">קריאה ברצף</span></a>
+  <p class="pt-manage"><a href="#/tehillim">עריכת הרשימה</a></p>`;
 }
 let ptKind = 'date';
 async function openPersonalChapter(ch) {
@@ -1024,6 +1030,61 @@ async function openPersonalChapter(ch) {
   if (my !== libSeq) return;
   if (!r?.node.leaf) { closeReader(); return renderPersonal(); }
   return openReader('tehillim', currentDate, null, { path, info: r, personal: true });
+}
+// 1.0.187: the personal chapters as a list – each chapter once, with whose it is (a chapter shared by two people, or by
+// someone and the Rebbe, is said once). Used for the continuous reading and for the chapters before the daily Tehillim.
+function ptChapterList(iso, { twenty = false, personal = true, rebbe = !!prefs.tehillimRebbe } = {}) {
+  const out = [];
+  const add = (c, who) => {
+    if (!(c >= 1 && c <= MAX_CHAPTER)) return;
+    const e = out.find(x => x.c === c);
+    if (e) { if (who && !e.who.includes(who)) e.who.push(who); } else out.push({ c, who: who ? [who] : [] });
+  };
+  if (twenty) add(20, '');
+  if (personal) for (const p of ptProfiles()) { const r = personalChapter(p, iso); if (!r.error && r.chapter) add(r.chapter, p.name); }
+  if (rebbe) { const r = rebbeChapter(iso); if (r.chapter) add(r.chapter, 'פרק הרבי'); }
+  return out.map(x => ({ c: x.c, label: x.who.join(', ') }));
+}
+const ptHasSeq = () => ptChapterList(currentDate).length > 0;
+function ptHomeHref() { return ptHasSeq() ? '#/tehillim/seq' : '#/tehillim'; }
+/** The chapters to say before the daily Tehillim (settings: chapter 20, the personal chapters, the Rebbe's), or []. */
+function prePlan(plan, unit) {
+  if (unit !== 'tehillim' || !(prefs.tehillimPre20 || prefs.tehillimPrePersonal || prefs.tehillimPreRebbe)) return [];
+  return ptChapterList(plan.iso || currentDate, { twenty: !!prefs.tehillimPre20, personal: !!prefs.tehillimPrePersonal, rebbe: !!prefs.tehillimPreRebbe });
+}
+// Each chapter is a normal Tehillim block list (same text, niqqud and read-aloud as the daily Tehillim); the ids carry a
+// prefix so a chapter that is also in the day's portion stays a separate, uniquely addressable copy.
+async function tehillimBlocks(list) {
+  const blocks = [];
+  for (let i = 0; i < list.length; i++) {
+    const { c, label } = list[i];
+    const d = await data(`tehillim/${c}.json`);
+    blocks.push({ type: 'h', text: `מזמור ${gem(c)}${label ? ` – ${label}` : ''}` });
+    for (let v = 1; v <= d.v.length; v++) blocks.push({ type: 'v', id: `p${i}_${c}:${v}`, ref: `Psalms ${c}:${v}`, num: gem(v), text: d.v[v - 1], src: 'tanakh' });
+  }
+  return blocks;
+}
+async function buildDocPre(plan, unit) {
+  const doc = await buildDoc(plan, unit), pre = prePlan(plan, unit);
+  if (!pre.length) return doc;
+  const blocks = [...await tehillimBlocks(pre), { type: 'h', text: `${doc.title} – תהילים היומי` }, ...doc.blocks];
+  return { ...doc, blocks, subtitle: `לפני השיעור: ${pre.map(x => gem(x.c)).join(', ')} · ${doc.subtitle}` };
+}
+async function filesForPre(plan, unit) {
+  // with the daily Tehillim, also the chapters said before it and the personal sequence (offline reading)
+  const extra = unit === 'tehillim' ? [...prePlan(plan, unit), ...ptChapterList(plan.iso || currentDate)].map(x => `tehillim/${x.c}.json`) : [];
+  return [...new Set([...extra, ...await filesFor(plan, unit)])];
+}
+async function describePre(plan, unit) {
+  const t = await describe(plan, unit), pre = prePlan(plan, unit);
+  return pre.length ? `לפני: ${pre.map(x => gem(x.c)).join(', ')} · ${t}` : t;
+}
+function openPersonalSeq() {
+  const iso = currentDate, list = ptChapterList(iso);
+  if (!list.length) { closeReader(); location.replace('#/tehillim'); return; }
+  const info = { node: { label: 'הפרקים האישיים', leaf: true }, crumbs: [], prev: null, next: null };
+  return openReader('tehillim', iso, null, { path: 'tehillim/seq', personal: true, seq: true, info,
+    makeDoc: async () => ({ book: 'Psalms', title: 'תהילים אישי – הפרקים ברצף', subtitle: list.map(x => `${gem(x.c)}${x.label ? ` (${x.label})` : ''}`).join(' · '), blocks: await tehillimBlocks(list), tanakh: true }) });
 }
 function renderPersonal() {
   const iso = currentDate, plan = dayPlan(iso, { il: prefs.il }), ps = ptProfiles();
@@ -1044,7 +1105,13 @@ function renderPersonal() {
   <p class="note pt-privacy">השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד (וגם בקובץ גיבוי, אם תייצאו אחד). דבר אינו נשלח. תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד; התמונה, הקובץ ומספרי הזהות אינם נשמרים.</p>
   <h2>הפרקים שלי</h2>
   ${ps.length ? `<ul class="pt-list">${ps.map(row).join('')}</ul>` : '<p id="pt-empty">עדיין לא נוספו אנשים. הוסיפו את עצמכם ואת בני המשפחה בטופס שלמטה.</p>'}
-  <label class="check"><input type="checkbox" id="pt-rebbe" ${prefs.tehillimRebbe ? 'checked' : ''}>הצג גם את פרק הרבי (נולד י״א בניסן תרס״ב) – כיום <a href="#/tehillim/${rb.chapter}">פרק ${gem(rb.chapter)}</a></label>
+  <label class="check"><input type="checkbox" id="pt-rebbe" ${prefs.tehillimRebbe ? 'checked' : ''}><span>הצג גם את פרק הרבי (נולד י״א בניסן תרס״ב) – כיום <a href="#/tehillim/${rb.chapter}">פרק ${gem(rb.chapter)}</a></span></label>
+  ${ps.length || prefs.tehillimRebbe ? `<p class="pt-seq"><a class="btn primary" id="pt-seq" href="#/tehillim/seq">קריאת הפרקים ברצף (${ptChapterList(iso).map(x => gem(x.c)).join(', ')})</a></p>` : ''}
+  <fieldset class="pt-pre"><legend>לפני תהילים היומי (בשיעור היומי, ברצף אחד)</legend>
+    <label class="check"><input type="checkbox" id="pt-pre20" ${prefs.tehillimPre20 ? 'checked' : ''}>פרק כ׳</label>
+    <label class="check"><input type="checkbox" id="pt-preP" ${prefs.tehillimPrePersonal ? 'checked' : ''}>הפרקים האישיים</label>
+    <label class="check"><input type="checkbox" id="pt-preR" ${prefs.tehillimPreRebbe ? 'checked' : ''}>פרק הרבי</label>
+    <p class="hint">הסדר: פרק כ׳, הפרקים האישיים, פרק הרבי – ואחריהם התהילים של היום. פרק שחוזר (למשל של שני אנשים) נאמר פעם אחת.</p></fieldset>
   <form class="form pt-form" id="pt-form" novalidate onsubmit="return false" aria-labelledby="pt-add-h">
     <h2 id="pt-add-h">הוספת אדם</h2>
     <label class="field"><span>שם</span><input type="text" id="pt-name" maxlength="40" autocomplete="off" aria-required="true"></label>
@@ -1125,7 +1192,8 @@ function renderPersonal() {
     const p = ps.find(x => x.id === b.dataset.del);
     if (p && confirm(`למחוק את ${p.name}?`)) { setPref('tehillimProfiles', ps.filter(x => x.id !== p.id)); renderPersonal(); toast('נמחק'); $('#pt-name')?.focus(); }
   }));
-  $('#pt-rebbe').onchange = e => setPref('tehillimRebbe', e.target.checked);
+  $('#pt-rebbe').onchange = e => { setPref('tehillimRebbe', e.target.checked); renderPersonal(); $('#pt-rebbe')?.focus(); };
+  for (const [id, k] of [['pt-pre20', 'tehillimPre20'], ['pt-preP', 'tehillimPrePersonal'], ['pt-preR', 'tehillimPreRebbe']]) { const el = $('#' + id); if (el) el.onchange = e => { setPref(k, e.target.checked); toast(e.target.checked ? 'יתווסף לפני תהילים היומי' : 'הוסר מלפני תהילים היומי'); }; }
   const go = () => { const n = Math.floor(Number($('#pt-go-n').value)); if (n >= 1 && n <= MAX_CHAPTER) location.hash = `#/tehillim/${n}`; else toast('מספר פרק בין 1 ל־150'); };
   $('#pt-go').onclick = go; $('#pt-go-n').onkeydown = e => { if (e.key === 'Enter') go(); };
   $('#pt-src-link').onclick = e => { e.preventDefault(); const h = $('#pt-sources'); h.scrollIntoView({ block: 'start' }); h.focus(); };
@@ -1134,14 +1202,19 @@ function renderPersonal() {
 function showPtReview(people) {
   const box = $('#pt-sapach-review'), list = $('#pt-review-list');
   if (!box || !list) return;
+  // 1.0.187: a row without a birth date (the holder's date is on the card, not on the appendix) or a child marked ז״ל
+  // starts unchecked, with the reason shown; a date read from a Hebrew date says so.
   list.innerHTML = people.map((p, i) => `<li class="pt-rev-item" data-i="${i}">
-    <label class="check"><input type="checkbox" class="pt-rev-on" checked> להוסיף${p.roleHe ? ` <small>(${esc(p.roleHe)})</small>` : ''}</label>
+    <label class="check"><input type="checkbox" class="pt-rev-on" ${p.noDate || p.deceased ? '' : 'checked'}> להוסיף${p.roleHe ? ` <small>(${esc(p.roleHe)})</small>` : ''}</label>
+    ${p.noDate ? '<p class="note pt-rev-why">תאריך הלידה לא מופיע בספח – אפשר להקליד אותו ולסמן.</p>' : p.deceased ? '<p class="note pt-rev-why">מסומן בספח ז״ל – לא סומן להוספה.</p>' : p.fromHebrew ? `<p class="note pt-rev-why">התאריך חושב מהתאריך העברי בספח: ${esc(p.fromHebrew)}</p>` : ''}
     <label class="field"><span>שם</span><input type="text" class="pt-rev-name" maxlength="40" value="${esc(p.name)}" autocomplete="off"></label>
     <label class="field"><span>תאריך לידה (יום/חודש/שנה)</span>
       <span class="datefield"><input type="text" class="pt-rev-greg" dir="ltr" inputmode="numeric" maxlength="10" placeholder="יי/חח/שששש" value="${esc(p.dateRaw || (p.greg ? fmtDmy(p.greg) : ''))}" autocomplete="off" spellcheck="false"></span>
     </label>
   </li>`).join('');
   list.querySelectorAll('.pt-rev-greg').forEach(bindDmyInput);
+  // typing a full date in a row that had none (the holder) marks it for adding
+  list.querySelectorAll('.pt-rev-item').forEach(li => { const g = li.querySelector('.pt-rev-greg'), on = li.querySelector('.pt-rev-on'); g?.addEventListener('input', () => { if (on && !on.checked && !people[+li.dataset.i]?.deceased && parseDmy(g.value)) on.checked = true; }); });
   box.hidden = false;
   box.scrollIntoView({ block: 'nearest' });
 }
@@ -1173,7 +1246,7 @@ function isSapachImage(file) {
 function sapachOcrProgress(st, extra) {
   return m => {
     const note = extra ? ` ${extra}` : '';
-    if (m?.status === 'recognizing text' && m.progress != null) st.textContent = `קורא את הספח במכשיר${note}… ${Math.round(m.progress * 100)}%`;
+    if (m?.status === 'recognizing text' && m.progress != null) st.textContent = `קורא את הספח במכשיר${note}${m.passes > 1 ? ` (קריאה ${m.pass} מתוך ${m.passes})` : ''}… ${Math.round(m.progress * 100)}%`;
     else if (m?.status === 'loading language traineddata' || m?.status === 'initializing tesseract') st.textContent = 'טוען את מודל העברית במכשיר…';
   };
 }
@@ -1193,11 +1266,11 @@ async function processSapachFile(file, st, { allowPdf }) {
       text = result.text || '';
       const images = result.images || [];
       if (images.length) {
-        const { recognizeSapachImage } = await import('./sapach-ocr.js');
+        const { recognizeSapachReadings } = await import('./sapach-ocr.js');
         const parts = [text];
         for (let i = 0; i < images.length; i++) {
           const extra = images.length > 1 ? `(עמוד ${i + 1} מתוך ${images.length})` : '';
-          parts.push(await recognizeSapachImage(images[i], sapachOcrProgress(st, extra)));
+          parts.push(pickReading(await recognizeSapachReadings(images[i], sapachOcrProgress(st, extra))));
           if (typeof images[i] === 'string' && images[i].startsWith('blob:')) revoke.push(images[i]);
         }
         text = parts.filter(Boolean).join('\n\n');
@@ -1206,12 +1279,13 @@ async function processSapachFile(file, st, { allowPdf }) {
       st.textContent = 'טוען את מנגנון הקריאה במכשיר (פעם ראשונה זה עשוי לקחת רגע)…';
       const url = URL.createObjectURL(file);
       revoke.push(url);
-      const { recognizeSapachImage } = await import('./sapach-ocr.js');
-      text = await recognizeSapachImage(url, sapachOcrProgress(st));
+      const { recognizeSapachReadings } = await import('./sapach-ocr.js');
+      text = pickReading(await recognizeSapachReadings(url, sapachOcrProgress(st)));
     }
     const { people } = parseSapachText(text);
     if (!people.length) { st.textContent = 'לא זוהו שמות ותאריכי לידה. אפשר להוסיף ידנית בטופס למעלה, או לנסות תצלום או קובץ חד וברור יותר.'; return; }
-    st.textContent = `זוהו ${people.length} אנשים. בדקו ותקנו לפני ההוספה. התמונה והקובץ לא נשמרו.`;
+    const ready = people.filter(p => p.name && p.greg && !p.deceased).length;
+    st.textContent = `זוהו ${people.length} אנשים${ready < people.length ? ` (${ready} מוכנים להוספה)` : ''}. בדקו ותקנו לפני ההוספה. התמונה והקובץ לא נשמרו.`;
     showPtReview(people);
   } catch (err) {
     console.error('sapach-ocr', err && err.message ? err.message : err);
@@ -1312,8 +1386,9 @@ async function openReader(unit, iso, sid = null, lib = null) {
   R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
   const lparent = R.libInfo?.crumbs.at(-1);
   const dayFocus = R.dayFocus; R.dayFocus = null;
-  const backHref = R.personal ? '#/tehillim' : lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
-  const backLbl = R.personal ? 'חזרה לתהילים אישי' : lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
+  R.ptSeq = !!lib?.seq;
+  const backHref = R.ptSeq ? '#/' : R.personal ? '#/tehillim' : lpath ? '#/lib/' + (lparent?.id || '') : sid ? '#/siddur' : '#/d/' + iso;
+  const backLbl = R.ptSeq ? 'חזרה לדף הבית' : R.personal ? 'חזרה לתהילים אישי' : lpath ? `חזרה ל${esc(lparent?.he || 'ספרייה')}` : sid ? 'חזרה לתוכן הסידור' : 'חזרה לדף הבית';
   el.innerHTML = `
   <main class="r-viewport ${prefs.layout}" id="vp" aria-label="טקסט השיעור"><article class="r-content" id="rc" lang="he" aria-live="off"><p>טוען…</p></article><div class="spine" aria-hidden="true"></div></main>
   <button type="button" class="r-fab" id="b-fab" aria-label="ניווט" aria-expanded="false" aria-controls="rchrome">${ICON.fab}</button>
@@ -1358,8 +1433,8 @@ async function openReader(unit, iso, sid = null, lib = null) {
       const [bk, n] = sid.split('/'); R.sorder = await siddurOrder(); R.doc = await buildSiddurBookDoc(bk, sidOpts());
       if (!R.doc.siddur.secs[n - 1]) throw new Error('siddur section not found');
     }
-    else if (lpath) R.doc = (await libDoc(lpath)).doc;
-    else R.doc = await buildDoc(plan, unit);
+    else if (lpath) R.doc = lib?.makeDoc ? await lib.makeDoc() : (await libDoc(lpath)).doc;
+    else R.doc = await buildDocPre(plan, unit);
   } catch (e) {
     // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
     const rc = $('#rc'); rc.classList.add('r-error'); rc.style.cssText = '';
@@ -1376,7 +1451,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     await renderDoc();
     const p = getProgress('lib', lpath);
     if (seek && seekSeg(seek)) { /* a search result or a shared link to a verse */ }
-    else if (p?.pos && !p.done) restore(p);
+    else if (p?.pos && !p.done && !R.ptSeq) restore(p); // the personal sequence changes from day to day: it opens at the start
     requestWake();
     if (dayFocus) { toast(R.libInfo.node.label); const b = $(`.daynav-top [data-day="${dayFocus}"]`); if (b && (R.page === 0 || prefs.layout !== 'pages') && b.getClientRects().length) b.focus({ preventScroll: true }); }
     if (auto) ttsToggle();
@@ -1431,7 +1506,7 @@ function libNavHtml(pos) {
   </nav>`;
 }
 function libCrumbsHtml() {
-  if (R.personal) return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום"><a href="#/tehillim">תהילים אישי</a> <i aria-hidden="true">›</i> <span>${esc(R.libInfo?.node.label || R.doc?.subtitle || '')}</span></nav>`;
+  if (R.personal) return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום"><a href="#/tehillim"${R.ptSeq ? ' aria-label="תהילים אישי – עריכת הרשימה"' : ''}>תהילים אישי</a> <i aria-hidden="true">›</i> <span>${esc(R.libInfo?.node.label || R.doc?.subtitle || '')}</span></nav>`;
   const c = R.libInfo?.crumbs || [];
   return `<nav class="doc-kicker lib-crumbs" aria-label="מיקום בספרייה"><a href="#/lib">ספרייה</a>${c.map(x => ` <i aria-hidden="true">›</i> <a href="#/lib/${x.id}">${esc(x.he)}</a>`).join('')}</nav>`;
 }
@@ -1659,7 +1734,7 @@ function nextUnit(autoplay) {
   // the end of a seder is the end of its last section
   if (R.sid && R.doc?.siddur) setProgress('siddur', `${R.sid.split('/')[0]}/${R.doc.siddur.secs.length}`, { done: true, frac: 1 });
   if (R.sid) { const nx = nextSid(); R.autoplay = !!nx && autoplay; location.hash = nx ? `#/s/${nx.book}/${nx.n}` : '#/siddur'; return; }
-  if (R.lib) { const nx = R.libInfo?.next; R.autoplay = !!nx && autoplay; location.hash = nx ? libChapterHref(nx) : (R.personal ? '#/tehillim' : `#/lib/${R.libInfo?.crumbs.at(-1)?.id || ''}`); return; }
+  if (R.lib) { const nx = R.libInfo?.next; R.autoplay = !!nx && autoplay; location.hash = nx ? libChapterHref(nx) : (R.ptSeq ? '#/' : R.personal ? '#/tehillim' : `#/lib/${R.libInfo?.crumbs.at(-1)?.id || ''}`); return; }
   const n = nextUnitId();
   if (!n) { toastAfterNav = 'סיימת את כל שיעורי היום. יישר כח!'; location.hash = '#/d/' + R.iso; return; }
   R.autoplay = autoplay;
