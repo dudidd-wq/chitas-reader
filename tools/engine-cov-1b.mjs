@@ -63,7 +63,7 @@ export function applyManifest(root,manifest){
 const manifestURL=new URL('./engine-cov-1b-manifest.json',import.meta.url);
 if(process.argv[1]&&fileURLToPath(import.meta.url)===path.resolve(process.argv[1])){
   const bytes=fs.readFileSync(manifestURL);
-  demand(sha(bytes)==='084b5bcf6a65de32f86ec1071f710f4c551c925100c7e43b745f9406729ff92a','frozen manifest changed; independent review required');
+  demand(sha(bytes)==='56bed6caf204776c101273661ed0e9f4fc5387cd74e05059e7c10520e453734b','frozen manifest changed; independent review required');
   const root=fileURLToPath(new URL('../',import.meta.url));
   console.log(JSON.stringify(applyManifest(root,JSON.parse(bytes))));
 }

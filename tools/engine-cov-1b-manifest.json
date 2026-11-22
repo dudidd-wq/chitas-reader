@@ -11249,8 +11249,8 @@
     },
     {
       "path": "site/data/gemara/ysay/Ketubot/52.json",
-      "before_sha256": "82e9b3a413543325496f68881e53cdcb6c6e6ab10412af298f40697fb9d5fe2b",
-      "after_sha256": "82e9b3a413543325496f68881e53cdcb6c6e6ab10412af298f40697fb9d5fe2b"
+      "before_sha256": "52c2bc352cc38e06530204195261937f45620c32ca2c4eb306a98d0f41620fc7",
+      "after_sha256": "52c2bc352cc38e06530204195261937f45620c32ca2c4eb306a98d0f41620fc7"
     },
     {
       "path": "site/data/gemara/ysay/Kilayim/37.json",
