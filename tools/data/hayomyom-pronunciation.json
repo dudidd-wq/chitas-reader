@@ -2,7 +2,8 @@
   "_notes": [
     "Exact vocalized forms only; no replacing ambiguous bare words by guesswork.",
     "HATAMA U+05AB marks primary stress for the existing local IPA path; it is stripped before Web Speech.",
-    "Phrase corrections are specific to their context. No Yiddish is deleted."
+    "Phrase corrections are specific to their context. No Yiddish is deleted.",
+    "מספר noun/verb (and closely similar ספר) phrase fixes: only clear contextual cases, never a bare-word swap."
   ],
   "words": {
     "לָנוּ": {
@@ -63,6 +64,22 @@
     {
       "from": "ראש אייל",
       "to": "רֹאשׁ אַ֫יִל"
+    },
+    {
+      "from": "הלא המספר",
+      "to": "הֲלֹ֫א הַמְסַפֵּ֫ר"
+    },
+    {
+      "from": "מספרים, שבכתב",
+      "to": "מְסַפְּרִ֫ים, שֶׁבִּכְתָ֫ב"
+    },
+    {
+      "from": "מספר של בינונים",
+      "to": "מִסֵּ֫פֶר שֶׁל בֵּינוֹנִ֫ים"
+    },
+    {
+      "from": "הצמח צדק בספרו לבנו",
+      "to": "הַצֶּ֫מַח צֶ֫דֶק בְּסַפְּרוֹ֫ לִבְנוֹ֫"
     }
   ]
 }
