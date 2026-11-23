@@ -11229,8 +11229,8 @@
   "pins": [
     {
       "path": "site/data/gemara/ysay/Berakhot/19.json",
-      "before_sha256": "3275cdf30bf38fc3468b64ab64c1ee9b88c9343f368d769f120eea2a1ae31ae7",
-      "after_sha256": "3275cdf30bf38fc3468b64ab64c1ee9b88c9343f368d769f120eea2a1ae31ae7"
+      "before_sha256": "58106fcb951f6c31730d234505dd21aa5629d645e52ce2b574ec675acf852bac",
+      "after_sha256": "58106fcb951f6c31730d234505dd21aa5629d645e52ce2b574ec675acf852bac"
     },
     {
       "path": "site/data/gemara/ysay/Berakhot/46.json",
@@ -11249,13 +11249,13 @@
     },
     {
       "path": "site/data/gemara/ysay/Ketubot/52.json",
-      "before_sha256": "52c2bc352cc38e06530204195261937f45620c32ca2c4eb306a98d0f41620fc7",
-      "after_sha256": "52c2bc352cc38e06530204195261937f45620c32ca2c4eb306a98d0f41620fc7"
+      "before_sha256": "7c2f03e0f03fd842b7664e130ed69a00a4312ee03c09e70280a980339250bab0",
+      "after_sha256": "7c2f03e0f03fd842b7664e130ed69a00a4312ee03c09e70280a980339250bab0"
     },
     {
       "path": "site/data/gemara/ysay/Kilayim/37.json",
-      "before_sha256": "090e60abdf7f9b146e68932bbf27cb008a4c4a36bbca22f3bc4aca0488bf4e8a",
-      "after_sha256": "090e60abdf7f9b146e68932bbf27cb008a4c4a36bbca22f3bc4aca0488bf4e8a"
+      "before_sha256": "4587807ba869a9ed3046caa217ad4605e62dc07694a829c599310139ab12d8ae",
+      "after_sha256": "4587807ba869a9ed3046caa217ad4605e62dc07694a829c599310139ab12d8ae"
     },
     {
       "path": "site/data/gemara/ysay/Peah/23.json",
@@ -11274,8 +11274,8 @@
     },
     {
       "path": "site/data/gemara/ysay/Peah/5.json",
-      "before_sha256": "80ae2b4b648c7c6883c64b0449277d84b6b1d705fd3a983eaa52aa5eef723ea6",
-      "after_sha256": "80ae2b4b648c7c6883c64b0449277d84b6b1d705fd3a983eaa52aa5eef723ea6"
+      "before_sha256": "dae668a61d521383e17e4fd40c2ae62f762c866960be1bd3d86d5afce8f3566e",
+      "after_sha256": "dae668a61d521383e17e4fd40c2ae62f762c866960be1bd3d86d5afce8f3566e"
     },
     {
       "path": "site/data/gemara/ysay/Sheviit/8.json",
