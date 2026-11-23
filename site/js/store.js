@@ -6,7 +6,7 @@ const KEY = 'chitas-reader.v1';
 export const DEFAULT_PREFS = {
   theme: 'paper', design: 'classic', designFont: 'design', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, rashiFont: 'rashi', hayomNiqqud: true, biurNiqqud: true, mitzvotNiqqud: true, lessonNach: false, lessonShnayim: false, shnayimSplit: 'day', gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false, lessonDaf: false, lessonAmud: false, lessonYer: false, lessonMishna: false,
-  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsSkipCites: true, ttsContinuous: true,
+  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsGemaraBiurOnly: false, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
@@ -24,7 +24,7 @@ export const snapRate = r => TTS_RATES.reduce((a, b) => (Math.abs(b - r) < Math.
 function load() {
   try {
     const d = JSON.parse(localStorage.getItem(KEY) || '{}'), prefs = { ...DEFAULT_PREFS, ...(d.prefs || {}) };
-    for (const k of ['readingBold', 'hideSiddurInstructions', 'ttsVocalizedGemara']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
+    for (const k of ['readingBold', 'hideSiddurInstructions', 'ttsVocalizedGemara', 'ttsGemaraBiurOnly']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
     if (prefs.font === 'cardo') prefs.font = 'noto'; // 1.0.139: Cardo removed – its Hebrew marks are misplaced
     if (typeof prefs.hayomNiqqud !== 'boolean') prefs.hayomNiqqud = true;
     if (typeof prefs.biurNiqqud !== 'boolean') prefs.biurNiqqud = true;

@@ -191,7 +191,8 @@ test('store.js: DEFAULT_PREFS.ttsVocalizedGemara === false and load() sanitizes 
 test('app.js string-level checks: ttsForm has the Hebrew checkbox + explanation and ttsSegments uses speechTextForBlock', () => {
   const appSrc = readFileSync(resolve(jsDir, 'app.js'), 'utf8');
 
-  assert.match(appSrc, /import\s+\{\s*speechTextForBlock\s*\}\s+from\s+['"]\.\/gemara-speech\.js['"]/);
+  assert.match(appSrc, /import\s+\{[^}]*speechTextForBlock[^}]*\}\s+from\s+['"]\.\/gemara-speech\.js['"]/);
+  assert.match(appSrc, /primaryPartForSegment/);
 
   const ttsFormMatch = appSrc.match(/function ttsForm\(\)\s*\{[\s\S]*?\n\}/);
   assert.ok(ttsFormMatch, 'ttsForm() found in app.js');

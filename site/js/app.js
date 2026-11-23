@@ -1,5 +1,5 @@
 import { nps1Speech } from './bavli-nps1.js';
-import { speechTextForBlock } from './gemara-speech.js';
+import { speechTextForBlock, primaryPartForSegment } from './gemara-speech.js';
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, formatDmyInput, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
@@ -760,6 +760,8 @@ function ttsForm() {
   ${check('ttsBiur', prefs.ttsBiur, 'הקרא גם את ה״ביאור הקצר״ אחרי כל פסקה')}
   ${check('ttsVocalizedGemara', prefs.ttsVocalizedGemara, 'הקרא את הגמרא המנוקדת במקום הביאור')}
   <small>בדף היומי ובעמוד היומי, ובירושלמי במקום ״פני משה״. ברירת המחדל נשארת הקראת הביאור. התצוגה לא משתנה: רואים גמרא וביאור כמו היום. כשהאפשרות מסומנת שומעים את נוסח הגמרא המנוקד שכבר במאגר (מהדורת דייוידסון בבבלי, גוגנהיימר בירושלמי), לא את הביאור.</small>
+  ${check('ttsGemaraBiurOnly', prefs.ttsGemaraBiurOnly, 'בגמרא: להקריא רק את הביאור (בלי הגמרא הארמית)')}
+  <small>בדף היומי, בעמוד היומי ובירושלמי. כשהאפשרות מסומנת מוקרא רק הביאור (שטיינזלץ או פני משה), והגמרא הארמית מדולגת – גם אם סומנה האפשרות להקריא את הגמרא המנוקדת. קטע בלי ביאור מדולג בלי הפסקה. ברירת המחדל אינה מסומנת, וההקראה נשארת כמו שהיא היום.</small>
   ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}`;
@@ -771,6 +773,8 @@ function bindForm(root, onChange) {
     if (typeof DEFAULT_PREFS[el.name] === 'number') v = Number(v);
     if (el.name === 'il') { v = v === 'true' || v === true; setPref('locationChosen', true); }
     setPref(el.name, v);
+    if (el.name === 'ttsGemaraBiurOnly' && v === true) { setPref('ttsVocalizedGemara', false); const m = root.querySelector('input[name=ttsVocalizedGemara]'); if (m) m.checked = false; }
+    if (el.name === 'ttsVocalizedGemara' && v === true) { setPref('ttsGemaraBiurOnly', false); const m = root.querySelector('input[name=ttsGemaraBiurOnly]'); if (m) m.checked = false; }
     if (el.name === 'font' && v === 'frank') setPref('taamim', false);
     // 1.0.114: under a design, picking a font in the list means "my font" – otherwise the choice would not be seen
     if (el.name === 'font' && prefs.design !== 'classic' && prefs.designFont !== 'mine') { setPref('designFont', 'mine'); const m = root.querySelector('input[name=designFont][value=mine]'); if (m) m.checked = true; }
@@ -2120,17 +2124,22 @@ document.addEventListener('keydown', e => {
 
 // ---------------- TTS in reader ----------------
 function ttsSegments() {
-  const byId = R.doc.tanakh ? new Map(R.doc.blocks.map(b => [String(b.id), b])) : null;
-  const say = new Map(R.doc.blocks.map(b => [String(b.id), speechTextForBlock(b, prefs, { nps1Speech, fallback: '' })]).filter(([, t]) => t));
+  const allById = new Map(R.doc.blocks.map(b => [String(b.id), b]));
+  const byId = R.doc.tanakh ? allById : null;
+  const sayOpts = { nps1Speech, fallback: '' };
+  const say = new Map(R.doc.blocks.map(b => [String(b.id), speechTextForBlock(b, prefs, sayOpts)]).filter(([, t]) => t));
   const sbm = prefs.ttsBiur && prefs.shortBiur !== false ? new Map(R.doc.blocks.filter(b => b.sb).map(b => [String(b.id), b.sb.v])) : null; // 1.0.100
   // 1.0.101: every source uses pauseChunks (0.18 s / 0.38 s). 1.0.96 introduced this for Gemara.
   // 1.0.90: Kaddish paragraphs of the siddur are skipped by the read-aloud when the reader chose so; they stay on screen
   const skipK = R.doc.siddur && prefs.siddurKaddish === 'skip' ? new Set(R.doc.blocks.filter(b => b.kaddish).map(b => String(b.id))) : null;
   return R.segs.map(s => {
     if (skipK?.has(s.dataset.id)) return { el: s, parts: [], cites: [], acc: null, accParts: [], primaryParts: [], kaddish: true };
-    const parts = [say.has(s.dataset.id) ? say.get(s.dataset.id) : unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
+    const srcBlock = allById.get(s.dataset.id);
+    const primary = primaryPartForSegment(srcBlock, prefs, { ...sayOpts, displayedFallback: '' });
+    if (primary.skip) return { el: s, parts: [], cites: [], acc: null, accParts: [], primaryParts: [], gemaraSkip: true };
+    const parts = [primary.text || unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
     // Speech-only Rashi keeps the display edition intact and supplies its own primary-stress metadata.
-    const block = byId?.get(s.dataset.id), accParts = [block?.text || say.get(s.dataset.id) || null], primaryParts = [say.has(s.dataset.id)];
+    const block = byId?.get(s.dataset.id), accParts = [block?.text || primary.text || null], primaryParts = [!!primary.text];
     // 1.0.98: Shnayim Mikra – the verse twice; Nach / Onkelos – the explanation / Targum after the verse (speech text)
     for (let k = 1; k < (block?.repeat || 1); k++) { parts.push(parts[0]); accParts.push(accParts[0]); primaryParts.push(primaryParts[0]); }
     for (const x of block?.biurSay || []) if (x) { parts.push(x); accParts.push(x); primaryParts.push(true); }
@@ -2210,6 +2219,11 @@ async function ttsToggle() {
   });
   R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara, pitch: prefs.ttsPitch },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: R.lib ? 'ספרייה' : dayPlan(R.iso, { il: prefs.il }).hebDate });
+  if (!R.speaker.queue.length) {
+    R.speaker = null; R.ttsShown = false; showTtsBar(false);
+    toast('אין ביאור להקראה בשיעור הזה');
+    return;
+  }
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);
   R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
