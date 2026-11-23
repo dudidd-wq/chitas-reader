@@ -11414,8 +11414,8 @@
     },
     {
       "path": "site/js/texts.js",
-      "before_sha256": "f9e8577762bed228a719edddf285b8b5f9cde7ec0c414d2237c47a84d65443ff",
-      "after_sha256": "f9e8577762bed228a719edddf285b8b5f9cde7ec0c414d2237c47a84d65443ff"
+      "before_sha256": "8dd7c13818d2bf4d5ed2ff0ebc3c06ba734ce93379cd5f8831aa0bed0352f282",
+      "after_sha256": "8dd7c13818d2bf4d5ed2ff0ebc3c06ba734ce93379cd5f8831aa0bed0352f282"
     },
     {
       "path": "site/js/tts-prep.js",

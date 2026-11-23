@@ -47,7 +47,7 @@ test('Mishnah: a whole chapter with Bartenura; the mishnah then Bartenura is rea
   const r = await libNode('mishnah/Berakhot/1'); assert.equal(r.next.id, 'mishnah/Berakhot/2');
   const { doc } = await libDoc('mishnah/Berakhot/1'), ps = doc.blocks.filter(b => b.type === 'p');
   assert.equal(ps.length, 5);
-  assert.ok(ps.every(b => b.biur.length && b.say.startsWith(strip(b.text.replace(/<[^>]+>/g, '')).slice(0, 8)) || b.say.startsWith(b.text.replace(/<[^>]+>/g, '').slice(0, 8))));
+  assert.ok(ps.every(b => { const plain = b.text.replace(/<[^>]+>/g, ''); const say0 = b.say.replace(/\u05AB/g, ''); return b.biur.length && (say0.startsWith(strip(plain).slice(0, 8)) || say0.startsWith(plain.slice(0, 8))); }));
 });
 
 test('Shekalim of the Daf Yomi is the Jerusalem Talmud (Vilna Bavli pages)', async () => {

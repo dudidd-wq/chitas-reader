@@ -439,7 +439,8 @@ async function gemaraDoc(plan, unit) {
     if (spec.chapter) blocks.push({ type: 'h', text: `משנה ${gem(m.m)}` });
     if (s?.partial && !partial) partial = s.partial;
     const plain = f.m[i].replace(/<[^>]+>/g, '');
-    blocks.push({ type: 'p', id: `${m.c}.${m.m}`, ref: `Mishnah ${m.t} ${m.c}:${m.m}`, text: f.m[i], biur: f.b[i] || [], biurV: s?.v?.[i], biurLabel: 'ברטנורא', say: [plain, ...(s?.bs?.[i] || []).filter(Boolean)].join(' '), src: 'gemara', pause: true });
+    const mishnaSay = s?.ms?.[i] || plain;
+    blocks.push({ type: 'p', id: `${m.c}.${m.m}`, ref: `Mishnah ${m.t} ${m.c}:${m.m}`, text: f.m[i], biur: f.b[i] || [], biurV: s?.v?.[i], biurLabel: 'ברטנורא', say: [mishnaSay, ...(s?.bs?.[i] || []).filter(Boolean)].join(' '), src: 'gemara', pause: true });
   }
   if (partial) blocks.unshift(partialNote(partial));
   return { title, subtitle, blocks, raw: true, gemara: 'mishna', credits: gemaraCredits(idx, [['משנה', 'mishnah'], ['ברטנורא', 'bartenura']]) };
