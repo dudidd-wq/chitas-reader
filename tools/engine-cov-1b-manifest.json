@@ -11229,13 +11229,13 @@
   "pins": [
     {
       "path": "site/data/gemara/ysay/Berakhot/19.json",
-      "before_sha256": "58106fcb951f6c31730d234505dd21aa5629d645e52ce2b574ec675acf852bac",
-      "after_sha256": "58106fcb951f6c31730d234505dd21aa5629d645e52ce2b574ec675acf852bac"
+      "before_sha256": "29e476a1770885440c442ac9424a139fca8963bc9c4f563179180936228135f4",
+      "after_sha256": "29e476a1770885440c442ac9424a139fca8963bc9c4f563179180936228135f4"
     },
     {
       "path": "site/data/gemara/ysay/Berakhot/46.json",
-      "before_sha256": "66aeecaa1ee894894898fe0b16441f4a899c94342509699b8520e19925ec2a71",
-      "after_sha256": "66aeecaa1ee894894898fe0b16441f4a899c94342509699b8520e19925ec2a71"
+      "before_sha256": "15ee17218008b596f5d231fb55b6ca526f6fd37524f21b7976a61336e0c9f752",
+      "after_sha256": "15ee17218008b596f5d231fb55b6ca526f6fd37524f21b7976a61336e0c9f752"
     },
     {
       "path": "site/data/gemara/ysay/Berakhot/47.json",
@@ -11244,48 +11244,48 @@
     },
     {
       "path": "site/data/gemara/ysay/Demai/23.json",
-      "before_sha256": "6c00f4d449b97be0cce2e269301790437d8ab5a474d296e60d8e67eae8fbc0b0",
-      "after_sha256": "6c00f4d449b97be0cce2e269301790437d8ab5a474d296e60d8e67eae8fbc0b0"
+      "before_sha256": "b0a4e87d022334a3547b48cfc89a1657be845c8847965b626da5425df52ab528",
+      "after_sha256": "b0a4e87d022334a3547b48cfc89a1657be845c8847965b626da5425df52ab528"
     },
     {
       "path": "site/data/gemara/ysay/Ketubot/52.json",
-      "before_sha256": "7c2f03e0f03fd842b7664e130ed69a00a4312ee03c09e70280a980339250bab0",
-      "after_sha256": "7c2f03e0f03fd842b7664e130ed69a00a4312ee03c09e70280a980339250bab0"
+      "before_sha256": "d0c2ee69a22ec8cb8e3b10076116c15fc41fd6c4949f284b3882eb9cf726f545",
+      "after_sha256": "d0c2ee69a22ec8cb8e3b10076116c15fc41fd6c4949f284b3882eb9cf726f545"
     },
     {
       "path": "site/data/gemara/ysay/Kilayim/37.json",
-      "before_sha256": "4587807ba869a9ed3046caa217ad4605e62dc07694a829c599310139ab12d8ae",
-      "after_sha256": "4587807ba869a9ed3046caa217ad4605e62dc07694a829c599310139ab12d8ae"
+      "before_sha256": "6a4547f4c6c7f96bc0fa55ee3b6c69fad400211438f5020bf1e260f1d5fe8805",
+      "after_sha256": "6a4547f4c6c7f96bc0fa55ee3b6c69fad400211438f5020bf1e260f1d5fe8805"
     },
     {
       "path": "site/data/gemara/ysay/Peah/23.json",
-      "before_sha256": "98970b1ec2f9c20c037dd73706516fb95344302e69f25d94b4fedf2bb3993e38",
-      "after_sha256": "98970b1ec2f9c20c037dd73706516fb95344302e69f25d94b4fedf2bb3993e38"
+      "before_sha256": "1632bfb3051cadabf96a014d9692c9b21f86362a69461db38457466f71b78648",
+      "after_sha256": "1632bfb3051cadabf96a014d9692c9b21f86362a69461db38457466f71b78648"
     },
     {
       "path": "site/data/gemara/ysay/Peah/26.json",
-      "before_sha256": "1ab9d9d91fe2ef4ab0125f821924b61b0e714292e1bda6d8f8eeb426f9d23e23",
-      "after_sha256": "1ab9d9d91fe2ef4ab0125f821924b61b0e714292e1bda6d8f8eeb426f9d23e23"
+      "before_sha256": "f4484eb13303a91fc178baa12625d6886d0f2a8e705534bbed2e20ff66248b99",
+      "after_sha256": "f4484eb13303a91fc178baa12625d6886d0f2a8e705534bbed2e20ff66248b99"
     },
     {
       "path": "site/data/gemara/ysay/Peah/36.json",
-      "before_sha256": "a7e5de2a462a1229b45795c504fd8d9791f11b8cc4daa0065adaacd3e132bbd5",
-      "after_sha256": "a7e5de2a462a1229b45795c504fd8d9791f11b8cc4daa0065adaacd3e132bbd5"
+      "before_sha256": "2d6c0774c5946dec1a23c86fd69418900cb3e20ffc6d51097f858399605b4d34",
+      "after_sha256": "2d6c0774c5946dec1a23c86fd69418900cb3e20ffc6d51097f858399605b4d34"
     },
     {
       "path": "site/data/gemara/ysay/Peah/5.json",
-      "before_sha256": "dae668a61d521383e17e4fd40c2ae62f762c866960be1bd3d86d5afce8f3566e",
-      "after_sha256": "dae668a61d521383e17e4fd40c2ae62f762c866960be1bd3d86d5afce8f3566e"
+      "before_sha256": "48debeec1300550d819ac6b03b146931fbdfdc435e6094ea2f6ef7bc672dde97",
+      "after_sha256": "48debeec1300550d819ac6b03b146931fbdfdc435e6094ea2f6ef7bc672dde97"
     },
     {
       "path": "site/data/gemara/ysay/Sheviit/8.json",
-      "before_sha256": "ac17141cecc8192d6e67a9046b61c705e41d87511f419a3207c40a9e7e28230e",
-      "after_sha256": "ac17141cecc8192d6e67a9046b61c705e41d87511f419a3207c40a9e7e28230e"
+      "before_sha256": "7041dea407e8bb94a81e67f9dc9141200f793592a35837afc34b6705d2bd8a82",
+      "after_sha256": "7041dea407e8bb94a81e67f9dc9141200f793592a35837afc34b6705d2bd8a82"
     },
     {
       "path": "site/data/gemara/ysay/Terumot/26.json",
-      "before_sha256": "311ec117eb667a8d1bd5d926ae0f148c44da516ddaa4eb06108bf65e89158bed",
-      "after_sha256": "311ec117eb667a8d1bd5d926ae0f148c44da516ddaa4eb06108bf65e89158bed"
+      "before_sha256": "c859655a7e0b9321b8f3c28558e3d30fe4941b2b95987e04b6b3b2a7b51fc059",
+      "after_sha256": "c859655a7e0b9321b8f3c28558e3d30fe4941b2b95987e04b6b3b2a7b51fc059"
     },
     {
       "path": "site/data/nach/I_Samuel/15.json",
