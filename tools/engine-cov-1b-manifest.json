@@ -11364,18 +11364,18 @@
     },
     {
       "path": "site/data/nachv/Isaiah/22.json",
-      "before_sha256": "f597d10ce095b690bb26af6d508447047a40a08bdb3d5348564454e3f67d8916",
-      "after_sha256": "1daded19c81d8caed8cd930a9381b5f18e832128d68cf2ab93f505932db5ed19"
+      "before_sha256": "4f4610d0c6713f9fae25c9df177d0bbf1cb3720fc771c0053ce799323d716bcd",
+      "after_sha256": "74fda0622e7bf5e2b84a7151ffcaa2539858ced25d5ed7f02f43b6801d30c998"
     },
     {
       "path": "site/data/nachv/Isaiah/27.json",
-      "before_sha256": "e99bd2e14047ba2d71eba35a4563e89768000ebe2fdd3bd59af1a71be7db6df3",
-      "after_sha256": "32ffe7a001fdee4077d62ec4c2876b79e7bc2bfd36f9a0505e26561ca1c71192"
+      "before_sha256": "9df37b92096521f44b2d316cba05eb6b34b1952415470e701f11127edebcaed0",
+      "after_sha256": "e9325d4739c5277b58fedba20236350a4904cd7cd6c465dfe2a944e47bb284d4"
     },
     {
       "path": "site/data/nachv/Isaiah/61.json",
-      "before_sha256": "18a08525fea095a45ad518282f2b362cdbcd6ab4ba34d6cf61b94e45b19831a1",
-      "after_sha256": "5ea80a501010b0046b9ce2e6bd9a5e4b53c083c38d7074c1480a5bdd9f9e31a0"
+      "before_sha256": "c240ac5aa3088003df01433df8460b90d5a21c3cceac0b452886c46f3c4d8ac8",
+      "after_sha256": "8732cfe308c40dc2923b05c64ab750603b26043f1972fcbbf46e84ff184fe438"
     },
     {
       "path": "site/data/nachv/Joshua/15.json",
