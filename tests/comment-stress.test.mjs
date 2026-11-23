@@ -27,10 +27,30 @@ test('lexicon apply report, gates, display/sidecar bytes, and ole invariants hol
   assert.ok((blocked.forms || []).includes('זָרַע'));
   assert.equal((report.occurrences || []).filter(o => o.key === 'זָרַע').length, 0);
 
+  const reportPages = new Set((report.occurrences || []).map(o => 'site/data/' + o.page + '.json'));
+  assert.equal(reportPages.size, report.pagesWritten);
+  assert.equal(report.pagesWritten, 6055);
+  assert.equal(report.changedTokens, 34146);
+  for (const rel of report.skippedPins) {
+    assert.ok(fs.existsSync(path.join(ROOT, rel)), 'missing pin ' + rel);
+  }
+  const pickSay = (say, segs) => segs.reduce((n, i) => n[i], say);
+  const pageCache = new Map();
+  const loadPage = rel => {
+    if (!pageCache.has(rel)) {
+      const f = path.join(ROOT, rel);
+      assert.ok(fs.existsSync(f), 'missing page ' + rel);
+      pageCache.set(rel, JSON.parse(fs.readFileSync(f, 'utf8')));
+    }
+    return pageCache.get(rel);
+  };
+  for (const rel of reportPages) loadPage(rel);
+
+  // git diff HEAD is empty on a clean CI checkout of the release; only use it in a dirty worktree.
   const changedSet = new Set(execFileSync('git', ['diff', '--name-only', 'HEAD', '--',
     'site/data/gemara/bsay', 'site/data/gemara/ysay', 'site/data/nachv'], { cwd: ROOT, encoding: 'utf8' })
     .trim().split('\n').filter(Boolean));
-  assert.equal(changedSet.size, report.pagesWritten);
+  if (changedSet.size) assert.equal(changedSet.size, report.pagesWritten);
 
   let oleAdded = 0, lavHits = 0, blockedHits = 0;
   for (const rel of changedSet) {
@@ -91,6 +111,10 @@ test('lexicon apply report, gates, display/sidecar bytes, and ole invariants hol
     assert.ok(o.dest.includes(HATAMA));
     assert.equal(stripOle(o.dest), o.src);
     assert.equal(isLav(o.bare), false);
+    const rel = 'site/data/' + o.page + '.json';
+    const sayNode = pickSay(loadPage(rel).say, o.path);
+    assert.equal(typeof sayNode, 'string', rel);
+    assert.ok(sayNode.includes(o.dest), 'dest missing ' + rel + ' ' + o.dest);
     if (o.key === 'זָרַע') blockedHits++;
     oleAdded++;
   }
