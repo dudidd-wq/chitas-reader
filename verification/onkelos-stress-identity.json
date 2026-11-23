@@ -1,0 +1,459 @@
+{
+  "n_pages": 75,
+  "n_tokens": 196,
+  "n_forms": 29,
+  "alreadyOle": 1310,
+  "alignment": "torah-verse-stressKey",
+  "rows": [
+    {
+      "file": "site/data/onkelos/Deuteronomy/1.json",
+      "t_sha256": "392e89b7f97e1168856687fa2211f19e94a6e74d467cd2c5c23f53202bc9696e",
+      "say_strip_ole_sha256": "dc43aee2485f334d54be3ec4f6f8cde72f1694d7babdb0cf81fd78a3cf7bb8c4",
+      "verses": 46
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/11.json",
+      "t_sha256": "d85c19d4f85bc9620c87393549313be0676a2a142743853ed84e5d27e5c42a3d",
+      "say_strip_ole_sha256": "9ec047bd28c9bc25939ada9e8651f5425008d100f382d8cc8fd377b0134ac682",
+      "verses": 32
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/15.json",
+      "t_sha256": "b692517fbfca4c04c1bd6ad6eb18f93806bf196d2d14bd8d7b3aea9d42db1f93",
+      "say_strip_ole_sha256": "9e04be7d3025e1af7f1bce9f22524486e4c3cd87abc5510a05fedfd257077ea1",
+      "verses": 23
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/16.json",
+      "t_sha256": "0d58f4753e58dea99c83c77a62c87347605cafadaf0ec97acced6700238577c9",
+      "say_strip_ole_sha256": "a4f2bc05acfe6007c4f1cde29153505b601c38f5e35778dddf88e872032d2d9d",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/23.json",
+      "t_sha256": "b9100b601d0c20f0d244cd9a9226ee740ab9de8c599b4245601234dd5f596a8a",
+      "say_strip_ole_sha256": "af9a208d43f03caab0f890802738f77cc767b9306f92e486f28071cbafc4886b",
+      "verses": 26
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/24.json",
+      "t_sha256": "c038a48a8e343b69511f5d69651d445d7e9700d4a1507cae58c12c647fb0c34d",
+      "say_strip_ole_sha256": "02a38e4dc34ecb1451ae52299e4fba34104456ed1934e36adada9416c035ef2f",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/25.json",
+      "t_sha256": "9ab749b32247860e602f188e198ee4d8c84d3b620b460cd0713f22a9413f843d",
+      "say_strip_ole_sha256": "a99d91dbf605451f5e182a3473a39d6d976d2a72a808578efb84f74722f51430",
+      "verses": 19
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/26.json",
+      "t_sha256": "806ed8c50ee90ed8fe1acade1432e9e0982c56e6987a6ce765ce693efb917b0a",
+      "say_strip_ole_sha256": "bb868d4968294ac2ecc0a4d9e030c79a33821378c1a5b9c3e482491814500a63",
+      "verses": 19
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/28.json",
+      "t_sha256": "492a7e77aafde59d36c8bd49a7d4445e94703e20977ef907e3f7b6e7b4a83e9b",
+      "say_strip_ole_sha256": "c0e6d3bc836f9e728996ea9aced2ef512d8353fda24bd8ff52b9c849f4359573",
+      "verses": 69
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/33.json",
+      "t_sha256": "f57e538a8615ce0e92cc262454c2dde0dc52855df24053ae5c6fb9ee0ce7323c",
+      "say_strip_ole_sha256": "a31c0cbbcd555d0b448aff507c67908080472d454656bc5ae995ffac0f4358cf",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/34.json",
+      "t_sha256": "d1b99bf030b591e3112b5b0580bc483598598672168093e87a91cb82b056dc3f",
+      "say_strip_ole_sha256": "55c24622f3d9214307e1e499b45452c2520fa1d4d9ea2a71c229d83e54415ba3",
+      "verses": 12
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/4.json",
+      "t_sha256": "15b760ab8a9cadf42d87e60b21d9b438dd237d13a12333ba788039dc2abe86c3",
+      "say_strip_ole_sha256": "ad69b82259043727f2910cb73a9d3392a9d823bf28c269a5e11a607f400d5197",
+      "verses": 49
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/6.json",
+      "t_sha256": "f5f00c8efa06bb395a15eeb93826cd93a0da46b8d782ccf3722c8375d557d438",
+      "say_strip_ole_sha256": "7c1dfb83de2b453e2bccb475bdfc879f699ca3311c733c5a4302261ebde178ac",
+      "verses": 25
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/7.json",
+      "t_sha256": "c5be171c326ad1e17cfaab8f99d4693ecb1fc3d088d0073616436bd0f547220d",
+      "say_strip_ole_sha256": "f5ead2c282e5105fad65a41f3cb6470e0c69eba18b05499ce59ca460f61422c4",
+      "verses": 26
+    },
+    {
+      "file": "site/data/onkelos/Deuteronomy/9.json",
+      "t_sha256": "6d9a67b42e0e633c2c93b11c76ea889b139854800dda984fdf3770b01c86407f",
+      "say_strip_ole_sha256": "2f4319eb027b170117b2d4db9998310fe178ccdf903ac778adb06da393b94ef4",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Exodus/10.json",
+      "t_sha256": "94d7ab1aea9fc5ba4f3dd53152514a532ad21ea94c9a9caad9cd0412bcb32b07",
+      "say_strip_ole_sha256": "9f4c690ea0307547d91f237a0f21cb502c595f5ba4bde7b9f74933df1366a9be",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Exodus/11.json",
+      "t_sha256": "37ea6953ae6ea64d66a82615dc5dd849567cdbc9f6d18215622c1546bc8e5c07",
+      "say_strip_ole_sha256": "0c055594eaf072f2b97c26df3d2eb19bdff835ee1f564a202dd67c02f1802ea6",
+      "verses": 10
+    },
+    {
+      "file": "site/data/onkelos/Exodus/12.json",
+      "t_sha256": "98e13d890bb2188c06548654f206800fe39c45dba72f01c37e3279d87701da36",
+      "say_strip_ole_sha256": "6dcf075a552f8867b82367dc263cb0ef51bdcb31cf9fc256ebc98cd7354d5b12",
+      "verses": 51
+    },
+    {
+      "file": "site/data/onkelos/Exodus/13.json",
+      "t_sha256": "edf47a0f90399ebfbb81d0d6f675ee3ef388f95479e2b1b40bb4779d6638c4c8",
+      "say_strip_ole_sha256": "e5e78d6d934fbe7df63bffa32640c835585464b3831cca0e994649ef0d9ddddf",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Exodus/14.json",
+      "t_sha256": "16f9e972a9ba628b63dd3fb4b369151bc1fa0969ea0a10b5c788cd1672a7bdd6",
+      "say_strip_ole_sha256": "32a4cf49b912d4d7a298fa3d6e0e44daad606bc58befd726bc8ec92e2b141945",
+      "verses": 31
+    },
+    {
+      "file": "site/data/onkelos/Exodus/17.json",
+      "t_sha256": "e5114e9484d20652e0910988b0a216b9bd08bd02a8d2d482fc876630f0461b96",
+      "say_strip_ole_sha256": "d04ffd581fc8bca26ac80bf382ce681d0e0c2646de03773859afb5b4f2f8eb80",
+      "verses": 16
+    },
+    {
+      "file": "site/data/onkelos/Exodus/18.json",
+      "t_sha256": "8dd38c93a1b6c2863a51550e111259b2016aa4f52b3e8349bf42cdc581ac4183",
+      "say_strip_ole_sha256": "5518e772e16755f807adfdd898c471ca7e822a71d0f4c6e9735ff394f7f6e86d",
+      "verses": 27
+    },
+    {
+      "file": "site/data/onkelos/Exodus/23.json",
+      "t_sha256": "e5da7811c50a61314d156043ad9a64942eeab2833dee25efff592d011007f8bc",
+      "say_strip_ole_sha256": "ec276171a756977e39ef3339abe5419e2157abaa90a4a47f5fec53cc6884e49b",
+      "verses": 33
+    },
+    {
+      "file": "site/data/onkelos/Exodus/28.json",
+      "t_sha256": "337acc90c83c1be1ddffa33c540f5e679c1be4836ab2d06cc7b54acf477301a1",
+      "say_strip_ole_sha256": "4aafbc705ca42283381339a53d0c1797aaadbb063f71a2505d2e9d038fccbdeb",
+      "verses": 43
+    },
+    {
+      "file": "site/data/onkelos/Exodus/29.json",
+      "t_sha256": "87c4767f2e4fb8d3e7210f471e9bcbdd77276b5854ccc56261aa84fa6cc0b548",
+      "say_strip_ole_sha256": "6ded5791162ba1ee4a7abb032648b5494e6a83e8229ca5b7ebdbcdf579160b3a",
+      "verses": 46
+    },
+    {
+      "file": "site/data/onkelos/Exodus/3.json",
+      "t_sha256": "0094d1829e4f5af22e9583ab92357ba1a07c107ac34749369ea1a9dbd159a1e1",
+      "say_strip_ole_sha256": "f83dc51b12045483a3692bc772ae2c1a48ddce2e51b1b3ce7508761a8671af91",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Exodus/31.json",
+      "t_sha256": "0dbb3b9a642f0488970f49f41cf1244c1c938dcc6a023b027b1f0680ca630b14",
+      "say_strip_ole_sha256": "9b2f01b94b82039e957a70f41206caf43aa5de58dec469b675b01a10246da169",
+      "verses": 18
+    },
+    {
+      "file": "site/data/onkelos/Exodus/33.json",
+      "t_sha256": "62a27d0891a5da46f066980ab5f5b402d1e37ae894bb8057e8c32a09f45fbf0d",
+      "say_strip_ole_sha256": "ab6535c35acf409fb1b009b161d8db2ff6c8d7ba92bfe482a297ec4f8d6e43b1",
+      "verses": 23
+    },
+    {
+      "file": "site/data/onkelos/Exodus/34.json",
+      "t_sha256": "06c914f25ba04bc22bbe2fbf064b04e4b5af10a13d282e1af05500506d8eacd7",
+      "say_strip_ole_sha256": "104b1ba2ffb2df811f881a2238113048d708b511204ac7fd56bcac970bed24d5",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Exodus/35.json",
+      "t_sha256": "fbe0c2ff2a97bb87f9ca50a60768fce04dc83153c1cdca1fffd1ba74cea57fe2",
+      "say_strip_ole_sha256": "2850202bf831168de05f70e1710ad7a679b64fd912ce7e7b323b53899680c68a",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Exodus/6.json",
+      "t_sha256": "522bfeb179369390cca0bbe729bcc99acd65a678cf3ef4203d3968633961d2c7",
+      "say_strip_ole_sha256": "89580f741af4d9d7e06a6ceb059e7736243edf2c293a6073d3cf7853b84a611a",
+      "verses": 30
+    },
+    {
+      "file": "site/data/onkelos/Exodus/7.json",
+      "t_sha256": "7dfef465e3530cf043eba06b610fbe93ce4c94755e6774acc51e60d3a0fa9604",
+      "say_strip_ole_sha256": "48d2f190c4dcf5c36adf8a5e8ce5437f90d980ced0405521d6a5e574d7693419",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Exodus/8.json",
+      "t_sha256": "ce597f2f200e239ddf2c98dbb7c77f34c85f9d41b96129e60d04a4e8efd15f47",
+      "say_strip_ole_sha256": "a96827ede60623e105177341f60a9030aa99bfceecd54a38fbd8e115a61582ed",
+      "verses": 28
+    },
+    {
+      "file": "site/data/onkelos/Exodus/9.json",
+      "t_sha256": "d3e382406d0ae92e269681e44976ab0f2b76ffee27038c6d0e31054ae96d5419",
+      "say_strip_ole_sha256": "2ef0d9e4f77547b242774373888b1b41cc88ab38a9df77d936ca2c054a02b4cb",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Genesis/11.json",
+      "t_sha256": "eb1702c1c892df855a1cc1cfe5c8b4ea6d668f1a72880ea85c4c9e2838e34ad8",
+      "say_strip_ole_sha256": "158287cfceca2df086a041369845a8238d2a1101caa385eebd85f0181cc926ae",
+      "verses": 32
+    },
+    {
+      "file": "site/data/onkelos/Genesis/13.json",
+      "t_sha256": "5c7a0fdf2ef672821f717c9d9ca31ee644bab65be99c15682164e8cd8813f149",
+      "say_strip_ole_sha256": "c18ec004b1eb1ea56702626a98ca33f35479336856d46c2cd3ca1947b2c29ffa",
+      "verses": 18
+    },
+    {
+      "file": "site/data/onkelos/Genesis/20.json",
+      "t_sha256": "ab29199dc999100524e43ee8d3bd019fc0b4f7220dcf19bf730159eee094e1f2",
+      "say_strip_ole_sha256": "605b7a19fbd31a3f82732b2bea73426499a984dd690e0544da96bcd2525d40a7",
+      "verses": 18
+    },
+    {
+      "file": "site/data/onkelos/Genesis/21.json",
+      "t_sha256": "e9429abd1b55c24788ca0f22fc7d317cbef93ffea0979e3c3bd062b9b896276f",
+      "say_strip_ole_sha256": "d424382bf2411aa46d50ba717f46f2eea14dbc19877b500775bd41b8a61a26ba",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Genesis/22.json",
+      "t_sha256": "e7c36ea9d1a7ddaccc2acaec635c180bf7b89a546b2d8ea6c34546737d4a2e55",
+      "say_strip_ole_sha256": "7a9b881a55b6df5b44ff59bf3e6ab2a341d245327d7863869d63d92ef7324ac2",
+      "verses": 24
+    },
+    {
+      "file": "site/data/onkelos/Genesis/25.json",
+      "t_sha256": "be9c920f73fab8907f7fe08727183e5736b6cd0a22ed4165c84315552692ebc1",
+      "say_strip_ole_sha256": "dcc9f17a074b2e1f4dae0f5c439bb816496665010f7b81d280365f43c5a69e6f",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Genesis/26.json",
+      "t_sha256": "2313c5508079ae1c9bd4b1071c39ccef49ed3c87b4c5728933597b93ab393f3a",
+      "say_strip_ole_sha256": "dab2d2e073d26ecbe11abea576c84d8df8cb1e1570709b366479d92b392105ee",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Genesis/27.json",
+      "t_sha256": "4e1c850164ab108b677d7297f970d30d7e34bfe2bc5625f92b6c5caad593c2b0",
+      "say_strip_ole_sha256": "4808dc638096029396d388518eb82efe5a87d5ffc901dceef7ed5ab9396725be",
+      "verses": 46
+    },
+    {
+      "file": "site/data/onkelos/Genesis/28.json",
+      "t_sha256": "7d983577d53db5d39a7ed2d1e6d8b4bfc726f0a1379cbcb6ff375d4d41b59bb6",
+      "say_strip_ole_sha256": "0cc8ae803454b9ae0aaa68bd7f2920d04699799d18655bb9c3e8eeb0cfdecf06",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Genesis/35.json",
+      "t_sha256": "552b410870ae452f292fab21b79d54119b9da0dd79d6881a59d9a4226d05968f",
+      "say_strip_ole_sha256": "ab69fca40bfa7c381188a2002257ede33e9d772d7e65f95bbdc4c19494d33682",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Genesis/36.json",
+      "t_sha256": "76136380b836903534062a43667338953a70f2b32acba0fd8d767e3c2d9e116b",
+      "say_strip_ole_sha256": "4b1c55a561b5dcfbffaa305450a6269f844e9bc4b5026058df7244c1427c7e1c",
+      "verses": 43
+    },
+    {
+      "file": "site/data/onkelos/Genesis/4.json",
+      "t_sha256": "c1d868a6772fae770840dd7fd4bb2b74e0a18e17bb817498565a6bf685db32e3",
+      "say_strip_ole_sha256": "9fc29fba52b9f4ed9199918691e103b4d949d3f18a2cb3f0de72a78c7ab30130",
+      "verses": 26
+    },
+    {
+      "file": "site/data/onkelos/Genesis/41.json",
+      "t_sha256": "68d1b53c87142d7aa0a9dac0c14361139759aa7c0186abf2343b78216bce2a9c",
+      "say_strip_ole_sha256": "671f75ce761cde216cdf062710c2f19c6df5362f268b1e47dbce6e3fbd8abda5",
+      "verses": 57
+    },
+    {
+      "file": "site/data/onkelos/Genesis/42.json",
+      "t_sha256": "048ad0783876e04fb96117e5d3a376ba07b3472bf354af82ef4a4b7579a8eeca",
+      "say_strip_ole_sha256": "6bf634e7c2ea0d361990bc7a7743d0d40030cc12a4da04b148a4736cb0a46ad3",
+      "verses": 38
+    },
+    {
+      "file": "site/data/onkelos/Genesis/43.json",
+      "t_sha256": "3369c868780792fa5d2227161ad95a76e2d81d2bf3269af6734265b74d323980",
+      "say_strip_ole_sha256": "7037daeca8b0dbf3dbc2f3e0040cd2b4977f60bdd12bac915392842229b5e5a0",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Genesis/45.json",
+      "t_sha256": "79670b77a6e440fabdde76f6fe64ad59d2ce23ee91f22379cd80d520c85a16fe",
+      "say_strip_ole_sha256": "b0ff5ca9aa0dd37b0f7c5beec6bbc216861b52419b69b0b23f094c6994f2e758",
+      "verses": 28
+    },
+    {
+      "file": "site/data/onkelos/Genesis/46.json",
+      "t_sha256": "169f2eba86c4ea6290dd332e2d46cb14573af67d3d0be58c66d6112b2d58fd88",
+      "say_strip_ole_sha256": "2a82ac86946dac14e4f4c482176fa2a5f41b1ab723f95a634b398bb36db43b80",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Genesis/47.json",
+      "t_sha256": "7c8e89b3c38fb8315737420323caa131a37ee66acbc230c5a242ed7644bd585a",
+      "say_strip_ole_sha256": "b30cc61404042f84da4340bff1afe8c75d7ab4daa22503910ac6b71c25de8f27",
+      "verses": 31
+    },
+    {
+      "file": "site/data/onkelos/Genesis/48.json",
+      "t_sha256": "c38bcf9e8dd587b9ec90cbe222df795128adafa669107d9221ab329aeb3f2108",
+      "say_strip_ole_sha256": "74359715d9543d768ab486021a7454838243b84ca6fda646bd3b5e5315783c9a",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Genesis/5.json",
+      "t_sha256": "ac29ca1592ac7e1147c60fd48047583ef854892787d8ccbed1e3e2a601a01d7e",
+      "say_strip_ole_sha256": "922822b3628fd7bdb64f617826561fd3d40166b24fe84d80347c8b72422065e1",
+      "verses": 32
+    },
+    {
+      "file": "site/data/onkelos/Genesis/50.json",
+      "t_sha256": "59f9e3bcd8d5d3291c8973e970d9211842c106dba420c012cd2cb4ca23dea493",
+      "say_strip_ole_sha256": "a207231257494fcaf55bf184ed68349e6559025ca8de6ed7e487227ea6ac6a54",
+      "verses": 26
+    },
+    {
+      "file": "site/data/onkelos/Genesis/6.json",
+      "t_sha256": "77db31c0f927cab7406775451ef7fac020fc900d6e9b30ff1c59b6c5ceffe166",
+      "say_strip_ole_sha256": "04f3674e9e2e38934764358bc2c12c0cfd4bcd07bae4e98007d37c24f5495c07",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Genesis/7.json",
+      "t_sha256": "45c224fc169a310022d85e4a6434381ba7e4101615c03f1a88ac864d103ba48b",
+      "say_strip_ole_sha256": "37ca92a623acef8cbfa2797ed4741a31bda9ebd008334a101719ea3c20f92f71",
+      "verses": 24
+    },
+    {
+      "file": "site/data/onkelos/Genesis/8.json",
+      "t_sha256": "8f11b2434444f1580a528493e4b9b1edb533561cd4cca1e57f3f81b4cf6f4c73",
+      "say_strip_ole_sha256": "7265b859707f3b8745f496212a38e233bdf18655db66cfc4a5c12f27b8307ca1",
+      "verses": 22
+    },
+    {
+      "file": "site/data/onkelos/Genesis/9.json",
+      "t_sha256": "1fc936b47acf7845341ea9adeb570499c6e2ca3540dc2edb576481dbf5198fc8",
+      "say_strip_ole_sha256": "471cd5f3296eb04167aa3977e321a5eb6329c61bb4166b2bae24bed555de7fdc",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Leviticus/2.json",
+      "t_sha256": "3483c19439c7575eeb5ead1b109d1e7179e64376aee1cd9b2f0d8cf6239d1de9",
+      "say_strip_ole_sha256": "31b6fb5e0b9fe3b4684c03054714921fa5b45fc1e59879efcd9396316612fb8d",
+      "verses": 16
+    },
+    {
+      "file": "site/data/onkelos/Numbers/1.json",
+      "t_sha256": "a6fb301ae3e352309d2ba8f7f0acde65a083dd34017eee6bb135d430b21e9e97",
+      "say_strip_ole_sha256": "1508185608560fcde3b48cfa081b36320afed0aae9ced2d16dbdb3e3c4bcdde0",
+      "verses": 54
+    },
+    {
+      "file": "site/data/onkelos/Numbers/10.json",
+      "t_sha256": "c5b25a50eca0e52104941fbf9a6f8f2dbbdb1afb24ec04fef55d444d014e9347",
+      "say_strip_ole_sha256": "f8f995cff03c79a7d05725e4f4732d027360fb21665e11266af1df5b0a6b6bae",
+      "verses": 36
+    },
+    {
+      "file": "site/data/onkelos/Numbers/11.json",
+      "t_sha256": "0a2d1a38da46c77637c4b3b34a029f29656afc4d66939ed75457bb060c20dbac",
+      "say_strip_ole_sha256": "3366a77f777442ef462072be9a08c4948209690042a244d0ad2b891867a90f8e",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Numbers/14.json",
+      "t_sha256": "9ffaf44146c3ceefda60e17ff938e3420a1055dd0e39a21fb6f5f35720d8d474",
+      "say_strip_ole_sha256": "45a4def97a85aac2317cba7b8fba615e117f21e5c40b4d2300099fd9affc17e1",
+      "verses": 45
+    },
+    {
+      "file": "site/data/onkelos/Numbers/16.json",
+      "t_sha256": "8f42f1ecf7412a95d8b287dbb793a195b2110429be6a8a8cfab05f22b3fd25f9",
+      "say_strip_ole_sha256": "cab73edc3705028f48997c33c20a709ddc976afd29b38364ce8bf45179d61810",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Numbers/2.json",
+      "t_sha256": "981e0abb7612de3578121e5221f17bf77e86443f43dea110871cb66a331463c4",
+      "say_strip_ole_sha256": "cd8db71e225a8e3bb95d215ecc690234fc7f6369b89362b51259e7ec0258ac4c",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Numbers/20.json",
+      "t_sha256": "c99e47ce85c8417c6b82e67774e2b83a2e3558ca8ad25529fddbadf4da50df3f",
+      "say_strip_ole_sha256": "f03dc9e1bb62460ac446df04fd174e2f277bd5d6e80f28282a3d427c74f28945",
+      "verses": 29
+    },
+    {
+      "file": "site/data/onkelos/Numbers/21.json",
+      "t_sha256": "25538bd4388ddf7b5aae319d8b49c68023dd05e40ed953c551e4715cf08d1cdd",
+      "say_strip_ole_sha256": "c416ce5d25e635d4cf4a7c4b4908b2f79a98365c3642d4d0bea2fb54f4e72a24",
+      "verses": 35
+    },
+    {
+      "file": "site/data/onkelos/Numbers/22.json",
+      "t_sha256": "84a5ede9d9730aa125b8dc1827dfdbd56a10d15718ad1d89f84299106acc22c2",
+      "say_strip_ole_sha256": "15871cf3e410f8ddd94390b7eda4dc1315a962062969c57fc99acf976e4b94b2",
+      "verses": 41
+    },
+    {
+      "file": "site/data/onkelos/Numbers/23.json",
+      "t_sha256": "fa555e5e47ae29bc8a2cd6f3692f120bef4d4c7899a4774c0cc215272a280a2c",
+      "say_strip_ole_sha256": "891b52891f21ed14f4ecd456048e307bfcb28c4e4e65a5c45f38853fe66a0fc1",
+      "verses": 30
+    },
+    {
+      "file": "site/data/onkelos/Numbers/24.json",
+      "t_sha256": "3d3200a0f73713c2217938fedd525c248139561c8ab04e0ca180dff62c335e37",
+      "say_strip_ole_sha256": "5af1e515a2e88f1cfa68fc19558c2dbf6fc099652a6c475e8af40d286bc97e9b",
+      "verses": 25
+    },
+    {
+      "file": "site/data/onkelos/Numbers/26.json",
+      "t_sha256": "e345e2f8eeca26b1a4db6c72345142638064f21a4d77229d467cbde03beaef97",
+      "say_strip_ole_sha256": "46413808474c116ace55c4a4ef0d9b4580c6545e44285c7a5e1eaa7ecdbeaf3c",
+      "verses": 65
+    },
+    {
+      "file": "site/data/onkelos/Numbers/32.json",
+      "t_sha256": "38688e0eab855ffbc15d61a99a3ee50274a20740ded8fec87aafd806524afcbe",
+      "say_strip_ole_sha256": "e18245434809321206f838637f8e7120d7a0d389eb14b9d70a63a23f5960339c",
+      "verses": 42
+    },
+    {
+      "file": "site/data/onkelos/Numbers/35.json",
+      "t_sha256": "d069dfaa31218730d85d5742f76d838454edbfd02469fdeab7252f51a7aaf3a1",
+      "say_strip_ole_sha256": "224c3bbaead725088756f6e6f3f6774e7e2a4181eea1874c5c683cf13ed61ea5",
+      "verses": 34
+    },
+    {
+      "file": "site/data/onkelos/Numbers/7.json",
+      "t_sha256": "3e74a8846129ba4cab152723e17685135face9768c21f8b25fa08ce7d5cd6283",
+      "say_strip_ole_sha256": "466a7e714feae07e4b810a08f7d7cc017ebeff0e018b4ac81c33ff2b6920aa97",
+      "verses": 89
+    }
+  ]
+}
