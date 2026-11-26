@@ -11,7 +11,8 @@ import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline 
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { divineNamesForParts } from './divine-tts.js';
-import { buildSaidReport, renderSaidHtml, downloadSaidTsv, resolveSaidEngine } from './tts-said.js';
+import { buildSaidReport, renderSaidHtml, downloadSaidTsv, resolveSaidEngine, speechForSegment } from './tts-said.js';
+import { addWrongReport, loadWrongReports, removeWrongReport, clearWrongReports, renderWrongHtml, downloadWrongJson, importWrongJson } from './tts-wrong.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
 import { VOICE_FILES } from './voice-files.js';
@@ -827,7 +828,7 @@ function ttsForm() {
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}
   <label class="field"><span>טיימר שינה</span><select name="ttsSleep">${TTS_SLEEP.map(m => `<option value="${m}" ${prefs.ttsSleep === m ? 'selected' : ''}>${m ? m + ' דקות' : 'כבוי'}</option>`).join('')}</select></label>
   <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>
-  ${R.doc && !$('#reader')?.hidden ? '<button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><div id="said-view" hidden></div>' : ''}`;
+  ${R.doc && !$('#reader')?.hidden ? '<button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="said-view" hidden></div><div id="wrong-view" hidden></div>' : ''}`;
 }
 function bindForm(root, onChange) {
   root.addEventListener('input', e => {
@@ -2189,6 +2190,8 @@ function openSheet(kind, note = '') {
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
   $('#sh-said')?.addEventListener('click', ev => { ev.preventDefault(); showSaidView(); });
+  $('#sh-wrong')?.addEventListener('click', ev => { ev.preventDefault(); saveWrongFromCurrent(); });
+  $('#sh-wrong-list')?.addEventListener('click', ev => { ev.preventDefault(); showWrongView(); });
   bindForm(sh.querySelector('form'), async name => {
     // 1.0.90: the Kaddish choice changes only what is read: a running read-aloud restarts from the current paragraph
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
@@ -2339,6 +2342,94 @@ function showSaidView() {
     ev.preventDefault();
     const name = `said-${String(R.unit || 'lesson').replace(/[^\w.-]+/g, '_')}-${String(R.iso || R.sid || 'local').replace(/[^\w.-]+/g, '_')}.tsv`;
     downloadSaidTsv(report, name);
+  });
+}
+function currentWrongEntry() {
+  const speaker = R.speaker;
+  const qi = speaker && Number.isInteger(speaker.i) ? speaker.i : -1;
+  const q = qi >= 0 ? speaker.queue?.[qi] : null;
+  let si = Number.isInteger(q?.si) ? q.si : -1;
+  if (si < 0) {
+    const s = currentSeg();
+    si = s && R.segs ? R.segs.indexOf(s) : -1;
+  }
+  const segs = R.doc ? ttsSegments() : [];
+  const seg = si >= 0 ? segs[si] : null;
+  const opts = saidLoadOpts();
+  const speech = String(q?.text || (seg ? speechForSegment(seg, opts).text : '')).replace(/\s+/g, ' ').trim();
+  if (!speech) return null;
+  const sel = String(getSelection?.() || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  const el = seg?.el || (si >= 0 ? R.segs?.[si] : currentSeg());
+  const title = [R.doc?.title, R.doc?.subtitle].filter(Boolean).join(' – ');
+  return {
+    t: Date.now(),
+    unit: R.unit || '',
+    iso: R.iso || '',
+    sid: R.sid || '',
+    lib: R.lib || '',
+    title,
+    pos: el?.dataset?.ref || el?.dataset?.id || '',
+    say: qi >= 0 ? qi : undefined,
+    word: sel,
+    speech,
+    context: String(el?.querySelector?.('.t')?.textContent || el?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 300),
+    engine: opts.engine,
+    voice: prefs.ttsVoice || '',
+    havara: prefs.ttsHavara || '',
+    variant: prefs.ttsModel || '',
+    gender: prefs.ttsGender || '',
+  };
+}
+function saveWrongFromCurrent() {
+  const entry = currentWrongEntry();
+  if (!entry) { toast('אין קטע לשמירה. עמדו על פסקה בשיעור, או התחילו הקראה.'); return; }
+  const { added } = addWrongReport(entry);
+  if (!added) { toast('לא ניתן לשמור את הדיווח'); return; }
+  toast('נשמר במכשיר בלבד. דבר אינו נשלח.');
+  const box = $('#wrong-view');
+  if (box && !box.hidden) showWrongView();
+}
+function showWrongView() {
+  const box = $('#wrong-view'); if (!box) return;
+  const items = loadWrongReports();
+  box.innerHTML = renderWrongHtml(items);
+  box.hidden = false;
+  $('#sh-wrong-export')?.addEventListener('click', ev => {
+    ev.preventDefault();
+    const name = `wrong-${String(R.unit || 'lesson').replace(/[^\w.-]+/g, '_')}-${String(R.iso || R.sid || 'local').replace(/[^\w.-]+/g, '_')}.json`;
+    downloadWrongJson(loadWrongReports(), name);
+  });
+  $('#sh-wrong-clear')?.addEventListener('click', ev => {
+    ev.preventDefault();
+    if (!confirm('למחוק את כל הדיווחים השמורים במכשיר? הייצוא ששמרתם נשאר אצלכם, ואפשר לשחזר ממנו.')) return;
+    clearWrongReports();
+    showWrongView();
+  });
+  box.querySelectorAll('.wrong-del').forEach(btn => btn.addEventListener('click', ev => {
+    ev.preventDefault();
+    const id = Number(btn.dataset.id);
+    if (!Number.isInteger(id)) return;
+    removeWrongReport(id);
+    showWrongView();
+  }));
+  const file = $('#sh-wrong-file');
+  $('#sh-wrong-import')?.addEventListener('click', ev => { ev.preventDefault(); file?.click(); });
+  file?.addEventListener('change', ev => {
+    const f = ev.target.files?.[0];
+    ev.target.value = '';
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onerror = () => toast('לא ניתן לקרוא את הקובץ');
+    reader.onload = () => {
+      try {
+        const cur = loadWrongReports();
+        const replace = cur.length > 0 && confirm('לשחזר במקום הדיווחים השמורים עכשיו? ביטול יוסיף רק דיווחים חדשים, בלי למחוק את הקיימים.');
+        importWrongJson(String(reader.result), { replace: !!replace });
+        showWrongView();
+        toast('הדיווחים שוחזרו במכשיר בלבד.');
+      } catch { toast('קובץ השחזור אינו תקין'); }
+    };
+    reader.readAsText(f);
   });
 }
 async function ttsToggle() {

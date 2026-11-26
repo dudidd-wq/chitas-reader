@@ -1329,3 +1329,15 @@ html[data-rashi-font="text"][data-design] .r-content .rashi { font-family: var(-
 .said-why { font-weight: 500; color: var(--muted); }
 .said-speech { margin: .3rem 0 0; font-size: .95rem; line-height: 1.6; }
 .said-empty { color: var(--muted); }
+
+
+/* 1.0.232: local wrong-word reports in the TTS sheet only (lesson typography is unchanged). */
+#wrong-view { margin-top: .8rem; }
+.wrong-sum { font-size: .95rem; margin: 0 0 .6rem; }
+.wrong-list { list-style: none; margin: 0; padding: 0; }
+.wrong-item { border-top: 1px solid var(--rule); padding: .55rem 0; }
+.wrong-h { display: flex; flex-wrap: wrap; gap: .35rem .6rem; align-items: baseline; font-weight: 600; }
+.wrong-when { color: var(--muted); font-weight: 500; }
+.wrong-where { color: var(--muted); font-weight: 500; }
+.wrong-speech { margin: .3rem 0 .4rem; font-size: .95rem; line-height: 1.6; }
+.wrong-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
