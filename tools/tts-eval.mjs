@@ -8,7 +8,7 @@
 // See verification/TTS-EVAL.md.
 import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { prepareForTTS } from '../site/js/tts-prep.js';
+import { prepareForTTS, pauseChunks } from '../site/js/tts-prep.js';
 import { textToIPA } from '../site/js/g2p.js';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
@@ -72,6 +72,20 @@ export function formatDiff(d, limitPerClass = 8) {
   lines.push('\nIf the change is intended: node tools/tts-eval.mjs --update-golden (and review the golden diff in git).');
   return lines.join('\n');
 }
+
+// ---------------------------------------------------------------- prosody report (A2, deterministic, no audio)
+/** Per item: the chunks pauseChunks gives the synthesizer, their gaps, and whether the commas stayed inside the chunks.
+ *  commasKept = every comma of the prepared text is in some chunk (never dropped); commaCuts = chunks that end at a comma
+ *  (only a forced length cut may do that); sentenceGapsOk = every chunk ending in [.:;?!] has gap 0.38. */
+export function prosodyItem(item) {
+  const prep = prepareForTTS(item.html, { stress: true, divineName: 'hashem' }), ch = pauseChunks(prep);
+  const commas = (prep.match(/,/g) || []).length;
+  return { id: item.id, chunks: ch.length, gaps: ch.map(x => x.gap), commas,
+    commasKept: ch.reduce((a, x) => a + (x.c.match(/,/g) || []).length, 0) === commas,
+    commaCuts: ch.filter(x => /,$/.test(x.c)).length,
+    sentenceGapsOk: ch.every(x => !/[.:;?!]$/.test(x.c) || x.gap === 0.38) };
+}
+export const prosodyReport = (fixture = readJson(FIXTURE)) => fixture.items.map(prosodyItem);
 
 // ---------------------------------------------------------------- silent omission
 /** Characters the final IPA filter of textToIPA keeps (anything else is dropped silently). */
@@ -173,7 +187,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const d = diffSnapshots(gold, cur), om = findOmissions(cur);
     console.log(formatDiff(d));
     if (om.length) { console.log(`\nsilent omissions: ${om.length}`); for (const o of om.slice(0, 20)) console.log(`  ${o.id} [${o.tradition}] ${o.kind}: ${o.detail}`); }
-    if (arg.has('--audio')) {
+    const pr = prosodyReport();
+    console.log(`
+prosody (pauseChunks): ${pr.length} items, ${pr.reduce((a, x) => a + x.chunks, 0)} chunks, ${pr.reduce((a, x) => a + x.commas, 0)} commas, comma-ended chunks ${pr.reduce((a, x) => a + x.commaCuts, 0)}; all commas kept: ${pr.every(x => x.commasKept)}; sentence gaps 0.38: ${pr.every(x => x.sentenceGapsOk)}`);
+    if (arg.has('--prosody')) for (const x of pr) console.log(`  ${x.id}: ${x.chunks} chunk(s) gaps=[${x.gaps}] commas=${x.commas}`);
+    if (process.env.TTS_EVAL_AUDIO === '1' || arg.has('--audio')) {
       if (!voiceInstalled()) console.log('\naudio: local voice not installed – skipped');
       else console.log('\naudio metrics:', JSON.stringify(await synthMetrics(readJson(FIXTURE).items), null, 1));
     }

@@ -59,15 +59,15 @@ test('NPS1 rules C5: N=2 both directions, sentence marks, commentary and accepte
   check(fixture('בית גדול, ובית קטן חצר גדולה.'),'C7',true);
   const f=fixture();check(f,'C5',false,[{kind:'punctuation',start:3,end:3,after:','}]);
 });
-test('NPS1 rules C6: real planner rejects short chunk created at its length cap',()=>{
+test('NPS1 rules C6 (1.0.225 contract): a comma no longer creates a short audio chunk, so the length-cap case is allowed; the planner check stays as a guard',()=>{
   const g=fixture('ב'.repeat(178)+' גָדוֹל, וּבַיִת קָטָן');
-  check(g,'C6');
+  check(g,'C7',true);
   // A pre-existing identical short chunk must not hide a second new occurrence.
   const prefix='גָדוֹל, בית רחב שדה רחב ',h=fixture('ב'.repeat(178)+' גָדוֹל, וּבַיִת קָטָן');
   h.speech=prefix+h.speech;h.commentary=prefix+h.commentary;
   h.edit.start+=prefix.length;h.edit.end+=prefix.length;
   h.ctx=boundaryContext(h);h.sidecar={...h.sidecar,base:h.speech,commentary:h.commentary};
-  check(h,'C6');
+  check(h,'C7',true);
   check(fixture(),'C7',true);
 });
 test('NPS1 rules C7/C8: literal four-word context permits; quotation edge or abbreviation abstains',()=>{

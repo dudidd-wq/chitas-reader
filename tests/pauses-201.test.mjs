@@ -29,11 +29,19 @@ test('1.0.101: zaqef in a longer verse becomes a short pause; one-word pieces st
   const spoken = P(v, H);
   const ch = pauseChunks(spoken);
   assert.ok(ch.length >= 2);
-  assert.ok(ch.every(x => x.gap === 0.18 || x.gap === 0.38));
-  // Gemara contract unchanged
+  assert.ok(ch.every(x => x.gap === 0.22 || x.gap === 0.38));
+  // 1.0.225 contract: commas no longer cut the audio
   const g = pauseChunks('אמר רבי יוחנן, שמע מינה כך וכך, כן. ועוד דבר אחר.');
-  assert.deepEqual(g.map(x => x.c), ['אמר רבי יוחנן,', 'שמע מינה כך וכך, כן.', 'ועוד דבר אחר.']);
-  assert.deepEqual(g.map(x => x.gap), [0.18, 0.38, 0.38]);
+  assert.deepEqual(g.map(x => x.c), ['אמר רבי יוחנן, שמע מינה כך וכך, כן.', 'ועוד דבר אחר.']);
+  assert.deepEqual(g.map(x => x.gap), [0.38, 0.38]);
+  // a sentence longer than max is cut for length only (short gap 0.22), commas elsewhere stay inside
+  const long = ('מילה אחת שתיים שלוש, '.repeat(14) + 'סוף.');
+  const lc = pauseChunks(long);
+  assert.ok(lc.length >= 2 && lc.every(x => x.c.length <= 180));
+  assert.equal(lc.at(-1).gap, 0.38);
+  assert.ok(lc.slice(0, -1).every(x => x.gap === 0.22));
+  // lone-word glue on a forced cut
+  assert.ok(pauseChunks('א'.repeat(170) + ' בב ' + 'ג'.repeat(30) + '.').every(x => (x.c.match(/[א-ת]+/g) || []).length >= 2));
 });
 
 test('1.0.101: ole stress tags in prose are not treated as cantillation; a lone atnach word gets no trailing mark', () => {

@@ -5,7 +5,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { snapshot, diffSnapshots, formatDiff, findOmissions, classifyIpa, audioMetrics, voiceInstalled, synthMetrics,
-  FIXTURE, GOLDEN, TRADITIONS } from '../tools/tts-eval.mjs';
+  FIXTURE, GOLDEN, TRADITIONS, prosodyReport } from '../tools/tts-eval.mjs';
+import { pauseChunks } from '../site/js/tts-prep.js';
+import { finishAudio, DEFAULT_NOISE_SCALE, DEFAULT_NOISE_W } from '../site/js/piper-core.js';
 
 const fixture = JSON.parse(fs.readFileSync(FIXTURE, 'utf8'));
 const golden = JSON.parse(fs.readFileSync(GOLDEN, 'utf8'));
@@ -86,4 +88,32 @@ test('audio metrics with the local voice (sanity bounds, not golden – synthesi
     assert.ok(m.maxSilenceMs < 1500, `${id} silence ${m.maxSilenceMs}`);
     assert.ok(m.headPeak < 0.2 && m.tailPeak < 0.2, `${id} cut edges ${m.headPeak}/${m.tailPeak}`);
   }
+});
+
+// ---- A2 (1.0.225): sentence-level synthesis, safe audio finish
+test('A2 prosody: commas stay inside the chunk, sentence ends get 0.38, the sample never drops a comma', () => {
+  const pr = prosodyReport(fixture);
+  assert.equal(pr.length, fixture.items.length);
+  assert.ok(pr.every(x => x.commasKept && x.sentenceGapsOk), JSON.stringify(pr.filter(x => !x.commasKept || !x.sentenceGapsOk)));
+  assert.ok(pr.every(x => x.gaps.every(g => g === 0.38 || g === 0.22)));
+  const c = pauseChunks('אמר רבי יוחנן, שמע מינה, כך וכך. ועוד, דבר אחר?');
+  assert.deepEqual(c, [{ c: 'אמר רבי יוחנן, שמע מינה, כך וכך.', gap: 0.38 }, { c: 'ועוד, דבר אחר?', gap: 0.38 }]);
+});
+
+test('A2 finishAudio: fades, peak normalisation without clipping, near-silence untouched', () => {
+  const rate = 22050, n = 4000, loud = new Float32Array(n);
+  for (let i = 200; i < n - 200; i++) loud[i] = 0.3 * Math.sin(i / 7) * Math.sin(Math.PI * (i - 200) / (n - 400));   // a tone with a smooth envelope and silent edges
+  const o = finishAudio(loud, rate);
+  const peak = Math.max(...o.map(Math.abs));
+  assert.ok(Math.abs(peak - 0.89) < 1e-3 && peak <= 0.89 + 1e-6, 'peak ' + peak);
+  assert.equal(o[0], 0);                         // starts at zero (fade-in)
+  assert.ok(Math.abs(o[o.length - 1]) < 0.01);   // ends near zero (fade-out)
+  for (let i = 1; i < o.length; i++) assert.ok(Math.abs(o[i] - o[i - 1]) < 0.2, 'click at ' + i);
+  const quiet = new Float32Array(2000).fill(0.01), q = finishAudio(quiet, rate);
+  assert.ok(Math.max(...q.map(Math.abs)) <= 0.0101, 'near-silence must not be boosted');
+  assert.equal(finishAudio(new Float32Array(0), rate).length, 0);
+});
+
+test('A2 noise defaults are lowered only when the config sets nothing', () => {
+  assert.equal(DEFAULT_NOISE_SCALE, 0.5); assert.equal(DEFAULT_NOISE_W, 0.6);
 });

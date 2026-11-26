@@ -34,3 +34,8 @@ git diff tests/fixtures/tts-eval/golden.json     # לעבור על ההפרשי�
 
 ## מגבלות v1
 המדגם קטן ולא מייצג סטטיסטית; מודד תעתיק ולא צליל. ניתן להרחיב ב־`buildFixtureItems()`.
+
+## Prosody report (A2, 1.0.225)
+`node tools/tts-eval.mjs` also prints a deterministic prosody line (chunks, commas, comma-ended chunks, "all commas kept",
+"sentence gaps 0.38"); `--prosody` lists chunks/gaps per item. Audio metrics stay optional (`--audio` or `TTS_EVAL_AUDIO=1`).
+Contract: see PAUSES-225.md. The golden prep/IPA snapshot is not affected by A2.

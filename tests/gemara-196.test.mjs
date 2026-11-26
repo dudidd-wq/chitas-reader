@@ -40,10 +40,10 @@ test('Steinsaltz speech source: no <big> quote, no verse references, ר׳ is ר�
   assert.ok(runs.some(r => r.b && /יוחנן/.test(r.t)));
 });
 
-test('a short pause at every comma and period; a one-word piece is glued to its neighbour', () => {
+test('1.0.225: a sentence stays one chunk, commas included; only sentence ends get the 0.38 s gap', () => {
   const c = pauseChunks('אמר רבי יוחנן, שמע מינה כך וכך, כן. ועוד דבר אחר.');
-  assert.deepEqual(c.map(x => x.c), ['אמר רבי יוחנן,', 'שמע מינה כך וכך, כן.', 'ועוד דבר אחר.']);
-  assert.deepEqual(c.map(x => x.gap), [0.18, 0.38, 0.38]);
+  assert.deepEqual(c.map(x => x.c), ['אמר רבי יוחנן, שמע מינה כך וכך, כן.', 'ועוד דבר אחר.']);
+  assert.deepEqual(c.map(x => x.gap), [0.38, 0.38]);
 });
 
 test('1.0.97: every date has its lesson files (sampled over a full Daf Yomi cycle); the read-aloud text is the explanation only', async () => {

@@ -633,20 +633,22 @@ export function chunkText(t, max = 180) {
   return out;
 }
 
-/** 1.0.96 (Gemara): chunks for a short pause at every comma and period – a sentence is cut again at each comma, but a
- *  piece of a single word is glued to its neighbour (the prototype's "lone-word glue": a one-word utterance sounds
- *  clipped). gap: seconds of silence after the chunk (comma 0.18 s, end of sentence 0.38 s). */
+/** 1.0.225 (A2): sentence-level synthesis. A sentence (chunkText on [.:;?!]) stays ONE chunk, commas included: the
+ *  commas remain in the spoken text (intonation) but no longer cut the audio. Only a sentence longer than `max` is cut
+ *  (chunkText, at a comma when possible); the pieces of such a cut get a short gap and a one-word piece is glued to its
+ *  neighbour (lone-word glue). gap: seconds of silence after the chunk – end of sentence [.:;?!] 0.38 s, forced
+ *  length cut (or unpunctuated tail) 0.22 s. No 0.18 s gap after every comma any more. */
+export const GAP_SENTENCE = 0.38, GAP_CUT = 0.22;
 export function pauseChunks(t, max = 180) {
-  const out = [];
-  const words = x => (x.match(/[\u05D0-\u05EA]+/g) || []).length;
-  for (const sent of chunkText(t, max)) {
-    const pieces = sent.split(/(?<=,)\s+/), merged = [];
-    for (const p of pieces) {
-      if (merged.length && (words(merged.at(-1)) < 2 || words(p) < 2)) merged[merged.length - 1] += ' ' + p; else merged.push(p);
-    }
-    merged.forEach((c, i) => out.push({ c, gap: i === merged.length - 1 ? (/[.:;?!]$/.test(c) ? 0.38 : 0.18) : 0.18 }));
+  const words = x => (x.match(/[א-ת]+/g) || []).length;
+  const end = x => /[.:;?!]$/.test(x);
+  const merged = [];
+  for (const c of chunkText(t, max)) {
+    const prev = merged.at(-1);
+    // same sentence = the previous chunk was cut for length (does not end a sentence)
+    if (prev && !end(prev) && (words(prev) < 2 || words(c) < 2)) merged[merged.length - 1] = prev + ' ' + c; else merged.push(c);
   }
-  return out;
+  return merged.map(c => ({ c, gap: end(c) ? GAP_SENTENCE : GAP_CUT }));
 }
 
 /** Round 3: Rashi's headwords (דיבור המתחיל) are printed without vowels, so a voice guesses their reading. When the
