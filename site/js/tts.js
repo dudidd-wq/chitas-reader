@@ -71,7 +71,7 @@ export class Speaker {
     segments.forEach((s, si) => {
       const chunks = [];
       s.parts.forEach((html, pi) => {
-        const prepared = prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi] });
+        const prepared = prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], unit: opts.unit });
         // 1.0.101: same comma/period pauses as the local voice; the gap is a delay after the utterance (tests may set __ttsPauseScale = 0)
         for (const x of pauseChunks(prepared)) chunks.push(x);
       });

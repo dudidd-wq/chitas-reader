@@ -8,13 +8,14 @@ const RE_MARKS = /[\u0591-\u05C7]/g;
 export const skeleton = w => w.replace(RE_MARKS, '').replace(/[^\u05D0-\u05EA"'״׳]/g, '');
 
 // Common abbreviations in Rashi / Tanya / Rambam (consonantal form, quotes normalised to ").
-// Only unambiguous ones are expanded; ambiguous ones (e.g. ע"ה, ע"ז, כ"א) are left as is.
+// Only unambiguous ones are expanded; ambiguous ones (e.g. ע"ה, ע"ז, כ"א, and from 1.0.227 also ז"א / ת"ת) are
+// resolved in contextAbbr (or left as letter names). Do not put a single default back in this table.
 export const ABBREVIATIONS = {
   'הקב"ה': 'הַקָּדוֹשׁ בָּרוּךְ הוּא', 'ב"ה': 'בָּרוּךְ הוּא', 'ית\'': 'יִתְבָּרֵךְ', 'יתב\'': 'יִתְבָּרֵךְ',
   'ז"ל': 'זִכְרוֹנוֹ לִבְרָכָה', 'רז"ל': 'רַבּוֹתֵינוּ זִכְרוֹנָם לִבְרָכָה', 'חז"ל': 'חֲכָמֵינוּ זִכְרוֹנָם לִבְרָכָה',
   'וכו\'': 'וְכוּלֵּי', 'כו\'': 'כּוּלֵּי', 'וגו\'': 'וְגוֹמֵר', 'א"כ': 'אִם כֵּן', 'וא"כ': 'וְאִם כֵּן', 'א"א': 'אִי אֶפְשָׁר',
   'כ"ש': 'כָּל שֶׁכֵּן', 'וכ"ש': 'וְכָל שֶׁכֵּן', 'ר"ל': 'רוֹצֶה לוֹמַר', 'ע"י': 'עַל יְדֵי', 'ע"פ': 'עַל פִּי', 'ע"ד': 'עַל דֶּרֶךְ',
-  'ז"א': 'זֹאת אוֹמֶרֶת', 'ח"ו': 'חַס וְשָׁלוֹם', 'ד"ה': 'דִּבּוּר הַמַּתְחִיל', 'וכיו"ב': 'וְכַיּוֹצֵא בָּזֶה',
+  'ח"ו': 'חַס וְשָׁלוֹם', 'ד"ה': 'דִּבּוּר הַמַּתְחִיל', 'וכיו"ב': 'וְכַיּוֹצֵא בָּזֶה',
   'שנא\'': 'שֶׁנֶּאֱמַר', 'ונא\'': 'וְנֶאֱמַר', 'הנ"ל': 'הַנִּזְכָּר לְעֵיל', 'כנ"ל': 'כַּנִּזְכָּר לְעֵיל', 'עכ"ל': 'עַד כָּאן לְשׁוֹנוֹ',
   'א"י': 'אֶרֶץ יִשְׂרָאֵל', 'בהמ"ק': 'בֵּית הַמִּקְדָּשׁ', 'ב"ד': 'בֵּית דִּין', 'בי"ד': 'בֵּית דִּין', 'ס"ת': 'סֵפֶר תּוֹרָה',
   'ש"ץ': 'שְׁלִיחַ צִבּוּר', 'ע"ש': 'עַיֵּין שָׁם', 'כמ"ש': 'כְּמוֹ שֶׁכָּתוּב', 'וכמ"ש': 'וּכְמוֹ שֶׁכָּתוּב', 'מ"מ': 'מִכָּל מָקוֹם',
@@ -22,8 +23,8 @@ export const ABBREVIATIONS = {
   'א"ס': 'אֵין סוֹף', 'אוא"ס': 'אוֹר אֵין סוֹף', 'ס"א': 'סִטְרָא אָחֳרָא', 'סט"א': 'סִטְרָא אָחֳרָא', 'נה"ב': 'נֶפֶשׁ הַבַּהֲמִית',
   'נה"א': 'נֶפֶשׁ הָאֱלֹקִית', 'מ"ע': 'מִצְוַת עֲשֵׂה', 'מצ"ע': 'מִצְוַת עֲשֵׂה', 'ל"ת': 'לֹא תַעֲשֶׂה', 'מל"ת': 'מִצְוַת לֹא תַעֲשֶׂה',
   'יו"ט': 'יוֹם טוֹב', 'יוה"כ': 'יוֹם הַכִּפּוּרִים', 'ר"ה': 'רֹאשׁ הַשָּׁנָה', 'ר"ח': 'רֹאשׁ חֹדֶשׁ', 'ת"ח': 'תַּלְמִיד חָכָם',
-  'ת"ת': 'תַּלְמוּד תּוֹרָה', 'עוה"ז': 'עוֹלָם הַזֶּה', 'עוה"ב': 'עוֹלָם הַבָּא', 'ק"ש': 'קְרִיאַת שְׁמַע', 'בעה"ז': 'בָּעוֹלָם הַזֶּה',
-  'וק"ל': 'וְקַל לְהָבִין', 'כנודע': 'כַּנּוֹדָע', 'אדה"ר': 'אָדָם הָרִאשׁוֹן', 'ב"ה': 'בָּרוּךְ הוּא', 'ע"כ': 'עַל כֵּן',
+  'עוה"ז': 'עוֹלָם הַזֶּה', 'עוה"ב': 'עוֹלָם הַבָּא', 'ק"ש': 'קְרִיאַת שְׁמַע', 'בעה"ז': 'בָּעוֹלָם הַזֶּה',
+  'וק"ל': 'וְקַל לְהָבִין', 'כנודע': 'כַּנּוֹדָע', 'אדה"ר': 'אָדָם הָרִאשׁוֹן', 'ע"כ': 'עַל כֵּן',
   'פי\'': 'פֵּירוּשׁ', 'פירש"י': 'פֵּירֵשׁ רַשִׁ"י', 'רש"י': 'רַשִׁ"י', 'ר\'': 'רַבִּי', 'ת"ר': 'תָּנוּ רַבָּנָן', 'א"ר': 'אָמַר רַבִּי',
   'ה\'': 'הַשֵּׁם', 'הוי\'': 'הֲוָיָ"ה', 'הוי"ה': 'הֲוָיָ"ה', 'אד\'': 'אדנות', 'הש"י': 'הַשֵּׁם יִתְבָּרֵךְ', 'השי"ת': 'הַשֵּׁם יִתְבָּרֵךְ',
   // round 4: common in Rashi / Rambam, one reading only
@@ -75,7 +76,7 @@ export const ABBREVIATIONS = {
   'שע"ז': 'שֶׁעַל זֶה', 'וע"ז': 'וְעַל זֶה', 'בעה"כ': 'בְּעֶרְכֵי הַכִּנּוּיִים', 'ת"ז': 'תִּיקּוּנֵי ז֫וֹהַר', 'הת"ז': 'תִּיקּוּנֵי ז֫וֹהַר', 'הפע"ח': 'פְּרִי עֵץ חַיִּים', 'מהפע"ח': 'מִפְּרִי עֵץ חַיִּים', 'בהע"ס': 'בָּעֶשֶׂר סְפִירוֹת',
   'הרמ"ז': 'הָרַמַ"ז', 'בהרמ"ז': 'בָּרַמַ"ז', 'ובהרמ"ז': 'וּבָרַמַ"ז', 'והרמ"ז': 'וְהָרַמַ"ז',
   'ב"פ': 'שְׁתֵּי פְּעָמִים',
-  'מדה"ר': 'מִדַּת הָרַחֲמִים', 'העכו"ם': 'עוֹבְדֵי הַכּוֹכָבִים וְהַמַּזָּלוֹת', 'יחו"ע': 'יִחוּדָא עִילָּאָה',
+  'מדה"ר': 'מִדַּת הָרַחֲמִים', 'העכו"ם': 'עוֹבְדֵי הַכּוֹכָבִים וְהַמַּזָּלוֹת',
   'אאמו"ר': 'אֲדוֹנִי אָבִי מוֹרִי וְרַבִּי', 'ש"ס': 'שַׁ"ס', 'הש"ס': 'הַשַּׁ"ס', 'תנ"ך': 'תַּנַ"ךְ', 'לקב"ה': 'לְהַקָּדוֹשׁ בָּרוּךְ הוּא', 'דרז"ל': 'דְּרַבּוֹתֵינוּ זִכְרוֹנָם לִבְרָכָה', 'בדרז"ל': 'בְּדִבְרֵי רַבּוֹתֵינוּ זִכְרוֹנָם לִבְרָכָה',
 };
 // gate (round 3, verification/ABBR-112.tsv): only entries reviewed strictly above 9.5; withdrawn: חו״ב, ק״נ, ב״ן, ג״פ, כ״כ, years
@@ -304,7 +305,74 @@ const PARASHOT = new Set('בראשית נח לך וירא חיי תולדות ו
  *  ת״ד after י״ג = תִּיקּוּנֵי דִּיקְנָא; מדה״ר after י״ג = מִדּוֹת הָרַחֲמִים. */
 // a letter name (ר״פ מ״ם, ר״פ צדי) is not a chapter numeral here (the letter-name reading was not deployed, see contextAbbr)
 const LETTER_VALUE = { אלף: 1, בית: 2, גימל: 3, דלת: 4, הא: 5, ויו: 6, וו: 6, זין: 7, חית: 8, טית: 9, יוד: 10, כף: 20, למד: 30, מם: 40, נון: 50, סמך: 60, עין: 70, פא: 80, צדי: 90, קוף: 100, ריש: 200, שין: 300, תו: 400 };
-export function contextAbbr(words, i) {
+// 1.0.227 (A4): ז״א and ת״ת are ambiguous. Expand only with a book unit or a positive local cue;
+// otherwise say the letter names here (do not leave the token for numeralReading, which would
+// treat ת״ת as 800 and לז״א as 38). Speech only; display is unchanged.
+// yearWord (Jewish years such as תרס״ו) stays undeployed – it was reviewed 8.8 and held back.
+const KAB_UNITS = new Set(['tolt', 'tanya']);
+const ZOT_UNITS = new Set(['chumash', 'nachyomi', 'rambam1', 'rambam3', 'mitzvot', 'ravyomi']);
+const stripNiq = s => (s || '').replace(/[\u0591-\u05C7]/g, '').replace(/״/g, '"').replace(/׳/g, "'");
+const isSpace = s => !s || /^\s+$/.test(s);
+const wordTokens = (arr, a = 0, b = arr.length) => arr.slice(a, b).filter(w => !isSpace(w)).map(w => stripNiq(w).replace(/^[([{"«]+/, '').replace(/[.,:;!?)\].»"]+$/, ''));
+const joinWords = (arr, a, b) => wordTokens(arr, a, b).join(' ');
+function nearbyWords(words, i, before, after) {
+  const out = [];
+  let n = 0;
+  for (let j = i - 1; j >= 0 && n < before; j--) if (!isSpace(words[j])) { out.unshift(words[j]); n++; }
+  out.push(words[i]);
+  n = 0;
+  for (let j = i + 1; j < words.length && n < after; j++) if (!isSpace(words[j])) { out.push(words[j]); n++; }
+  return out;
+}
+const KAB_CORE = /^(אצילות|נוקבא|נוקבי[אה]|נוק['"]|פרצוף|פרצופים|מוחין|אימא|זעיר|אנפין|עתיק|עתיקא|עתיקין|ספירות|קוין|קווין|קווים)$/;
+function hasKabCue(words) {
+  // Whole-token cues only: never match across a word boundary, and never on short stems
+  // (אצי, נוק, אבא, אמא) or ordinary words (מלכות, מדות) that appear in non-Kabbalah prose.
+  return wordTokens(words).some(t => {
+    if (/^(חח"ן|נה"י|או"א)$/.test(t)) return true;
+    if (KAB_CORE.test(t)) return true;
+    if (/^[ובלמכשהד]/.test(t) && KAB_CORE.test(t.slice(1))) return true;
+    if (/^[ובלמכשהד]{2}/.test(t) && KAB_CORE.test(t.slice(2))) return true;
+    return false;
+  });
+}
+export function ambiguousAbbr(sk, words, i, opt, out) {
+  const unit = opt?.unit || '';
+  const kab = KAB_UNITS.has(unit) || (!ZOT_UNITS.has(unit) && hasKabCue(words));
+  const zaNames = p => out(withPrefix(p, LETTER_NAME['ז'] + ' ' + LETTER_NAME['א'], true));
+  const ttNames = p => out(withPrefix(p, LETTER_NAME['ת'] + ' ' + LETTER_NAME['ת'], true));
+  const za = /^([ובלמכשהד]{0,2})ז"א$/.exec(sk);
+  if (za) {
+    const after = joinWords(words, i + 1).replace(/^[^\u05D0-\u05EA"]+/, '');
+    const p = za[1];
+    if (/^כלומר.{0,24}זאת ?אומרת/.test(after)) return zaNames(p);   // documented safety: do not guess
+    if (kab || p.includes('ד')) return out(p.endsWith('ד') ? withPrefix(p.slice(0, -1), 'דְּזְעֵיר אַנְפִּין') : withPrefix(p, 'זְעֵיר אַנְפִּין'));
+    if (ZOT_UNITS.has(unit)) return out(withPrefix(p, 'זֹאת אוֹמֶרֶת'));
+    return zaNames(p);
+  }
+  const tt = /^([ובלמכשהד]{0,2})ת"ת$/.exec(sk);
+  if (tt) {
+    const p = tt[1], around = joinWords(nearbyWords(words, i, 4, 4));
+    const huTtD = /(?:^| )(?:הוא|שהוא) ת"ת ד/.test(around);
+    // ת"ת ד… is Tiferet only in a Kabbalah unit (or with a whole-token kab cue). A following
+    // word that merely starts with ד (ת״ת דאורייתא) must not trigger Tiferet in other books.
+    const ttDKab = /ת"ת ד(?:אימא|אמא|ז"א)/.test(around) || ((KAB_UNITS.has(unit) || hasKabCue(words)) && /ת"ת ד/.test(around));
+    const tiferet = /(?:הוא|שהוא|דהיינו) ת"ת/.test(around) || /השמים.{0,24}ת"ת/.test(around) || ttDKab
+      || ((KAB_UNITS.has(unit) || hasKabCue(words)) && /(?:מלכות|חסד|גבורה|יסוד|כתר|פרצוף|אצילות)/.test(around));
+    // מצות/מצוה counts as Talmud Torah when it is juxtaposed (מצות ת״ת) or when there is no Tiferet cue.
+    // A מצות elsewhere in the ±4-word window must not override ת״ת ד… / שבחסד in a Kabbalah unit.
+    const talmudDirect = /(?:מצות|מצוות|מצוה) ת"ת/.test(around) || /כנגד ?כולם|והגית|תלמוד ?תורה/.test(around);
+    const talmudLoose = /מצות|מצוות|מצוה|לימוד/.test(around);
+    if (huTtD && (tiferet || KAB_UNITS.has(unit))) return out(withPrefix(p, 'תִּפְאֶרֶת'));
+    if (ttDKab) return out(withPrefix(p, 'תִּפְאֶרֶת'));
+    if (talmudDirect || (talmudLoose && !tiferet)) return out(withPrefix(p, 'תַּלְמוּד תּוֹרָה'));
+    if (tiferet) return out(withPrefix(p, 'תִּפְאֶרֶת'));
+    return ttNames(p);
+  }
+  return null;
+}
+
+export function contextAbbr(words, i, opt = {}) {
   const w = words[i];
   // (letter-name chapters after ס״פ / ר״פ – ר״פ צדי – reviewed 9.2 in round 3: not deployed; such a ר״פ stays as in 1.0.110)
   const m = /^([^\u05D0-\u05EA]*)([\u05D0-\u05EA]+["״][\u05D0-\u05EA])([.,:;)\]]*)$/.exec(w || '');
@@ -312,6 +380,8 @@ export function contextAbbr(words, i) {
   const near = dir => { for (let j = i + dir; j >= 0 && j < words.length; j += dir) if (words[j] && !/^\s+$/.test(words[j])) return words[j]; return ''; };
   const norm = x => skeleton(x || '').replace(/״/g, '"').replace(/׳/g, "'").replace(/^[([]+/, '').replace(/[.,:;)\]]+$/, '');
   const sk = norm(m[2]), nx = norm(near(1)), pv = norm(near(-1)), out = s => m[1] + s + m[3];
+  const amb = ambiguousAbbr(sk, words, i, opt, out);
+  if (amb !== null) return amb;
   const isNum = x => /^[\u05D0-\u05EA]{1,3}["'][\u05D0-\u05EA]?$/.test(x) && !ABBR.has(x) && !ABBR_112.has(x) && !!splitNumeral(x) && !splitNumeral(x).pre;
   // round 2: the chapter number after ס״פ / ר״פ is a number (סוֹף פֶּרֶק עֶשְׂרִים וּשְׁלוֹשָׁה); after ב״ר, פ״א = פָּרָשָׁה אַחַת
   // gate: not a letter name (מ״ם) and not an amud (דר״פ ע״ב = folio 280b, not chapter 72)
@@ -605,7 +675,7 @@ export function prepareForTTS(html, opt = {}) {
       const at = w.search(/[\u05D0-\u05EA]/), end = w.lastIndexOf("'") >= 0 ? w.lastIndexOf("'") + 1 : w.length;
       return w.slice(0, at) + (bm[1] ? withPrefix(bm[1], form) : form) + w.slice(end);
     }
-    const ctx = contextAbbr(words, i);
+    const ctx = contextAbbr(words, i, o);
     if (ctx !== null) return ctx;
     const num = numeralReading(words, i);
     if (num !== null) return num;

@@ -101,7 +101,7 @@ export class PiperSpeaker extends Speaker {
       // the voice needs the vowels: niqqud is always kept for it (the "stress" setting concerns the browser's engine)
       s.parts.forEach((html, pi) => {
         const primary = !!s.primaryParts?.[pi];
-        const prepared = prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary });
+        const prepared = prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary, unit: opts.unit });
         // 1.0.101: pauseChunks for every source (comma 0.18 s, sentence 0.38 s). Gemara already used this.
         for (const { c, gap } of pauseChunks(prepared)) chunks.push(primary
           ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c }, gap }
