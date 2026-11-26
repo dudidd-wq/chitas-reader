@@ -8,7 +8,7 @@ export const PROGRESS_WARN = 4250;
 export const DEFAULT_PREFS = {
   theme: 'paper', design: 'classic', designFont: 'design', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, rashiFont: 'rashi', hayomNiqqud: true, biurNiqqud: true, mitzvotNiqqud: true, lessonNach: false, lessonShnayim: false, shnayimSplit: 'day', gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false, lessonDaf: false, lessonAmud: false, lessonYer: false, lessonMishna: false,
-  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivine: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsGemaraBiurOnly: false, ttsSkipCites: true, ttsContinuous: true,
+  ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivineScripture: 'hashem', ttsDivineOral: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsGemaraBiurOnly: false, ttsSkipCites: true, ttsContinuous: true,
   ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
@@ -55,7 +55,12 @@ export function normalizePrefs(raw) {
   if (!['tap', 'inline', 'off'].includes(prefs.gloss)) prefs.gloss = 'tap';
   if (!['1', '3', 'both'].includes(prefs.rambamTrack)) prefs.rambamTrack = 'both';
   if (!['full', 'abbr'].includes(prefs.divine)) prefs.divine = 'full';
-  if (!['hashem', 'adonai'].includes(prefs.ttsDivine)) prefs.ttsDivine = 'hashem';
+  // Two TTS settings (scripture/prayer vs Oral Torah). A legacy backup that only has ttsDivine
+  // is applied to both, so a reader who already chose "adonai" keeps that everywhere.
+  const validDivine = v => v === 'hashem' || v === 'adonai';
+  const legacyDivine = validDivine(src.ttsDivine) ? src.ttsDivine : 'hashem';
+  prefs.ttsDivineScripture = validDivine(src.ttsDivineScripture) ? src.ttsDivineScripture : legacyDivine;
+  prefs.ttsDivineOral = validDivine(src.ttsDivineOral) ? src.ttsDivineOral : legacyDivine;
   prefs.size = Number.isFinite(prefs.size) ? Math.min(48, Math.max(12, Math.round(prefs.size))) : DEFAULT_PREFS.size;
   prefs.lineHeight = Number.isFinite(prefs.lineHeight) ? Math.min(2.6, Math.max(1.2, Math.round(prefs.lineHeight * 10) / 10)) : DEFAULT_PREFS.lineHeight;
   prefs.candleMins = Number.isFinite(prefs.candleMins) && prefs.candleMins >= 0 && prefs.candleMins <= 120 ? prefs.candleMins : 0;

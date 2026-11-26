@@ -2,7 +2,8 @@
 // optional silent-audio keep-alive for lock-screen controls. Policy (1.0.224): the reader never speaks with a network
 // voice (localService === false) – such voices make the browser send the text to the vendor. hebrewVoices() returns
 // usable (local) voices only; allHebrewVoices() lists network voices too, solely so the UI can show them as unavailable.
-import { prepareForTTS, pauseChunks } from './tts-prep.js';
+import { pauseChunks } from './tts-prep.js';
+import { prepareSpeechForTTS } from './divine-tts.js';
 import { webPitch, clampPitch } from './voice-pitch.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -71,7 +72,7 @@ export class Speaker {
     segments.forEach((s, si) => {
       const chunks = [];
       s.parts.forEach((html, pi) => {
-        const prepared = prepareForTTS(html, { stress: opts.stress, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], unit: opts.unit });
+        const prepared = prepareSpeechForTTS(html, { stress: opts.stress, divineName: s.divineNames?.[pi] ?? opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], unit: opts.unit });
         // 1.0.101: same comma/period pauses as the local voice; the gap is a delay after the utterance (tests may set __ttsPauseScale = 0)
         for (const x of pauseChunks(prepared)) chunks.push(x);
       });

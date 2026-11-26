@@ -3,7 +3,8 @@
 // ('voice-v1'), outside the service worker's precache, and the synthesis runs on the device in a Web Worker.
 // PiperSpeaker has the interface of tts.js's Speaker (load/startAt/play/pause/toggle/stop/skip/setRate, same callbacks).
 import { Speaker } from './tts.js';
-import { prepareForTTS, pauseChunks } from './tts-prep.js';
+import { pauseChunks } from './tts-prep.js';
+import { prepareSpeechForTTS } from './divine-tts.js';
 import { VOICE_FILES } from './voice-files.js';
 import { timbreFor, f0Stats } from './voice-pitch.js';
 
@@ -101,7 +102,7 @@ export class PiperSpeaker extends Speaker {
       // the voice needs the vowels: niqqud is always kept for it (the "stress" setting concerns the browser's engine)
       s.parts.forEach((html, pi) => {
         const primary = !!s.primaryParts?.[pi];
-        const prepared = prepareForTTS(html, { stress: true, divineName: opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary, unit: opts.unit });
+        const prepared = prepareSpeechForTTS(html, { stress: true, divineName: s.divineNames?.[pi] ?? opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary, unit: opts.unit });
         // 1.0.101: pauseChunks for every source (comma 0.18 s, sentence 0.38 s). Gemara already used this.
         for (const { c, gap } of pauseChunks(prepared)) chunks.push(primary
           ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c }, gap }

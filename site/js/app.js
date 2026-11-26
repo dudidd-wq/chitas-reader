@@ -10,6 +10,7 @@ import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearPro
 import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline } from './offline.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
+import { divineNamesForParts } from './divine-tts.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
 import { VOICE_FILES } from './voice-files.js';
@@ -668,7 +669,7 @@ function displayText() {
     ${check('biurNiqqud', prefs.biurNiqqud, 'הצג ניקוד בביאורים (שטיינזלץ, פני משה, ברטנורא, מצודת דוד, ביאור קצר)')}
     <small>ניקוד אוטומטי של דיקטה (בביאורים: מילות הגמרא – לפי ניקוד המהדורה), שלא הוגה במלואו; ייתכנו טעויות. ההקראה אינה מושפעת מהבחירה.</small></fieldset>
   <fieldset><legend>תצוגת שם ה׳</legend>${radio('divine', prefs.divine, [['full', 'מלא (יְהֹוָה)'], ['abbr', 'ה׳']])}
-    <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרת ״הקראת שם ה׳״.</small></fieldset>
+    <small>בכל הטקסטים. ההקראה אינה מושפעת – היא נשלטת בהגדרות ״הקראת שם ה׳״.</small></fieldset>
   <fieldset><legend>ביאור מילים</legend>${radio('gloss', prefs.gloss, [['tap', 'בלחיצה על מילה'], ['inline', 'מעל המילה'], ['off', 'כבוי']])}</fieldset>
   ${check('studyNotes', prefs.studyNotes, 'הצג מראי מקומות (תניא, תורה אור ולקוטי תורה) וקישור לביאור הרב שטיינזלץ (רמב״ם) בסוף כל קטע')}
   <fieldset><legend>ביאור קצר</legend>${check('shortBiur', prefs.shortBiur, 'הצג ״ביאור קצר״ מקופל מתחת לפסקה (תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה)')}<small>בתניא, ברמב״ם ובספר המצוות – ביאור ממוחשב; בתורה אור ובלקוטי תורה – תמצית ממוחשבת של הביאור באנגלית באתר LikuteiTorah.com. אינם פירוש רבני, וכל ביאור מסומן כך. כרגע יש ביאור רק לחלק מהשיעורים, ושאר השיעורים יתווספו בהדרגה. הניקוד – לפי ״הצג ניקוד בביאורים״.</small></fieldset>`;
@@ -809,7 +810,10 @@ function ttsForm() {
   <h3 class="set-sub" id="tts-opts-h">מהירות ואפשרויות הקראה</h3>
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
-  <fieldset><legend>הקראת שם ה׳</legend>${radio('ttsDivine', prefs.ttsDivine, [['hashem', '״השם״ / ״אלוקים״'], ['adonai', 'כבתפילה (אדנות)']])}</fieldset>
+  <fieldset><legend>הקראת שם ה׳ בפסוקים ובתפילה</legend>${radio('ttsDivineScripture', prefs.ttsDivineScripture, [['hashem', '״השם״ / ״אדשם״ / ״אלוקים״'], ['adonai', 'כהוויתו בתפילה וקריאה (אֲדֹנָי / אֱלֹהִים)']])}
+    <small>חומש ותרגומו, נ״ך, תהילים, סידור, ושניים מקרא. פירושים שנלווים לפסוק (רש״י, מצודות וביאור קצר) נקראים לפי ההגדרה של תורה שבעל פה.</small></fieldset>
+  <fieldset><legend>הקראת שם ה׳ בתורה שבעל פה</legend>${radio('ttsDivineOral', prefs.ttsDivineOral, [['hashem', '״השם״ / ״אדשם״ / ״אלוקים״'], ['adonai', 'כהוויתו בתפילה וקריאה (אֲדֹנָי / אֱלֹהִים)']])}
+    <small>תניא, תורה אור, היום יום, גמרא, משנה, רמב״ם, ספר המצוות, שולחן ערוך, ופירושים.</small></fieldset>
   ${R.sid ? kaddishField() : ''}
   ${check('ttsRashi', prefs.ttsRashi, 'הקרא גם את פירוש רש״י')}
   ${check('ttsBiur', prefs.ttsBiur, 'הקרא גם את ה״ביאור הקצר״ אחרי כל פסקה')}
@@ -1071,10 +1075,10 @@ function renderAbout() {
   <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו משתמש בהם כלל: הם מופיעים ברשימה כ״לא זמין״ ואי אפשר לבחור בהם, וההקראה פועלת רק בקול מותקן במכשיר (או בקול האיכותי המקומי). בלי קול כזה ההקראה נעצרת עם הודעה, והטקסט אינו נשלח לספק.</li>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
   <li id="qv-about"><b>קול איכותי (מקומי, ניסיוני, מגרסה 1.0.59):</b> במקום קול הדפדפן אפשר להוריד – רק בלחיצה על ״קול איכותי״ בהגדרות ההקראה – את הקול <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">noa</a> (Piper, של thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>). ההורדה חד־פעמית (כ־92 MB, או כ־38 MB בגרסה הקלה), מאתר זה בלבד; הקול נשמר במכשיר וההקראה נעשית בו, בלי רשת ובלי לשלוח טקסט. ההגייה נבנית מהניקוד: ההטעמה (מלעיל/מלרע) לפי טעמי המקרא בתורה ובתהילים; בשאר הטקסטים – לפי רשימת חריגים ומודל סיומות שנלמד מהטעמים (כ־93% נכון כשנבדק על ספר מקרא שלא נלמד – תורה מול תהילים; בלשון חכמים ובתניא הדיוק לא נמדד), שווא נע לפי כללי הדקדוק, וקמץ קטן רק במילים שאומתו (כל, חכמה, קרבן ועוד). <b>הקול לא נבדק בהאזנה אנושית</b> – רק במדידות אוטומטיות (תמלול חוזר); יש שגיאות הגייה, ובטקסט שאינו מנוקד ההגייה גרועה. אם הקול אינו נתמך או לא נטען – ההקראה חוזרת לקול הדפדפן. <b>מגרסה 1.0.60 ברירת המחדל היא קול גברי</b>: אותו קול noa בעיבוד אות במכשיר (גובה צליל נמוך בכ־6 חצאי טון, פורמנטים נמוכים בכ־6%), בלי הורדה נוספת; הקול הנשי המקורי זמין בהגדרות. זהו גוון מלאכותי, שגם הוא לא נבדק בהאזנה אנושית; במדידה האוטומטית הבהירות (תמלול חוזר) כמעט לא השתנתה – הפירוט בקובץ האימות.</li>
-  <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
+  <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים, וקוראת את שם ה׳ לפי שתי הגדרות נפרדות: אחת לפסוקים ולתפילה, ואחת לתורה שבעל פה.</li>
   <li>לחיצה אחת על כפתור ההקראה מתחילה לקרוא מיד; ההגדרות (קול, מהירות, שם ה׳) – בלחיצה ארוכה על הכפתור או בכפתור ההגדרות שבסרגל ההקראה.</li>
   <li>מה לא מוקרא: סימני פרשה פתוחה/סתומה (פ/ס), והפניות למקורות בסוגריים, כמו ״(שמות כ׳)״ או ״(מכילתא)״ – הן נשארות על המסך. ראשי תיבות מורחבים רק כשהם חד־משמעיים (למשל ת״ל – תַּלְמוּד לוֹמַר); אחרת נקראים ככתבם.</li>
-  <li>שם ה׳ במצב ״השם״: שם הוי׳ה, ה׳, יי ו״ה׳״ עם מקף או אות שימוש (לַה׳ – לַהַשֵּׁם) נקראים ״הַשֵּׁם״; אֲדֹנָי כשם קודש נקרא ״אֲדוֹשֵׁם״; אלוקים, קָהּ וקֵל בק׳. במקום שהמילה אינה שם קודש (למשל ״אלהים אחרים״) – אין החלפה. זו רשימה שלנו, לא פסק הלכה.</li>
+  <li>שם ה׳ במצב ״השם / אדשם / אלוקים״: שם הוי׳ה, ה׳, יי, ידוד, יקוק ו״ה׳״ עם מקף או אות שימוש (לַה׳ – לַהַשֵּׁם) נקראים ״הַשֵּׁם״; אֲדֹנָי כשם קודש נקרא ״אֲדוֹשֵׁם״; אלוקים, קָהּ וקֵל בק׳. במצב ״כהוויתו בתפילה וקריאה״ נקראים אֲדֹנָי / אֱלֹהִים ככתבם המקובל בקריאה. במקום שהמילה אינה שם קודש (למשל ״אלהים אחרים״) – אין החלפה. זו רשימה שלנו, לא פסק הלכה. התצוגה על המסך אינה משתנה.</li>
   <li id="tts-untested"><b>מה נבדק ומה לא:</b> ההכנה לדיבור (ניקוד, מספרים, ראשי תיבות, שם ה׳) נבדקת בבדיקות אוטומטיות, והנגן נבדק בדפדפן עם קול מדומה. <b>ההקראה בפועל עם קולות עבריים אמיתיים, באייפון ובאנדרואיד, לא נבדקה</b> – לא היה בידינו מכשיר כזה לבדיקה, ולכן גם המשפט הבא מבוסס על התיעוד של הדפדפנים ולא על ניסוי.
     <details id="tts-howto"><summary>איך לבדוק במכשיר שלכם</summary><ol>
     <li>מתקינים קול עברי (אנדרואיד: מנוע Google ← התקנת נתוני קול ← עברית; אייפון: נגישות ← תוכן מוקרא ← קולות ← עברית ← כרמית).</li>
@@ -2229,7 +2233,14 @@ function ttsSegments() {
     // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.
     // prepareForTTS strips these before Web Speech; Piper must receive the original in parallel.
     const acc = byId?.get(s.dataset.id)?.text || say.get(s.dataset.id) || null;
-    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, pause: true };
+    const divineNames = divineNamesForParts(R.unit, {
+      repeat: block?.repeat || 1,
+      biurSay: (block?.biurSay || []).filter(Boolean),
+      biurLabel: block?.biurLabel || '',
+      rashiCount: prefs.ttsRashi ? s.querySelectorAll('.rashi p').length : 0,
+      shortBiur: !!sbv,
+    }, prefs);
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, divineNames, pause: true };
   });
 }
 const TTS_ERR = {
@@ -2297,7 +2308,7 @@ async function ttsToggle() {
       toast(TTS_ERR[code] || `ההקראה נעצרה בגלל שגיאה במנוע הדיבור (${code}). השיעור לא סומן כנלמד.`);
     },
   });
-  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivine, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara, pitch: prefs.ttsPitch, unit: R.unit },
+  R.speaker.load(ttsSegments(), { rate: prefs.ttsRate, voice: prefs.ttsVoice, stress: prefs.ttsStress, divineName: prefs.ttsDivineOral, divineScripture: prefs.ttsDivineScripture, divineOral: prefs.ttsDivineOral, skipCites: prefs.ttsSkipCites, lockscreen: prefs.ttsLockscreen, variant: prefs.ttsModel, voiceGender: prefs.ttsGender, havara: prefs.ttsHavara, pitch: prefs.ttsPitch, unit: R.unit },
     { title: R.doc.title + ' – ' + R.doc.subtitle, album: R.lib ? 'ספרייה' : dayPlan(R.iso, { il: prefs.il }).hebDate });
   if (!R.speaker.queue.length) {
     R.speaker = null; R.ttsShown = false; showTtsBar(false);
