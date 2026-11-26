@@ -2,12 +2,17 @@ name: Deploy site to GitHub Pages
 on:
   push: { branches: [main] }
   workflow_dispatch:
-permissions: { contents: read, pages: write, id-token: write }
-concurrency: { group: pages, cancel-in-progress: true }
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -16,8 +21,22 @@ jobs:
         run: python3 -m pip install --user fonttools brotli
       - name: Install and test (retry the suite once; pitch-192 and siddur-flow can flake on CI runners)
         run: npm ci && (npm test || npm test)
+      - name: Drop leftover pages artifacts from a rerun of this workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ids=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" \
+            --jq '.artifacts[] | select(.name=="github-pages" and .expired==false) | .id')
+          for id in $ids; do
+            gh api -X DELETE "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}"
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
       - id: d
         uses: actions/deploy-pages@v4
