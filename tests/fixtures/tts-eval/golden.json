@@ -1,0 +1,1368 @@
+{
+ "schema": 1,
+ "items": {
+  "mikra-gen1-1": {
+   "prep": "בְּרֵאשִׁית בָּרָא אֱלֹקִים; אֵת הַשָּׁמַיִם וְאֵת הָאָרֶץ.",
+   "ipa": {
+    "israeli": "beʁeʃˈit baʁˈa ʔelokˈim, ʔˈet haʃamˈajim veʔˈet haʔˈaʁets.",
+    "chabad": "beʁejʃˈis boʁˈo elojkˈim, ˈejs haʃomˈajim veˈejs hoˈoʁets."
+   },
+   "trace": {
+    "israeli": [
+     "בְּרֵאשִׁית|beʁeʃˈit|0|acc",
+     "בָּרָא|baʁˈa|0|acc",
+     "אֱלֹקִים|ʔelokˈim|0|exc",
+     "אֵת|ʔˈet|0|acc",
+     "הַשָּׁמַיִם|haʃamˈajim|1|acc",
+     "וְאֵת|veʔˈet|0|acc",
+     "הָאָרֶץ|haʔˈaʁets|1|acc"
+    ],
+    "chabad": [
+     "בְּרֵאשִׁית|beʁejʃˈis|0|acc",
+     "בָּרָא|boʁˈo|0|acc",
+     "אֱלֹקִים|elojkˈim|0|exc",
+     "אֵת|ˈejs|0|acc",
+     "הַשָּׁמַיִם|haʃomˈajim|1|acc",
+     "וְאֵת|veˈejs|0|acc",
+     "הָאָרֶץ|hoˈoʁets|1|acc"
+    ]
+   }
+  },
+  "mikra-gen1-2": {
+   "prep": "וְהָאָרֶץ הָיְתָה תֹהוּ וָבֹהוּ, וְחֹשֶׁךְ עַל פְּנֵי תְהוֹם; וְרוּחַ אֱלֹקִים מְרַחֶפֶת עַל פְּנֵי הַמָּיִם.",
+   "ipa": {
+    "israeli": "vehaʔˈaʁets hajtˈa tˈohu vavˈohu, veχˈoʃeχ ʔˈal penˈej tehˈom, veʁˈuaχ ʔelokˈim meʁaχˈefet ʔˈal penˈej hamˈajim.",
+    "chabad": "vehoˈoʁets hojsˈo sˈojhu vovˈojhu, veχˈojʃeχ ˈal penˈej sehˈojm, veʁˈuaχ elojkˈim meʁaχˈefes ˈal penˈej hamˈojim."
+   },
+   "trace": {
+    "israeli": [
+     "וְהָאָרֶץ|vehaʔˈaʁets|1|acc",
+     "הָיְתָה|hajtˈa|0|acc",
+     "תֹהוּ|tˈohu|1|acc",
+     "וָבֹהוּ|vavˈohu|1|acc",
+     "וְחֹשֶׁךְ|veχˈoʃeχ|1|acc",
+     "עַל|ʔˈal|0|mono",
+     "פְּנֵי|penˈej|0|acc",
+     "תְהוֹם|tehˈom|0|acc",
+     "וְרוּחַ|veʁˈuaχ|1|acc",
+     "אֱלֹקִים|ʔelokˈim|0|exc",
+     "מְרַחֶפֶת|meʁaχˈefet|1|acc",
+     "עַל|ʔˈal|0|mono",
+     "פְּנֵי|penˈej|0|acc",
+     "הַמָּיִם|hamˈajim|1|acc"
+    ],
+    "chabad": [
+     "וְהָאָרֶץ|vehoˈoʁets|1|acc",
+     "הָיְתָה|hojsˈo|0|acc",
+     "תֹהוּ|sˈojhu|1|acc",
+     "וָבֹהוּ|vovˈojhu|1|acc",
+     "וְחֹשֶׁךְ|veχˈojʃeχ|1|acc",
+     "עַל|ˈal|0|mono",
+     "פְּנֵי|penˈej|0|acc",
+     "תְהוֹם|sehˈojm|0|acc",
+     "וְרוּחַ|veʁˈuaχ|1|acc",
+     "אֱלֹקִים|elojkˈim|0|exc",
+     "מְרַחֶפֶת|meʁaχˈefes|1|acc",
+     "עַל|ˈal|0|mono",
+     "פְּנֵי|penˈej|0|acc",
+     "הַמָּיִם|hamˈojim|1|acc"
+    ]
+   }
+  },
+  "mikra-gen1-3": {
+   "prep": "וַיֹּאמֶר אֱלֹקִים יְהִי אוֹר; וַיְהִי אוֹר.",
+   "ipa": {
+    "israeli": "vajˈomeʁ ʔelokˈim jehˈi ʔˈoʁ, vajhˈi ʔˈoʁ.",
+    "chabad": "vajˈojmeʁ elojkˈim jehˈi ˈojʁ, vajhˈi ˈojʁ."
+   },
+   "trace": {
+    "israeli": [
+     "וַיֹּאמֶר|vajˈomeʁ|1|acc",
+     "אֱלֹקִים|ʔelokˈim|0|exc",
+     "יְהִי|jehˈi|0|acc",
+     "אוֹר|ʔˈoʁ|0|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "אוֹר|ʔˈoʁ|0|acc"
+    ],
+    "chabad": [
+     "וַיֹּאמֶר|vajˈojmeʁ|1|acc",
+     "אֱלֹקִים|elojkˈim|0|exc",
+     "יְהִי|jehˈi|0|acc",
+     "אוֹר|ˈojʁ|0|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "אוֹר|ˈojʁ|0|acc"
+    ]
+   }
+  },
+  "mikra-gen1-5": {
+   "prep": "וַיִּקְרָא אֱלֹקִים לָאוֹר יוֹם, וְלַחֹשֶׁךְ קָרָא לָיְלָה; וַיְהִי עֶרֶב וַיְהִי בֹקֶר יוֹם אֶחָד.",
+   "ipa": {
+    "israeli": "vajikʁˈa ʔelokˈim laʔˈoʁ jˈom, velaχˈoʃeχ kˈaʁa lˈajla, vajhˈi ʔˈeʁev vajhˈi vˈokeʁ jˈom ʔeχˈad.",
+    "chabad": "vajikʁˈo elojkˈim loˈojʁ jˈojm, velaχˈojʃeχ kˈoʁo lˈojlo, vajhˈi ˈeʁev vajhˈi vˈojkeʁ jˈojm eχˈod."
+   },
+   "trace": {
+    "israeli": [
+     "וַיִּקְרָא|vajikʁˈa|0|acc",
+     "אֱלֹקִים|ʔelokˈim|0|exc",
+     "לָאוֹר|laʔˈoʁ|0|default",
+     "יוֹם|jˈom|0|acc",
+     "וְלַחֹשֶׁךְ|velaχˈoʃeχ|1|acc",
+     "קָרָא|kˈaʁa|1|acc",
+     "לָיְלָה|lˈajla|1|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "עֶרֶב|ʔˈeʁev|1|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "בֹקֶר|vˈokeʁ|1|acc",
+     "יוֹם|jˈom|0|acc",
+     "אֶחָד|ʔeχˈad|0|acc"
+    ],
+    "chabad": [
+     "וַיִּקְרָא|vajikʁˈo|0|acc",
+     "אֱלֹקִים|elojkˈim|0|exc",
+     "לָאוֹר|loˈojʁ|0|default",
+     "יוֹם|jˈojm|0|acc",
+     "וְלַחֹשֶׁךְ|velaχˈojʃeχ|1|acc",
+     "קָרָא|kˈoʁo|1|acc",
+     "לָיְלָה|lˈojlo|1|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "עֶרֶב|ˈeʁev|1|acc",
+     "וַיְהִי|vajhˈi|0|default",
+     "בֹקֶר|vˈojkeʁ|1|acc",
+     "יוֹם|jˈojm|0|acc",
+     "אֶחָד|eχˈod|0|acc"
+    ]
+   }
+  },
+  "mikra-ex20-2": {
+   "prep": "אָנֹכִי הַשֵּׁם אֱלֹקֶיךָ; אֲשֶׁר הוֹצֵאתִיךָ מֵאֶרֶץ מִצְרַיִם מִבֵּית עֲבָדִ͏ים.",
+   "ipa": {
+    "israeli": "ʔanoχˈi haʃˈem ʔelokˈeχa, ʔaʃˈeʁ hotsetˈiχa meʔˈeʁets mitsʁˈajim mibˈet ʔavadˈi jˈm.",
+    "chabad": "onojχˈi haʃˈejm elojkˈeχo, aʃˈeʁ hojtsejsˈiχo mejˈeʁets mitsʁˈajim mibˈejs avodˈi jˈm."
+   },
+   "trace": {
+    "israeli": [
+     "אָנֹכִי|ʔanoχˈi|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "אֱלֹקֶיךָ|ʔelokˈeχa|1|exc",
+     "אֲשֶׁר|ʔaʃˈeʁ|0|acc",
+     "הוֹצֵאתִיךָ|hotsetˈiχa|1|acc",
+     "מֵאֶרֶץ|meʔˈeʁets|1|acc",
+     "מִצְרַיִם|mitsʁˈajim|1|acc",
+     "מִבֵּית|mibˈet|0|acc",
+     "עֲבָדִ|ʔavadˈi|0|default",
+     "ים|jˈm|0|mono"
+    ],
+    "chabad": [
+     "אָנֹכִי|onojχˈi|0|default",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "אֱלֹקֶיךָ|elojkˈeχo|1|exc",
+     "אֲשֶׁר|aʃˈeʁ|0|acc",
+     "הוֹצֵאתִיךָ|hojtsejsˈiχo|1|acc",
+     "מֵאֶרֶץ|mejˈeʁets|1|acc",
+     "מִצְרַיִם|mitsʁˈajim|1|acc",
+     "מִבֵּית|mibˈejs|0|acc",
+     "עֲבָדִ|avodˈi|0|default",
+     "ים|jˈm|0|mono"
+    ]
+   }
+  },
+  "mikra-ex20-3": {
+   "prep": "לֹא יִהְיֶ͏ה לְךָ אֱלֹהִים אֲחֵרִים עַל פָּנָ͏ַי.",
+   "ipa": {
+    "israeli": "lˈo jihjˈe hˈe leχˈa ʔelohˈim ʔaχeʁˈim ʔˈal panˈa jˈ.",
+    "chabad": "lˈoj jihjˈe hˈej leχˈo elojhˈim aχejʁˈim ˈal ponˈo jˈ."
+   },
+   "trace": {
+    "israeli": [
+     "לֹא|lˈo|0|mono",
+     "יִהְיֶ|jihjˈe|0|default",
+     "ה|hˈe|0|spell",
+     "לְךָ|leχˈa|0|mono",
+     "אֱלֹהִים|ʔelohˈim|0|acc",
+     "אֲחֵרִים|ʔaχeʁˈim|0|acc",
+     "עַל|ʔˈal|0|mono",
+     "פָּנָ|panˈa|0|default",
+     "ַי|jˈ|0|mono"
+    ],
+    "chabad": [
+     "לֹא|lˈoj|0|mono",
+     "יִהְיֶ|jihjˈe|0|default",
+     "ה|hˈej|0|spell",
+     "לְךָ|leχˈo|0|mono",
+     "אֱלֹהִים|elojhˈim|0|acc",
+     "אֲחֵרִים|aχejʁˈim|0|acc",
+     "עַל|ˈal|0|mono",
+     "פָּנָ|ponˈo|0|default",
+     "ַי|jˈ|0|mono"
+    ]
+   }
+  },
+  "mikra-ps23-1": {
+   "prep": "מִזְמוֹר לְדָוִד; הַשֵּׁם רֹעִי לֹא אֶחְסָר.",
+   "ipa": {
+    "israeli": "mizmˈoʁ ledavˈid, haʃˈem ʁoʔˈi lˈo ʔeχsˈaʁ.",
+    "chabad": "mizmˈojʁ ledovˈid, haʃˈejm ʁojˈi lˈoj eχsˈoʁ."
+   },
+   "trace": {
+    "israeli": [
+     "מִזְמוֹר|mizmˈoʁ|0|acc",
+     "לְדָוִד|ledavˈid|0|acc",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "רֹעִי|ʁoʔˈi|0|acc",
+     "לֹא|lˈo|0|acc",
+     "אֶחְסָר|ʔeχsˈaʁ|0|acc"
+    ],
+    "chabad": [
+     "מִזְמוֹר|mizmˈojʁ|0|acc",
+     "לְדָוִד|ledovˈid|0|acc",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "רֹעִי|ʁojˈi|0|acc",
+     "לֹא|lˈoj|0|acc",
+     "אֶחְסָר|eχsˈoʁ|0|acc"
+    ]
+   }
+  },
+  "mikra-ps23-2": {
+   "prep": "בִּנְאוֹת דֶּשֶׁא יַרְבִּיצֵנִי; עַל מֵי מְנֻחוֹת יְנַהֲלֵנִי.",
+   "ipa": {
+    "israeli": "binʔˈot dˈeʃe jaʁbitsˈeni, ʔˈal mˈej menuχˈot jenahalˈeni.",
+    "chabad": "binˈojs dˈeʃe jaʁbitsˈejni, ˈal mˈej menuχˈojs jenahalˈejni."
+   },
+   "trace": {
+    "israeli": [
+     "בִּנְאוֹת|binʔˈot|0|acc",
+     "דֶּשֶׁא|dˈeʃe|1|suf2",
+     "יַרְבִּיצֵנִי|jaʁbitsˈeni|1|acc",
+     "עַל|ʔˈal|0|mono",
+     "מֵי|mˈej|0|acc",
+     "מְנֻחוֹת|menuχˈot|0|acc",
+     "יְנַהֲלֵנִי|jenahalˈeni|1|acc"
+    ],
+    "chabad": [
+     "בִּנְאוֹת|binˈojs|0|acc",
+     "דֶּשֶׁא|dˈeʃe|1|suf2",
+     "יַרְבִּיצֵנִי|jaʁbitsˈejni|1|acc",
+     "עַל|ˈal|0|mono",
+     "מֵי|mˈej|0|acc",
+     "מְנֻחוֹת|menuχˈojs|0|acc",
+     "יְנַהֲלֵנִי|jenahalˈejni|1|acc"
+    ]
+   }
+  },
+  "rashi-gen1-1": {
+   "prep": "בְּרֵאשִׁית. אָמַר רַבִּי יִצְחָק לֹא הָיָה צָרִיךְ לְהַתְחִיל אֶת הַתּוֹרָה אֶלָּא מֵהַחֹדֶשׁ הַזֶּה לָכֶם, שֶׁהִיא מִצְוָה רִאשׁוֹנָה שֶׁנִּצְטַוּוּ בָּהּ יִשׂרָאֵל, וּמַה טַּעַם",
+   "ipa": {
+    "israeli": "beʁeʃˈit. ʔamˈaʁ ʁabˈi jitsχˈak lˈo hajˈa tsaʁˈiχ lehatχˈil ʔˈet hatoʁˈa ʔelˈa mehaχˈodeʃ hazˈe laχˈem, ʃehˈi mitsvˈa ʁiʃonˈa ʃenitstavu bˈa jisʁaʔˈel, ʔumˈa taʔˈam",
+    "chabad": "beʁˈejʃis. ˈomaʁ ʁˈabi jˈitsχok lˈoj hˈojo tsˈoʁiχ lehˈasχil ˈes hatˈojʁo ˈelo mejhaχˈojdeʃ hazˈe lˈoχem, ʃˈehi mˈitsvo ʁiʃˈojno ʃenitstˈavu bˈo jisʁˈoejl, ʔumˈa tˈaam"
+   },
+   "trace": {
+    "israeli": [
+     "בְּרֵאשִׁית|beʁeʃˈit|0|exc",
+     "אָמַר|ʔamˈaʁ|0|exc",
+     "רַבִּי|ʁabˈi|0|default",
+     "יִצְחָק|jitsχˈak|0|default",
+     "לֹא|lˈo|0|mono",
+     "הָיָה|hajˈa|0|default",
+     "צָרִיךְ|tsaʁˈiχ|0|exc",
+     "לְהַתְחִיל|lehatχˈil|0|default",
+     "אֶת|ʔˈet|0|mono",
+     "הַתּוֹרָה|hatoʁˈa|0|default",
+     "אֶלָּא|ʔelˈa|0|default",
+     "מֵהַחֹדֶשׁ|mehaχˈodeʃ|1|suf2",
+     "הַזֶּה|hazˈe|0|default",
+     "לָכֶם|laχˈem|0|default",
+     "שֶׁהִיא|ʃehˈi|0|default",
+     "מִצְוָה|mitsvˈa|0|exc",
+     "רִאשׁוֹנָה|ʁiʃonˈa|0|default",
+     "שֶׁנִּצְטַוּוּ|ʃenitstavu|0|suf2",
+     "בָּהּ|bˈa|0|mono",
+     "יִשׂרָאֵל|jisʁaʔˈel|0|default",
+     "וּמַה|ʔumˈa|0|default",
+     "טַּעַם|taʔˈam|0|default"
+    ],
+    "chabad": [
+     "בְּרֵאשִׁית|beʁˈejʃis|1|exc+milel",
+     "אָמַר|ˈomaʁ|1|exc+milel",
+     "רַבִּי|ʁˈabi|1|default+milel",
+     "יִצְחָק|jˈitsχok|1|default+milel",
+     "לֹא|lˈoj|0|mono",
+     "הָיָה|hˈojo|1|default+milel",
+     "צָרִיךְ|tsˈoʁiχ|1|exc+milel",
+     "לְהַתְחִיל|lehˈasχil|1|default+milel",
+     "אֶת|ˈes|0|mono",
+     "הַתּוֹרָה|hatˈojʁo|1|default+milel",
+     "אֶלָּא|ˈelo|1|default+milel",
+     "מֵהַחֹדֶשׁ|mejhaχˈojdeʃ|1|suf2",
+     "הַזֶּה|hazˈe|0|default",
+     "לָכֶם|lˈoχem|1|default+milel",
+     "שֶׁהִיא|ʃˈehi|1|default+milel",
+     "מִצְוָה|mˈitsvo|1|exc+milel",
+     "רִאשׁוֹנָה|ʁiʃˈojno|1|default+milel",
+     "שֶׁנִּצְטַוּוּ|ʃenitstˈavu|1|suf2+milel",
+     "בָּהּ|bˈo|0|mono",
+     "יִשׂרָאֵל|jisʁˈoejl|1|default+milel",
+     "וּמַה|ʔumˈa|0|default",
+     "טַּעַם|tˈaam|1|default+milel"
+    ]
+   }
+  },
+  "rashi-gen1-2": {
+   "prep": "תֹהוּ וָבֹהוּ. תֹּהוּ לְשׁוֹן תֵּמַהּ וְשִׁמָּמוֹן, שֶׁאָדָם תּוֹהֵא וּמִשְׁתּוֹמֵם עַל בֹּהוּ שֶׁבָּהּ:",
+   "ipa": {
+    "israeli": "tˈohu vavˈohu. tˈohu leʃˈon temˈa veʃimamˈon, ʃeʔadˈam tohˈe ʔumiʃtomˈem ʔˈal bˈohu ʃebˈa.",
+    "chabad": "sˈojhu vovˈojhu. tˈojhu leʃˈojn tˈejma veʃimˈomojn, ʃeˈodom tˈojhej ʔumiʃtˈojmejm ˈal bˈojhu ʃˈebo."
+   },
+   "trace": {
+    "israeli": [
+     "תֹהוּ|tˈohu|1|suf1",
+     "וָבֹהוּ|vavˈohu|1|suf1",
+     "תֹּהוּ|tˈohu|1|suf1",
+     "לְשׁוֹן|leʃˈon|0|mono",
+     "תֵּמַהּ|temˈa|0|default",
+     "וְשִׁמָּמוֹן|veʃimamˈon|0|default",
+     "שֶׁאָדָם|ʃeʔadˈam|0|default",
+     "תּוֹהֵא|tohˈe|0|default",
+     "וּמִשְׁתּוֹמֵם|ʔumiʃtomˈem|0|default",
+     "עַל|ʔˈal|0|mono",
+     "בֹּהוּ|bˈohu|1|suf1",
+     "שֶׁבָּהּ|ʃebˈa|0|default"
+    ],
+    "chabad": [
+     "תֹהוּ|sˈojhu|1|suf1",
+     "וָבֹהוּ|vovˈojhu|1|suf1",
+     "תֹּהוּ|tˈojhu|1|suf1",
+     "לְשׁוֹן|leʃˈojn|0|mono",
+     "תֵּמַהּ|tˈejma|1|default+milel",
+     "וְשִׁמָּמוֹן|veʃimˈomojn|1|default+milel",
+     "שֶׁאָדָם|ʃeˈodom|1|default+milel",
+     "תּוֹהֵא|tˈojhej|1|default+milel",
+     "וּמִשְׁתּוֹמֵם|ʔumiʃtˈojmejm|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "בֹּהוּ|bˈojhu|1|suf1",
+     "שֶׁבָּהּ|ʃˈebo|1|default+milel"
+    ]
+   }
+  },
+  "rashi-gen1-4": {
+   "prep": "וַיַּרְא אֱלֹקִים אֶת הָאוֹר כִּי טוֹב וַיַּבְדֵּל. אַף בָּזֶה אָנוּ צְרִיכִין לְדִבְרֵי אַגַּדָה, רָאָהוּ שֶׁאֵינוֹ כְדַאי לְהִשְׁתַּמֵשׁ בּוֹ רְשָׁעִים, וְהִבְדִּילוֹ לַצַּדִּיקִים לֶעָתִיד",
+   "ipa": {
+    "israeli": "vajˈaʁ ʔelokˈim ʔˈet haʔˈoʁ kˈi tˈov vajavdˈel. ʔˈaf bazˈe ʔˈanu tseʁiχˈin ledivʁˈej ʔaɡadˈa, ʁaʔˈahu ʃeʔejnˈo χedˈaj lehiʃtamˈeʃ bˈo ʁeʃaʔˈim, vehivdilˈo latsadikˈim leʔatˈid",
+    "chabad": "vajˈaʁ elˈojkim ˈes hˈoojʁ kˈi tˈojv vajˈavdejl. ˈaf bˈoze ˈonu tseʁˈiχin ledˈivʁej aɡˈado, ʁoˈohu ʃeˈejnoj χedˈaj lehiʃtˈamejʃ bˈoj ʁeʃˈoim, vehivdˈiloj latsadˈikim leˈosid"
+   },
+   "trace": {
+    "israeli": [
+     "וַיַּרְא|vajˈaʁ|0|default",
+     "אֱלֹקִים|ʔelokˈim|0|exc",
+     "אֶת|ʔˈet|0|mono",
+     "הָאוֹר|haʔˈoʁ|0|default",
+     "כִּי|kˈi|0|mono",
+     "טוֹב|tˈov|0|mono",
+     "וַיַּבְדֵּל|vajavdˈel|0|default",
+     "אַף|ʔˈaf|0|mono",
+     "בָּזֶה|bazˈe|0|default",
+     "אָנוּ|ʔˈanu|1|suf1",
+     "צְרִיכִין|tseʁiχˈin|0|default",
+     "לְדִבְרֵי|ledivʁˈej|0|default",
+     "אַגַּדָה|ʔaɡadˈa|0|default",
+     "רָאָהוּ|ʁaʔˈahu|1|suf1",
+     "שֶׁאֵינוֹ|ʃeʔejnˈo|0|default",
+     "כְדַאי|χedˈaj|0|mono",
+     "לְהִשְׁתַּמֵשׁ|lehiʃtamˈeʃ|0|default",
+     "בּוֹ|bˈo|0|mono",
+     "רְשָׁעִים|ʁeʃaʔˈim|0|default",
+     "וְהִבְדִּילוֹ|vehivdilˈo|0|default",
+     "לַצַּדִּיקִים|latsadikˈim|0|default",
+     "לֶעָתִיד|leʔatˈid|0|default"
+    ],
+    "chabad": [
+     "וַיַּרְא|vajˈaʁ|0|default",
+     "אֱלֹקִים|elˈojkim|1|exc+milel",
+     "אֶת|ˈes|0|mono",
+     "הָאוֹר|hˈoojʁ|1|default+milel",
+     "כִּי|kˈi|0|mono",
+     "טוֹב|tˈojv|0|mono",
+     "וַיַּבְדֵּל|vajˈavdejl|1|default+milel",
+     "אַף|ˈaf|0|mono",
+     "בָּזֶה|bˈoze|1|default+milel",
+     "אָנוּ|ˈonu|1|suf1",
+     "צְרִיכִין|tseʁˈiχin|1|default+milel",
+     "לְדִבְרֵי|ledˈivʁej|1|default+milel",
+     "אַגַּדָה|aɡˈado|1|default+milel",
+     "רָאָהוּ|ʁoˈohu|1|suf1",
+     "שֶׁאֵינוֹ|ʃeˈejnoj|1|default+milel",
+     "כְדַאי|χedˈaj|0|mono",
+     "לְהִשְׁתַּמֵשׁ|lehiʃtˈamejʃ|1|default+milel",
+     "בּוֹ|bˈoj|0|mono",
+     "רְשָׁעִים|ʁeʃˈoim|1|default+milel",
+     "וְהִבְדִּילוֹ|vehivdˈiloj|1|default+milel",
+     "לַצַּדִּיקִים|latsadˈikim|1|default+milel",
+     "לֶעָתִיד|leˈosid|1|default+milel"
+    ]
+   }
+  },
+  "mishna-avot1-1": {
+   "prep": "משֶׁה קִבֵּל תּוֹרָה מִסִּינַי, וּמְסָרָהּ לִיהוֹשֻׁעַ, וִיהוֹשֻׁעַ לִזְקֵנִים, וּזְקֵנִים לִנְבִיאִים, וּנְבִיאִים מְסָרוּהָ לְאַנְשֵׁי כְנֶסֶת הַגְּדוֹלָה. הֵם אָמְרוּ שְׁלשָׁה דְבָרִים, הֱווּ מְתוּנִים בַּדִּין,",
+   "ipa": {
+    "israeli": "mʃˈe kibˈel toʁˈa misinˈaj, ʔumesaʁˈa lihoʃˈua, vihoʃˈua lizkenˈim, ʔuzekenˈim linviʔˈim, ʔuneviʔˈim mesaʁˈuha leʔanʃˈej χenˈeset haɡedolˈa. hˈem ʔamʁˈu ʃelʃˈa devaʁˈim, heˈu metunˈim badˈin,",
+    "chabad": "mʃˈe kˈibejl tˈojʁo misˈinaj, ʔumesˈoʁo lihojʃˈua, vihojʃˈua lizkˈejnim, ʔuzekˈejnim linvˈiim, ʔunevˈiim mesoʁˈuho leˈanʃej χenˈeses haɡedˈojlo. hˈejm ˈomʁu ʃelʃˈo devˈoʁim, heˈu mesˈunim bˈadin,"
+   },
+   "trace": {
+    "israeli": [
+     "משֶׁה|mʃˈe|0|mono",
+     "קִבֵּל|kibˈel|0|default",
+     "תּוֹרָה|toʁˈa|0|exc",
+     "מִסִּינַי|misinˈaj|0|default",
+     "וּמְסָרָהּ|ʔumesaʁˈa|0|default",
+     "לִיהוֹשֻׁעַ|lihoʃˈua|1|suf1",
+     "וִיהוֹשֻׁעַ|vihoʃˈua|1|suf1",
+     "לִזְקֵנִים|lizkenˈim|0|default",
+     "וּזְקֵנִים|ʔuzekenˈim|0|default",
+     "לִנְבִיאִים|linviʔˈim|0|default",
+     "וּנְבִיאִים|ʔuneviʔˈim|0|default",
+     "מְסָרוּהָ|mesaʁˈuha|1|suf1",
+     "לְאַנְשֵׁי|leʔanʃˈej|0|default",
+     "כְנֶסֶת|χenˈeset|1|suf2",
+     "הַגְּדוֹלָה|haɡedolˈa|0|default",
+     "הֵם|hˈem|0|mono",
+     "אָמְרוּ|ʔamʁˈu|0|exc",
+     "שְׁלשָׁה|ʃelʃˈa|0|mono",
+     "דְבָרִים|devaʁˈim|0|default",
+     "הֱווּ|heˈu|0|suf2",
+     "מְתוּנִים|metunˈim|0|default",
+     "בַּדִּין|badˈin|0|default"
+    ],
+    "chabad": [
+     "משֶׁה|mʃˈe|0|mono",
+     "קִבֵּל|kˈibejl|1|default+milel",
+     "תּוֹרָה|tˈojʁo|1|exc+milel",
+     "מִסִּינַי|misˈinaj|1|default+milel",
+     "וּמְסָרָהּ|ʔumesˈoʁo|1|default+milel",
+     "לִיהוֹשֻׁעַ|lihojʃˈua|1|suf1",
+     "וִיהוֹשֻׁעַ|vihojʃˈua|1|suf1",
+     "לִזְקֵנִים|lizkˈejnim|1|default+milel",
+     "וּזְקֵנִים|ʔuzekˈejnim|1|default+milel",
+     "לִנְבִיאִים|linvˈiim|1|default+milel",
+     "וּנְבִיאִים|ʔunevˈiim|1|default+milel",
+     "מְסָרוּהָ|mesoʁˈuho|1|suf1",
+     "לְאַנְשֵׁי|leˈanʃej|1|default+milel",
+     "כְנֶסֶת|χenˈeses|1|suf2",
+     "הַגְּדוֹלָה|haɡedˈojlo|1|default+milel",
+     "הֵם|hˈejm|0|mono",
+     "אָמְרוּ|ˈomʁu|1|exc+milel",
+     "שְׁלשָׁה|ʃelʃˈo|0|mono",
+     "דְבָרִים|devˈoʁim|1|default+milel",
+     "הֱווּ|heˈu|0|suf2",
+     "מְתוּנִים|mesˈunim|1|default+milel",
+     "בַּדִּין|bˈadin|1|default+milel"
+    ]
+   }
+  },
+  "mishna-avot1-2": {
+   "prep": "שִׁמְעוֹן הַצַּדִּיק הָיָה מִשְּׁיָרֵי כְנֶסֶת הַגְּדוֹלָה. הוּא הָיָה אוֹמֵר, עַל שְׁלשָׁה דְבָרִים הָעוֹלָם עוֹמֵד, עַל הַתּוֹרָה וְעַל הָעֲבוֹדָה וְעַל גְּמִילוּת חֲסָדִים:",
+   "ipa": {
+    "israeli": "ʃimʔˈon hatsadˈik hajˈa miʃejaʁˈej χenˈeset haɡedolˈa. hˈu hajˈa ʔomˈeʁ, ʔˈal ʃelʃˈa devaʁˈim haʔolˈam ʔomˈed, ʔˈal hatoʁˈa veʔˈal haʔavodˈa veʔˈal ɡemilˈut χasadˈim.",
+    "chabad": "ʃˈimojn hatsˈadik hˈojo miʃejˈoʁej χenˈeses haɡedˈojlo. hˈu hˈojo ˈojmejʁ, ˈal ʃelʃˈo devˈoʁim hoˈojlom ˈojmejd, ˈal hatˈojʁo veˈal hoavˈojdo veˈal ɡemˈilus χasˈodim."
+   },
+   "trace": {
+    "israeli": [
+     "שִׁמְעוֹן|ʃimʔˈon|0|default",
+     "הַצַּדִּיק|hatsadˈik|0|default",
+     "הָיָה|hajˈa|0|default",
+     "מִשְּׁיָרֵי|miʃejaʁˈej|0|default",
+     "כְנֶסֶת|χenˈeset|1|suf2",
+     "הַגְּדוֹלָה|haɡedolˈa|0|default",
+     "הוּא|hˈu|0|mono",
+     "הָיָה|hajˈa|0|default",
+     "אוֹמֵר|ʔomˈeʁ|0|exc",
+     "עַל|ʔˈal|0|mono",
+     "שְׁלשָׁה|ʃelʃˈa|0|mono",
+     "דְבָרִים|devaʁˈim|0|default",
+     "הָעוֹלָם|haʔolˈam|0|default",
+     "עוֹמֵד|ʔomˈed|0|default",
+     "עַל|ʔˈal|0|mono",
+     "הַתּוֹרָה|hatoʁˈa|0|default",
+     "וְעַל|veʔˈal|0|mono",
+     "הָעֲבוֹדָה|haʔavodˈa|0|default",
+     "וְעַל|veʔˈal|0|mono",
+     "גְּמִילוּת|ɡemilˈut|0|default",
+     "חֲסָדִים|χasadˈim|0|default"
+    ],
+    "chabad": [
+     "שִׁמְעוֹן|ʃˈimojn|1|default+milel",
+     "הַצַּדִּיק|hatsˈadik|1|default+milel",
+     "הָיָה|hˈojo|1|default+milel",
+     "מִשְּׁיָרֵי|miʃejˈoʁej|1|default+milel",
+     "כְנֶסֶת|χenˈeses|1|suf2",
+     "הַגְּדוֹלָה|haɡedˈojlo|1|default+milel",
+     "הוּא|hˈu|0|mono",
+     "הָיָה|hˈojo|1|default+milel",
+     "אוֹמֵר|ˈojmejʁ|1|exc+milel",
+     "עַל|ˈal|0|mono",
+     "שְׁלשָׁה|ʃelʃˈo|0|mono",
+     "דְבָרִים|devˈoʁim|1|default+milel",
+     "הָעוֹלָם|hoˈojlom|1|default+milel",
+     "עוֹמֵד|ˈojmejd|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "הַתּוֹרָה|hatˈojʁo|1|default+milel",
+     "וְעַל|veˈal|0|mono",
+     "הָעֲבוֹדָה|hoavˈojdo|1|default+milel",
+     "וְעַל|veˈal|0|mono",
+     "גְּמִילוּת|ɡemˈilus|1|default+milel",
+     "חֲסָדִים|χasˈodim|1|default+milel"
+    ]
+   }
+  },
+  "rambam-brachot1-1": {
+   "prep": "מִצְוַת עֲשֵׂה מִן הַתּוֹרָה לְבָרֵךְ אַחַר אֲכִילַת מָזוֹן שֶׁנֶּאֱמַר וְאָכַלְתָּ וְשָׂבָעְתָּ וּבֵרַכְתָּ אֶת הַשֵּׁם אֱלֹקֶיךָ וְאֵינוֹ חַיָּיב מִן הַתּוֹרָה אֶלָּא אִם כֵּן",
+   "ipa": {
+    "israeli": "mitsvˈat ʔasˈe mˈin hatoʁˈa levaʁˈeχ ʔaχˈaʁ ʔaχilˈat mazˈon ʃeneʔemˈaʁ veʔaχaltˈa vesavˈaʔta ʔuveʁaχtˈa ʔˈet haʃˈem ʔelokˈeχa veʔejnˈo χajˈav mˈin hatoʁˈa ʔelˈa ʔˈim kˈen",
+    "chabad": "mˈitsvas asˈej mˈin hatˈojʁo levˈoʁejχ ˈaχaʁ aχˈilas mˈozojn ʃeneemˈaʁ veoχˈalto vesovˈoto ʔuvejʁˈaχto ˈes haʃˈejm elojkˈeχo veˈejnoj χˈajov mˈin hatˈojʁo ˈelo ˈim kˈejn"
+   },
+   "trace": {
+    "israeli": [
+     "מִצְוַת|mitsvˈat|0|default",
+     "עֲשֵׂה|ʔasˈe|0|default",
+     "מִן|mˈin|0|mono",
+     "הַתּוֹרָה|hatoʁˈa|0|default",
+     "לְבָרֵךְ|levaʁˈeχ|0|default",
+     "אַחַר|ʔaχˈaʁ|0|default",
+     "אֲכִילַת|ʔaχilˈat|0|default",
+     "מָזוֹן|mazˈon|0|default",
+     "שֶׁנֶּאֱמַר|ʃeneʔemˈaʁ|0|exc",
+     "וְאָכַלְתָּ|veʔaχaltˈa|0|suf3",
+     "וְשָׂבָעְתָּ|vesavˈaʔta|1|suf2",
+     "וּבֵרַכְתָּ|ʔuveʁaχtˈa|0|suf3",
+     "אֶת|ʔˈet|0|mono",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "אֱלֹקֶיךָ|ʔelokˈeχa|1|exc",
+     "וְאֵינוֹ|veʔejnˈo|0|default",
+     "חַיָּיב|χajˈav|0|default",
+     "מִן|mˈin|0|mono",
+     "הַתּוֹרָה|hatoʁˈa|0|default",
+     "אֶלָּא|ʔelˈa|0|default",
+     "אִם|ʔˈim|0|mono",
+     "כֵּן|kˈen|0|mono"
+    ],
+    "chabad": [
+     "מִצְוַת|mˈitsvas|1|default+milel",
+     "עֲשֵׂה|asˈej|0|default",
+     "מִן|mˈin|0|mono",
+     "הַתּוֹרָה|hatˈojʁo|1|default+milel",
+     "לְבָרֵךְ|levˈoʁejχ|1|default+milel",
+     "אַחַר|ˈaχaʁ|1|default+milel",
+     "אֲכִילַת|aχˈilas|1|default+milel",
+     "מָזוֹן|mˈozojn|1|default+milel",
+     "שֶׁנֶּאֱמַר|ʃeneemˈaʁ|0|exc",
+     "וְאָכַלְתָּ|veoχˈalto|1|suf3+milel",
+     "וְשָׂבָעְתָּ|vesovˈoto|1|suf2",
+     "וּבֵרַכְתָּ|ʔuvejʁˈaχto|1|suf3+milel",
+     "אֶת|ˈes|0|mono",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "אֱלֹקֶיךָ|elojkˈeχo|1|exc",
+     "וְאֵינוֹ|veˈejnoj|1|default+milel",
+     "חַיָּיב|χˈajov|1|default+milel",
+     "מִן|mˈin|0|mono",
+     "הַתּוֹרָה|hatˈojʁo|1|default+milel",
+     "אֶלָּא|ˈelo|1|default+milel",
+     "אִם|ˈim|0|mono",
+     "כֵּן|kˈejn|0|mono"
+    ]
+   }
+  },
+  "rambam-brachot1-2": {
+   "prep": "וּמִדִּבְרֵי סוֹפְרִים לְבָרֵךְ עַל כׇּל מַאֲכָל תְּחִלָּה וְאַחַר כָּךְ יֵהָנֶה מִמֶּנּוּ וַאֲפִילּוּ נִתְכַּוּין לֶאֱכֹול אוֹ לִשְׁתּוֹת כׇּל שֶׁהוּא מְבָרֵךְ וְאַחַר כָּךְ יֵהָנֶה וְכֵן",
+   "ipa": {
+    "israeli": "ʔumidivʁˈej sofeʁˈim levaʁˈeχ ʔˈal kˈol maʔaχˈol teχilˈa veʔaχˈaʁ kˈaχ jehanˈe mimˈenu vaʔafilˈu nitkˈaun leʔeχˈol ʔˈo liʃtˈot kˈol ʃehˈu mevaʁˈeχ veʔaχˈaʁ kˈaχ jehanˈe veχˈen",
+    "chabad": "ʔumidˈivʁej sˈojfeʁim levˈoʁejχ ˈal kˈol maaχˈol teχˈilo veˈaχaʁ kˈoχ jejhˈone mimˈenu vaafˈilu nˈiskaun leeχˈojl ˈoj lˈiʃtojs kˈol ʃˈehu mevˈoʁejχ veˈaχaʁ kˈoχ jejhˈone veχˈejn"
+   },
+   "trace": {
+    "israeli": [
+     "וּמִדִּבְרֵי|ʔumidivʁˈej|0|default",
+     "סוֹפְרִים|sofeʁˈim|0|default",
+     "לְבָרֵךְ|levaʁˈeχ|0|default",
+     "עַל|ʔˈal|0|mono",
+     "כׇּל|kˈol|0|mono",
+     "מַאֲכָל|maʔaχˈol|0|default",
+     "תְּחִלָּה|teχilˈa|0|default",
+     "וְאַחַר|veʔaχˈaʁ|0|default",
+     "כָּךְ|kˈaχ|0|mono",
+     "יֵהָנֶה|jehanˈe|0|default",
+     "מִמֶּנּוּ|mimˈenu|1|suf1",
+     "וַאֲפִילּוּ|vaʔafilˈu|0|suf2",
+     "נִתְכַּוּין|nitkˈaun|0|default",
+     "לֶאֱכֹול|leʔeχˈol|0|default",
+     "אוֹ|ʔˈo|0|mono",
+     "לִשְׁתּוֹת|liʃtˈot|0|default",
+     "כׇּל|kˈol|0|mono",
+     "שֶׁהוּא|ʃehˈu|0|default",
+     "מְבָרֵךְ|mevaʁˈeχ|0|default",
+     "וְאַחַר|veʔaχˈaʁ|0|default",
+     "כָּךְ|kˈaχ|0|mono",
+     "יֵהָנֶה|jehanˈe|0|default",
+     "וְכֵן|veχˈen|0|mono"
+    ],
+    "chabad": [
+     "וּמִדִּבְרֵי|ʔumidˈivʁej|1|default+milel",
+     "סוֹפְרִים|sˈojfeʁim|1|default+milel",
+     "לְבָרֵךְ|levˈoʁejχ|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "כׇּל|kˈol|0|mono",
+     "מַאֲכָל|maaχˈol|0|default",
+     "תְּחִלָּה|teχˈilo|1|default+milel",
+     "וְאַחַר|veˈaχaʁ|1|default+milel",
+     "כָּךְ|kˈoχ|0|mono",
+     "יֵהָנֶה|jejhˈone|1|default+milel",
+     "מִמֶּנּוּ|mimˈenu|1|suf1",
+     "וַאֲפִילּוּ|vaafˈilu|1|suf2+milel",
+     "נִתְכַּוּין|nˈiskaun|1|default+milel",
+     "לֶאֱכֹול|leeχˈojl|0|default",
+     "אוֹ|ˈoj|0|mono",
+     "לִשְׁתּוֹת|lˈiʃtojs|1|default+milel",
+     "כׇּל|kˈol|0|mono",
+     "שֶׁהוּא|ʃˈehu|1|default+milel",
+     "מְבָרֵךְ|mevˈoʁejχ|1|default+milel",
+     "וְאַחַר|veˈaχaʁ|1|default+milel",
+     "כָּךְ|kˈoχ|0|mono",
+     "יֵהָנֶה|jejhˈone|1|default+milel",
+     "וְכֵן|veχˈejn|0|mono"
+    ]
+   }
+  },
+  "rambam-brachot1-3": {
+   "prep": "וּכְשֵׁם שֶׁמְּבָרְכִין עַל הַהֲנָיָיה כָּךְ מְבָרְכִין עַל כׇּל מִצְוָה וּמִצְוָה וְאַחַר כָּךְ יַעֲשֶׂה אוֹתָהּ וּבְרָכוֹת רַבּוֹת תִּקְּנוּ חֲכָמִים דֶּרֶךְ שֶׁבַח וְהוֹדָיָה וְדֶרֶךְ בַּקָּשָׁה",
+   "ipa": {
+    "israeli": "ʔuχeʃˈem ʃemevaʁχˈin ʔˈal hahanajˈa kˈaχ mevaʁχˈin ʔˈal kˈol mitsvˈa ʔumitsvˈa veʔaχˈaʁ kˈaχ jaʔasˈe ʔotˈa ʔuveʁaχˈot ʁabˈot tˈikenu χaχamˈim dˈeʁeχ ʃˈevaχ vehodajˈa vedˈeʁeχ bakaʃˈa",
+    "chabad": "ʔuχeʃˈejm ʃemevˈoʁχin ˈal hahanˈojo kˈoχ mevˈoʁχin ˈal kˈol mˈitsvo ʔumˈitsvo veˈaχaʁ kˈoχ jaasˈe ˈojso ʔuveʁˈoχojs ʁˈabojs tˈikenu χaχˈomim dˈeʁeχ ʃˈevaχ vehojdˈojo vedˈeʁeχ bakˈoʃo"
+   },
+   "trace": {
+    "israeli": [
+     "וּכְשֵׁם|ʔuχeʃˈem|0|default",
+     "שֶׁמְּבָרְכִין|ʃemevaʁχˈin|0|default",
+     "עַל|ʔˈal|0|mono",
+     "הַהֲנָיָיה|hahanajˈa|0|default",
+     "כָּךְ|kˈaχ|0|mono",
+     "מְבָרְכִין|mevaʁχˈin|0|default",
+     "עַל|ʔˈal|0|mono",
+     "כׇּל|kˈol|0|mono",
+     "מִצְוָה|mitsvˈa|0|exc",
+     "וּמִצְוָה|ʔumitsvˈa|0|default",
+     "וְאַחַר|veʔaχˈaʁ|0|default",
+     "כָּךְ|kˈaχ|0|mono",
+     "יַעֲשֶׂה|jaʔasˈe|0|default",
+     "אוֹתָהּ|ʔotˈa|0|default",
+     "וּבְרָכוֹת|ʔuveʁaχˈot|0|default",
+     "רַבּוֹת|ʁabˈot|0|default",
+     "תִּקְּנוּ|tˈikenu|1|suf1",
+     "חֲכָמִים|χaχamˈim|0|default",
+     "דֶּרֶךְ|dˈeʁeχ|1|suf2",
+     "שֶׁבַח|ʃˈevaχ|1|suf2",
+     "וְהוֹדָיָה|vehodajˈa|0|default",
+     "וְדֶרֶךְ|vedˈeʁeχ|1|suf2",
+     "בַּקָּשָׁה|bakaʃˈa|0|default"
+    ],
+    "chabad": [
+     "וּכְשֵׁם|ʔuχeʃˈejm|0|default",
+     "שֶׁמְּבָרְכִין|ʃemevˈoʁχin|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "הַהֲנָיָיה|hahanˈojo|1|default+milel",
+     "כָּךְ|kˈoχ|0|mono",
+     "מְבָרְכִין|mevˈoʁχin|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "כׇּל|kˈol|0|mono",
+     "מִצְוָה|mˈitsvo|1|exc+milel",
+     "וּמִצְוָה|ʔumˈitsvo|1|default+milel",
+     "וְאַחַר|veˈaχaʁ|1|default+milel",
+     "כָּךְ|kˈoχ|0|mono",
+     "יַעֲשֶׂה|jaasˈe|0|default",
+     "אוֹתָהּ|ˈojso|1|default+milel",
+     "וּבְרָכוֹת|ʔuveʁˈoχojs|1|default+milel",
+     "רַבּוֹת|ʁˈabojs|1|default+milel",
+     "תִּקְּנוּ|tˈikenu|1|suf1",
+     "חֲכָמִים|χaχˈomim|1|default+milel",
+     "דֶּרֶךְ|dˈeʁeχ|1|suf2",
+     "שֶׁבַח|ʃˈevaχ|1|suf2",
+     "וְהוֹדָיָה|vehojdˈojo|1|default+milel",
+     "וְדֶרֶךְ|vedˈeʁeχ|1|suf2",
+     "בַּקָּשָׁה|bakˈoʃo|1|default+milel"
+    ]
+   }
+  },
+  "tanya-la1-1": {
+   "prep": "תַּנְיָא: \"מַשְׁבִּיעִים אוֹתוֹ, תְּהִי צַדִּיק וְאַל תְּהִי רָשָׁע. וַאֲפִילוּ כָּל הָעוֹלָם כּוּלּוֹ אוֹמְרִים לְךָ צַדִּיק אַתָּה, הֱיֵה",
+   "ipa": {
+    "israeli": "tanjˈa. maʃbiʔˈim ʔotˈo, tehˈi tsadˈik veʔˈal tehˈi ʁaʃˈa. vaʔafˈilu kˈol haʔolˈam kulˈo ʔomeʁˈim leχˈa tsadˈik ʔatˈa, hejˈe",
+    "chabad": "tˈanjo. maʃbˈiim ˈojsoj, tehˈi tsˈadik veˈal tehˈi ʁˈoʃo. vaafˈilu kˈol hoˈojlom kˈuloj ˈojmeʁim leχˈo tsˈadik ˈato, hejˈej"
+   },
+   "trace": {
+    "israeli": [
+     "תַּנְיָא|tanjˈa|0|default",
+     "מַשְׁבִּיעִים|maʃbiʔˈim|0|default",
+     "אוֹתוֹ|ʔotˈo|0|default",
+     "תְּהִי|tehˈi|0|mono",
+     "צַדִּיק|tsadˈik|0|default",
+     "וְאַל|veʔˈal|0|mono",
+     "תְּהִי|tehˈi|0|mono",
+     "רָשָׁע|ʁaʃˈa|0|default",
+     "וַאֲפִילוּ|vaʔafˈilu|1|suf3",
+     "כָּל|kˈol|0|mono",
+     "הָעוֹלָם|haʔolˈam|0|default",
+     "כּוּלּוֹ|kulˈo|0|default",
+     "אוֹמְרִים|ʔomeʁˈim|0|default",
+     "לְךָ|leχˈa|0|mono",
+     "צַדִּיק|tsadˈik|0|default",
+     "אַתָּה|ʔatˈa|0|exc",
+     "הֱיֵה|hejˈe|0|default"
+    ],
+    "chabad": [
+     "תַּנְיָא|tˈanjo|1|default+milel",
+     "מַשְׁבִּיעִים|maʃbˈiim|1|default+milel",
+     "אוֹתוֹ|ˈojsoj|1|default+milel",
+     "תְּהִי|tehˈi|0|mono",
+     "צַדִּיק|tsˈadik|1|default+milel",
+     "וְאַל|veˈal|0|mono",
+     "תְּהִי|tehˈi|0|mono",
+     "רָשָׁע|ʁˈoʃo|1|default+milel",
+     "וַאֲפִילוּ|vaafˈilu|1|suf3",
+     "כָּל|kˈol|0|mono",
+     "הָעוֹלָם|hoˈojlom|1|default+milel",
+     "כּוּלּוֹ|kˈuloj|1|default+milel",
+     "אוֹמְרִים|ˈojmeʁim|1|default+milel",
+     "לְךָ|leχˈo|0|mono",
+     "צַדִּיק|tsˈadik|1|default+milel",
+     "אַתָּה|ˈato|1|exc+milel",
+     "הֱיֵה|hejˈej|0|default"
+    ]
+   }
+  },
+  "tanya-la1-2": {
+   "prep": "וְצָרִיךְ לְהָבִין, דְּהָא תְּנַן: \"וְאַל תְּהִי רָשָׁע בִּפְנֵי עַצְמֶךָ\".",
+   "ipa": {
+    "israeli": "vetsaʁˈiχ lehavˈin, dehˈa tenˈan. veʔˈal tehˈi ʁaʃˈa bifnˈej ʔatsmˈeχa.",
+    "chabad": "vetsˈoʁiχ lehˈovin, dehˈo tenˈan. veˈal tehˈi ʁˈoʃo bˈifnej atsmˈeχo."
+   },
+   "trace": {
+    "israeli": [
+     "וְצָרִיךְ|vetsaʁˈiχ|0|default",
+     "לְהָבִין|lehavˈin|0|default",
+     "דְּהָא|dehˈa|0|mono",
+     "תְּנַן|tenˈan|0|mono",
+     "וְאַל|veʔˈal|0|mono",
+     "תְּהִי|tehˈi|0|mono",
+     "רָשָׁע|ʁaʃˈa|0|default",
+     "בִּפְנֵי|bifnˈej|0|default",
+     "עַצְמֶךָ|ʔatsmˈeχa|1|suf1"
+    ],
+    "chabad": [
+     "וְצָרִיךְ|vetsˈoʁiχ|1|default+milel",
+     "לְהָבִין|lehˈovin|1|default+milel",
+     "דְּהָא|dehˈo|0|mono",
+     "תְּנַן|tenˈan|0|mono",
+     "וְאַל|veˈal|0|mono",
+     "תְּהִי|tehˈi|0|mono",
+     "רָשָׁע|ʁˈoʃo|1|default+milel",
+     "בִּפְנֵי|bˈifnej|1|default+milel",
+     "עַצְמֶךָ|atsmˈeχo|1|suf1"
+    ]
+   }
+  },
+  "tanya-la1-3": {
+   "prep": "וְגַם, אִם יִהְיֶה בְעֵינָיו כְּרָשָׁע, יֵרַע לְבָבוֹ וְיִהְיֶה עָצֵב, וְלֹא יוּכַל לַעֲבוֹד הַשֵּׁם בְּשִׂמְחָה וּבְטוּב לֵבָב, וְאִם לֹא יֵרַע לְבָבוֹ כְּלָל",
+   "ipa": {
+    "israeli": "veɡˈam, ʔˈim jihjˈe veʔenˈav keʁaʃˈa, jeʁˈa levavˈo vejihjˈe ʔatsˈev, velˈo juχˈal laʔavˈod haʃˈem besimχˈa ʔuvetˈuv levˈav, veʔˈim lˈo jeʁˈa levavˈo kelˈal",
+    "chabad": "veɡˈam, ˈim jˈihje veˈejnov keʁˈoʃo, jˈejʁa levˈovoj vejˈihje ˈotsejv, velˈoj jˈuχal laavˈojd haʃˈejm besˈimχo ʔuvetˈuv lˈejvov, veˈim lˈoj jˈejʁa levˈovoj kelˈol"
+   },
+   "trace": {
+    "israeli": [
+     "וְגַם|veɡˈam|0|mono",
+     "אִם|ʔˈim|0|mono",
+     "יִהְיֶה|jihjˈe|0|default",
+     "בְעֵינָיו|veʔenˈav|0|default",
+     "כְּרָשָׁע|keʁaʃˈa|0|default",
+     "יֵרַע|jeʁˈa|0|suf3",
+     "לְבָבוֹ|levavˈo|0|default",
+     "וְיִהְיֶה|vejihjˈe|0|default",
+     "עָצֵב|ʔatsˈev|0|default",
+     "וְלֹא|velˈo|0|mono",
+     "יוּכַל|juχˈal|0|default",
+     "לַעֲבוֹד|laʔavˈod|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "בְּשִׂמְחָה|besimχˈa|0|default",
+     "וּבְטוּב|ʔuvetˈuv|0|default",
+     "לֵבָב|levˈav|0|default",
+     "וְאִם|veʔˈim|0|mono",
+     "לֹא|lˈo|0|mono",
+     "יֵרַע|jeʁˈa|0|suf3",
+     "לְבָבוֹ|levavˈo|0|default",
+     "כְּלָל|kelˈal|0|mono"
+    ],
+    "chabad": [
+     "וְגַם|veɡˈam|0|mono",
+     "אִם|ˈim|0|mono",
+     "יִהְיֶה|jˈihje|1|default+milel",
+     "בְעֵינָיו|veˈejnov|1|default+milel",
+     "כְּרָשָׁע|keʁˈoʃo|1|default+milel",
+     "יֵרַע|jˈejʁa|1|suf3+milel",
+     "לְבָבוֹ|levˈovoj|1|default+milel",
+     "וְיִהְיֶה|vejˈihje|1|default+milel",
+     "עָצֵב|ˈotsejv|1|default+milel",
+     "וְלֹא|velˈoj|0|mono",
+     "יוּכַל|jˈuχal|1|default+milel",
+     "לַעֲבוֹד|laavˈojd|0|default",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "בְּשִׂמְחָה|besˈimχo|1|default+milel",
+     "וּבְטוּב|ʔuvetˈuv|0|default",
+     "לֵבָב|lˈejvov|1|default+milel",
+     "וְאִם|veˈim|0|mono",
+     "לֹא|lˈoj|0|mono",
+     "יֵרַע|jˈejʁa|1|suf3+milel",
+     "לְבָבוֹ|levˈovoj|1|default+milel",
+     "כְּלָל|kelˈol|0|mono"
+    ]
+   }
+  },
+  "tanya-la1-4": {
+   "prep": "אַךְ הָעִנְיָן, כִּי הִנֵּה מָצִינוּ בַּגְּמָרָא הַשֵּׁם חֲלוּקּוֹת: צַדִּיק וְטוֹב לוֹ, צַדִּיק וְרַע לוֹ, רָשָׁע וְטוֹב לוֹ, רָשָׁע וְרַע לוֹ, וּבֵינוֹנִי.",
+   "ipa": {
+    "israeli": "ʔˈaχ haʔinjˈan, kˈi hinˈe matsˈinu baɡemaʁˈa haʃˈem χalukˈot. tsadˈik vetˈov lˈo, tsadˈik veʁˈa lˈo, ʁaʃˈa vetˈov lˈo, ʁaʃˈa veʁˈa lˈo, ʔuvenonˈi.",
+    "chabad": "ˈaχ hoˈinjon, kˈi hˈinej motsˈinu baɡemˈoʁo haʃˈejm χalˈukojs. tsˈadik vetˈojv lˈoj, tsˈadik veʁˈa lˈoj, ʁˈoʃo vetˈojv lˈoj, ʁˈoʃo veʁˈa lˈoj, ʔuvejnˈojni."
+   },
+   "trace": {
+    "israeli": [
+     "אַךְ|ʔˈaχ|0|mono",
+     "הָעִנְיָן|haʔinjˈan|0|default",
+     "כִּי|kˈi|0|mono",
+     "הִנֵּה|hinˈe|0|default",
+     "מָצִינוּ|matsˈinu|1|suf1",
+     "בַּגְּמָרָא|baɡemaʁˈa|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "חֲלוּקּוֹת|χalukˈot|0|default",
+     "צַדִּיק|tsadˈik|0|default",
+     "וְטוֹב|vetˈov|0|mono",
+     "לוֹ|lˈo|0|mono",
+     "צַדִּיק|tsadˈik|0|default",
+     "וְרַע|veʁˈa|0|mono",
+     "לוֹ|lˈo|0|mono",
+     "רָשָׁע|ʁaʃˈa|0|default",
+     "וְטוֹב|vetˈov|0|mono",
+     "לוֹ|lˈo|0|mono",
+     "רָשָׁע|ʁaʃˈa|0|default",
+     "וְרַע|veʁˈa|0|mono",
+     "לוֹ|lˈo|0|mono",
+     "וּבֵינוֹנִי|ʔuvenonˈi|0|default"
+    ],
+    "chabad": [
+     "אַךְ|ˈaχ|0|mono",
+     "הָעִנְיָן|hoˈinjon|1|default+milel",
+     "כִּי|kˈi|0|mono",
+     "הִנֵּה|hˈinej|1|default+milel",
+     "מָצִינוּ|motsˈinu|1|suf1",
+     "בַּגְּמָרָא|baɡemˈoʁo|1|default+milel",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "חֲלוּקּוֹת|χalˈukojs|1|default+milel",
+     "צַדִּיק|tsˈadik|1|default+milel",
+     "וְטוֹב|vetˈojv|0|mono",
+     "לוֹ|lˈoj|0|mono",
+     "צַדִּיק|tsˈadik|1|default+milel",
+     "וְרַע|veʁˈa|0|mono",
+     "לוֹ|lˈoj|0|mono",
+     "רָשָׁע|ʁˈoʃo|1|default+milel",
+     "וְטוֹב|vetˈojv|0|mono",
+     "לוֹ|lˈoj|0|mono",
+     "רָשָׁע|ʁˈoʃo|1|default+milel",
+     "וְרַע|veʁˈa|0|mono",
+     "לוֹ|lˈoj|0|mono",
+     "וּבֵינוֹנִי|ʔuvejnˈojni|1|default+milel"
+    ]
+   }
+  },
+  "hayomyom-tishrei3-1": {
+   "prep": "מַתְחִילִין \"מִזְמוֹר לְדָוִד\" וְלֹא \"לְכוּ נְרַנְּנָה\", וְכֵן בְּכׇל שַׁבָּת מוֹצָאֵי יוֹם טוֹב. הַפְּטוּרָה: שׁוּבָה יִכָּשְׁלוּ בָּם. מִי קֵל כָּמוֹךָ מִיְּמֵי קֶדֶם.",
+   "ipa": {
+    "israeli": "matχilˈin mizmˈoʁ ledavˈid velˈo leχˈu neʁanenˈa, veχˈen beχˈol ʃabˈat motsˈaʔej jˈom tˈov. hapetuʁˈa. ʃuvˈa jikaʃlˈu bˈam. mˈi kˈel kamˈoχa mijemˈej kˈedem.",
+    "chabad": "masχˈilin mˈizmojʁ ledˈovid velˈoj leχˈu neʁˈaneno, veχˈejn beχˈol ʃˈabos mojtsˈoej jˈojm tˈojv. hapetˈuʁo. ʃˈuvo jikˈoʃlu bˈom. mˈi kˈejl komˈojχo mˈijemej kˈedem."
+   },
+   "trace": {
+    "israeli": [
+     "מַתְחִילִין|matχilˈin|0|default",
+     "מִזְמוֹר|mizmˈoʁ|0|default",
+     "לְדָוִד|ledavˈid|0|default",
+     "וְלֹא|velˈo|0|mono",
+     "לְכוּ|leχˈu|0|mono",
+     "נְרַנְּנָה|neʁanenˈa|0|default",
+     "וְכֵן|veχˈen|0|mono",
+     "בְּכׇל|beχˈol|0|mono",
+     "שַׁבָּת|ʃabˈat|0|exc",
+     "מוֹצָאֵי|motsˈaʔej|1|suf3",
+     "יוֹם|jˈom|0|mono",
+     "טוֹב|tˈov|0|mono",
+     "הַפְּטוּרָה|hapetuʁˈa|0|default",
+     "שׁוּבָה|ʃuvˈa|0|lex",
+     "יִכָּשְׁלוּ|jikaʃlˈu|0|suf2",
+     "בָּם|bˈam|0|mono",
+     "מִי|mˈi|0|mono",
+     "קֵל|kˈel|0|mono",
+     "כָּמוֹךָ|kamˈoχa|1|suf1",
+     "מִיְּמֵי|mijemˈej|0|default",
+     "קֶדֶם|kˈedem|1|suf2"
+    ],
+    "chabad": [
+     "מַתְחִילִין|masχˈilin|1|default+milel",
+     "מִזְמוֹר|mˈizmojʁ|1|default+milel",
+     "לְדָוִד|ledˈovid|1|default+milel",
+     "וְלֹא|velˈoj|0|mono",
+     "לְכוּ|leχˈu|0|mono",
+     "נְרַנְּנָה|neʁˈaneno|1|default+milel",
+     "וְכֵן|veχˈejn|0|mono",
+     "בְּכׇל|beχˈol|0|mono",
+     "שַׁבָּת|ʃˈabos|1|exc+milel",
+     "מוֹצָאֵי|mojtsˈoej|1|suf3",
+     "יוֹם|jˈojm|0|mono",
+     "טוֹב|tˈojv|0|mono",
+     "הַפְּטוּרָה|hapetˈuʁo|1|default+milel",
+     "שׁוּבָה|ʃˈuvo|1|lex+milel",
+     "יִכָּשְׁלוּ|jikˈoʃlu|1|suf2+milel",
+     "בָּם|bˈom|0|mono",
+     "מִי|mˈi|0|mono",
+     "קֵל|kˈejl|0|mono",
+     "כָּמוֹךָ|komˈojχo|1|suf1",
+     "מִיְּמֵי|mˈijemej|1|default+milel",
+     "קֶדֶם|kˈedem|1|suf2"
+    ]
+   }
+  },
+  "hayomyom-tishrei3-3": {
+   "prep": "כׇּל הַחַבְרַיָּא קַדִּישָׁא הָיוּ בְּהִתְעוֹרְרוּת גְּדוֹלָה מִתּוֹרָה הַהִיא. הָרַב הַצַּדִּיק רַבִּי מְשֻׁולָּם זוּסְיָא מֵאנִיפוֹלִי אָמַר, כִּי הוּא אֵינוֹ יָכוֹל לְהַגִּיעַ לְמַעֲלַת תְּשׁוּבָה",
+   "ipa": {
+    "israeli": "kˈol haχavʁajˈa kadiʃˈa hajˈu behitʔoʁeʁˈut ɡedolˈa mitoʁˈa hahˈi. haʁˈav hatsadˈik ʁabˈi meʃulˈam zusjˈa menifolˈi ʔamˈaʁ, kˈi hˈu ʔejnˈo jaχˈol lehaɡˈia lemaʔalˈat teʃˈuva",
+    "chabad": "kˈol haχavʁˈajo kadˈiʃo hˈoju behisˈojʁeʁus ɡedˈojlo mitˈojʁo hˈahi. hˈoʁav hatsˈadik ʁˈabi meʃˈulom zˈusjo mejnifˈojli ˈomaʁ, kˈi hˈu ˈejnoj jˈoχojl lehaɡˈia lemaalˈas teʃˈuvo"
+   },
+   "trace": {
+    "israeli": [
+     "כׇּל|kˈol|0|mono",
+     "הַחַבְרַיָּא|haχavʁajˈa|0|default",
+     "קַדִּישָׁא|kadiʃˈa|0|default",
+     "הָיוּ|hajˈu|0|suf2",
+     "בְּהִתְעוֹרְרוּת|behitʔoʁeʁˈut|0|default",
+     "גְּדוֹלָה|ɡedolˈa|0|default",
+     "מִתּוֹרָה|mitoʁˈa|0|default",
+     "הַהִיא|hahˈi|0|default",
+     "הָרַב|haʁˈav|0|default",
+     "הַצַּדִּיק|hatsadˈik|0|default",
+     "רַבִּי|ʁabˈi|0|default",
+     "מְשֻׁולָּם|meʃulˈam|0|default",
+     "זוּסְיָא|zusjˈa|0|default",
+     "מֵאנִיפוֹלִי|menifolˈi|0|default",
+     "אָמַר|ʔamˈaʁ|0|exc",
+     "כִּי|kˈi|0|mono",
+     "הוּא|hˈu|0|mono",
+     "אֵינוֹ|ʔejnˈo|0|default",
+     "יָכוֹל|jaχˈol|0|default",
+     "לְהַגִּיעַ|lehaɡˈia|1|suf1",
+     "לְמַעֲלַת|lemaʔalˈat|0|default",
+     "תְּשׁוּבָה|teʃˈuva|1|suf4"
+    ],
+    "chabad": [
+     "כׇּל|kˈol|0|mono",
+     "הַחַבְרַיָּא|haχavʁˈajo|1|default+milel",
+     "קַדִּישָׁא|kadˈiʃo|1|default+milel",
+     "הָיוּ|hˈoju|1|suf2+milel",
+     "בְּהִתְעוֹרְרוּת|behisˈojʁeʁus|1|default+milel",
+     "גְּדוֹלָה|ɡedˈojlo|1|default+milel",
+     "מִתּוֹרָה|mitˈojʁo|1|default+milel",
+     "הַהִיא|hˈahi|1|default+milel",
+     "הָרַב|hˈoʁav|1|default+milel",
+     "הַצַּדִּיק|hatsˈadik|1|default+milel",
+     "רַבִּי|ʁˈabi|1|default+milel",
+     "מְשֻׁולָּם|meʃˈulom|1|default+milel",
+     "זוּסְיָא|zˈusjo|1|default+milel",
+     "מֵאנִיפוֹלִי|mejnifˈojli|1|default+milel",
+     "אָמַר|ˈomaʁ|1|exc+milel",
+     "כִּי|kˈi|0|mono",
+     "הוּא|hˈu|0|mono",
+     "אֵינוֹ|ˈejnoj|1|default+milel",
+     "יָכוֹל|jˈoχojl|1|default+milel",
+     "לְהַגִּיעַ|lehaɡˈia|1|suf1",
+     "לְמַעֲלַת|lemaalˈas|0|default",
+     "תְּשׁוּבָה|teʃˈuvo|1|suf4"
+    ]
+   }
+  },
+  "onkelos-gen1-1": {
+   "prep": "בְּקַדְמִין בְּרָא הַשֵּׁם יָת שׁמַיָּא וְיָת אַרְעָא.",
+   "ipa": {
+    "israeli": "bekadmˈin beʁˈa haʃˈem jˈat ʃmajˈa vejˈat ʔaʁʔˈa.",
+    "chabad": "bekˈadmin beʁˈo haʃˈejm jˈos ʃmˈajo vejˈos ˈaʁo."
+   },
+   "trace": {
+    "israeli": [
+     "בְּקַדְמִין|bekadmˈin|0|default",
+     "בְּרָא|beʁˈa|0|mono",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "יָת|jˈat|0|mono",
+     "שׁמַיָּא|ʃmajˈa|0|default",
+     "וְיָת|vejˈat|0|mono",
+     "אַרְעָא|ʔaʁʔˈa|0|default"
+    ],
+    "chabad": [
+     "בְּקַדְמִין|bekˈadmin|1|default+milel",
+     "בְּרָא|beʁˈo|0|mono",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "יָת|jˈos|0|mono",
+     "שׁמַיָּא|ʃmˈajo|1|default+milel",
+     "וְיָת|vejˈos|0|mono",
+     "אַרְעָא|ˈaʁo|1|default+milel"
+    ]
+   }
+  },
+  "onkelos-gen1-2": {
+   "prep": "וְאַרְעָא הֲוָת צָדְיָא וְרֵיקָנְיָא וַחֲשׁוֹכָא עַל אַפֵּי תְּהוֹמָא וְרוּחָא מִן קֳדָם הַשֵּׁם מְנַשְּׁבָא עַל אַפֵּי מַיָּא.",
+   "ipa": {
+    "israeli": "veʔaʁʔˈa havˈat tsadjˈa veʁekanjˈa vaχaʃoχˈa ʔˈal ʔapˈej tehomˈa veʁuχˈa mˈin kodˈam haʃˈem menaʃevˈa ʔˈal ʔapˈej majˈa.",
+    "chabad": "veˈaʁo havˈos tsˈodjo veʁejkˈonjo vaχaʃˈojχo ˈal ˈapej tehˈojmo veʁˈuχo mˈin kodˈom haʃˈejm menˈaʃevo ˈal ˈapej mˈajo."
+   },
+   "trace": {
+    "israeli": [
+     "וְאַרְעָא|veʔaʁʔˈa|0|default",
+     "הֲוָת|havˈat|0|default",
+     "צָדְיָא|tsadjˈa|0|default",
+     "וְרֵיקָנְיָא|veʁekanjˈa|0|default",
+     "וַחֲשׁוֹכָא|vaχaʃoχˈa|0|default",
+     "עַל|ʔˈal|0|mono",
+     "אַפֵּי|ʔapˈej|0|default",
+     "תְּהוֹמָא|tehomˈa|0|default",
+     "וְרוּחָא|veʁuχˈa|0|default",
+     "מִן|mˈin|0|mono",
+     "קֳדָם|kodˈam|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "מְנַשְּׁבָא|menaʃevˈa|0|default",
+     "עַל|ʔˈal|0|mono",
+     "אַפֵּי|ʔapˈej|0|default",
+     "מַיָּא|majˈa|0|default"
+    ],
+    "chabad": [
+     "וְאַרְעָא|veˈaʁo|1|default+milel",
+     "הֲוָת|havˈos|0|default",
+     "צָדְיָא|tsˈodjo|1|default+milel",
+     "וְרֵיקָנְיָא|veʁejkˈonjo|1|default+milel",
+     "וַחֲשׁוֹכָא|vaχaʃˈojχo|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "אַפֵּי|ˈapej|1|default+milel",
+     "תְּהוֹמָא|tehˈojmo|1|default+milel",
+     "וְרוּחָא|veʁˈuχo|1|default+milel",
+     "מִן|mˈin|0|mono",
+     "קֳדָם|kodˈom|0|default",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "מְנַשְּׁבָא|menˈaʃevo|1|default+milel",
+     "עַל|ˈal|0|mono",
+     "אַפֵּי|ˈapej|1|default+milel",
+     "מַיָּא|mˈajo|1|default+milel"
+    ]
+   }
+  },
+  "onkelos-gen1-3": {
+   "prep": "וַאֲמַר הַשֵּׁם יְהֵי נְהוֹרָא וַהֲוָה נְהוֹרָא.",
+   "ipa": {
+    "israeli": "vaʔamˈaʁ haʃˈem jehˈej nehoʁˈa vahavˈa nehoʁˈa.",
+    "chabad": "vaamˈaʁ haʃˈejm jehˈej nehˈojʁo vahavˈo nehˈojʁo."
+   },
+   "trace": {
+    "israeli": [
+     "וַאֲמַר|vaʔamˈaʁ|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "יְהֵי|jehˈej|0|mono",
+     "נְהוֹרָא|nehoʁˈa|0|default",
+     "וַהֲוָה|vahavˈa|0|default",
+     "נְהוֹרָא|nehoʁˈa|0|default"
+    ],
+    "chabad": [
+     "וַאֲמַר|vaamˈaʁ|0|default",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "יְהֵי|jehˈej|0|mono",
+     "נְהוֹרָא|nehˈojʁo|1|default+milel",
+     "וַהֲוָה|vahavˈo|0|default",
+     "נְהוֹרָא|nehˈojʁo|1|default+milel"
+    ]
+   }
+  },
+  "bavli-bb100a-1": {
+   "prep": "רַב אָשֵׁי אָמַר: כׇּל מִן הַצַּד, דֶּרֶךְ עֲקַלָּתוֹן הִיא; קְרוֹבָה לָזֶה, וּרְחוֹקָה לָזֶה.",
+   "ipa": {
+    "israeli": "ʁˈav ʔaʃˈej ʔamˈaʁ. kˈol mˈin hatsˈad, dˈeʁeχ ʔakalatˈon hˈi, keʁovˈa lazˈe, ʔuʁeχokˈa lazˈe.",
+    "chabad": "ʁˈav ˈoʃej ˈomaʁ. kˈol mˈin hatsˈad, dˈeʁeχ akalˈosojn hˈi, keʁˈojvo lˈoze, ʔuʁeχˈojko lˈoze."
+   },
+   "trace": {
+    "israeli": [
+     "רַב|ʁˈav|0|mono",
+     "אָשֵׁי|ʔaʃˈej|0|default",
+     "אָמַר|ʔamˈaʁ|0|exc",
+     "כׇּל|kˈol|0|mono",
+     "מִן|mˈin|0|mono",
+     "הַצַּד|hatsˈad|0|default",
+     "דֶּרֶךְ|dˈeʁeχ|1|suf2",
+     "עֲקַלָּתוֹן|ʔakalatˈon|0|default",
+     "הִיא|hˈi|0|mono",
+     "קְרוֹבָה|keʁovˈa|0|default",
+     "לָזֶה|lazˈe|0|default",
+     "וּרְחוֹקָה|ʔuʁeχokˈa|0|default",
+     "לָזֶה|lazˈe|0|default"
+    ],
+    "chabad": [
+     "רַב|ʁˈav|0|mono",
+     "אָשֵׁי|ˈoʃej|1|default+milel",
+     "אָמַר|ˈomaʁ|1|exc+milel",
+     "כׇּל|kˈol|0|mono",
+     "מִן|mˈin|0|mono",
+     "הַצַּד|hatsˈad|0|default",
+     "דֶּרֶךְ|dˈeʁeχ|1|suf2",
+     "עֲקַלָּתוֹן|akalˈosojn|1|default+milel",
+     "הִיא|hˈi|0|mono",
+     "קְרוֹבָה|keʁˈojvo|1|default+milel",
+     "לָזֶה|lˈoze|1|default+milel",
+     "וּרְחוֹקָה|ʔuʁeχˈojko|1|default+milel",
+     "לָזֶה|lˈoze|1|default+milel"
+    ]
+   }
+  },
+  "bavli-bb100a-2": {
+   "prep": "וְלֵימָא לְהוּ: שִׁקְלוּ דִּידְכוּ וְהַבוּ לִי דִּידִי! הָא מַנִּי, רַבִּי אֱלִיעֶזֶר הִיא. דְּתַנְיָא, רַבִּי יְהוּדָה אוֹמֵר מִשּׁוּם רַבִּי אֱלִיעֶזֶר: רַבִּים שֶׁבֵּרְרוּ",
+   "ipa": {
+    "israeli": "velemˈa lehˈu. ʃiklˈu didχˈu vehˈavu lˈi didˈi! hˈa mˈani, ʁabˈi ʔeliʔˈezeʁ hˈi. detanjˈa, ʁabˈi jehudˈa ʔomˈeʁ miʃˈum ʁabˈi ʔeliʔˈezeʁ. ʁabˈim ʃebeʁeʁˈu",
+    "chabad": "velˈejmo lehˈu. ʃˈiklu dˈidχu vehˈavu lˈi dˈidi! hˈo mˈani, ʁˈabi eliˈezeʁ hˈi. desˈanjo, ʁˈabi jehˈudo ˈojmejʁ mˈiʃum ʁˈabi eliˈezeʁ. ʁˈabim ʃebˈejʁeʁu"
+   },
+   "trace": {
+    "israeli": [
+     "וְלֵימָא|velemˈa|0|default",
+     "לְהוּ|lehˈu|0|mono",
+     "שִׁקְלוּ|ʃiklˈu|0|suf2",
+     "דִּידְכוּ|didχˈu|0|suf2",
+     "וְהַבוּ|vehˈavu|1|suf1",
+     "לִי|lˈi|0|mono",
+     "דִּידִי|didˈi|0|default",
+     "הָא|hˈa|0|mono",
+     "מַנִּי|mˈani|1|suf2",
+     "רַבִּי|ʁabˈi|0|default",
+     "אֱלִיעֶזֶר|ʔeliʔˈezeʁ|1|suf2",
+     "הִיא|hˈi|0|mono",
+     "דְּתַנְיָא|detanjˈa|0|default",
+     "רַבִּי|ʁabˈi|0|default",
+     "יְהוּדָה|jehudˈa|0|default",
+     "אוֹמֵר|ʔomˈeʁ|0|exc",
+     "מִשּׁוּם|miʃˈum|0|default",
+     "רַבִּי|ʁabˈi|0|default",
+     "אֱלִיעֶזֶר|ʔeliʔˈezeʁ|1|suf2",
+     "רַבִּים|ʁabˈim|0|default",
+     "שֶׁבֵּרְרוּ|ʃebeʁeʁˈu|0|suf2"
+    ],
+    "chabad": [
+     "וְלֵימָא|velˈejmo|1|default+milel",
+     "לְהוּ|lehˈu|0|mono",
+     "שִׁקְלוּ|ʃˈiklu|1|suf2+milel",
+     "דִּידְכוּ|dˈidχu|1|suf2+milel",
+     "וְהַבוּ|vehˈavu|1|suf1",
+     "לִי|lˈi|0|mono",
+     "דִּידִי|dˈidi|1|default+milel",
+     "הָא|hˈo|0|mono",
+     "מַנִּי|mˈani|1|suf2",
+     "רַבִּי|ʁˈabi|1|default+milel",
+     "אֱלִיעֶזֶר|eliˈezeʁ|1|suf2",
+     "הִיא|hˈi|0|mono",
+     "דְּתַנְיָא|desˈanjo|1|default+milel",
+     "רַבִּי|ʁˈabi|1|default+milel",
+     "יְהוּדָה|jehˈudo|1|default+milel",
+     "אוֹמֵר|ˈojmejʁ|1|exc+milel",
+     "מִשּׁוּם|mˈiʃum|1|default+milel",
+     "רַבִּי|ʁˈabi|1|default+milel",
+     "אֱלִיעֶזֶר|eliˈezeʁ|1|suf2",
+     "רַבִּים|ʁˈabim|1|default+milel",
+     "שֶׁבֵּרְרוּ|ʃebˈejʁeʁu|1|suf2+milel"
+    ]
+   }
+  },
+  "siddur-shacharit1-1": {
+   "prep": "הוֹדוּ לַהַשֵּׁם קִרְאוּ בִשְׁמוֹ, הוֹדִיעוּ בָעַמִּים עֲלִילוֹתָיו: שִׁירוּ לוֹ זַמְּרוּ לוֹ, שִׂיחוּ בְּכָל נִפְלְאֹתָיו: הִתְהַלְּלוּ בְּשֵׁם קָדְשׁוֹ, יִשְׂמַח לֵב מְבַקְּשֵׁי הַשֵּׁם: דִּרְשׁוּ",
+   "ipa": {
+    "israeli": "hodˈu lahaʃˈem kiʁʔˈu viʃmˈo, hodˈiʔu vaʔamˈim ʔalilotˈav. ʃˈiʁu lˈo zameʁˈu lˈo, sˈiχu beχˈol nifleʔotˈav. hithalelˈu beʃˈem kodʃˈo, jismˈaχ lˈev mevakeʃˈej haʃˈem. diʁʃˈu",
+    "chabad": "hˈojdu lahˈaʃejm kˈiʁu vˈiʃmoj, hojdˈiu voˈamim alilˈojsov. ʃˈiʁu lˈoj zˈameʁu lˈoj, sˈiχu beχˈol nifleˈojsov. hishˈalelu beʃˈejm kˈodʃoj, jˈismaχ lˈejv mevˈakeʃej haʃˈejm. dˈiʁʃu"
+   },
+   "trace": {
+    "israeli": [
+     "הוֹדוּ|hodˈu|0|suf2",
+     "לַהַשֵּׁם|lahaʃˈem|0|default",
+     "קִרְאוּ|kiʁʔˈu|0|suf3",
+     "בִשְׁמוֹ|viʃmˈo|0|default",
+     "הוֹדִיעוּ|hodˈiʔu|1|suf3",
+     "בָעַמִּים|vaʔamˈim|0|default",
+     "עֲלִילוֹתָיו|ʔalilotˈav|0|default",
+     "שִׁירוּ|ʃˈiʁu|1|suf3",
+     "לוֹ|lˈo|0|mono",
+     "זַמְּרוּ|zameʁˈu|0|suf2",
+     "לוֹ|lˈo|0|mono",
+     "שִׂיחוּ|sˈiχu|1|suf3",
+     "בְּכָל|beχˈol|0|mono",
+     "נִפְלְאֹתָיו|nifleʔotˈav|0|default",
+     "הִתְהַלְּלוּ|hithalelˈu|0|suf2",
+     "בְּשֵׁם|beʃˈem|0|mono",
+     "קָדְשׁוֹ|kodʃˈo|0|default",
+     "יִשְׂמַח|jismˈaχ|0|default",
+     "לֵב|lˈev|0|mono",
+     "מְבַקְּשֵׁי|mevakeʃˈej|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "דִּרְשׁוּ|diʁʃˈu|0|suf2"
+    ],
+    "chabad": [
+     "הוֹדוּ|hˈojdu|1|suf2+milel",
+     "לַהַשֵּׁם|lahˈaʃejm|1|default+milel",
+     "קִרְאוּ|kˈiʁu|1|suf3+milel",
+     "בִשְׁמוֹ|vˈiʃmoj|1|default+milel",
+     "הוֹדִיעוּ|hojdˈiu|1|suf3",
+     "בָעַמִּים|voˈamim|1|default+milel",
+     "עֲלִילוֹתָיו|alilˈojsov|1|default+milel",
+     "שִׁירוּ|ʃˈiʁu|1|suf3",
+     "לוֹ|lˈoj|0|mono",
+     "זַמְּרוּ|zˈameʁu|1|suf2+milel",
+     "לוֹ|lˈoj|0|mono",
+     "שִׂיחוּ|sˈiχu|1|suf3",
+     "בְּכָל|beχˈol|0|mono",
+     "נִפְלְאֹתָיו|nifleˈojsov|1|default+milel",
+     "הִתְהַלְּלוּ|hishˈalelu|1|suf2+milel",
+     "בְּשֵׁם|beʃˈejm|0|mono",
+     "קָדְשׁוֹ|kˈodʃoj|1|default+milel",
+     "יִשְׂמַח|jˈismaχ|1|default+milel",
+     "לֵב|lˈejv|0|mono",
+     "מְבַקְּשֵׁי|mevˈakeʃej|1|default+milel",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "דִּרְשׁוּ|dˈiʁʃu|1|suf2+milel"
+    ]
+   }
+  },
+  "siddur-shacharit1-2": {
+   "prep": "מִזְמוֹר שִׁיר חֲנֻכַּת הַבַּיִת לְדָוִד: אֲרוֹמִמְךָ הַשֵּׁם כִּי דִלִּיתָנִי, וְלֹא שִׂמַּחְתָּ אֹיְבַי לִי: הַשֵּׁם אֱלֹקָי, שִׁוַּעְתִּי אֵלֶיךָ וַתִּרְפָּאֵנִי: הַשֵּׁם הֶעֱלִיתָ מִן שְׁאוֹל",
+   "ipa": {
+    "israeli": "mizmˈoʁ ʃˈiʁ χanukˈat habˈajit ledavˈid. ʔaʁomimχˈa haʃˈem kˈi dilitˈani, velˈo simˈaχta ʔojvˈaj lˈi. haʃˈem ʔelokˈaj, ʃivˈaʔti ʔelˈeχa vatiʁpaʔˈeni. haʃˈem heʔelˈita mˈin ʃeʔˈol",
+    "chabad": "mˈizmojʁ ʃˈiʁ χanˈukas habˈajis ledˈovid. aʁojmˈimχo haʃˈejm kˈi dilisˈoni, velˈoj simˈaχto ˈojvaj lˈi. haʃˈejm elˈojkoj, ʃivˈati ejlˈeχo vatiʁpoˈejni. haʃˈejm heelˈiso mˈin ʃeˈojl"
+   },
+   "trace": {
+    "israeli": [
+     "מִזְמוֹר|mizmˈoʁ|0|default",
+     "שִׁיר|ʃˈiʁ|0|mono",
+     "חֲנֻכַּת|χanukˈat|0|default",
+     "הַבַּיִת|habˈajit|1|exc",
+     "לְדָוִד|ledavˈid|0|default",
+     "אֲרוֹמִמְךָ|ʔaʁomimχˈa|0|suf2",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "כִּי|kˈi|0|mono",
+     "דִלִּיתָנִי|dilitˈani|1|suf3",
+     "וְלֹא|velˈo|0|mono",
+     "שִׂמַּחְתָּ|simˈaχta|1|lex",
+     "אֹיְבַי|ʔojvˈaj|0|default",
+     "לִי|lˈi|0|mono",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "אֱלֹקָי|ʔelokˈaj|0|default",
+     "שִׁוַּעְתִּי|ʃivˈaʔti|1|suf2",
+     "אֵלֶיךָ|ʔelˈeχa|1|suf1",
+     "וַתִּרְפָּאֵנִי|vatiʁpaʔˈeni|1|suf3",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "הֶעֱלִיתָ|heʔelˈita|1|suf1",
+     "מִן|mˈin|0|mono",
+     "שְׁאוֹל|ʃeʔˈol|0|mono"
+    ],
+    "chabad": [
+     "מִזְמוֹר|mˈizmojʁ|1|default+milel",
+     "שִׁיר|ʃˈiʁ|0|mono",
+     "חֲנֻכַּת|χanˈukas|1|default+milel",
+     "הַבַּיִת|habˈajis|1|exc",
+     "לְדָוִד|ledˈovid|1|default+milel",
+     "אֲרוֹמִמְךָ|aʁojmˈimχo|1|suf2+milel",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "כִּי|kˈi|0|mono",
+     "דִלִּיתָנִי|dilisˈoni|1|suf3",
+     "וְלֹא|velˈoj|0|mono",
+     "שִׂמַּחְתָּ|simˈaχto|1|lex",
+     "אֹיְבַי|ˈojvaj|1|default+milel",
+     "לִי|lˈi|0|mono",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "אֱלֹקָי|elˈojkoj|1|default+milel",
+     "שִׁוַּעְתִּי|ʃivˈati|1|suf2",
+     "אֵלֶיךָ|ejlˈeχo|1|suf1",
+     "וַתִּרְפָּאֵנִי|vatiʁpoˈejni|1|suf3",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "הֶעֱלִיתָ|heelˈiso|1|suf1",
+     "מִן|mˈin|0|mono",
+     "שְׁאוֹל|ʃeˈojl|0|mono"
+    ]
+   }
+  },
+  "siddur-shacharit1-3": {
+   "prep": "\"יְהִי כְבוֹד Stand while reciting until הַשֵּׁם מֶלֶךְ, הַשֵּׁם מָלָךְ, הַשֵּׁם יִמְלֹךְ לְעוֹלָם וָעֶד",
+   "ipa": {
+    "israeli": "jehˈi χevˈod tand while e itin until haʃˈem mˈeleχ, haʃˈem malˈaχ, haʃˈem jimlˈoχ leʔolˈam vaʔˈed",
+    "chabad": "jehˈi χevˈojd tand while e itin until haʃˈejm mˈeleχ, haʃˈejm mˈoloχ, haʃˈejm jˈimlojχ leˈojlom voˈed"
+   },
+   "trace": {
+    "israeli": [
+     "יְהִי|jehˈi|0|mono",
+     "כְבוֹד|χevˈod|0|mono",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "מֶלֶךְ|mˈeleχ|1|exc",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "מָלָךְ|malˈaχ|0|default",
+     "הַשֵּׁם|haʃˈem|0|default",
+     "יִמְלֹךְ|jimlˈoχ|0|default",
+     "לְעוֹלָם|leʔolˈam|0|exc",
+     "וָעֶד|vaʔˈed|0|default"
+    ],
+    "chabad": [
+     "יְהִי|jehˈi|0|mono",
+     "כְבוֹד|χevˈojd|0|mono",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "מֶלֶךְ|mˈeleχ|1|exc",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "מָלָךְ|mˈoloχ|1|default+milel",
+     "הַשֵּׁם|haʃˈejm|0|default",
+     "יִמְלֹךְ|jˈimlojχ|1|default+milel",
+     "לְעוֹלָם|leˈojlom|1|exc+milel",
+     "וָעֶד|voˈed|0|default"
+    ]
+   }
+  },
+  "synthetic-abbr": {
+   "prep": "וְהַקָּדוֹשׁ בָּרוּךְ הוּא אָמַר לְמשֶׁה רַבֵּנוּ עָלָיו הַשָּׁלוֹם: \"וְכוּלֵּי\" (שְׁמוֹת יוּד בֵּית, גִּימֶל).",
+   "ipa": {
+    "israeli": "vehakadˈoʃ baʁˈuχ hˈu ʔamˈaʁ lemʃˈe ʁabˈenu ʔalˈav haʃalˈom. veχulˈej ʃemˈot jˈud bˈet, ɡˈimel.",
+    "chabad": "vehakˈodojʃ bˈoʁuχ hˈu ˈomaʁ lemʃˈe ʁabˈejnu ˈolov haʃˈolojm. veχˈulej ʃemˈojs jˈud bˈejs, ɡˈimel."
+   },
+   "trace": {
+    "israeli": [
+     "וְהַקָּדוֹשׁ|vehakadˈoʃ|0|default",
+     "בָּרוּךְ|baʁˈuχ|0|exc",
+     "הוּא|hˈu|0|mono",
+     "אָמַר|ʔamˈaʁ|0|exc",
+     "לְמשֶׁה|lemʃˈe|0|mono",
+     "רַבֵּנוּ|ʁabˈenu|1|suf1",
+     "עָלָיו|ʔalˈav|0|default",
+     "הַשָּׁלוֹם|haʃalˈom|0|default",
+     "וְכוּלֵּי|veχulˈej|0|default",
+     "שְׁמוֹת|ʃemˈot|0|mono",
+     "יוּד|jˈud|0|mono",
+     "בֵּית|bˈet|0|mono",
+     "גִּימֶל|ɡˈimel|1|exc"
+    ],
+    "chabad": [
+     "וְהַקָּדוֹשׁ|vehakˈodojʃ|1|default+milel",
+     "בָּרוּךְ|bˈoʁuχ|1|exc+milel",
+     "הוּא|hˈu|0|mono",
+     "אָמַר|ˈomaʁ|1|exc+milel",
+     "לְמשֶׁה|lemʃˈe|0|mono",
+     "רַבֵּנוּ|ʁabˈejnu|1|suf1",
+     "עָלָיו|ˈolov|1|default+milel",
+     "הַשָּׁלוֹם|haʃˈolojm|1|default+milel",
+     "וְכוּלֵּי|veχˈulej|1|default+milel",
+     "שְׁמוֹת|ʃemˈojs|0|mono",
+     "יוּד|jˈud|0|mono",
+     "בֵּית|bˈejs|0|mono",
+     "גִּימֶל|ɡˈimel|1|exc"
+    ]
+   }
+  }
+ }
+}

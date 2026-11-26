@@ -734,7 +734,7 @@ async function bindQv(root) {
       R.piperBroken = false;
       if (R.speaker) { const was = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (was === 'playing') ttsToggle(); }
       await refresh(); toast(v === 'natural' ? 'הקול הגברי הטבעי הותקן' : 'הקול האיכותי הותקן');
-    } catch (e) { st.textContent = `ההורדה נכשלה (${e.message}). ההקראה תמשיך בקול הדפדפן; אפשר לנסות שוב.`; }
+    } catch (e) { st.textContent = `ההורדה נכשלה (${e.message}). ההקראה תמשיך בקול המכשיר המקומי (אם מותקן); אפשר לנסות שוב.`; }
     finally { dl.disabled = false; prog.hidden = true; }
   };
   del.onclick = async () => {
@@ -749,8 +749,8 @@ function ttsForm() {
   <h3 class="set-sub" id="tts-voice-h">קול</h3>
   ${qvForm()}
   <div id="voice-warn"></div>
-  <label class="field"><span>קול הדפדפן / המכשיר</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית)</option></select></label>
-  <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). ברירת המחדל היא תמיד קול מקומי, כשיש כזה.</small>
+  <label class="field"><span>קול הדפדפן / המכשיר (מקומי בלבד)</span><select name="ttsVoice" id="voice-sel"><option value="">ברירת מחדל (עברית, מקומי)</option></select></label>
+  <small id="voice-net" hidden>קול המסומן ״מקוון״ אינו פועל במכשיר: הדפדפן היה שולח את הטקסט המוקרא לשרת של ספק הקול (למשל Google, Microsoft או Apple). לכן הוא לא זמין לבחירה, וההקראה משתמשת רק בקול מותקן במכשיר.</small>
   <h3 class="set-sub" id="tts-opts-h">מהירות ואפשרויות הקראה</h3>
   <label class="field"><span>מהירות: <output id="o-rate">${prefs.ttsRate}</output></span><input type="range" name="ttsRate" min="${TTS_RATES[0]}" max="${TTS_RATES.at(-1)}" step="0.1" value="${prefs.ttsRate}"></label>
   ${check('ttsStress', prefs.ttsStress, 'הקראה בהטעמה – שליחת הטקסט המנוקד למנוע הדיבור (מומלץ)')}
@@ -783,8 +783,14 @@ function bindForm(root, onChange) {
   });
   const sel = root.querySelector('#voice-sel'), warn = root.querySelector('#voice-warn');
   if (sel) onVoices(vs => {
-    sel.innerHTML = '<option value="">ברירת מחדל (עברית)</option>' + vs.map(v => `<option value="${esc(v.name)}" ${v.name === prefs.ttsVoice ? 'selected' : ''}>${esc(v.name)}${isNetworkVoice(v) ? ' – מקוון (הטקסט נשלח לספק)' : ''}</option>`).join('');
-    warn.innerHTML = vs.length ? '' : voiceHelp();
+    // 1.0.224: network voices are listed only as disabled, unavailable entries – they can never be chosen or used
+    const local = vs.filter(v => !isNetworkVoice(v));
+    const savedOk = local.some(v => v.name === prefs.ttsVoice);
+    if (prefs.ttsVoice && !savedOk && vs.length) setPref('ttsVoice', '');   // a saved network (or vanished) voice is dropped
+    sel.innerHTML = '<option value="">ברירת מחדל (עברית, מקומי)</option>' + vs.map(v => isNetworkVoice(v)
+      ? `<option value="" disabled>${esc(v.name)} – מקוון, לא זמין (הטקסט היה נשלח לספק)</option>`
+      : `<option value="${esc(v.name)}" ${v.name === prefs.ttsVoice ? 'selected' : ''}>${esc(v.name)}</option>`).join('');
+    warn.innerHTML = local.length ? '' : voiceHelp();
     const net = root.querySelector('#voice-net'); if (net) net.hidden = !vs.some(isNetworkVoice);
   });
   bindQv(root);
@@ -794,7 +800,7 @@ function voiceHelp() {
   return `<div class="warn"><b>לא נמצא במכשיר קול עברי.</b> ההקראה עלולה להישמע לא נכון או לא לפעול. להתקנה:
   <ul><li><b>אנדרואיד:</b> הגדרות ← מערכת ← שפות וקלט ← פלט טקסט לדיבור ← מנוע Google ← התקנת נתוני קול ← עברית.</li>
   <li><b>אייפון/אייפד:</b> הגדרות ← נגישות ← תוכן מוקרא ← קולות ← עברית (כרמית).</li>
-  <li><b>Windows:</b> הגדרות ← זמן ושפה ← דיבור ← הוספת קולות ← עברית. (Edge מציע גם קולות ״טבעיים״ מקוונים; קולות כאלה שולחים את הטקסט ל-Microsoft, ולכן עדיף קול מותקן.)</li>
+  <li><b>Windows:</b> הגדרות ← זמן ושפה ← דיבור ← הוספת קולות ← עברית. (Edge מציע גם קולות ״טבעיים״ מקוונים; קולות כאלה שולחים את הטקסט ל-Microsoft, ולכן האתר אינו משתמש בהם – יש להתקין קול עברי במכשיר.)</li>
   <li><b>macOS:</b> הגדרות מערכת ← נגישות ← תוכן מוקרא ← קול מערכת ← ניהול קולות ← עברית.</li></ul>
   לאחר ההתקנה יש לרענן את הדף.</div>`;
 }
@@ -939,7 +945,7 @@ async function glossCounts() {
 
 function renderAbout() {
   shell('אודות ומגבלות', `
-  <p>אתר לקריאת שיעורי חת״ת (חומש עם רש״י, תהילים, תניא) ורמב״ם יומי, בטקסט מנוקד ובתצוגה דמוית נייר, עם אפשרות שהדפדפן יקריא את הטקסט. עובד גם ללא רשת לאחר טעינה, ואינו אוסף מידע: אין חשבון, אין מעקב, והאתר עצמו אינו שולח נתונים (לחריג היחיד – קולות הקראה מקוונים – ראו ״הקראה״ להלן).</p>
+  <p>אתר לקריאת שיעורי חת״ת (חומש עם רש״י, תהילים, תניא) ורמב״ם יומי, בטקסט מנוקד ובתצוגה דמוית נייר, עם אפשרות שהדפדפן יקריא את הטקסט. עובד גם ללא רשת לאחר טעינה, ואינו אוסף מידע: אין חשבון, אין מעקב, והאתר עצמו אינו שולח נתונים (קולות הקראה מקוונים של הדפדפן נחסמים – ראו ״הקראה״ להלן).</p>
   <h2>לוח השיעורים</h2><ul>
   <li>החומש לפי המנהג: בכל יום עולה אחת מפרשת השבוע (ראשון – ראשון … שבת – שביעי). בשבוע שבו השבת היא יום טוב – לומדים את הפרשה של השבת הבאה. מאחרי השבת האחרונה של השנה ועד שמחת תורה – ״וזאת הברכה״. בשמחת תורה עצמה מסיימים את ״וזאת הברכה״ מעליית היום ועד סוף התורה, ומתחילים ״בראשית״ עד סוף עליית היום (ע״פ שיחת הרבי, תורת מנחם תשל״ב ח״א עמ׳ 129, ו״מנהגי חב״ד לשמחת תורה״ באתר chabad.org.il, ע״פ שערי הלכה ומנהג ח״ה סי׳ פח). בספר המנהגים ובלוח Chabad.org מופיעה בשמחת תורה ״וזאת הברכה״ בלבד – שתי השיטות מובאות בספרי המנהג. כששמחת תורה חלה בשבת (בארץ ישראל בלבד) לומדים ״וזאת הברכה״ משביעי עד הסוף בלבד, ולמחרת (אסרו חג) ״בראשית״ ״ראשון״ – לפי הכלל הכתוב בספר המנהגים (שיעורי חת״ת), המשותף לשתי השיטות. הוראה מפורשת למקרה זה (שבת בארץ ישראל) לא מצאנו; התוספת של ״בראשית״ עד עליית היום, שאנו נוהגים בה ביום חול, הייתה נותנת בשבת את כל פרשת בראשית, ולכן אינה מוצגת. ביום זה מוצגת הערה בקורא.</li>
   <li>תהילים לפי ימי החודש; בחודש חסר לומדים ביום כ״ט גם את של יום ל׳.</li>
@@ -999,7 +1005,7 @@ function renderAbout() {
   <li>הביאורים קצרים (עד 4 מילים) ומועתקים מוויקימילון כלשונם. גם כך ייתכנו טעויות – לכל ביאור יש קישור לערך המקור.</li>
   <li>בכל מקום אפשר לסמן מילה ולפתוח את ערכה בוויקימילון (קישור חיצוני).</li></ul>
   <h2>הקראה</h2><ul>
-  <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו בוחר קול מקוון כברירת מחדל כשיש קול מקומי, ואינו ממליץ עליהם.</li>
+  <li><b>פרטיות:</b> בקול מקומי ההקראה נעשית כולה במכשיר. יש דפדפנים שמציעים גם קולות <b>מקוונים</b> (מסומנים ״מקוון״ ברשימת הקולות): בהם הדפדפן שולח את הטקסט המוקרא לשרת של ספק הקול. האתר אינו משתמש בהם כלל: הם מופיעים ברשימה כ״לא זמין״ ואי אפשר לבחור בהם, וההקראה פועלת רק בקול מותקן במכשיר (או בקול האיכותי המקומי). בלי קול כזה ההקראה נעצרת עם הודעה, והטקסט אינו נשלח לספק.</li>
   <li>ההקראה משתמשת בקול המותקן במכשיר (Web Speech API). איכות ההגייה תלויה בקול: גם עם ניקוד, מנועי הדיבור אינם מקפידים על מלעיל/מלרע, שווא נע ודגש, וקריאת ארמית ולשון חכמים חלקית.</li>
   <li id="qv-about"><b>קול איכותי (מקומי, ניסיוני, מגרסה 1.0.59):</b> במקום קול הדפדפן אפשר להוריד – רק בלחיצה על ״קול איכותי״ בהגדרות ההקראה – את הקול <a href="https://huggingface.co/thewh1teagle/piper-he-noa" target="_blank" rel="noopener">noa</a> (Piper, של thewh1teagle, רישיון <a href="https://creativecommons.org/licenses/by/4.0/deed.he" target="_blank" rel="noopener">CC BY 4.0</a>). ההורדה חד־פעמית (כ־92 MB, או כ־38 MB בגרסה הקלה), מאתר זה בלבד; הקול נשמר במכשיר וההקראה נעשית בו, בלי רשת ובלי לשלוח טקסט. ההגייה נבנית מהניקוד: ההטעמה (מלעיל/מלרע) לפי טעמי המקרא בתורה ובתהילים; בשאר הטקסטים – לפי רשימת חריגים ומודל סיומות שנלמד מהטעמים (כ־93% נכון כשנבדק על ספר מקרא שלא נלמד – תורה מול תהילים; בלשון חכמים ובתניא הדיוק לא נמדד), שווא נע לפי כללי הדקדוק, וקמץ קטן רק במילים שאומתו (כל, חכמה, קרבן ועוד). <b>הקול לא נבדק בהאזנה אנושית</b> – רק במדידות אוטומטיות (תמלול חוזר); יש שגיאות הגייה, ובטקסט שאינו מנוקד ההגייה גרועה. אם הקול אינו נתמך או לא נטען – ההקראה חוזרת לקול הדפדפן. <b>מגרסה 1.0.60 ברירת המחדל היא קול גברי</b>: אותו קול noa בעיבוד אות במכשיר (גובה צליל נמוך בכ־6 חצאי טון, פורמנטים נמוכים בכ־6%), בלי הורדה נוספת; הקול הנשי המקורי זמין בהגדרות. זהו גוון מלאכותי, שגם הוא לא נבדק בהאזנה אנושית; במדידה האוטומטית הבהירות (תמלול חוזר) כמעט לא השתנתה – הפירוט בקובץ האימות.</li>
   <li>״הקראה בהטעמה״ שולחת את הטקסט המנוקד (ללא טעמי המקרא), מרחיבה ראשי תיבות נפוצים וקוראת את שם ה׳ ״השם״ (או כבתפילה, לפי בחירה).</li>
@@ -2158,7 +2164,7 @@ function ttsSegments() {
   });
 }
 const TTS_ERR = {
-  'no-voice': 'ההקראה לא הופעלה: לא נמצא במכשיר קול עברי. הוראות ההתקנה – כאן למטה.',
+  'no-voice': 'ההקראה לא הופעלה: לא נמצא במכשיר קול עברי מקומי (קולות מקוונים נחסמים כדי שהטקסט לא יישלח לספק). הוראות ההתקנה – כאן למטה.',
   silent: 'מנוע הדיבור לא השמיע את הטקסט (ייתכן שאין קול עברי). ההקראה נעצרה, והשיעור לא סומן כנלמד.',
 };
 // The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
@@ -2168,7 +2174,10 @@ function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('
 async function ttsEngine() {
   if (prefs.ttsEngine !== 'piper' || R.piperBroken || !piperSupported()) return 'web';
   if ((await voiceStatus())[modelFor(prefs.ttsGender, prefs.ttsModel)]) return 'piper';
-  toast(prefs.ttsGender === 'natural' ? 'הקול הגברי הטבעי עדיין לא הורד – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.' : 'הקול האיכותי אינו מותקן במכשיר – ההקראה בקול הדפדפן. להורדה: הגדרות הקראה ← קול איכותי.');
+  // 1.0.224: the fall-back is the browser's *local* voice only; with none, ttsToggle stops with a clear message
+  await waitForVoices();
+  const tail = hebrewVoices().length ? 'ההקראה בקול המכשיר המקומי' : 'וגם אין במכשיר קול עברי מקומי – ההקראה לא תופעל';
+  toast(prefs.ttsGender === 'natural' ? `הקול הגברי הטבעי עדיין לא הורד – ${tail}. להורדה: הגדרות הקראה ← קול איכותי.` : `הקול האיכותי אינו מותקן במכשיר – ${tail}. להורדה: הגדרות הקראה ← קול איכותי.`);
   return 'web';
 }
 async function ttsToggle() {
@@ -2182,6 +2191,8 @@ async function ttsToggle() {
   const eng = engine === 'web' ? 'web' : await ttsEngine();
   if (eng === 'web' && !ttsSupported()) { toast('הדפדפן אינו תומך בהקראה'); return; }
   if (eng === 'web') await waitForVoices();
+  // 1.0.224: local voices only. No local Hebrew voice (network voices are never used): say so and stop – nothing is sent to a vendor.
+  if (eng === 'web' && !hebrewVoices().length) { openSheet('tts', TTS_ERR['no-voice']); return; }
   if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
   R.speaker = new (eng === 'piper' ? PiperSpeaker : Speaker)({
     onSegment: (i, frac = 0) => {
@@ -2208,7 +2219,7 @@ async function ttsToggle() {
       // the local voice failed (not installed, out of memory, unsupported WASM…): fall back to the browser's voice
       if (String(code).startsWith('piper')) {
         R.piperBroken = true;
-        toast(`הקול האיכותי לא נטען (${code.slice(6)}) – ממשיכים בקול הדפדפן.`);
+        toast(`הקול האיכותי לא נטען (${code.slice(6)}) – ${hebrewVoices().length ? 'ממשיכים בקול המכשיר המקומי' : 'ואין במכשיר קול עברי מקומי'}.`);
         if (ttsSupported()) ttsToggle();
         return;
       }

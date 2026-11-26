@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright-core';
 
-const ROOT = new URL('../site/', import.meta.url).pathname;
+import { fileURLToPath } from 'node:url';
+const ROOT = fileURLToPath(new URL('../site/', import.meta.url));
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.txt': 'text/plain', '.md': 'text/plain', '.wasm': 'application/wasm', '.traineddata': 'application/octet-stream', '.pdf': 'application/pdf' };
 export function serve(root = ROOT, log = null) {
   return new Promise(res => {
@@ -18,7 +19,7 @@ export function serve(root = ROOT, log = null) {
     srv.listen(0, '127.0.0.1', () => res({ url: `http://127.0.0.1:${srv.address().port}/`, close: () => srv.close() }));
   });
 }
-export const CHROME = ['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find(p => fs.existsSync(p));
+export const CHROME = process.env.EDGE_PATH || ['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find(p => fs.existsSync(p));
 export const launch = () => chromium.launch({ executablePath: CHROME });
 /** Default test prefs: location already chosen (skips the first-run question). */
 export const PREFS = { il: true, locationChosen: true };
@@ -26,7 +27,18 @@ export async function pageWith(browser, base, { prefs = {}, progress = {}, viewp
   const ctx = await browser.newContext({ viewport, locale: 'he-IL', serviceWorkers: 'block' });
   const p = await ctx.newPage();
   const errors = []; p.on('pageerror', e => errors.push(e.message));
-  await p.addInitScript(() => { window.__ttsPauseScale = 0; window.__chromeIdleMs = 120000; }); // 1.0.101/121: no comma gaps; keep the nav overlay open while a test clicks it
+  await p.addInitScript(() => {
+    window.__ttsPauseScale = 0; window.__chromeIdleMs = 120000;
+    // 1.0.224: reading uses on-device Hebrew voices only. Headless Chrome often has none, so ttsToggle would
+    // return before Speaker.load and tests that capture the queue would hang. Tests that need another voice
+    // list replace speechSynthesis themselves after this.
+    const voices = [{ name: 'Test Hebrew', lang: 'he-IL', default: true, localService: true, voiceURI: 'test-he' }];
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: {
+      getVoices: () => voices, cancel() {}, pause() {}, resume() {}, speaking: false, pending: false,
+      addEventListener() {}, removeEventListener() {},
+      speak(u) { setTimeout(() => { u.onstart?.({}); setTimeout(() => u.onend?.({}), 3); }, 1); },
+    }});
+  }); // 1.0.101/121: no comma gaps; keep the nav overlay open while a test clicks it
   await p.addInitScript(([pr, pg]) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('chitas-reader.v1', JSON.stringify({ prefs: pr, progress: pg })); sessionStorage.setItem('seeded', '1'); } }, [{ ...PREFS, ...prefs }, progress]);
   if (init) await p.addInitScript(...(Array.isArray(init) ? init : [init]));
   p.errors = errors;

@@ -1,25 +1,31 @@
 // Browser speech (Web Speech API) reader with per-segment highlighting, Media Session and
-// optional silent-audio keep-alive for lock-screen controls. The app itself sends nothing; note that some browser
-// voices are network voices (localService === false) whose engine sends the text to the browser vendor – those are
-// labelled in the UI and never chosen by default when a local Hebrew voice exists.
+// optional silent-audio keep-alive for lock-screen controls. Policy (1.0.224): the reader never speaks with a network
+// voice (localService === false) – such voices make the browser send the text to the vendor. hebrewVoices() returns
+// usable (local) voices only; allHebrewVoices() lists network voices too, solely so the UI can show them as unavailable.
 import { prepareForTTS, pauseChunks } from './tts-prep.js';
 import { webPitch, clampPitch } from './voice-pitch.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
 export const ttsSupported = () => !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
 
-export function hebrewVoices() {
-  if (!ttsSupported()) return [];
-  // local (on-device) voices first, so the default voice never sends text to a vendor if a local one exists
-  return synth.getVoices().filter(v => /^(he|iw)([-_]|$)/i.test(v.lang))
-    .map((v, i) => [v, i]).sort((a, b) => isNetworkVoice(a[0]) - isNetworkVoice(b[0]) || a[1] - b[1]).map(([v]) => v);
-}
 /** A voice whose speech is synthesised by the vendor's server (the text is sent there). */
 export const isNetworkVoice = v => v?.localService === false;
+const isHebrew = v => /^(he|iw)([-_]|$)/i.test(v.lang);
+/** Every Hebrew voice the browser lists, local first. For display only – never speak with a network voice. */
+export function allHebrewVoices() {
+  if (!ttsSupported()) return [];
+  return synth.getVoices().filter(isHebrew)
+    .map((v, i) => [v, i]).sort((a, b) => isNetworkVoice(a[0]) - isNetworkVoice(b[0]) || a[1] - b[1]).map(([v]) => v);
+}
+/** Hebrew voices that may be used for reading: on-device only (localService !== false). */
+export const hebrewVoices = () => allHebrewVoices().filter(v => !isNetworkVoice(v));
+/** The voice to speak with: the saved one only if it is a usable local voice, otherwise the first local voice. */
+export function pickVoice(name) { const vs = hebrewVoices(); return vs.find(v => v.name === name) || vs[0] || null; }
+/** cb(allVoices) – callers separate usable from network voices with isNetworkVoice. */
 export function onVoices(cb) {
   if (!ttsSupported()) return cb([]);
-  cb(hebrewVoices());
-  synth.addEventListener?.('voiceschanged', () => cb(hebrewVoices()));
+  cb(allHebrewVoices());
+  synth.addEventListener?.('voiceschanged', () => cb(allHebrewVoices()));
 }
 
 // 1 s of 8 kHz 8-bit silence, generated at runtime (keeps a media session alive on some platforms).
@@ -95,7 +101,8 @@ export class Speaker {
     const q = this.queue[this.i];
     const u = new SpeechSynthesisUtterance(q.text);
     u.lang = 'he-IL';
-    const v = hebrewVoices().find(v => v.name === this.opts.voice) || hebrewVoices()[0];
+    const v = pickVoice(this.opts.voice);
+    if (!v) { this.fail('no-voice'); return; }   // never fall back to the engine's default voice – it may be a network one
     try { if (v) u.voice = v; } catch { /* non-native voice object */ }
     u.rate = this.opts.rate || 1;
     if (clampPitch(this.opts.pitch)) u.pitch = webPitch(this.opts.pitch);   // 1.0.92: only when the reader moved the slider
