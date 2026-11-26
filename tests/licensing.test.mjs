@@ -83,6 +83,11 @@ test('reader credits the Wikisource chapter (Chametz uMatzah ch. 9) with a link 
     await p.click('#sh-x');
     await p.goto(srv.url + '#/r/tehillim/2026-11-02'); await p.waitForSelector('.seg');
     assert.match(await p.textContent('.doc-credit'), /תהילים: מקרא על פי המסורה/);
+    // Shnayim Mikra must display BOTH Chumash (CC BY-SA) and Onkelos (CC BY-SA) credits
+    await p.goto(srv.url + '#/r/shnayim/2026-11-02'); await p.waitForSelector('.seg');
+    const sh = await p.textContent('.doc-credit');
+    assert.match(sh, /חומש: מקרא על פי המסורה \(CC BY-SA/);
+    assert.match(sh, /תרגום אונקלוס.*CC BY-SA/);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

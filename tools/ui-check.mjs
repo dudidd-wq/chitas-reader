@@ -2,8 +2,11 @@
 // plus an offline check of the service worker. Run: node tools/ui-check.mjs [baseUrl]  (exit code 1 on failure)
 import { chromium } from 'playwright-core';
 import AxeBuilder from '@axe-core/playwright';
-const base = process.argv[2] || 'http://localhost:8765/';
-const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+import { CHROME, serve, openChrome } from '../tests/helpers.mjs';
+if (!CHROME) { console.error('FAIL: no Chrome/Chromium executable found (set CHROME_PATH or EDGE_PATH)'); process.exit(1); }
+const ownSrv = process.argv[2] ? null : await serve();
+const base = process.argv[2] || ownSrv.url;
+const b = await chromium.launch({ executablePath: CHROME });
 const D = new Date().toLocaleDateString('sv'), fails = [], log = [];
 const screens = [
   ['home', `d/${D}`], ['settings', 'settings'], ['sources', 'sources'], ['about', 'about'],
@@ -16,6 +19,12 @@ const screens = [
   ['siddur-hallel-sepia-scroll', 's/rc/1', { theme: 'sepia', layout: 'scroll', size: 30 }],
   ['siddur-omer-chart-dark-scroll', 's/omer/1', { theme: 'dark', layout: 'scroll', siddurLang: 'both' }],
   ['siddur-ana-bekoach-sepia', 's/boker/5', { theme: 'sepia', layout: 'scroll' }],
+  ['offline', 'offline'], ['lib', 'lib'], ['search', 'search'],
+  ['modern-home', `d/${D}`, { design: 'modern', theme: 'paper' }],
+  ['modern-settings', 'settings', { design: 'modern', theme: 'paper' }],
+  ['modern-dark-home', `d/${D}`, { design: 'modern', theme: 'dark' }],
+  ['nocturne-home', `d/${D}`, { design: 'nocturne', theme: 'paper' }],
+  ['nocturne-settings', 'settings', { design: 'nocturne', theme: 'paper' }],
 ];
 for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   const ctx = await b.newContext({ viewport: { width: w, height: 740 }, locale: 'he-IL', serviceWorkers: 'block' });
@@ -41,6 +50,7 @@ for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   }
   // sheets
   if (name === 'chumash' && w === 390) for (const id of ['#b-aa', '#b-tts']) {
+    await openChrome(p);
     await p.click(id, id === '#b-tts' ? { button: 'right' } : {}); await p.waitForTimeout(300);
     const r = await new AxeBuilder({ page: p }).withTags(['wcag2a', 'wcag2aa']).analyze();
     for (const v of r.violations) fails.push(`${w} ${name}${id}: axe ${v.id} ×${v.nodes.length}: ${v.nodes[0].target}`);
@@ -64,6 +74,7 @@ for (const w of [320, 360, 390]) for (const [name, hash, prefs] of screens) {
   await ctx.close();
 }
 await b.close();
+ownSrv?.close();
 console.log(log.join('\n'));
 console.log(fails.length ? 'FAIL\n' + fails.join('\n') : 'ALL UI CHECKS PASS');
 process.exit(fails.length ? 1 : 0);

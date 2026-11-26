@@ -19,8 +19,32 @@ jobs:
         with: { node-version: 22 }
       - name: Install fontTools for font-coverage tests
         run: python3 -m pip install --user fonttools brotli
-      - name: Install and test (retry the suite once; pitch-192 and siddur-flow can flake on CI runners)
-        run: npm ci && (npm test || npm test)
+      - name: Set up Chrome for browser & accessibility tests
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+      - name: Install dependencies and verify browser availability
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          npm ci
+          node -e "import('./tests/helpers.mjs').then(m => { if (!m.CHROME) { console.error('Chrome missing'); process.exit(1); } console.log('Chrome:', m.CHROME); })"
+      - name: Run main test suite (no global retry; deterministic pass required)
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          mapfile -t main_tests < <(ls tests/*.test.mjs | grep -vE 'pitch-192\.test\.mjs|siddur-flow\.test\.mjs')
+          node --test "${main_tests[@]}"
+      - name: Run CPU-sensitive browser tests in isolation (pitch-192, siddur-flow)
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: |
+          for f in tests/pitch-192.test.mjs tests/siddur-flow.test.mjs; do
+            node --test --test-concurrency=1 "$f" || { echo "::warning::Flake retry for $f"; node --test --test-concurrency=1 "$f"; }
+          done
+      - name: Run UI & axe-core accessibility checks
+        env:
+          CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+        run: npm run ui
       - name: Drop leftover pages artifacts from a rerun of this workflow
         env:
           GH_TOKEN: ${{ github.token }}

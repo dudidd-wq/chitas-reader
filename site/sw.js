@@ -4,15 +4,15 @@
 // (round 4): files whose hash in data/manifest.json is unchanged are copied from the old cache, changed ones are
 // re-fetched and checked against the manifest hash. Only when that succeeded is the old cache deleted; until then it
 // remains an offline fallback, so an update while the network is poor never loses the 30-day save.
-const VERSION = '1.0.227';
-const DATA_VERSION = '216182cf4316';
+const VERSION = '1.0.228';
+const DATA_VERSION = 'b8e0bfaf7367';
 const SHELL = `shell-${VERSION}`;
 const DATA = `data-${DATA_VERSION}`;
 const MANIFEST = new URL('data/manifest.json', self.registration.scope).href;
-const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/bavli-nps1.js', 'js/bavli-nps1-rules.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/niqqud.js', 'js/hayomyom-display.js', 'js/layout.js', 'js/zmanim.js', 'js/kivun.js', 'js/kivun-ui.js', 'js/wmm.js', 'js/divine.js', 'js/personal.js', 'js/sapach.js', 'js/sapach-ocr.js', 'js/sapach-pdf.js', 'js/tefila.js', 'js/siddur-lang.js', 'js/library.js', 'js/library-ui.js', 'js/search.js', 'js/gemara-cycles.js', 'js/gemara-speech.js', 'js/vendor/hebcal.js',
+const ASSETS = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/offline.js', 'js/rav-warn.js', 'js/bavli-nps1.js', 'js/bavli-nps1-rules.js', 'js/calendar.js', 'js/texts.js', 'js/store.js', 'js/tts.js', 'js/tts-prep.js', 'js/chol.js', 'js/gloss.js', 'js/hnorm.js', 'js/niqqud.js', 'js/hayomyom-display.js', 'js/layout.js', 'js/zmanim.js', 'js/kivun.js', 'js/kivun-ui.js', 'js/wmm.js', 'js/divine.js', 'js/personal.js', 'js/sapach.js', 'js/sapach-ocr.js', 'js/sapach-pdf.js', 'js/tefila.js', 'js/siddur-lang.js', 'js/library.js', 'js/library-ui.js', 'js/search.js', 'js/gemara-cycles.js', 'js/gemara-speech.js', 'js/vendor/hebcal.js',
   'js/piper.js', 'js/piper-worker.js', 'js/piper-core.js', 'js/g2p.js', 'js/shin-vav-lex.js', 'js/unvocal-lex.js', 'js/voice-files.js', 'js/voice-pitch.js',
-  'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'fonts/taamey-ashkenaz-medium.woff2', 'fonts/taamey-ashkenaz-bold.woff2', 'fonts/TaameyAshkenaz-LICENSE.txt', 'fonts/GPL-2.0.txt', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png',
-  'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json', 'data/rambam-errata.json', 'data/torah/index.json', 'data/mitzvot/index.json', 'data/siddur/index.json', 'data/gemara/index.json'];
+  'fonts/NotoSerifHebrew.woff2', 'fonts/FrankRuhlLibre.woff2', 'fonts/EzraSIL.woff2', 'fonts/taamey-ashkenaz-medium.woff2', 'fonts/taamey-ashkenaz-bold.woff2', 'fonts/TaameyAshkenaz-LICENSE.txt', 'fonts/GPL-2.0.txt', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png',
+  'data/sources.json', 'data/tanya/index.json', 'data/rambam/index.json', 'data/glossary.json', 'data/rambam-errata.json', 'data/torah/index.json', 'data/tehillim/index.json', 'data/mitzvot/index.json', 'data/siddur/index.json', 'data/gemara/index.json', 'data/nach/index.json', 'data/sbiur/index.json'];
 self.addEventListener('install', e => {
   e.waitUntil(Promise.all([
     caches.open(SHELL).then(c => c.addAll(ASSETS)),
@@ -54,6 +54,14 @@ self.addEventListener('activate', e => {
     .then(() => self.clients.claim()));
 });
 self.addEventListener('message', e => { if (e.data === 'version') e.source?.postMessage({ version: VERSION, data: DATA_VERSION }); });
+const NAV_TIMEOUT_MS = 3500;
+function fetchNavWithTimeout(req, ms = NAV_TIMEOUT_MS) {
+  const ac = typeof AbortController === 'function' ? new AbortController() : null;
+  let timer;
+  const p = fetch(req, ac ? { signal: ac.signal } : undefined).then(r => { clearTimeout(timer); return r; }, err => { clearTimeout(timer); throw err; });
+  const to = new Promise((_, rej) => { timer = setTimeout(() => { ac?.abort(); rej(new Error('nav-timeout')); }, ms); });
+  return Promise.race([p, to]);
+}
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
@@ -76,8 +84,10 @@ self.addEventListener('fetch', e => {
   const isData = url.pathname.includes('/data/') && !/index\.json$|sources\.json$|glossary\.json$|rambam-errata\.json$/.test(url.pathname);
   if (isData) {
     // cache-first; offline, a text that only an older (not yet migrated) data cache holds is still served
-    e.respondWith(caches.open(DATA).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; })
-      .catch(async err => (await caches.match(e.request)) || Promise.reject(err))));
+    e.respondWith(caches.open(DATA).then(async c => (await c.match(e.request)) || fetch(e.request).then(r => {
+      if (r.ok) e.waitUntil(c.put(e.request, r.clone()));
+      return r;
+    }).catch(async err => (await caches.match(e.request)) || Promise.reject(err))));
     return;
   }
   // the local voice (site/voice/, ~38–92 MB): never precached and never put in the shell cache. The page stores it in
@@ -86,10 +96,17 @@ self.addEventListener('fetch', e => {
     e.respondWith(caches.open('voice-v1').then(c => c.match(e.request)).then(m => m || fetch(e.request)));
     return;
   }
-  // shell: network-first for navigation (fresh after deploy), cache-first for the rest
+  // shell: network-first with timeout for navigation (falls back cleanly on a half-dead network), cache-first for the rest
   if (e.request.mode === 'navigate') {
-    e.respondWith(fetch(e.request).then(r => { const cl = r.clone(); caches.open(SHELL).then(c => c.put('index.html', cl)); return r; }).catch(() => caches.match('index.html')));
+    e.respondWith(fetchNavWithTimeout(e.request).then(r => {
+      if (r.ok) { const cl = r.clone(); e.waitUntil(caches.open(SHELL).then(c => c.put('index.html', cl))); return r; }
+      if (r.status >= 500) return caches.match('index.html').then(m => m || r);
+      return r;
+    }).catch(() => caches.match('index.html')));
     return;
   }
-  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(m => m || fetch(e.request).then(r => { if (r.ok) { const cl = r.clone(); caches.open(SHELL).then(c => c.put(e.request, cl)); } return r; })));
+  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(m => m || fetch(e.request).then(r => {
+    if (r.ok) { const cl = r.clone(); e.waitUntil(caches.open(SHELL).then(c => c.put(e.request, cl))); }
+    return r;
+  })));
 });

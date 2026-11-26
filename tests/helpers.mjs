@@ -19,7 +19,25 @@ export function serve(root = ROOT, log = null) {
     srv.listen(0, '127.0.0.1', () => res({ url: `http://127.0.0.1:${srv.address().port}/`, close: () => srv.close() }));
   });
 }
-export const CHROME = process.env.EDGE_PATH || ['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'].find(p => fs.existsSync(p));
+export function findChrome() {
+  const env = [process.env.CHROME_PATH, process.env.EDGE_PATH, process.env.CHROME_BIN, process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH].filter(Boolean);
+  const candidates = [
+    ...env,
+    '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser', '/snap/bin/chromium',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    ...(process.env.LOCALAPPDATA ? [`${process.env.LOCALAPPDATA}\\Google\\Chrome\\Application\\chrome.exe`] : []),
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+  ];
+  const found = candidates.find(p => { try { return fs.existsSync(p); } catch { return false; } });
+  if (found) return found;
+  try { const pw = chromium.executablePath(); if (pw && fs.existsSync(pw)) return pw; } catch { /* not installed */ }
+  return undefined;
+}
+export const CHROME = findChrome();
 export const launch = () => chromium.launch({ executablePath: CHROME });
 /** Default test prefs: location already chosen (skips the first-run question). */
 export const PREFS = { il: true, locationChosen: true };

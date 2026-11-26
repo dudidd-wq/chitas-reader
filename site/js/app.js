@@ -3,9 +3,11 @@ import { speechTextForBlock, primaryPartForSegment } from './gemara-speech.js';
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, formatDmyInput, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
+import { ravWarnFrom, ravWarnBlock } from './rav-warn.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } from './tefila.js';
-import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent } from './store.js';
+import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent, getStorageStatus, PROGRESS_CAP } from './store.js';
+import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline } from './offline.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
@@ -234,6 +236,7 @@ function route() {
   if (view === 's' && /^[a-z]+$/.test(a) && /^\d+$/.test(b)) { openReader('siddur', currentDate, `${a}/${+b}`, params.get('s') ? { seek: params.get('s') } : null); return; }
   if (view === 'lib') return libRoute(h.slice(4), params.get('s'));
   if (view === 'search') { closeReader(); return renderSearch(params.get('q') || '', params.get('in') || '', { shell, $, prefs }); }
+  if (view === 'offline') { closeReader(); return renderOffline({ shell, $, toast }); }
   if (view === 'siddur') return renderSiddur();
   if (view === 'kivun') return renderKivun({ prefs, setPref, esc, $, shell, PIN, zmanPlace });
   if (view === 'settings') return renderSettings();
@@ -334,6 +337,36 @@ function bindDateField() {
   $('#calbtn').addEventListener('click', () => { try { n.showPicker(); } catch { t.focus(); t.select(); } });
   n.addEventListener('change', () => { if (n.value) { t.value = fmtDmy(n.value); go(); } });
 }
+const scrollBeh = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+function triggerBackupDownload() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(exportBackup());
+  a.download = `chitas-backup-${todayIso()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function storageBannerHtml() {
+  const st = getStorageStatus();
+  if (st.ok && !st.nearLimit) return '<div id="st-banner" hidden></div>';
+  const msg = !st.ok
+    ? 'שמירת ההתקדמות וההעדפות במכשיר נכשלה (ייתכן שהאחסון מלא או חסום). מומלץ לייצא קובץ גיבוי כדי שהשינויים לא יאבדו.'
+    : `מאגר ההתקדמות מתקרב לתקרה (${st.count.toLocaleString('he-IL')} מתוך ${st.cap.toLocaleString('he-IL')} רשומות). מומלץ לייצא קובץ גיבוי למכשיר.`;
+  return `<aside id="st-banner" class="warn" role="${st.ok ? 'status' : 'alert'}"><p>${msg}</p><p><button type="button" class="btn primary" id="st-exp">ייצוא קובץ גיבוי</button></p></aside>`;
+}
+function bindStorageBanner(root = document) {
+  root.querySelector('#st-exp')?.addEventListener('click', triggerBackupDownload);
+}
+let lastStorageToast = 0;
+document.addEventListener('chitas-storage', e => {
+  const st = e.detail || getStorageStatus();
+  const host = $('#st-banner');
+  if (host) { host.outerHTML = storageBannerHtml(); bindStorageBanner(); }
+  if (!st.ok && Date.now() - lastStorageToast > 30000) {
+    lastStorageToast = Date.now();
+    toast('השמירה במכשיר נכשלה – ייצאו גיבוי בהגדרות');
+  }
+});
+
 async function renderHome(showLoc = false) {
   const plan = dayPlan(currentDate, { il: prefs.il });
   const isToday = currentDate === todayIso();
@@ -343,12 +376,13 @@ async function renderHome(showLoc = false) {
   document.title = `חת״ת ורמב״ם – ${plan.hebDate} (${fmtDmy(currentDate)})`;
   v.innerHTML = `<div class="wrap home">
     <header class="hero">
-      <nav class="hero-tools" aria-label="ספרייה וחיפוש"><a class="btn ghost" href="#/lib" aria-label="ספרייה – כל הספרים">${LIB_ICON}</a><a class="btn ghost" href="#/search" aria-label="חיפוש בכל הספרים">${SEARCH_ICON}</a></nav>
+      <nav class="hero-tools" aria-label="ספרייה וחיפוש"><a class="btn ghost" href="#/lib" aria-label="ספרייה – כל הספרים">${LIB_ICON}</a><a class="btn ghost" href="#/search" aria-label="חיפוש בספרים">${SEARCH_ICON}</a></nav>
       <p class="kicker">${esc(plan.dayHe)}${isToday ? ' · <b>היום</b>' : ''}</p>
       <h1 class="hd">${esc(plan.hebDate)}</h1>
       <p class="sub">${esc(gregHe(currentDate))} · פרשת ${esc(plan.weekParsha)}</p>
       ${first ? '' : `<button class="chip" id="loc" aria-expanded="${showLoc}" aria-controls="locq">${PIN}<span>לוח ${locLabel(prefs.il)}</span><span class="sr"> – שינוי</span></button>`}
     </header>
+    ${storageBannerHtml()}
     ${first || showLoc ? locationPanel(first) : ''}
     ${first ? '' : `    <nav class="datebar" aria-label="בחירת תאריך">
       <a class="btn" href="#/d/${shiftIso(currentDate, -1)}" aria-label="היום הקודם, ${fmtDmy(shiftIso(currentDate, -1))}">${ICON.prev}<span>הקודם</span></a>
@@ -362,6 +396,7 @@ async function renderHome(showLoc = false) {
       ${isToday ? '' : `<a class="btn today" href="#/d/${todayIso()}">חזרה להיום</a>`}
       <p id="dateerr" class="dateerr" role="alert"></p>
     </nav>
+    <div id="rav-warn" hidden></div>
     <section aria-labelledby="day-h">
       <div class="dayhead"><h2 id="day-h">שיעורי היום</h2><span id="daysum" class="daysum"></span></div>
       <ol class="cards">${units.map(u => `
@@ -379,7 +414,7 @@ async function renderHome(showLoc = false) {
     ${tefilaCard()}
 `}
     <footer class="home-foot">
-      <button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button>
+      <div class="set-actions"><button class="btn" id="dl30">שמירה לשימוש ללא רשת (30 יום)</button><a class="btn" id="dl-offline" href="#/offline">הורד הכל לשימוש בלי אינטרנט</a></div>
       <p class="note" id="dl-st" role="status" aria-live="polite"></p>
       <nav class="links" aria-label="קישורים">
         ${[['#/lib', LIB_ICON, 'ספרייה'], ['#/search', SEARCH_ICON, 'חיפוש בספרים'], ['#/zmanim/' + currentDate, NAV_ICON.clock, 'זמני היום'], ['#/siddur', NAV_ICON.book, 'סידור'], ['#/kivun', NAV_ICON.compass, 'כיוון התפילה'], [ptHomeHref(), NAV_ICON.heart, 'תהילים אישי'], ['#/settings', ICON.gear, 'הגדרות'], ['#/sources', NAV_ICON.doc, 'מקורות ורישיונות'], ['#/about', NAV_ICON.info, 'אודות ומגבלות']].map(([h, i, t]) => `<a href="${h}">${i}<span>${t}</span></a>`).join('')}
@@ -387,6 +422,7 @@ async function renderHome(showLoc = false) {
       <p class="note">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>
     </footer>
   </div>`;
+  bindStorageBanner(v);
   $('#dl30').addEventListener('click', downloadAhead);
   v.querySelectorAll('#locq [data-il]').forEach(b => b.addEventListener('click', () => {
     setPref('il', b.dataset.il === 'true'); setPref('locationChosen', true);
@@ -395,6 +431,20 @@ async function renderHome(showLoc = false) {
   if (first) return;
   bindDateField();
   $('#loc').addEventListener('click', () => { renderHome(!showLoc); if (!showLoc) $('#locq [data-il]')?.focus(); });
+  if (prefs.lessonRavYomi) {
+    data('ravyomi/schedule.json').then(S => {
+      const box = $('#rav-warn');
+      if (!box || !box.isConnected || currentDate < ravWarnFrom(S.last)) return;
+      const ended = currentDate > S.last, lastDmy = fmtDmy(S.last);
+      const left = Math.max(0, Math.round((Date.parse(S.last + 'T00:00:00Z') - Date.parse(currentDate + 'T00:00:00Z')) / 864e5));
+      box.className = 'warn';
+      box.hidden = false;
+      box.setAttribute('role', 'note');
+      box.innerHTML = ended
+        ? `<b>לוח ״רב יומי״:</b> הלוח שבאתר הסתיים ב־${lastDmy} (כ״ג טבת תשפ״ז). להמשך המחזור: <a href="https://chabad.info/service/1287411/" target="_blank" rel="noopener">הלוח הרשמי ב-chabad.info</a>.`
+        : `<b>לוח ״רב יומי״:</b> הלוח שבאתר מסתיים ב־${lastDmy} (${left === 0 ? 'היום האחרון בלוח' : `בעוד ${left} ימים`}). טרם הוטמעה השנה הבאה – <a href="https://chabad.info/service/1287411/" target="_blank" rel="noopener">הלוח הרשמי ב-chabad.info</a>.`;
+    }).catch(() => {});
+  }
   let done = 0;
   for (const u of units) {
     const p = getProgress(currentDate, u);
@@ -434,30 +484,31 @@ function autoPrefetch() {
 async function downloadAhead() {
   const btn = $('#dl30'), st = $('#dl-st'); btn.disabled = true;
   try {
-    const files = new Set(['tanya/index.json', 'rambam/index.json', 'glossary.json', 'sources.json']);
+    const files = new Set(['tanya/index.json', 'rambam/index.json', 'nach/index.json', 'sbiur/index.json', 'gemara/index.json', 'glossary.json', 'sources.json']);
     for (let i = 0; i < 30; i++) {
       const plan = dayPlan(shiftIso(currentDate, i), { il: prefs.il });
       for (const u of unitsFor()) (await filesForPre(plan, u)).forEach(f => files.add(f));
     }
-    let n = 0, ok = 0;
-    for (const f of files) { if (await fetch('data/' + f).then(r => r.ok).catch(() => false)) ok++; n++; if (n % 10 === 0) btn.textContent = `מוריד… ${Math.round(100 * n / files.size)}%`; }
+    const res = await verifyCacheFiles([...files], {
+      onProgress: ({ done, total, bytes }) => {
+        if (!btn.isConnected) return;
+        btn.textContent = `מוריד ומאמת… ${done}/${total} (${fmtMb(bytes)})`;
+      },
+    });
+    if (!btn.isConnected) return;
     // ask the browser not to evict the saved texts (review 3); report the real answer, not a hope
     const persist = await persistStorage();
-    const pmsg = persist === true ? 'הדפדפן אישר אחסון קבוע.'
-      : persist === false ? 'הדפדפן לא אישר אחסון קבוע, ולכן ייתכן שימחק את השמירה אם יחסר מקום או לאחר זמן רב ללא שימוש (בעיקר ב-iPhone).'
-      : 'הדפדפן אינו תומך בבקשת אחסון קבוע; ייתכן שימחק את השמירה אם יחסר מקום.';
-    if (ok === files.size) { btn.textContent = '✓ נשמר ל-30 יום'; st.textContent = `הטקסטים ל-30 הימים הקרובים נשמרו במכשיר, והשמירה נשארת גם אחרי עדכוני האתר (מורדים מחדש רק קבצים שהשתנו). ${pmsg}`; }
-    else { btn.textContent = 'שמירה חלקית – נסו שוב'; btn.disabled = false; st.textContent = `נשמרו ${ok} מתוך ${files.size} קבצים; חלק לא הורדו (בדקו חיבור). ${pmsg}`; }
+    const pmsg = persistMessage(persist);
+    if (res.failed === 0 && res.verified === res.total) {
+      btn.textContent = '✓ נשמר ל-30 יום';
+      st.textContent = `הטקסטים ל-30 הימים הקרובים (${res.verified} קבצים, ${fmtMb(res.bytes)} ירדו${res.alreadyCached ? `, ${res.alreadyCached} כבר היו שמורים` : ''}) נשמרו במכשיר ואומתו במטמון, והשמירה נשארת גם אחרי עדכוני האתר (מורדים מחדש רק קבצים שהשתנו). ${pmsg}`;
+    } else {
+      btn.textContent = 'שמירה חלקית – נסו שוב';
+      btn.disabled = false;
+      st.textContent = `שמירה חלקית: אומתו במטמון ${res.verified} מתוך ${res.total} קבצים (${fmtMb(res.bytes)} ירדו); חלק לא נשמרו (בדקו חיבור). ${pmsg}`;
+    }
     st.dataset.persisted = String(persist);
   } catch { btn.textContent = 'שגיאה בהורדה'; btn.disabled = false; st.textContent = 'ההורדה נכשלה – בדקו חיבור ונסו שוב.'; }
-}
-/** navigator.storage.persist(): true/false = the browser's answer, null = not supported */
-async function persistStorage() {
-  try {
-    if (!navigator.storage?.persist) return null;
-    if (await navigator.storage.persisted?.()) return true;
-    return await navigator.storage.persist();
-  } catch { return null; }
 }
 
 // ---------------- Siddur: what to pray now (home) and the full table of contents ----------------
@@ -533,11 +584,15 @@ async function renderSiddur() {
   $('#sd-dl').addEventListener('click', async () => {
     const b = $('#sd-dl'), s2 = $('#sd-dl-st'); b.disabled = true;
     try {
-      const files = [...await siddurFiles(), 'sources.json']; let ok = 0;
-      for (const [i, f] of files.entries()) { if (await fetch('data/' + f).then(r => r.ok).catch(() => false)) ok++; if (i % 10 === 0) b.textContent = `מוריד… ${Math.round(100 * i / files.length)}%`; }
+      const files = [...await siddurFiles(), 'sources.json'];
+      const res = await verifyCacheFiles(files, {
+        onProgress: ({ done, total, bytes }) => { if (b.isConnected) b.textContent = `מוריד ומאמת… ${done}/${total} (${fmtMb(bytes)})`; },
+      });
+      if (!b.isConnected) return;
       const persist = await persistStorage();
-      b.textContent = ok === files.length ? '✓ הסידור נשמר' : 'שמירה חלקית – נסו שוב'; b.disabled = ok === files.length;
-      s2.textContent = ok === files.length ? `כל ${files.length} קבצי הסידור נשמרו במכשיר.${persist === false ? ' הדפדפן לא אישר אחסון קבוע, ולכן ייתכן שימחק את השמירה אם יחסר מקום.' : ''}` : `נשמרו ${ok} מתוך ${files.length} קבצים (בדקו חיבור).`;
+      const okAll = res.failed === 0 && res.verified === res.total;
+      b.textContent = okAll ? '✓ הסידור נשמר' : 'שמירה חלקית – נסו שוב'; b.disabled = okAll;
+      s2.textContent = okAll ? `כל ${res.verified} קבצי הסידור נשמרו ואומתו במטמון במכשיר (${fmtMb(res.bytes)} ירדו). ${persistMessage(persist)}` : `אומתו ${res.verified} מתוך ${res.total} קבצים (בדקו חיבור). ${persistMessage(persist)}`;
     } catch { b.textContent = 'שגיאה בהורדה'; b.disabled = false; }
   });
 }
@@ -814,7 +869,7 @@ function renderSettings() {
   <form class="form" id="sf" onsubmit="return false">
     ${setCard('set-daily', `<fieldset><legend>מיקום (לחישוב פרשת השבוע)</legend>${radio('il', prefs.il, [['true', 'ארץ ישראל'], ['false', 'חוץ לארץ']])}</fieldset>
     <fieldset><legend>רמב״ם</legend>${radio('rambamTrack', prefs.rambamTrack, [['3', 'ג׳ פרקים'], ['1', 'פרק אחד'], ['both', 'שניהם']])}</fieldset>
-    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״')}${check('lessonDaf', prefs.lessonDaf, 'דף היומי (בבלי) – גמרא עם ביאור שטיינזלץ')}${check('lessonAmud', prefs.lessonAmud, 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ')}${check('lessonYer', prefs.lessonYer, 'ירושלמי יומי (מהדורת וילנא)')}${check('lessonMishna', prefs.lessonMishna, 'משנה יומית – שתי משניות ליום, עם ברטנורא')}${check('lessonNach', prefs.lessonNach, 'נ״ך יומי – פרק ליום, עם מצודת דוד')}${check('lessonShnayim', prefs.lessonShnayim, 'שניים מקרא ואחד תרגום')}
+    <fieldset><legend>שיעורים נוספים</legend>${check('lessonMitzvot', prefs.lessonMitzvot, 'ספר המצוות היומי (לרמב״ם, לפי לוח הרבי)')}${check('lessonTolt', prefs.lessonTolt, 'תורה אור ולקוטי תורה – שיעור יומי לפי לוח ״המורה שיעור״ (כינוס השלוחים)')}${check('lessonRavYomi', prefs.lessonRavYomi, 'שולחן ערוך אדמו״ר הזקן – לפי לוח ״רב יומי״ (כ״ד טבת תשפ״ו – כ״ג טבת תשפ״ז, עד 02/01/2027)')}${check('lessonDaf', prefs.lessonDaf, 'דף היומי (בבלי) – גמרא עם ביאור שטיינזלץ')}${check('lessonAmud', prefs.lessonAmud, 'עמוד היומי (דרשו) – גמרא עם ביאור שטיינזלץ')}${check('lessonYer', prefs.lessonYer, 'ירושלמי יומי (מהדורת וילנא)')}${check('lessonMishna', prefs.lessonMishna, 'משנה יומית – שתי משניות ליום, עם ברטנורא')}${check('lessonNach', prefs.lessonNach, 'נ״ך יומי – פרק ליום, עם מצודת דוד')}${check('lessonShnayim', prefs.lessonShnayim, 'שניים מקרא ואחד תרגום')}
     <p class="hint">שיעורים אלה נוספים לרשימת היום רק אם סימנת אותם. <a href="#/about">פרטים</a></p></fieldset><fieldset><legend>שניים מקרא</legend>${radio('shnayimSplit', prefs.shnayimSplit, [['day', 'לפי ימים – עלייה ליום, כמו החומש היומי'], ['week', 'כל הפרשה']])}</fieldset>`)}
     ${setCard('set-display', displayAppearance())}
     ${setCard('set-fonts', displayFonts())}
@@ -824,22 +879,30 @@ function renderSettings() {
     ${setCard('set-tehillim', `<p>הפרק בתהילים לפי הגיל (מנהג חב״ד) – לך ולבני המשפחה. הפרק נפתח באותו קורא של התהילים הרגיל. השמות ותאריכי הלידה נשמרים במכשיר הזה בלבד ואינם נשלחים; תצלום או קובץ (תמונה או PDF) של ספח מעובד במכשיר בלבד. <a class="btn" href="#/tehillim">תהילים אישי – פרופילים ופרקים</a></p>
     <fieldset><legend>לפני תהילים היומי (בשיעור היומי, ברצף אחד)</legend>${check('tehillimPre20', prefs.tehillimPre20, 'פרק כ׳')}${check('tehillimPrePersonal', prefs.tehillimPrePersonal, 'הפרקים האישיים (של כל מי שברשימה)')}${check('tehillimPreRebbe', prefs.tehillimPreRebbe, 'פרק הרבי (נולד י״א בניסן תרס״ב)')}
     <p class="hint">הסדר: פרק כ׳, הפרקים האישיים, פרק הרבי – ואחריהם התהילים של היום, באותו קורא ובאותה הקראה.</p></fieldset>`, 'pt-settings')}
-    ${setCard('set-backup', `<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה. אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
+    ${setCard('set-backup', `${storageBannerHtml()}<p>ההתקדמות וההעדפות נשמרות רק במכשיר הזה (${getStorageStatus().count.toLocaleString('he-IL')} מתוך ${PROGRESS_CAP.toLocaleString('he-IL')} רשומות). אפשר לייצא קובץ גיבוי ולייבא אותו במכשיר אחר.</p>
+    <label class="check"><input type="checkbox" id="imp-replace">החלף את כל הנתונים הקיימים בעת הייבוא (ברירת מחדל: מיזוג)</label>
     <div class="set-actions"><button class="btn" type="button" id="exp">ייצוא קובץ גיבוי</button>
     <label class="btn" for="imp">ייבוא קובץ גיבוי</label><input type="file" id="imp" accept="application/json,.json" class="sr">
+    <a class="btn" href="#/offline">הורד הכל לשימוש בלי אינטרנט</a>
     <button class="btn" type="button" id="rst">מחיקת כל הנתונים מהמכשיר</button></div>`)}
     ${setCard('set-about', `<p id="set-ver">גרסה <bdi dir="ltr" id="set-ver-n">…</bdi></p>
     <div class="set-actions"><a class="btn" href="#/about">אודות ומגבלות</a><a class="btn" href="#/sources">מקורות ורישיונות</a></div>
     <p class="hint">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>`)}
   </form>`);
   $('#view .page').classList.add('settings-page');
+  bindStorageBanner($('#view'));
   $('#view').querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
-    const h = $('#' + b.dataset.jump + ' h2'); h.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); h.tabIndex = -1; h.focus({ preventScroll: true }); h.addEventListener('blur', () => h.removeAttribute('tabindex'), { once: true });
+    const h = $('#' + b.dataset.jump + ' h2'); h.scrollIntoView({ block: 'start', behavior: scrollBeh() }); h.tabIndex = -1; h.focus({ preventScroll: true }); h.addEventListener('blur', () => h.removeAttribute('tabindex'), { once: true });
   }));
   fetch('sw.js').then(r => r.text()).then(t => { const m = t.match(/const VERSION = '([^']+)'/), n = $('#set-ver-n'); if (n) { if (m) n.textContent = m[1]; else $('#set-ver').hidden = true; } }).catch(() => { const v = $('#set-ver'); if (v) v.hidden = true; });
   const f = $('#sf'); bindForm(f);
-  $('#exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(exportBackup()); a.download = `chitas-backup-${todayIso()}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
-  $('#imp').onchange = async e => { const file = e.target.files[0]; if (!file) return; try { importBackup(await file.text()); applyPrefs(); toast('הגיבוי שוחזר'); renderSettings(); } catch { toast('קובץ לא תקין'); } };
+  $('#exp').onclick = triggerBackupDownload;
+  $('#imp').onchange = async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const mode = $('#imp-replace')?.checked ? 'replace' : 'merge';
+    try { importBackup(await file.text(), { mode }); applyPrefs(); toast('הגיבוי שוחזר'); renderSettings(); }
+    catch { toast('ייבוא הגיבוי נכשל – הקובץ אינו תקין או שהשמירה במכשיר נכשלה'); }
+  };
   $('#rst').onclick = () => { if (confirm('למחוק את כל ההתקדמות וההעדפות מהמכשיר?')) resetAll(); };
 }
 // the label is exactly what the source states (no invented version); a Wikisource original also cites Wikisource's stated version
@@ -857,7 +920,7 @@ async function renderSources() {
   <p>מסמכי הבדיקה (במאגר הקוד): <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">VERIFICATION.md</a> (לוח השיעורים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/GLOSSARY-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">GLOSSARY-VERIFICATION.md</a> (ביאור מילים), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/RAMBAM-ERRATA.md" target="_blank" rel="noopener" dir="ltr">RAMBAM-ERRATA.md</a> (נוסח הרמב״ם), <a href="https://github.com/dudidd-wq/chitas-reader/blob/main/verification/SIDDUR-VERIFICATION.md" target="_blank" rel="noopener" dir="ltr">SIDDUR-VERIFICATION.md</a> (הסידור), ו<a href="https://github.com/dudidd-wq/chitas-reader/blob/main/README.md#data-licence" target="_blank" rel="noopener">הערת רישיון הנתונים</a>.</p>
   <p>גרסאות שמקורן באתר <a href="https://mechon-mamre.org/copy.htm" rel="noopener" target="_blank">מכון ממרא</a> אינן בשימוש: אף שבספריא הן מסומנות ״נחלת הכלל״, האתר עצמו מתיר שימוש פרטי לשם לימוד והוראה בלבד ואוסר להעתיק את החומר לאתר אחר. לכן ההקדמה למשנה תורה ומניין המצוות נלקחו מוויקיטקסט (CC BY-SA).</p>
   <table class="src"><thead><tr><th>חלק</th><th>גרסה</th><th>רישיון</th><th>קישור</th><th>הערות</th></tr></thead><tbody>
-  ${row('חומש ותהילים', s.tanakh, 'מנוקד ומוטעם')}
+  ${row('חומש (יומי ושניים מקרא) ותהילים', s.tanakh, 'מנוקד ומוטעם')}
   ${row('פירוש רש״י', s.rashi, 'מנוקד; דיבורי המתחיל אינם מנוקדים (בהקראה הם נקראים בניקוד הפסוק כשהם מילות הפסוק)')}
   ${row('תניא', s.tanya, 'מנוקד. רישיון לשימוש לא מסחרי בלבד (NC)')}
   ${row('משנה תורה לרמב״ם', s.rambam, 'מנוקד')}
@@ -955,11 +1018,11 @@ function renderAbout() {
   <li><b>התאריך העברי מוצג לפי היום האזרחי:</b> לכל תאריך לועזי מוצג התאריך העברי של שעות היום שלו (חישוב של ספריית Hebcal). לפי ההלכה התאריך העברי מתחלף כבר בשקיעה, כך שבערב, אחרי השקיעה, כבר מתחיל התאריך העברי הבא – האתר אינו מחליף אותו בשקיעה.</li>
   <li>תאריכים לועזיים מוצגים בסדר הישראלי: יום/חודש/שנה (למשל <bdi dir="ltr">02/11/2026</bdi>) או ״2 בנובמבר 2026״.</li></ul>
   <h2 id="about-lib">ספרייה וחיפוש</h2><ul>
-    <li>ב<a href="#/lib">ספרייה</a> אפשר לעיין בכל פרק של כל הספרים שבאתר – חומש עם רש״י, תהילים (150 הפרקים, וגם לפי ימי החודש והשבוע), תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה, שולחן ערוך אדמו״ר הזקן והסידור – בלי קשר ללוח: ספר ← חלק ← פרק, עם ״הקודם/הבא״ לפי סדר הספר (גם מספר לספר, למשל מסוף בראשית לתחילת שמות). הפרק נפתח באותו קורא, עם אותן הגדרות.</li>
-    <li>לכל פרק קישור קבוע (למשל <bdi dir="ltr">#/lib/torah/Genesis/1</bdi>, ולפסוק או להלכה – <bdi dir="ltr">?s=1:1</bdi>); פרק שנפתח פעם אחת – או ספר שנשמר בכפתור ״שמירה לשימוש ללא רשת״ בדף שלו – זמין גם בלי רשת.</li>
+    <li>ב<a href="#/lib">ספרייה</a> אפשר לעיין בכל פרק של כל הספרים שבאתר – חומש עם רש״י, תהילים (150 הפרקים, וגם לפי ימי החודש והשבוע), תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה, היום יום, שולחן ערוך אדמו״ר הזקן, נ״ך, תלמוד בבלי, תלמוד ירושלמי, משנה והסידור – בלי קשר ללוח: ספר ← חלק ← פרק, עם ״הקודם/הבא״ לפי סדר הספר (גם מספר לספר, למשל מסוף בראשית לתחילת שמות). הפרק נפתח באותו קורא, עם אותן הגדרות.</li>
+    <li>לכל פרק קישור קבוע (למשל <bdi dir="ltr">#/lib/torah/Genesis/1</bdi>, ולפסוק או להלכה – <bdi dir="ltr">?s=1:1</bdi>); פרק שנפתח פעם אחת – או ספר שנשמר בכפתור ״שמירה לשימוש ללא רשת״ בדף שלו או במסך <a href="#/offline">הורד הכל לשימוש בלי אינטרנט</a> – זמין גם בלי רשת.</li>
     <li><b>עיון בספרייה אינו מסמן את שיעורי היום כנלמדו.</b> המקום והסימון ✓ של הספרייה נשמרים בנפרד, ברשימות הספרייה בלבד.</li>
-    <li><a href="#/search">חיפוש בכל הספרים</a>: עם ניקוד וטעמים או בלעדיהם, בלי תלות בגרש ובגרשיים, ובכתיב מלא או חסר (ו׳ ו־י׳ באמצע מילה); ״ה׳״ בחיפוש מוצא גם את השם המלא. התוצאות מקובצות לפי ספר, עם קטע מודגש וקישור לפסוק או להלכה. אפשר לצמצם לספר אחד.</li>
-    <li>החיפוש נעשה כולו במכשיר: האינדקס נבנה מראש מהטקסטים שבאתר, מחולק לפי ספר (כ־12 מגה־בייט בסך הכול, כ־4.3 מגה־בייט בהעברה דחוסה) ונטען רק כשמחפשים; אחרי חיפוש ראשון הוא נשמר במכשיר ועובד גם בלי רשת. <b>מה שמחפשים לא נשלח לשום מקום.</b></li></ul>
+    <li><a href="#/search">חיפוש בספרים</a>: עם ניקוד וטעמים או בלעדיהם, בלי תלות בגרש ובגרשיים, ובכתיב מלא או חסר (ו׳ ו־י׳ באמצע מילה); ״ה׳״ בחיפוש מוצא גם את השם המלא. התוצאות מקובצות לפי ספר, עם קטע מודגש וקישור לפסוק או להלכה. אפשר לצמצם לספר אחד. <b>מה כלול:</b> חומש ורש״י, נ״ך, תהילים, משנה, תניא, רמב״ם, ספר המצוות, תורה אור ולקוטי תורה, היום יום, שו״ע הרב והסידור. תלמוד בבלי ותלמוד ירושלמי אינם כלולים באינדקס החיפוש בשל נפחם הגדול (~250 מ״ב נתונים).</li>
+    <li>החיפוש נעשה כולו במכשיר: האינדקס נבנה מראש מהטקסטים שבאתר, מחולק לפי ספר (כ־15 מגה־בייט בסך הכול על הדיסק, כ־5 מגה־בייט בהעברה דחוסה) ונטען לפי דרישה רק כשמחפשים; אחרי חיפוש ראשון הוא נשמר במכשיר ועובד גם בלי רשת. <b>מה שמחפשים לא נשלח לשום מקום.</b></li></ul>
   <h2>תהילים אישי</h2><ul>
     <li>מנהג חב״ד לומר בכל יום את פרק התהילים של שנות החיים – מספר השנים שמלאו ועוד אחת – ולהתחיל פרק חדש ביום ההולדת העברי. הורים אומרים גם את פרקי ילדיהם.</li>
     <li>בעמוד <a href="#/tehillim">תהילים אישי</a> אפשר להוסיף את עצמכם ואת בני המשפחה (תאריך לידה לועזי או עברי, או גיל), לראות את הפרק של היום ולקרוא אותו באותו קורא של התהילים הרגיל – אותם גופנים, ניקוד, עיצוב והקראה. שם המקור והמגבלות (למשל: מגיל 150 לא נמצא מקור).</li>
@@ -1093,7 +1156,12 @@ async function tehillimBlocks(list) {
   return blocks;
 }
 async function buildDocPre(plan, unit) {
-  const doc = await buildDoc(plan, unit), pre = prePlan(plan, unit);
+  const doc = await buildDoc(plan, unit);
+  if (unit === 'ravyomi') {
+    const note = ravWarnBlock(plan.iso, (await data('ravyomi/schedule.json')).last);
+    if (note) doc.blocks = [note, ...doc.blocks];
+  }
+  const pre = prePlan(plan, unit);
   if (!pre.length) return doc;
   const blocks = [...await tehillimBlocks(pre), { type: 'h', text: `${doc.title} – תהילים היומי` }, ...doc.blocks];
   return { ...doc, blocks, subtitle: `לפני השיעור: ${pre.map(x => gem(x.c)).join(', ')} · ${doc.subtitle}` };
@@ -1664,11 +1732,12 @@ async function renderDoc() {
   // one-line source + licence credit for every lesson (round 3): the main edition, then any Rambam chapter from another one
   let srcs = {}; try { srcs = await data('sources.json'); } catch { /* offline and not cached */ }
   const main = { chumash: [['חומש', srcs.tanakh], showRashi && ['רש״י', srcs.rashi && { ...srcs.rashi, versionTitleInHebrew: 'מהדורת רוזנבאום–זילברמן (1929–1934)' }]], tehillim: [['תהילים', srcs.tanakh]],
+    shnayim: [['חומש', srcs.tanakh]],
     tanya: [['תניא', srcs.tanya && { ...srcs.tanya, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }]],
     mitzvot: [['ספר המצוות', srcs.mitzvot && { ...srcs.mitzvot, versionTitleInHebrew: 'ספר המצוות, ורשה תרמ״ג' }]],
     tolt: [['תורה אור / לקוטי תורה', srcs.tolt && { ...srcs.tolt, versionTitleInHebrew: 'הוצאת קה״ת (Kehot)' }], d.blocks.some(b => b.voc === 'cb') && srcs.tolt?.niqqud && ['ניקוד', srcs.tolt.niqqud]],
     ravyomi: [['שולחן ערוך הרב', srcs.ravyomi && { ...srcs.ravyomi, versionTitleInHebrew: 'הוצאת קה״ת, מהדורה מנוקדת' }]],
-    siddur: [['סידור', srcs.siddur], [prefs.siddurLang === 'en' ? 'הוראות באנגלית' : 'הנחיות (תרגום לעברית של ההוראות באנגלית)', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || (GEMARA_UNITS.includes(R.unit) || R.unit === 'nachyomi' || R.unit === 'shnayim' ? [] : [['רמב״ם', srcs.rambam]]);
+    siddur: [['סידור', srcs.siddur], [prefs.siddurLang === 'en' ? 'הוראות באנגלית' : 'הנחיות (תרגום לעברית של ההוראות באנגלית)', srcs.siddur && { ...srcs.siddur, license: srcs.siddur.instructionsLicense }]] }[R.unit] || (GEMARA_UNITS.includes(R.unit) || R.unit === 'nachyomi' ? [] : [['רמב״ם', srcs.rambam]]);
   const credits = [...main.filter(x => x && x[1]).map(([label, m]) => ({ label, ...m })), ...(d.credits || [])];
   const credit = credits.map(c => `${esc(c.label)}: <a href="${esc(c.versionSource)}" target="_blank" rel="noopener">${c.versionTitle === 'Wikisource Mishneh Torah' ? 'ויקיטקסט' : esc(c.versionTitleInHebrew || c.versionTitle)}</a> (${licenseLink(c.license, c)})`).join(' · ');
   // round 6: vocalisation is judged per block, not for the whole lesson (Positive Mitzvot: the first ~47 mitzvot are
@@ -1849,7 +1918,7 @@ function followSpeech(el, frac) {
   } else {
     const vp = $('#vp'), pad = chromePad(), e = el.getBoundingClientRect(), v = vp.getBoundingClientRect();
     const y = e.top + frac * e.height, lo = v.top + pad.top, hi = v.bottom - pad.bottom - 40;
-    if (y < lo || y > hi) vp.scrollBy({ top: y - lo - 20, behavior: 'smooth' });
+    if (y < lo || y > hi) vp.scrollBy({ top: y - lo - 20, behavior: scrollBeh() });
   }
 }
 function pageOf(el) {
@@ -1898,7 +1967,7 @@ function reportUrl(seg = currentSeg()) {
 function goToSeg(id, smooth = true, sub = 0) {
   const el = R.segs.find(s => s.dataset.id === id); if (!el) return;
   if (prefs.layout === 'pages') { const [p0, p1] = segSpan(el), p = Math.min(p1, p0 + sub); if (p !== R.page) setPage(p); }
-  else el.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+  else el.scrollIntoView({ block: 'center', behavior: smooth ? scrollBeh() : 'auto' });
 }
 function updateProgress(save = true) {
   let frac;
@@ -2043,7 +2112,7 @@ function turn(d) {
   if (prefs.layout === 'pages') {
     if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast(R.lib ? 'סוף הפרק' : 'סוף השיעור'); return; }
     setPage(R.page + d);
-  } else { const vp = $('#vp'); vp.scrollBy({ top: d * (vp.clientHeight - 80), behavior: 'smooth' }); }
+  } else { const vp = $('#vp'); vp.scrollBy({ top: d * (vp.clientHeight - 80), behavior: scrollBeh() }); }
 }
 // The ⤢ button reflects the real full-screen state (also when the browser leaves full screen by itself, e.g. Esc).
 function syncFullBtn() { const b = $('#b-full'); if (b) b.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false'); }

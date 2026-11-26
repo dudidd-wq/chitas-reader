@@ -4,17 +4,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { sourceHash } from '../tools/build-search.mjs';   // (also installs a file-system fetch for the site's modules)
 import * as S from '../site/js/search.js';
 import { libNode, libDoc, libFiles, family, FAMILIES } from '../site/js/library.js';
 
-const DIR = new URL('../site/data/search/', import.meta.url).pathname;
+const DIR = fileURLToPath(new URL('../site/data/search/', import.meta.url));
 const meta = JSON.parse(fs.readFileSync(DIR + 'shards.json', 'utf8'));
 const shards = meta.shards.map(s => ({ ...s, S: S.prepShard(JSON.parse(fs.readFileSync(DIR + s.id + '.json', 'utf8'))) }));
 const search = q => { const Q = S.compileQuery(q); return shards.flatMap(s => S.searchShard(s.S, Q, 1e6).hits.map(h => ({ ...h, shard: s.id, href: S.hitHref(h) }))); };
 const hrefs = q => search(q).map(h => h.href);
 
 test('the index is up to date with the text data (run `npm run search` after changing data)', () => {
+  assert.equal(FAMILIES.filter(f => f.noSearch).map(f => f.id).join(), 'bavli,yerushalmi');
   assert.equal(meta.source, sourceHash());
   for (const s of meta.shards) assert.equal(fs.statSync(DIR + s.id + '.json').size, s.bytes, s.id);
   assert.ok(meta.segs > 40000, 'segments ' + meta.segs);
@@ -68,6 +70,8 @@ test('search: known passages', () => {
   assert.ok(search('אתערותא דלתתא').some(h => h.shard === 'tanya'));
   assert.ok(hrefs('מזמור לדוד יהוה רעי').includes('#/lib/tehillim/23?s=23%3A1'));
   assert.ok(search('נטילת ידים').some(h => h.shard === 'siddur' || h.shard.startsWith('rambam')));
+  assert.ok(hrefs('חזק ואמץ').includes('#/lib/nach/Joshua/1?s=1%3A6'));
+  assert.ok(hrefs('מאימתי קורין את שמע').includes('#/lib/mishnah/Berakhot/1?s=1.1'));
   assert.equal(S.compileQuery('modeh'), null); assert.equal(S.compileQuery('א'), null);   // nothing to search for
 });
 

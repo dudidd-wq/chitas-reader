@@ -80,7 +80,7 @@ test('1.0.113: the design setting – four previewed options (no Chabad), stored
 
 const EXPECT = {
   sefer: { paper: '#efe2c2', card: 'rgba(0, 0, 0, 0)', top: /gradient/, hd: /Keter YG/, rashi: /Noto Rashi Hebrew/, hl: 'rgba(227, 194, 122, .55)' },
-  modern: { paper: '#f4efe6', card: 'rgb(226, 85, 45)', top: 'rgb(226, 85, 45)', hd: /Frank Ruhl Libre/, rashi: /Noto Rashi Hebrew/, hl: '#ffe7dc' },
+  modern: { paper: '#f4efe6', card: 'rgb(199, 65, 27)', top: 'rgb(199, 65, 27)', hd: /Frank Ruhl Libre/, rashi: /Noto Rashi Hebrew/, hl: '#ffe7dc' },
   nocturne: { paper: '#0d0c0a', card: 'rgba(0, 0, 0, 0)', top: /color\(srgb|rgba?\(/, hd: /Frank Ruhl Libre/, rashi: /Noto Rashi Hebrew/, hl: 'rgba(241, 215, 154, .1)' },
 };
 for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applies on home, reader, library, settings and siddur – text, font choice and layout intact`, async () => {
@@ -90,7 +90,7 @@ for (const [d, e] of Object.entries(EXPECT)) test(`1.0.113: design "${d}" applie
   assert.equal(await rootVar(p, '--paper'), e.paper);
   assert.equal(await css(p, '.card', 'background-color'), e.card);
   assert.match(await css(p, '.hero .hd', 'font-family'), /^"?Frank Ruhl Libre/, '1.0.118: with "my font" the title follows the user\'s font');
-  if (d === 'modern') { assert.equal(await css(p, '.card:nth-child(2)', 'background-color'), 'rgb(31, 138, 122)'); assert.equal(await css(p, '.cards', 'grid-template-columns').then(v => v.split(' ').length), 2); }
+  if (d === 'modern') { assert.equal(await css(p, '.card:nth-child(2)', 'background-color'), 'rgb(23, 117, 103)'); assert.equal(await css(p, '.cards', 'grid-template-columns').then(v => v.split(' ').length), 2); }
   if (d === 'sefer') assert.match(await css(p, '.hero', 'background-image'), /svg/);
   if (d === 'nocturne') assert.equal(await css(p, '.hero .hd', 'color'), 'rgba(0, 0, 0, 0)'); // gold gradient text
   const sw = await p.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); assert.ok(sw <= 0, `home overflows by ${sw}`);

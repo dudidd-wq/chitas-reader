@@ -16,11 +16,11 @@ export const FAMILIES = [
   { id: 'tolt', he: 'תורה אור ולקוטי תורה', desc: 'לפי פרשות השבוע ושיעורי היום של לוח ״מורה שיעור״', unit: 'tolt' },
   { id: 'hayomyom', he: 'היום יום', desc: 'לוח הרבי – רשומה לכל יום בשנה (לפי לוח תש״ג)', unit: 'hayomyom' },
   { id: 'rav', he: 'שולחן ערוך אדמו״ר הזקן', desc: 'אורח חיים – הסימנים שבלוח ״רב יומי״', unit: 'ravyomi' },
-  { id: 'nach', he: 'נ״ך', desc: 'נביאים וכתובים עם פירוש מצודת דוד (ברות, איכה ואסתר – רש״י), לפי ספרים ופרקים', unit: 'nachyomi', noSearch: true },   // 1.0.98
-  // 1.0.97: the whole Shas – not in the search index (tools/build-search.mjs skips noSearch), loaded per amud / daf / chapter
+  { id: 'nach', he: 'נ״ך', desc: 'נביאים וכתובים עם פירוש מצודת דוד (ברות, איכה ואסתר – רש״י), לפי ספרים ופרקים', unit: 'nachyomi' },   // 1.0.98
+  // 1.0.97: Bavli & Yerushalmi – excluded from default search due to size (~250 MB data), loaded per amud / daf
   { id: 'bavli', he: 'תלמוד בבלי', desc: 'כל הש״ס – גמרא מנוקדת עם ביאור שטיינזלץ, לפי סדרים, מסכתות ועמודים', unit: 'shasBavli', noSearch: true },
   { id: 'yerushalmi', he: 'תלמוד ירושלמי', desc: 'מהדורת וילנא, מנוקד, עם פירוש פני משה – לפי סדרים, מסכתות ודפים', unit: 'shasYer', noSearch: true },
-  { id: 'mishnah', he: 'משנה', desc: 'ששה סדרי משנה עם פירוש ברטנורא – לפי סדרים, מסכתות ופרקים', unit: 'shasMishna', noSearch: true },
+  { id: 'mishnah', he: 'משנה', desc: 'ששה סדרי משנה עם פירוש ברטנורא – לפי סדרים, מסכתות ופרקים', unit: 'shasMishna' },
   { id: 'siddur', he: 'סידור', desc: 'נוסח האריז״ל כמנהג חב״ד – תוכן הסידור והחיפוש בו', href: '#/siddur' },
 ];
 // Mishneh Torah: the 14 books (by position in rambam/index.json, which is in canonical order)

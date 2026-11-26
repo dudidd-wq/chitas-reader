@@ -6,9 +6,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { serve, launch, CHROME } from './helpers.mjs';
 
-const SITE = new URL('../site/', import.meta.url).pathname;
+const SITE = fileURLToPath(new URL('../site/', import.meta.url));
 const FILES = ['torah/Genesis/1.json', 'torah/Genesis/2.json', 'tehillim/1.json', 'tanya/LA/1.json'];
 
 async function scenario({ dropOldManifest }) {

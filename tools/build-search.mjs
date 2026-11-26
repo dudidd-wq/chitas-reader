@@ -4,21 +4,24 @@
 // then `npm run data-version`.   Usage: node tools/build-search.mjs
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-const SITE = new URL('../site/', import.meta.url).pathname, OUT = SITE + 'data/search/';
-globalThis.fetch = async p => { try { const t = fs.readFileSync(SITE + p, 'utf8'); return { ok: true, json: async () => JSON.parse(t) }; } catch { return { ok: false }; } };
-const { family, libDoc, RAMBAM_SEFER, FAMILIES } = await import(SITE + 'js/library.js');
-const { indexText } = await import(SITE + 'js/search.js');
-const { siddurOrder, buildSiddurDoc } = await import(SITE + 'js/texts.js');
-const { BOOK_HE } = await import(SITE + 'js/calendar.js');
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+const SITE = fileURLToPath(new URL('../site/', import.meta.url)), OUT = path.join(SITE, 'data/search/');
+globalThis.fetch = async p => { try { const t = fs.readFileSync(path.join(SITE, p), 'utf8'); return { ok: true, json: async () => JSON.parse(t) }; } catch { return { ok: false }; } };
+const imp = rel => import(pathToFileURL(path.join(SITE, rel)).href);
+const { family, libDoc, RAMBAM_SEFER, FAMILIES } = await imp('js/library.js');
+const { indexText } = await imp('js/search.js');
+const { siddurOrder, buildSiddurDoc } = await imp('js/texts.js');
+const { BOOK_HE } = await imp('js/calendar.js');
 
-export const INPUT_DIRS = ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'hayomyom', 'siddur'];
+export const INPUT_DIRS = ['torah', 'tehillim', 'tanya', 'rambam', 'mitzvot', 'tolt', 'ravyomi', 'hayomyom', 'siddur', 'nach', 'gemara/mishna'];
 /** hash of the text data the index is built from (tests/search.test.mjs checks the index is not stale) */
 export function sourceHash() {
   const h = crypto.createHash('sha256');
-  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) { const p = d + '/' + f.name; if (f.isDirectory()) walk(p); else if (f.name.endsWith('.json')) { h.update(p.slice(SITE.length)); h.update(fs.readFileSync(p)); } } };
-  for (const d of INPUT_DIRS) walk(SITE + 'data/' + d);
-  for (const f of ['rambam-errata.json']) h.update(fs.readFileSync(SITE + 'data/' + f));
-  for (const f of ['library.js', 'search.js', 'texts.js', 'divine.js']) h.update(fs.readFileSync(SITE + 'js/' + f));
+  const walk = d => { for (const f of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (f.name.endsWith('.json')) { h.update(path.relative(SITE, p).replace(/\\/g, '/')); h.update(fs.readFileSync(p)); } } };
+  for (const d of INPUT_DIRS) walk(path.join(SITE, 'data', d));
+  for (const f of ['rambam-errata.json']) h.update(fs.readFileSync(path.join(SITE, 'data', f)));
+  for (const f of ['library.js', 'search.js', 'texts.js', 'divine.js']) h.update(fs.readFileSync(path.join(SITE, 'js', f)));
   return h.digest('hex').slice(0, 16);
 }
 
@@ -56,9 +59,16 @@ async function main() {
   for (const [i, g] of toltBooks.entries()) await add(`tolt-${i + 1}`, 'tolt', `תורה אור ולקוטי תורה – ${g.he}`, g.kids.flatMap(w => w.kids));
   await add('hayomyom', 'hayomyom', 'היום יום', T.hayomyom.leaves);
   await add('rav', 'rav', 'שולחן ערוך אדמו״ר הזקן', T.rav.leaves);
+  // Nach: split into 3 shards (Early Prophets, Later Prophets, Writings) so each shard stays well under 1.5 MB.
+  const nachN = T.nach.root.kids[0].kids, nachK = T.nach.root.kids[1].kids;
+  await add('nach-1', 'nach', 'נ״ך – נביאים ראשונים', nachN.slice(0, 6).flatMap(b => b.kids));
+  await add('nach-2', 'nach', 'נ״ך – נביאים אחרונים', nachN.slice(6).flatMap(b => b.kids));
+  await add('nach-3', 'nach', 'נ״ך – כתובים', nachK.flatMap(b => b.kids));
+  // Mishnah: one shard per Seder (6 shards), loaded on demand.
+  for (const [i, g] of T.mishnah.root.kids.entries()) await add(`mishnah-${i + 1}`, 'mishnah', `משנה – ${g.he}`, g.kids.flatMap(tr => tr.kids));
   await add('siddur', 'siddur', 'סידור', (await siddurOrder()).map(s => ({ siddur: true, book: s.book, n: s.n, label: `${s.bookHe} – ${s.he}` })));
   const meta = { v: 1, source: sourceHash(), bytes: shards.reduce((a, s) => a + s.bytes, 0), segs: shards.reduce((a, s) => a + s.segs, 0), shards };
   fs.writeFileSync(OUT + 'shards.json', JSON.stringify(meta, null, 1) + '\n');
   console.log('total', meta.segs, 'segments,', (meta.bytes / 1048576).toFixed(2), 'MB in', shards.length, 'shards');
 }
-if (import.meta.url === `file://${process.argv[1]}`) await main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

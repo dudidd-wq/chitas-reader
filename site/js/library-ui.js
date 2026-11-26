@@ -6,15 +6,16 @@ import { compileQuery, prepShard, searchShard, hitHref } from './search.js';
 import { gem } from './calendar.js';
 import { data } from './texts.js';
 import { divineName } from './divine.js';
+import { verifyCacheFiles, persistStorage, persistMessage, fmtMb } from './offline.js';
 
 const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg>';
 export const LIB_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h4v16H4zM10 4h4v16h-4zM16.5 4.5l3.6 1-3.9 14.5-3.6-1"/></svg>';
 export { SEARCH_ICON };
 
 const CREDITS = `<section class="lib-credits" aria-labelledby="lib-cr"><h2 id="lib-cr">זכויות ורישיונות</h2>
-  <p>הטקסטים נלקחו דרך <a href="https://www.sefaria.org" target="_blank" rel="noopener">ספריא</a> מגרסאות שהרישיון שלהן מתיר הצגה כאן: חומש ותהילים (״מקרא על פי המסורה״) – CC BY-SA; רש״י, הרמב״ם (תורת אמת) וספר המצוות – נחלת הכלל (כמה פרקי רמב״ם ממהדורות אחרות, CC BY-SA); הסידור – CC0; <b>התניא, תורה אור ולקוטי תורה ושולחן ערוך אדמו״ר הזקן (קה״ת) – CC BY-NC, לשימוש לא מסחרי בלבד</b>; <b>הניקוד של ״חסידות בהירה״ בתורה אור ולקוטי תורה – באישור, לשימוש לא מסחרי בלבד</b>. אינדקס החיפוש נגזר מאותם טקסטים וכפוף לאותם רישיונות. מקור ורישיון מופיעים גם בסוף כל פרק. <a href="#/sources">הפירוט המלא – מקורות ורישיונות</a>.</p></section>`;
+  <p>הטקסטים נלקחו דרך <a href="https://www.sefaria.org" target="_blank" rel="noopener">ספריא</a> מגרסאות שהרישיון שלהן מתיר הצגה כאן: חומש, נ״ך ותהילים (״מקרא על פי המסורה״) – CC BY-SA; רש״י, הרמב״ם (תורת אמת), המשנה, ברטנורא, מצודת דוד וספר המצוות – נחלת הכלל (כמה פרקי רמב״ם ממהדורות אחרות, CC BY-SA); הסידור – CC0; <b>התניא, תורה אור ולקוטי תורה, שולחן ערוך אדמו״ר הזקן וגמרא בבלי עם שטיינזלץ (קה״ת / דייוידסון) – CC BY-NC, לשימוש לא מסחרי בלבד</b>; <b>הניקוד של ״חסידות בהירה״ בתורה אור ולקוטי תורה – באישור, לשימוש לא מסחרי בלבד</b>. אינדקס החיפוש נגזר מאותם טקסטים וכפוף לאותם רישיונות. מקור ורישיון מופיעים גם בסוף כל פרק. <a href="#/sources">הפירוט המלא – מקורות ורישיונות</a>.</p></section>`;
 
-const searchForm = (q = '', id = 'gs-q') => `<form class="sd-search lib-search" role="search" action="#/search" data-gs><label for="${id}">חיפוש בכל הספרים</label>
+const searchForm = (q = '', id = 'gs-q') => `<form class="sd-search lib-search" role="search" action="#/search" data-gs><label for="${id}">חיפוש בספרים (חומש, נ״ך, תהילים, משנה, תניא, רמב״ם, מצוות, תורה אור, היום יום, שו״ע הרב וסידור)</label>
   <div class="lib-sbar"><input type="search" id="${id}" name="q" value="${esc(q)}" placeholder="מילה או צירוף, עם ניקוד או בלעדיו" autocomplete="off" enterkeyhint="search"><button class="btn" type="submit" aria-label="חיפוש">${SEARCH_ICON}<span>חיפוש</span></button></div></form>`;
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]); }
 function bindSearchForm(root) {
@@ -31,6 +32,7 @@ export async function renderLibrary(path, ctx) {
     document.title = 'ספרייה – חת״ת ורמב״ם';
     shell('ספרייה', `<p>כל הספרים שבאתר, לעיון בכל פרק – בלי קשר ללוח השיעורים. הפרק נפתח באותו קורא (גופן, מסך מלא, הקראה, ביאורי מילים, שמירת מקום), ולכל פרק קישור קבוע שעובד גם ללא רשת אחרי שנפתח פעם אחת.</p>
       ${searchForm()}
+      <p class="lib-off-link"><a class="btn" href="#/offline">הורד הכל לשימוש בלי אינטרנט (בחירת ספרים)</a></p>
       <ul class="lib-fams">${FAMILIES.map(f => `<li><a class="lib-card" href="${f.href || '#/lib/' + f.id}"><b>${esc(f.he)}</b><span>${esc(f.desc)}</span></a></li>`).join('')}</ul>
       <p class="note lib-note">עיון בספרייה אינו מסמן את שיעורי היום כנלמדו. פרק שקראת עד סופו בספרייה מסומן ✓ ברשימות הספרייה בלבד.</p>
       ${CREDITS}`);
@@ -53,25 +55,39 @@ export async function renderLibrary(path, ctx) {
   for (const k of node.kids || []) { if (k.group) { flush(); body += `<h2>${esc(k.he)}</h2>${list(k.kids)}`; } else loose.push(k); }
   flush();
   const files = await libFiles(path).catch(() => []);
+  const bigWarn = files.length > 500 ? ` · נפח גדול (${files.length.toLocaleString('he-IL')} קבצים)` : '';
   $('.page').innerHTML = `<nav class="lib-crumbs" aria-label="מיקום בספרייה"><a href="#/lib">ספרייה</a>${crumbs.map(c => ` <i aria-hidden="true">›</i> <a href="#/lib/${c.id}">${esc(c.he)}</a>`).join('')}</nav>
     <h1>${esc(node.he)}</h1>${fam === path ? searchForm() : ''}${body}
-    ${files.length ? `<p class="lib-save"><button class="btn" id="lib-dl">שמירת ״${esc(node.he)}״ לשימוש ללא רשת (${files.length} קבצים)</button></p><p class="note" id="lib-dl-st" role="status" aria-live="polite"></p>` : ''}
+    ${files.length ? `<p class="lib-save"><button class="btn" id="lib-dl">שמירת ״${esc(node.he)}״ לשימוש ללא רשת (${files.length.toLocaleString('he-IL')} קבצים${bigWarn})</button></p><p class="note" id="lib-dl-st" role="status" aria-live="polite"></p>` : ''}
     ${fam === path ? CREDITS : ''}`;
   bindSearchForm($('.page'));
   $('#lib-dl')?.addEventListener('click', async () => {
-    const b = $('#lib-dl'), st = $('#lib-dl-st'); b.disabled = true; let ok = 0, n = 0;
+    const b = $('#lib-dl'), st = $('#lib-dl-st');
     const all = [...new Set([...files, 'sources.json'])];
-    for (let i = 0; i < all.length; i += 6) await Promise.all(all.slice(i, i + 6).map(async f => { if (await fetch('data/' + f).then(x => x.ok).catch(() => false)) ok++; n++; }))
-      .then(() => { b.textContent = `מוריד… ${Math.round(100 * n / all.length)}%`; });
-    b.textContent = ok === all.length ? '✓ נשמר במכשיר' : 'שמירה חלקית – נסו שוב'; b.disabled = ok === all.length;
-    st.textContent = ok === all.length ? `${all.length} קבצים נשמרו במכשיר; הפרקים ייפתחו גם ללא רשת.` : `נשמרו ${ok} מתוך ${all.length} קבצים (בדקו חיבור).`;
+    if (all.length > 500 && !confirm(`הורדת ״${node.he}״ כוללת ${all.length.toLocaleString('he-IL')} קבצים. להמשיך בהורדה למכשיר?`)) return;
+    b.disabled = true;
+    const res = await verifyCacheFiles(all, {
+      onProgress: ({ done: n, total, bytes }) => {
+        if (!b.isConnected) return;
+        b.textContent = `מוריד ומאמת… ${n.toLocaleString('he-IL')}/${total.toLocaleString('he-IL')} (${fmtMb(bytes)})`;
+      },
+    });
+    if (!b.isConnected) return;
+    const persist = await persistStorage();
+    const pmsg = persistMessage(persist);
+    b.textContent = res.failed === 0 ? '✓ נשמר ואומת במכשיר' : 'שמירה חלקית – נסו שוב';
+    b.disabled = res.failed === 0;
+    st.textContent = res.failed === 0
+      ? `${res.verified.toLocaleString('he-IL')} קבצים נשמרו ואומתו במטמון (${fmtMb(res.bytes)} ירדו); הפרקים ייפתחו גם ללא רשת. ${pmsg}`
+      : `שמירה חלקית: אומתו ${res.verified.toLocaleString('he-IL')} מתוך ${res.total.toLocaleString('he-IL')} קבצים (${fmtMb(res.bytes)} ירדו). בדקו חיבור ונסו שוב. ${pmsg}`;
+    st.dataset.persisted = String(persist);
     toast?.(st.textContent);
   });
 }
 const countLeaves = n => n.leaf ? 1 : (n.kids || []).reduce((a, k) => a + countLeaves(k), 0);
 
 // ---------------- search ----------------
-const shardCache = new Map(); // id → Promise<prepared shard>; all of them together are ~12 MB of one-byte strings
+const shardCache = new Map(); // id → Promise<prepared shard>; loaded per book on demand
 let metaP = null;
 const loadMeta = () => (metaP ||= data('search/shards.json').catch(e => { metaP = null; throw e; }));
 function loadShard(id) {
@@ -85,13 +101,16 @@ export const searchStats = { last: null };
 /** #/search?q=… */
 export async function renderSearch(q, scope, ctx) {
   const { shell, $, prefs } = ctx;
-  document.title = 'חיפוש בכל הספרים';
-  shell('חיפוש בכל הספרים', `<form class="sd-search lib-search" role="search" id="gs-form"><label for="gs-q">מילה או צירוף</label>
+  const included = FAMILIES.filter(f => !f.noSearch);
+  const excluded = FAMILIES.filter(f => f.noSearch);
+  document.title = 'חיפוש בספרים';
+  shell('חיפוש בספרים', `<form class="sd-search lib-search" role="search" id="gs-form"><label for="gs-q">מילה או צירוף</label>
     <div class="lib-sbar"><input type="search" id="gs-q" value="${esc(q || '')}" placeholder="למשל: שמע ישראל" autocomplete="off" enterkeyhint="search" aria-describedby="gs-hint"><button class="btn" type="submit" aria-label="חיפוש">${SEARCH_ICON}<span>חיפוש</span></button></div>
-    <label class="lib-scope" for="gs-scope">חיפוש ב:</label> <select id="gs-scope"><option value="">כל הספרים</option>${FAMILIES.filter(f => !f.noSearch).map(f => `<option value="${f.id}"${scope === f.id ? ' selected' : ''}>${esc(f.he)}</option>`).join('')}</select>
-    <p class="note" id="gs-hint">אפשר להקליד עם ניקוד או בלעדיו, בכתיב מלא או חסר; גרש וגרשיים אינם משנים. החיפוש נעשה במכשיר בלבד – דבר אינו נשלח. בפעם הראשונה כל ספר נטען (ונשמר במכשיר) כשמחפשים בו.</p></form>
+    <label class="lib-scope" for="gs-scope">חיפוש ב:</label> <select id="gs-scope"><option value="">כל הספרים שבאינדקס</option>${included.map(f => `<option value="${f.id}"${scope === f.id ? ' selected' : ''}>${esc(f.he)}</option>`).join('')}</select>
+    <p class="note" id="gs-hint">אפשר להקליד עם ניקוד או בלעדיו, בכתיב מלא או חסר; גרש וגרשיים אינם משנים. החיפוש נעשה במכשיר בלבד – דבר אינו נשלח. בפעם הראשונה כל ספר נטען (ונשמר במכשיר) כשמחפשים בו.</p>
+    <p class="note" id="gs-cov"><b>כלול באינדקס:</b> ${included.map(f => esc(f.he)).join(', ')}. <b>אינו כלול בחיפוש:</b> ${excluded.map(f => esc(f.he)).join(', ')} (בשל נפחם הגדול – ניתן לעיין בהם דרך <a href="#/lib">הספרייה</a>).</p></form>
     <p id="gs-st" role="status" aria-live="polite"></p><div id="gs-res"></div>
-    <p class="note"><a href="#/lib">לספרייה</a> · <a href="#/sources">מקורות ורישיונות</a></p>`);
+    <p class="note"><a href="#/lib">לספרייה</a> · <a href="#/offline">הורדה לאופליין</a> · <a href="#/sources">מקורות ורישיונות</a></p>`);
   const inp = $('#gs-q'), sc = $('#gs-scope');
   let t;
   const go = () => {
@@ -149,6 +168,8 @@ function hitHtml(h, prefs) {
   const [path, label] = h.chapter, seg = h.id;
   let where = '';
   if (path.startsWith('torah/')) { const v = +seg.replace(/^r/, '').split(':')[1]; where = `${seg.startsWith('r') ? 'רש״י על ' : ''}פסוק ${gem(v)}`; }
+  else if (path.startsWith('nach/')) { const v = +seg.split(':')[1]; if (v) where = `פסוק ${gem(v)}`; }
+  else if (path.startsWith('mishnah/')) { const n = +seg.split('.')[1]; if (n) where = `משנה ${gem(n)}`; }
   else if (path.startsWith('tehillim/')) where = `פסוק ${gem(+seg.split(':')[1])}`;
   else if (path.startsWith('rambam/')) { const n = +seg.split('.').pop(); if (n) where = `הלכה ${gem(n)}`; }
   const [a, m, b] = h.snip.map(x => divineName(esc(x), prefs.divine));

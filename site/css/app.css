@@ -812,6 +812,19 @@ html[data-bnav] #reader .r-bottom, html[data-bnav] #reader .lnav { padding-botto
 }
 .bnav a:hover { color: var(--accent); }
 .bnav a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+#off-prog { width: 100%; height: 10px; }
+#off-form .check { justify-content: space-between; gap: .6rem; }
+#off-form .check input { order: 2; }
+#off-form .check span { min-width: 0; }
+#st-banner, #rav-warn { margin-bottom: .9rem; }
+#st-banner p { margin: .25rem 0; }
+.lib-off-link { margin: .6rem 0; }
+@media (forced-colors: active) {
+  .btn, .card, .page, .set-card, .lib-card, .lib-grid a, .bnav, .r-chrome, .sheet, .warn, select, input { border: 1px solid ButtonText !important; }
+  .btn.primary, .btn[aria-pressed="true"], .seg-ctl label:has(input:checked), .bnav a[aria-current="page"] { forced-color-adjust: none; background: Highlight !important; color: HighlightText !important; border-color: Highlight !important; }
+  :focus-visible { outline: 3px solid Highlight !important; outline-offset: 2px; }
+  .r-content .speaking, .r-content .seg.seek-hit, .gs-hits p mark { outline: 2px solid Highlight; }
+}
 
 /* ===================================================================================================================
    1.0.113: designs (prefs.design) – "ספר קודש" (sefer), "מודרני וצבעוני" (modern), "לילי" (nocturne).
@@ -842,9 +855,9 @@ html[data-bnav] #reader .r-bottom, html[data-bnav] #reader .lnav { padding-botto
 [data-design-prev="sefer"] .dz-row { border-bottom: 1px solid rgba(176, 138, 62, .55); }
 [data-design-prev="sefer"] .dz-row i { border: 1.5px solid #8a2a12; background: #f7ecd0; } [data-design-prev="sefer"] .dz-row b { background: #c9ad72; } [data-design-prev="sefer"] .dz-row em { background: #4a2a17; border-radius: 2px; box-shadow: inset 0 0 0 1px #e3c27a; }
 [data-design-prev="modern"] .dz { background: #f4efe6; grid-template-columns: 1fr 1fr; grid-template-rows: 12px auto 1fr; column-gap: 4px; padding-inline: 5px; }
-[data-design-prev="modern"] .dz-bar { grid-column: 1 / -1; background: #e2552d; margin-inline: -5px; border-radius: 0 0 8px 8px; }
+[data-design-prev="modern"] .dz-bar { grid-column: 1 / -1; background: #c7411b; margin-inline: -5px; border-radius: 0 0 8px 8px; }
 [data-design-prev="modern"] .dz-hd { grid-column: 1 / -1; font-weight: 900; color: #17130f; text-align: start; padding-inline: 2px; }
-[data-design-prev="modern"] .dz-row { margin: 0; height: auto; border-radius: 8px; background: #1f8a7a; padding: 4px; align-items: flex-end; } [data-design-prev="modern"] .dz-row + .dz-row { background: #f0b429; }
+[data-design-prev="modern"] .dz-row { margin: 0; height: auto; border-radius: 8px; background: #177567; padding: 4px; align-items: flex-end; } [data-design-prev="modern"] .dz-row + .dz-row { background: #f0b429; }
 [data-design-prev="modern"] .dz-row i { display: none; } [data-design-prev="modern"] .dz-row b { background: rgba(255, 255, 255, .55); } [data-design-prev="modern"] .dz-row em { background: #fff; }
 [data-design-prev="nocturne"] .dz { background: radial-gradient(90% 60% at 50% 0%, #2a2116, #0d0c0a 75%); border-color: #3a3022; } [data-design-prev="nocturne"] .dz-bar { border-bottom: 1px solid rgba(201, 164, 92, .3); }
 [data-design-prev="nocturne"] .dz-hd { font-weight: 300; color: #e6c88a; }
@@ -959,14 +972,14 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 
 /* ================================== מודרני וצבעוני (modern) ================================== */
 :root[data-design="modern"] {
-  --paper: #f4efe6; --paper2: #e3dbcd; --ink: #17130f; --muted: #5a5048; --accent: #e2552d; --accent-ink: #fff;
-  --rule: #ddd3c3; --card: #fffaf2; --hl: #ffe7dc; --gloss: #1f8a7a; --shadow: none; --texture: 0;
+  --paper: #f4efe6; --paper2: #e3dbcd; --ink: #17130f; --muted: #5a5048; --accent: #b53816; --accent-ink: #fff;
+  --rule: #ddd3c3; --card: #fffaf2; --hl: #ffe7dc; --gloss: #177567; --shadow: none; --texture: 0;
   --ui: 'Assistant', system-ui, -apple-system, 'Segoe UI', sans-serif; --display-font: 'Frank Ruhl Libre', serif;
-  --c0: #e2552d; --c1: #1f8a7a; --c2: #f0b429; --c3: #d6457f; --c4: #2f5bd3; --c5: #6b3fa0;
+  --c0: #c7411b; --c1: #177567; --c2: #f0b429; --c3: #b82d66; --c4: #2f5bd3; --c5: #6b3fa0;
   --solid: #17130f; --solid-ink: #f4efe6; --rashi-bg: #e5f3f0; --rashi-ink: #173f39; --biur-bg: #fdf1d6;
 }
 :root[data-design="modern"]:is([data-theme="dark"], [data-theme="night"]) {
-  --paper: #17130f; --paper2: #2a241e; --ink: #f4efe6; --muted: #bdb2a3; --accent-ink: #fff; --rule: #3a332c; --card: #221c16;
+  --paper: #17130f; --paper2: #2a241e; --ink: #f4efe6; --muted: #bdb2a3; --accent: #ff8a65; --accent-ink: #17130f; --rule: #3a332c; --card: #221c16;
   --hl: rgba(226, 85, 45, .3); --gloss: #5fd0bd; color-scheme: dark; --err: #ff9a8f;
   --solid: #2e2720; --solid-ink: #f4efe6; --rashi-bg: #15322d; --rashi-ink: #cdeee7; --biur-bg: #2d2615;
 }
@@ -1004,8 +1017,8 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .glyph { font-family: var(--display-font); font-weight: 900; font-size: 150px; line-height: 1; color: var(--ci); opacity: .22; visibility: visible !important; }
 [data-design="modern"] .body { position: relative; z-index: 1; gap: .15rem; }
 [data-design="modern"] .ttl { font-weight: 800; font-size: 1.25rem; line-height: 1.1; color: inherit; letter-spacing: 0; padding-inline-end: 2rem; }
-[data-design="modern"] .card .what { font-family: var(--ui); font-weight: 600; font-size: .92rem; line-height: 1.25; color: inherit; opacity: .95; }
-[data-design="modern"] .card .meta { color: inherit; opacity: .9; font-size: .8rem; font-weight: 700; }
+[data-design="modern"] .card .what { font-family: var(--ui); font-weight: 600; font-size: .92rem; line-height: 1.25; color: inherit; }
+[data-design="modern"] .card .meta { color: inherit; font-size: .8rem; font-weight: 700; }
 [data-design="modern"] .card .go { position: relative; z-index: 1; margin-top: auto; align-self: flex-start; justify-self: auto; font-weight: 800; font-size: .9rem; background: rgba(255, 255, 255, .95); color: #17130f; }
 [data-design="modern"] .card:nth-child(6n+3) .go { background: #17130f; color: #fff; }
 [data-design="modern"] .card.done .go, [data-design="modern"] .card:nth-child(6n+3).done .go { background: transparent; color: inherit; border: 0; box-shadow: inset 0 0 0 2px currentColor; }
@@ -1037,7 +1050,7 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .r-top { background: var(--c0); color: #fff; border: 0; border-radius: 0 0 22px 22px; backdrop-filter: none; }
 [data-design="modern"] .r-top .btn { color: #fff; background: rgba(255, 255, 255, .16); border: 0; border-radius: 12px; box-shadow: none; }
 [data-design="modern"] .r-top .btn:hover { background: rgba(255, 255, 255, .28); }
-[data-design="modern"] .r-title b { font-family: var(--ui); font-weight: 800; color: #fff; } [data-design="modern"] .r-title small { color: rgba(255, 255, 255, .85); }
+[data-design="modern"] .r-title b { font-family: var(--ui); font-weight: 800; color: #fff; } [data-design="modern"] .r-title small { color: #fff; }
 [data-design="modern"] .r-bottom { background: #17130f; color: #fff; border: 0; border-radius: 14px 14px 0 0; backdrop-filter: none; overflow: hidden; }
 [data-design="modern"] .r-bottom .btn { color: #fff; background: transparent; border-color: transparent; box-shadow: none; }
 [data-design="modern"] .r-fab {
@@ -1094,7 +1107,8 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
   --go-bg: linear-gradient(180deg, #f4dca0, #c49a4e);
 }
 :root[data-design="nocturne"][data-theme="night"] { --paper: #000; --paper2: #0a0806; --card: #0a0806; --page-bg: #000; --texture: .5; }
-html[data-design="nocturne"] body, html[data-design="nocturne"] #reader { background: var(--page-bg) fixed; }
+html[data-design="nocturne"] { background: var(--paper); }
+html[data-design="nocturne"] body, html[data-design="nocturne"] #reader { background: var(--paper) var(--page-bg) fixed; }
 [data-design="nocturne"] body::before, [data-design="nocturne"] #reader::before { background-image: var(--grain); }
 [data-design="nocturne"] .hero { padding-top: 1.8rem; }
 [data-design="nocturne"] .hero::before { content: ''; position: absolute; top: .9rem; inset-inline-start: 1.2rem; width: 32px; height: 32px; border-radius: 50%; box-shadow: inset -8px 3px 0 0 var(--gold2); opacity: .85; transform: rotate(-20deg); pointer-events: none; }
@@ -1133,10 +1147,10 @@ html[data-design="nocturne"] body, html[data-design="nocturne"] #reader { backgr
 [data-design="nocturne"] :is(.tf-list a, .tf-always a) { border-radius: 999px; border: 1px solid rgba(201, 164, 92, .35); background: transparent; color: var(--ink); font-weight: 400; }
 [data-design="nocturne"] .tf-list li:first-child a { background: var(--gold); color: #1a140b; border-color: var(--gold); }
 [data-design="nocturne"] .zm-teaser .go { background: var(--go-bg); color: #1a140b; }
-[data-design="nocturne"] .home-foot .links a, [data-design="nocturne"] .lib-card, [data-design="nocturne"] .lib-grid a { background: rgba(201, 164, 92, .04); border-color: var(--line); }
+[data-design="nocturne"] .home-foot .links a, [data-design="nocturne"] .lib-card, [data-design="nocturne"] .lib-grid a { background: var(--card); border-color: var(--line); }
 [data-design="nocturne"] .home-foot .links a svg { color: var(--gold); }
 [data-design="nocturne"] .lib-card b { color: var(--gold2); font-weight: 500; }
-[data-design="nocturne"] :is(.page, .set-card) { background: rgba(201, 164, 92, .035); border-color: var(--line); border-radius: 18px; }
+[data-design="nocturne"] :is(.page, .set-card) { background: var(--card); border-color: var(--line); border-radius: 18px; }
 [data-design="nocturne"] .settings-page { background: none; }
 [data-design="nocturne"] .page h1 { font-family: var(--display-font); font-weight: 300; font-size: 1.9rem; color: var(--gold2); }
 [data-design="nocturne"] .set-card > h2 { font-family: var(--display-font); font-weight: 400; color: var(--gold2); }

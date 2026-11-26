@@ -3,13 +3,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import AxeBuilder from '@axe-core/playwright';
 import { serve, launch, pageWith, CHROME } from './helpers.mjs';
 import { DEFAULT_PREFS } from '../site/js/store.js';
 import { HDate } from '../site/js/vendor/hebcal.js';
 
 const skip = !CHROME && 'no Chrome';
-const site = new URL('../site/', import.meta.url).pathname;
+const site = fileURLToPath(new URL('../site/', import.meta.url));
 const json = p => JSON.parse(fs.readFileSync(site + 'data/' + p, 'utf8'));
 const S = json('ravyomi/schedule.json');
 const sim = n => json(`ravyomi/s/${n}.json`);
@@ -59,7 +60,7 @@ test('Rav Yomi: vocalized Kehot text, licence, only allowed markup, nothing else
     all++; if (/[\u05B0-\u05BC]/.test(p)) voc++;
   }
   assert.ok(voc / all > 0.99, `${voc}/${all} vocalized`); // the rest are short printer's remarks in brackets
-  for (const f of fs.readdirSync(site, { recursive: true })) if (String(f) !== 'fonts/SBL_Font_End_User_License_Agreement.pdf') assert.doesNotMatch(String(f), /\.pdf$|rav-?yomi-luach/i);
+  for (const f of fs.readdirSync(site, { recursive: true })) if (String(f).replace(/\\/g, '/') !== 'fonts/SBL_Font_End_User_License_Agreement.pdf') assert.doesNotMatch(String(f), /\.pdf$|rav-?yomi-luach/i);
 });
 
 test('Rav Yomi: opt-in, reader, honest notes, outside the luach year, About', { skip }, async () => {
@@ -90,6 +91,13 @@ test('Rav Yomi: opt-in, reader, honest notes, outside the luach year, About', { 
     }
     await p.goto(srv.url + '#/about'); await p.waitForSelector('#ravyomi-about');
     assert.match(await p.textContent('#ravyomi-about'), /רב יומי.*מנוקדת.*BY-NC.*355.*ח–י.*רסו.*שהיה והטמנה.*דבר מלכות/s);
+    // 30-day advance expiry warning on Home and in the Reader (S.last = 2027-01-02 -> warn from 2026-12-03)
+    await p.goto(srv.url + '#/d/2026-11-02'); await p.waitForSelector('.card');
+    assert.equal(await p.isVisible('#rav-warn'), false, 'no expiry warning >30 days out');
+    await p.goto(srv.url + '#/d/2026-12-15'); await p.waitForSelector('#rav-warn:not([hidden])');
+    assert.match(await p.textContent('#rav-warn'), /02\/01\/2027/);
+    await p.goto(srv.url + '#/r/ravyomi/2026-12-15'); await p.waitForSelector('#rc .day-note');
+    assert.match(await p.textContent('#rc'), /התרעה.*02\/01\/2027.*chabad\.info/s);
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });

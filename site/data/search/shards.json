@@ -1,8 +1,8 @@
 {
  "v": 1,
- "source": "580a551549f64388",
- "bytes": 13122642,
- "segs": 47666,
+ "source": "fe2b7a948bcedc61",
+ "bytes": 15632210,
+ "segs": 69216,
  "shards": [
   {
    "id": "torah-Genesis",
@@ -213,6 +213,69 @@
    "he": "שולחן ערוך אדמו״ר הזקן",
    "bytes": 585433,
    "segs": 2362
+  },
+  {
+   "id": "nach-1",
+   "fam": "nach",
+   "he": "נ״ך – נביאים ראשונים",
+   "bytes": 421325,
+   "segs": 4316
+  },
+  {
+   "id": "nach-2",
+   "fam": "nach",
+   "he": "נ״ך – נביאים אחרונים",
+   "bytes": 439502,
+   "segs": 4978
+  },
+  {
+   "id": "nach-3",
+   "fam": "nach",
+   "he": "נ״ך – כתובים",
+   "bytes": 569436,
+   "segs": 8064
+  },
+  {
+   "id": "mishnah-1",
+   "fam": "mishnah",
+   "he": "משנה – סדר זרעים",
+   "bytes": 135161,
+   "segs": 655
+  },
+  {
+   "id": "mishnah-2",
+   "fam": "mishnah",
+   "he": "משנה – סדר מועד",
+   "bytes": 161766,
+   "segs": 681
+  },
+  {
+   "id": "mishnah-3",
+   "fam": "mishnah",
+   "he": "משנה – סדר נשים",
+   "bytes": 159867,
+   "segs": 578
+  },
+  {
+   "id": "mishnah-4",
+   "fam": "mishnah",
+   "he": "משנה – סדר נזיקין",
+   "bytes": 198620,
+   "segs": 685
+  },
+  {
+   "id": "mishnah-5",
+   "fam": "mishnah",
+   "he": "משנה – סדר קדשים",
+   "bytes": 180383,
+   "segs": 590
+  },
+  {
+   "id": "mishnah-6",
+   "fam": "mishnah",
+   "he": "משנה – סדר טהרות",
+   "bytes": 243508,
+   "segs": 1003
   },
   {
    "id": "siddur",
