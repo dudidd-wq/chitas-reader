@@ -11,6 +11,7 @@ import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline 
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { divineNamesForParts } from './divine-tts.js';
+import { buildSaidReport, renderSaidHtml, downloadSaidTsv, resolveSaidEngine } from './tts-said.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
 import { VOICE_FILES } from './voice-files.js';
@@ -825,7 +826,8 @@ function ttsForm() {
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}
   <label class="field"><span>טיימר שינה</span><select name="ttsSleep">${TTS_SLEEP.map(m => `<option value="${m}" ${prefs.ttsSleep === m ? 'selected' : ''}>${m ? m + ' דקות' : 'כבוי'}</option>`).join('')}</select></label>
-  <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>`;
+  <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>
+  ${R.doc && !$('#reader')?.hidden ? '<button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><div id="said-view" hidden></div>' : ''}`;
 }
 function bindForm(root, onChange) {
   root.addEventListener('input', e => {
@@ -1486,6 +1488,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   const holdSleep = auto ? (R.pendingSleepUntil || R.sleepUntil) : null;
   R.pendingSleepUntil = null;
   if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
+  R.heardSi = null; R.saidComplete = false;
   if (holdSleep) { clearSleepTimer(false); R.sleepUntil = holdSleep; }
   else clearSleepTimer(true);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
@@ -2185,6 +2188,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').onclick = closeSheet;
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
+  $('#sh-said')?.addEventListener('click', ev => { ev.preventDefault(); showSaidView(); });
   bindForm(sh.querySelector('form'), async name => {
     // 1.0.90: the Kaddish choice changes only what is read: a running read-aloud restarts from the current paragraph
     if (name === 'siddurKaddish' && R.sid && R.speaker) { const was = R.speaker.state === 'playing'; R.speaker.stop(true); R.speaker = null; if (was) ttsToggle(); }
@@ -2305,6 +2309,38 @@ async function ttsEngine() {
   toast(prefs.ttsGender === 'natural' ? `הקול הגברי הטבעי עדיין לא הורד – ${tail}. להורדה: הגדרות הקראה ← קול איכותי.` : `הקול האיכותי אינו מותקן במכשיר – ${tail}. להורדה: הגדרות הקראה ← קול איכותי.`);
   return 'web';
 }
+function saidLoadOpts() {
+  const engine = resolveSaidEngine({
+    hasSpeaker: !!R.speaker,
+    speakerIsPiper: R.speaker instanceof PiperSpeaker,
+    preferPiper: prefs.ttsEngine === 'piper' && !R.piperBroken && piperSupported(),
+  });
+  return { engine, stress: prefs.ttsStress, skipCites: prefs.ttsSkipCites, divineName: prefs.ttsDivineOral, unit: R.unit };
+}
+function showSaidView() {
+  const box = $('#said-view'); if (!box) return;
+  if (!R.doc || !R.segs?.length) { box.hidden = false; box.innerHTML = '<p class="hint">פתחו שיעור כדי לראות מה יוקרא.</p>'; return; }
+  const heardSi = R.heardSi instanceof Set ? R.heardSi : new Set();
+  const report = buildSaidReport({
+    segments: ttsSegments(),
+    opts: saidLoadOpts(),
+    playback: {
+      started: !!(R.speaker || heardSi.size || R.saidComplete),
+      playing: R.speaker?.state === 'playing',
+      complete: !!R.saidComplete,
+      currentSi: R.speaker?.queue?.[R.speaker.i]?.si,
+      heardSi,
+    },
+    learned: !!getProgress(...pk())?.done,
+  });
+  box.innerHTML = renderSaidHtml(report);
+  box.hidden = false;
+  $('#sh-said-export')?.addEventListener('click', ev => {
+    ev.preventDefault();
+    const name = `said-${String(R.unit || 'lesson').replace(/[^\w.-]+/g, '_')}-${String(R.iso || R.sid || 'local').replace(/[^\w.-]+/g, '_')}.tsv`;
+    downloadSaidTsv(report, name);
+  });
+}
 async function ttsToggle() {
   if (R.speaker) { R.speaker.toggle(); return; }
   const unit = R.unit, iso = R.iso, doc = R.doc;
@@ -2322,6 +2358,7 @@ async function ttsToggle() {
   R.speaker = new (eng === 'piper' ? PiperSpeaker : Speaker)({
     onSegment: (i, frac = 0) => {
       const el = R.segs[i]; if (!el) return;
+      (R.heardSi ||= new Set()).add(i);
       if (!el.classList.contains('speaking')) { R.segs.forEach(s => s.classList.remove('speaking')); el.classList.add('speaking'); }
       followSpeech(el, frac);
       saveSay();
@@ -2347,6 +2384,7 @@ async function ttsToggle() {
     // Only a run that really reached the end with every chunk spoken marks the lesson as read / moves on.
     onEnd: ({ complete }) => {
       if (!complete) { clearSleepTimer(true); toast(TTS_ERR.silent); return; }
+      R.saidComplete = true;
       if (prefs.ttsContinuous && nextUnitId()) nextUnit(true);
       else { clearSleepTimer(true); setProgress(...pk(), { done: true, frac: 1 }); }
     },
@@ -2383,6 +2421,8 @@ async function ttsToggle() {
     if (pos && pos === cur?.dataset.id) qi = p.say;
   }
   R.speaker.onSleepStop = () => toast('ההקראה נעצרה לפי טיימר השינה');
+  R.heardSi = new Set();
+  R.saidComplete = false;
   R.speaker.startAt(curI, qi);
 }
 
@@ -2399,6 +2439,7 @@ function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
   if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
   clearSleepTimer(true);
+  R.heardSi = null; R.saidComplete = false;
   R.ttsShown = false; clearTimeout(R.hideT);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
