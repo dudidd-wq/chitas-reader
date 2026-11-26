@@ -6,7 +6,7 @@ import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED
 import { ravWarnFrom, ravWarnBlock } from './rav-warn.js';
 import { divineName, unAbbr } from './divine.js';
 import { suggest, insertionLines, noTachanunAt, siddurDay, shabbatOrYomTov } from './tefila.js';
-import { prefs, setPref, TTS_RATES, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent, getStorageStatus, PROGRESS_CAP } from './store.js';
+import { prefs, setPref, TTS_RATES, TTS_SLEEP, snapRate, getProgress, setProgress, clearProgress, exportBackup, importBackup, resetAll, DEFAULT_PREFS, isDivergent, getStorageStatus, PROGRESS_CAP } from './store.js';
 import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline } from './offline.js';
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
@@ -823,7 +823,9 @@ function ttsForm() {
   <small>בדף היומי, בעמוד היומי ובירושלמי. כשהאפשרות מסומנת מוקרא רק הביאור (שטיינזלץ או פני משה), והגמרא הארמית מדולגת – גם אם סומנה האפשרות להקריא את הגמרא המנוקדת. קטע בלי ביאור מדולג בלי הפסקה. ברירת המחדל אינה מסומנת, וההקראה נשארת כמו שהיא היום.</small>
   ${check('ttsSkipCites', prefs.ttsSkipCites, 'דלג על מראי מקום בסוגריים ברש״י וברמב״ם, כגון ״(שמות כ׳)״')}
   ${check('ttsContinuous', prefs.ttsContinuous, 'המשך אוטומטי לשיעור הבא')}
-  ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}`;
+  ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה (ניסיוני)')}
+  <label class="field"><span>טיימר שינה</span><select name="ttsSleep">${TTS_SLEEP.map(m => `<option value="${m}" ${prefs.ttsSleep === m ? 'selected' : ''}>${m ? m + ' דקות' : 'כבוי'}</option>`).join('')}</select></label>
+  <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>`;
 }
 function bindForm(root, onChange) {
   root.addEventListener('input', e => {
@@ -834,6 +836,11 @@ function bindForm(root, onChange) {
     setPref(el.name, v);
     if (el.name === 'ttsGemaraBiurOnly' && v === true) { setPref('ttsVocalizedGemara', false); const m = root.querySelector('input[name=ttsVocalizedGemara]'); if (m) m.checked = false; }
     if (el.name === 'ttsVocalizedGemara' && v === true) { setPref('ttsGemaraBiurOnly', false); const m = root.querySelector('input[name=ttsGemaraBiurOnly]'); if (m) m.checked = false; }
+    if (el.name === 'ttsSleep') {
+      R.sleepUntil = null;
+      if (!v && R.speaker) R.speaker.stopAfterCurrent = false;
+      armSleepTimer();
+    }
     if (el.name === 'font' && v === 'frank') setPref('taamim', false);
     // 1.0.114: under a design, picking a font in the list means "my font" – otherwise the choice would not be seen
     if (el.name === 'font' && prefs.design !== 'classic' && prefs.designFont !== 'mine') { setPref('designFont', 'mine'); const m = root.querySelector('input[name=designFont][value=mine]'); if (m) m.checked = true; }
@@ -1475,7 +1482,12 @@ async function openReader(unit, iso, sid = null, lib = null) {
   currentDate = iso;
   const lpath = lib?.path || null, seek = lib?.seek || null;
   const auto = R.autoplay; R.autoplay = false;
-  if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
+  // keep the wall-clock sleep deadline across ttsContinuous auto-advance
+  const holdSleep = auto ? (R.pendingSleepUntil || R.sleepUntil) : null;
+  R.pendingSleepUntil = null;
+  if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
+  if (holdSleep) { clearSleepTimer(false); R.sleepUntil = holdSleep; }
+  else clearSleepTimer(true);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   R.doc = null; R.segs = []; R.ttsShown = false; R.personal = !!lib?.personal;
   const plan = dayPlan(iso, { il: prefs.il });
@@ -1831,6 +1843,7 @@ function sidStep(dir) {
 }
 function nextUnitId() { if (R.lib) return R.libInfo?.next ? 'lib' : null; if (R.sid) return nextSid() ? 'siddur' : null; const us = unitsFor(); const i = us.indexOf(R.unit); return i >= 0 && i < us.length - 1 ? us[i + 1] : null; }
 function nextUnit(autoplay) {
+  if (autoplay && R.sleepUntil) R.pendingSleepUntil = R.sleepUntil;
   setProgress(...pk(), { done: true, frac: 1 });
   // the end of a seder is the end of its last section
   if (R.sid && R.doc?.siddur) setProgress('siddur', `${R.sid.split('/')[0]}/${R.doc.siddur.secs.length}`, { done: true, frac: 1 });
@@ -2179,7 +2192,7 @@ function openSheet(kind, note = '') {
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'shortBiur', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold', 'design', 'designFont'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
-    else if (name.startsWith('tts') && R.speaker && name !== 'ttsRate' && name !== 'ttsPitch') { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
+    else if (name.startsWith('tts') && R.speaker && !['ttsRate', 'ttsPitch', 'ttsSleep'].includes(name)) { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
   });
 }
@@ -2249,6 +2262,38 @@ const TTS_ERR = {
 };
 // The player is one compact row that replaces the pager (the pager buttons give way on narrow screens; the read-aloud
 // follows the pages by itself). The text area is re-laid out for the bar's real height (ResizeObserver in bindReaderUi).
+// 1.0.229: sleep timer (wall-clock) and exact TTS resume (queue index `say` in progress).
+function clearSleepTimer(resetDeadline = true) {
+  clearTimeout(R.sleepT); R.sleepT = null;
+  if (resetDeadline) R.sleepUntil = null;
+}
+function fireSleep() {
+  R.sleepT = null; R.sleepUntil = null;
+  if (!R.speaker) return;
+  if (R.speaker.state === 'playing') {
+    R.speaker.stopAfterCurrent = true;
+    toast('טיימר השינה: ההקראה תיעצר בסוף הקטע');
+  } else {
+    R.speaker.stop();
+    toast('ההקראה נעצרה לפי טיימר השינה');
+  }
+}
+function armSleepTimer() {
+  clearTimeout(R.sleepT); R.sleepT = null;
+  const m = prefs.ttsSleep || 0;
+  if (!m || !R.speaker || R.speaker.state === 'stopped') { if (!m) R.sleepUntil = null; return; }
+  if (!R.sleepUntil) R.sleepUntil = Date.now() + m * 60000;
+  const ms = R.sleepUntil - Date.now();
+  if (ms <= 0) { fireSleep(); return; }
+  R.sleepT = setTimeout(fireSleep, ms);
+}
+function saveSay() {
+  if (!R.speaker || !R.doc) return;
+  const i = R.speaker.i, q = R.speaker.queue[i], a = anchor() || {};
+  if (q && R.segs[q.si]) a.pos = R.segs[q.si].dataset.id;
+  setProgress(...pk(), { sec: a.sec ?? null, ...a, say: i });
+}
+
 function showTtsBar(on) { $('#ttsctl').hidden = !on; $('#rb').classList.toggle('tts-on', on); if (on) R.setChrome?.(true); else R.armAutoHide?.(); }
 // Which engine reads: the local voice when chosen, supported and installed – otherwise Web Speech (fallback).
 async function ttsEngine() {
@@ -2279,6 +2324,7 @@ async function ttsToggle() {
       const el = R.segs[i]; if (!el) return;
       if (!el.classList.contains('speaking')) { R.segs.forEach(s => s.classList.remove('speaking')); el.classList.add('speaking'); }
       followSpeech(el, frac);
+      saveSay();
     },
     onState: st => {
       showTtsBar(st !== 'stopped' || R.ttsShown);
@@ -2287,14 +2333,25 @@ async function ttsToggle() {
       if (was !== (st !== 'stopped') && $('#reader').classList.contains('immersive')) { const a = anchor(); layout(); restore(a); }
       $('#t-play').innerHTML = st === 'playing' ? ICON.pause : ICON.play;
       $('#t-play').setAttribute('aria-label', st === 'playing' ? 'השהה' : 'הפעל');
-      if (st === 'stopped') R.segs.forEach(s => s.classList.remove('speaking'));
+      if (st === 'playing') armSleepTimer();
+      else if (st === 'paused') saveSay();
+      else if (st === 'stopped') {
+        saveSay();
+        // finish() emits 'stopped' before onEnd. Keep the wall-clock deadline
+        // so ttsContinuous auto-advance can resume it in openReader();
+        // explicit stops (closeReader, end of last lesson, errors) still clear it.
+        clearSleepTimer(false);
+        R.segs.forEach(s => s.classList.remove('speaking'));
+      }
     },
     // Only a run that really reached the end with every chunk spoken marks the lesson as read / moves on.
     onEnd: ({ complete }) => {
-      if (!complete) { toast(TTS_ERR.silent); return; }
-      if (prefs.ttsContinuous && nextUnitId()) nextUnit(true); else setProgress(...pk(), { done: true, frac: 1 });
+      if (!complete) { clearSleepTimer(true); toast(TTS_ERR.silent); return; }
+      if (prefs.ttsContinuous && nextUnitId()) nextUnit(true);
+      else { clearSleepTimer(true); setProgress(...pk(), { done: true, frac: 1 }); }
     },
     onError: code => {
+      clearSleepTimer(true);
       R.speaker = null; R.ttsShown = false; showTtsBar(false);
       // the local voice failed (not installed, out of memory, unsupported WASM…): fall back to the browser's voice
       if (String(code).startsWith('piper')) {
@@ -2317,7 +2374,16 @@ async function ttsToggle() {
   }
   const cur = currentSeg();
   R.ttsShown = true; showTtsBar(true);
-  R.speaker.startAt(Math.max(0, R.segs.indexOf(cur)));
+  const p = getProgress(...pk());
+  const curI = Math.max(0, R.segs.indexOf(cur));
+  let qi;
+  if (!p?.done && Number.isInteger(p?.say) && p.say >= 0 && p.say < R.speaker.queue.length) {
+    const si = R.speaker.queue[p.say].si;
+    const pos = R.segs[si]?.dataset.id;
+    if (pos && pos === cur?.dataset.id) qi = p.say;
+  }
+  R.speaker.onSleepStop = () => toast('ההקראה נעצרה לפי טיימר השינה');
+  R.speaker.startAt(curI, qi);
 }
 
 // ---------------- Wake lock ----------------
@@ -2331,7 +2397,8 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 
 function closeReader() {
   const el = $('#reader'); if (el.hidden) return;
-  if (R.speaker) { R.speaker.stop(true); R.speaker = null; }
+  if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
+  clearSleepTimer(true);
   R.ttsShown = false; clearTimeout(R.hideT);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';

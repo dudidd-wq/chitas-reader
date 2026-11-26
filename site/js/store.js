@@ -9,7 +9,7 @@ export const DEFAULT_PREFS = {
   theme: 'paper', design: 'classic', designFont: 'design', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, rashiFont: 'rashi', hayomNiqqud: true, biurNiqqud: true, mitzvotNiqqud: true, lessonNach: false, lessonShnayim: false, shnayimSplit: 'day', gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false, lessonDaf: false, lessonAmud: false, lessonYer: false, lessonMishna: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivineScripture: 'hashem', ttsDivineOral: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsGemaraBiurOnly: false, ttsSkipCites: true, ttsContinuous: true,
-  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, wakeLock: true, spread: true, locationChosen: false,
+  ttsLockscreen: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, ttsSleep: 0, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
   siddurKaddish: 'read', // 1.0.90: 'read' | 'skip' (Kaddish in the siddur read-aloud)
@@ -23,6 +23,9 @@ export const DEFAULT_PREFS = {
 // One speed scale for the footer menu and the settings slider.
 export const TTS_RATES = [0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
 export const snapRate = r => TTS_RATES.reduce((a, b) => (Math.abs(b - r) < Math.abs(a - r) ? b : a), 1);
+// 1.0.229: sleep timer in minutes; 0 = off. The deadline is wall-clock (also while paused).
+export const TTS_SLEEP = [0, 15, 30, 45, 60];
+export const snapSleep = m => (TTS_SLEEP.includes(m) ? m : 0);
 
 const NULLABLE_OBJ_PREFS = new Set(['zmanGeo', 'kivunGeo', 'kivunManual']);
 const isPlainObj = x => !!x && typeof x === 'object' && !Array.isArray(x);
@@ -65,6 +68,7 @@ export function normalizePrefs(raw) {
   prefs.lineHeight = Number.isFinite(prefs.lineHeight) ? Math.min(2.6, Math.max(1.2, Math.round(prefs.lineHeight * 10) / 10)) : DEFAULT_PREFS.lineHeight;
   prefs.candleMins = Number.isFinite(prefs.candleMins) && prefs.candleMins >= 0 && prefs.candleMins <= 120 ? prefs.candleMins : 0;
   prefs.ttsRate = snapRate(Number(prefs.ttsRate) || 1);
+  prefs.ttsSleep = snapSleep(Number(prefs.ttsSleep) || 0);
   if ('hideNoTachanun' in src) { if (src.hideNoTachanun === true && !src.tachanunMode) prefs.tachanunMode = 'date'; }
   for (const k of ['tachanunMode', 'shabbatMode']) if (!['off', 'date', 'always'].includes(prefs[k])) prefs[k] = 'off';
   if (!['read', 'skip'].includes(prefs.siddurKaddish)) prefs.siddurKaddish = 'read';
@@ -93,6 +97,8 @@ function cleanProgressEntry(v) {
   if (Number.isFinite(v.sub)) out.sub = v.sub;
   if (Number.isFinite(v.sec) || v.sec === null) out.sec = v.sec;
   if (Number.isFinite(v.frac)) out.frac = Math.max(0, Math.min(1, v.frac));
+  // 1.0.229: queue index of the last spoken TTS chunk (exact resume). Ignored if out of range at play time.
+  if (Number.isInteger(v.say) && v.say >= 0 && v.say < 100000) out.say = v.say;
   return out;
 }
 

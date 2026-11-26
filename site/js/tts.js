@@ -59,8 +59,8 @@ export function waitForVoices(ms = 1500) {
 export class Speaker {
   /** onEnd({complete}) is called only when the queue ran to its end; complete=true only if every chunk was really spoken.
    *  onError(code) is called when speech fails – playback stops, nothing is marked as read. */
-  constructor({ onSegment, onState, onEnd, onError }) {
-    this.onSegment = onSegment; this.onState = onState; this.onEnd = onEnd; this.onError = onError;
+  constructor({ onSegment, onState, onEnd, onError, onSleepStop }) {
+    this.onSegment = onSegment; this.onState = onState; this.onEnd = onEnd; this.onError = onError; this.onSleepStop = onSleepStop;
     this.queue = []; this.i = 0; this.state = 'stopped'; this.opts = {};
     this.keepAlive = null; this.failed = 0;
   }
@@ -82,7 +82,11 @@ export class Speaker {
     });
     this.segCount = segments.length; this.bad = 0;
   }
-  startAt(segIndex = 0) { const k = this.queue.findIndex(q => q.si >= segIndex); this.i = k < 0 ? 0 : k; this.play(); }
+  startAt(segIndex = 0, queueIndex) {
+    if (Number.isInteger(queueIndex) && queueIndex >= 0 && queueIndex < this.queue.length) this.i = queueIndex;
+    else { const k = this.queue.findIndex(q => q.si >= segIndex); this.i = k < 0 ? 0 : k; }
+    this.play();
+  }
   play() {
     if (!ttsSupported() || !this.queue.length) return false;
     if (!hebrewVoices().length) { this.fail('no-voice'); return false; }
@@ -98,6 +102,7 @@ export class Speaker {
   }
   speakCurrent() {
     if (this.state !== 'playing') return;
+    this.chunkStarted = 0;
     if (this.i >= this.queue.length) { this.finish(); return; }
     const q = this.queue[this.i];
     const u = new SpeechSynthesisUtterance(q.text);
@@ -109,16 +114,13 @@ export class Speaker {
     if (clampPitch(this.opts.pitch)) u.pitch = webPitch(this.opts.pitch);   // 1.0.92: only when the reader moved the slider
     const token = this.token = Symbol();
     let started = 0;
-    u.onstart = () => { if (this.token !== token) return; started = performance.now(); this.onSegment?.(q.si, q.frac); };
+    u.onstart = () => { if (this.token !== token) return; started = this.chunkStarted = performance.now(); this.onSegment?.(q.si, q.frac); };
     u.onend = () => {
       if (this.token !== token || this.state !== 'playing') return;
       const min = q.text.length * (globalThis.__ttsMinMsPerChar ?? MIN_MS_PER_CHAR) / (u.rate || 1);
       if (!started || performance.now() - started < min) { this.bad++; if (++this.failed >= 2) return this.fail('silent'); }
       else this.failed = 0;
-      this.i++;
-      const gap = (q.gap || 0) * (globalThis.__ttsPauseScale ?? 1) / (u.rate || 1);
-      if (gap > 0) this.gapTimer = setTimeout(() => this.speakCurrent(), gap * 1000);
-      else this.speakCurrent();
+      this.advanceFromChunk(q);
     };
     u.onerror = e => {
       if (this.token !== token) return;
@@ -131,22 +133,48 @@ export class Speaker {
   pause() {
     // cancel + resume-from-chunk is more reliable across browsers than synth.pause()
     if (this.state !== 'playing') return;
-    this.state = 'paused'; this.token = null; this.clearGap(); synth.cancel(); this.onState?.('paused');
+    this.state = 'paused'; this.token = null; this.clearGap(); this.chunkStarted = 0; synth.cancel(); this.onState?.('paused');
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     this.keepAlive?.pause();
   }
   toggle() { return this.state === 'playing' ? (this.pause(), true) : this.play(); }
   stop(silent) {
     this.token = null; this.state = 'stopped'; this.clearGap();
+    this.stopAfterCurrent = false; this.chunkStarted = 0;
     if (ttsSupported()) synth.cancel();
     this.mediaSession(false);
     if (!silent) this.onState?.('stopped');
   }
+  // 1.0.229: after ~2s in the current chunk, "previous segment" restarts that segment (quick replay).
+  shouldRestartCurrent(delta) {
+    return !!(delta === -1 && this.state === 'playing' && this.chunkStarted && (performance.now() - this.chunkStarted > 2000));
+  }
+  interruptPlayback() {
+    this.token = null; this.clearGap(); this.chunkStarted = 0;
+    if (ttsSupported()) synth.cancel();
+  }
+  // Stop after the chunk that is already playing; do not mark the lesson complete (sleep timer).
+  advanceFromChunk(q) {
+    if (this.stopAfterCurrent) { this.stopAfterCurrent = false; this.stop(); this.onSleepStop?.(); return; }
+    this.i++;
+    const gap = (q?.gap || 0) * (globalThis.__ttsPauseScale ?? 1) / (this.opts.rate || 1);
+    if (gap > 0) this.gapTimer = setTimeout(() => this.speakCurrent(), gap * 1000);
+    else this.speakCurrent();
+  }
+  replay() {
+    const cur = this.queue[this.i]; if (!cur) return;
+    const k = this.queue.findIndex(q => q.si === cur.si);
+    this.i = k < 0 ? this.i : k;
+    if (this.state === 'playing') { this.interruptPlayback(); this.speakCurrent(); }
+    else if (this.state === 'paused') this.play();
+    else this.onSegment?.(this.queue[this.i]?.si, this.queue[this.i]?.frac);
+  }
   skip(delta) {
+    if (this.shouldRestartCurrent(delta)) { this.replay(); return; }
     const cur = this.queue[this.i]?.si ?? 0;
     const target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
     const k = this.queueIndexFor(target, delta);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.token = null; this.clearGap(); synth.cancel(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.interruptPlayback(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
   }
   /** First chunk of segment `target`; a segment with nothing to say (e.g. a skipped Kaddish, 1.0.90) gives the nearest
    *  spoken one in the direction of the skip. -1 if there is none. */

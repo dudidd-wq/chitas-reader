@@ -135,6 +135,7 @@ export class PiperSpeaker extends Speaker {
   }
   async speakCurrent() {
     if (this.state !== 'playing' || !worker) return;
+    this.chunkStarted = 0;
     if (this.i >= this.queue.length) { this.finish(); return; }
     const i = this.i, q = this.queue[i], token = this.token = Symbol();
     this.onSegment?.(q.si, q.frac);
@@ -143,26 +144,29 @@ export class PiperSpeaker extends Speaker {
     for (const k of [1, 2]) this.fetchChunk(i + k);   // synthesise ahead while this chunk plays
     for (const k of this.audio.keys()) if (parseInt(k) < i - 1) this.audio.delete(k);
     if (this.token !== token || this.state !== 'playing') return;
-    if (!m.audio.length) { this.i++; this.speakCurrent(); return; }   // nothing to say (e.g. punctuation only)
+    if (!m.audio.length) { this.i++; this.speakCurrent(); return; }   // nothing to say (e.g. punctuation only) – not a sleep-timer stop
     // 1.0.96: q.gap – seconds of silence after the chunk (the Gemara's pause at a comma / period), appended to the buffer
     const pad = Math.round((q.gap || 0) * m.sampleRate / (this.opts.rate || 1));
     const ac = this.ctx(), buf = ac.createBuffer(1, m.audio.length + pad, m.sampleRate);
     buf.copyToChannel ? buf.copyToChannel(m.audio, 0) : buf.getChannelData(0).set(m.audio);
     const src = this.src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
-    src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.i++; this.speakCurrent(); };
+    src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.advanceFromChunk(null); };
     src.start();
+    this.chunkStarted = performance.now();
     // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
     if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', havara: this.opts.havara || 'israeli', pitch: this.opts.pitch || 0, f0: f0Stats(m.audio, m.sampleRate).mean });
   }
   cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; }
   pause() {
     if (this.state !== 'playing') return;
-    this.state = 'paused'; this.cut(); this.onState?.('paused');
+    this.state = 'paused'; this.cut(); this.chunkStarted = 0; this.onState?.('paused');
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     this.keepAlive?.pause();
   }
-  stop(silent) { this.cut(); this.state = 'stopped'; this.mediaSession(false); if (!silent) this.onState?.('stopped'); }
+  stop(silent) { this.cut(); this.state = 'stopped'; this.stopAfterCurrent = false; this.chunkStarted = 0; this.mediaSession(false); if (!silent) this.onState?.('stopped'); }
+  interruptPlayback() { this.cut(); this.chunkStarted = 0; }
   skip(delta) {
+    if (this.shouldRestartCurrent(delta)) { this.replay(); return; }
     const cur = this.queue[this.i]?.si ?? 0, target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
     const k = this.queueIndexFor(target, delta);
     if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
