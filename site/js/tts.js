@@ -191,7 +191,8 @@ export class Speaker {
   finish() { this.state = 'stopped'; this.onState?.('stopped'); this.mediaSession(false); this.onEnd?.({ complete: this.bad === 0 }); }
   mediaSession(on) {
     if (!on) { this.keepAlive?.pause(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; return; }
-    if (this.opts.lockscreen) {
+    // When Piper is already playing real speech through <audio>, a second silent element fights iOS for the session.
+    if (this.opts.lockscreen && !this.usesForegroundAudio?.()) {
       if (!this.keepAlive) { this.keepAlive = new Audio(silentWavUrl()); this.keepAlive.loop = true; this.keepAlive.volume = 0.01; }
       this.keepAlive.play().catch(() => {});
     }

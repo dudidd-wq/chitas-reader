@@ -89,7 +89,44 @@ function synth(text, accents, rate, timbre, havara) {
   return new Promise((res, rej) => { pending.set(id, { res, rej }); worker.postMessage({ type: 'synth', id, text, accents, rate, timbre, havara }); });
 }
 
+
 export { timbreFor };
+
+/** 16-bit mono WAV blob from float32 PCM in [-1, 1]. Used by the iOS <audio> playback path. */
+export function floatToWavBlob(samples, sampleRate) {
+  const n = samples.length, bytes = n * 2, buf = new ArrayBuffer(44 + bytes), d = new DataView(buf);
+  const w = (o, s) => { for (let i = 0; i < s.length; i++) d.setUint8(o + i, s.charCodeAt(i)); };
+  w(0, 'RIFF'); d.setUint32(4, 36 + bytes, true); w(8, 'WAVE'); w(12, 'fmt ');
+  d.setUint32(16, 16, true);
+  d.setUint16(20, 1, true);
+  d.setUint16(22, 1, true);
+  d.setUint32(24, sampleRate, true);
+  d.setUint32(28, sampleRate * 2, true);
+  d.setUint16(32, 2, true);
+  d.setUint16(34, 16, true);
+  w(36, 'data'); d.setUint32(40, bytes, true);
+  for (let i = 0; i < n; i++) {
+    let x = samples[i];
+    if (x > 1) x = 1; else if (x < -1) x = -1;
+    d.setInt16(44 + i * 2, x < 0 ? Math.round(x * 0x8000) : Math.round(x * 0x7fff), true);
+  }
+  return new Blob([buf], { type: 'audio/wav' });
+}
+
+export function isLikelyIOS(ua = globalThis.navigator?.userAgent || '', platform = globalThis.navigator?.platform || '', maxTouch = globalThis.navigator?.maxTouchPoints || 0) {
+  if (/iP(hone|ad|od)/i.test(ua)) return true;
+  if (/Macintosh/i.test(ua) && maxTouch > 1) return true;
+  if (platform === 'MacIntel' && maxTouch > 1) return true;
+  return false;
+}
+
+/** <audio> path: forced by the __piperUseAudioEl test hook, or when lockscreen is on and the UA looks like iOS. */
+export function shouldUseAudioElement(opts = {}, hook = globalThis.__piperUseAudioEl, ios = isLikelyIOS()) {
+  if (hook === true) return true;
+  if (hook === false) return false;
+  return !!(opts.lockscreen && ios);
+}
+
 
 export class PiperSpeaker extends Speaker {
   /** opts.variant: 'full' | 'int8'; opts.voiceGender: 'male' (default – the noa model with the male timbre of
@@ -119,9 +156,10 @@ export class PiperSpeaker extends Speaker {
     if (PiperSpeaker.ac.state === 'suspended') PiperSpeaker.ac.resume().catch(() => {});
     return PiperSpeaker.ac;
   }
+  usesForegroundAudio() { return shouldUseAudioElement(this.opts); }
   play() {
     if (!this.queue.length) return false;
-    this.ctx();                                 // created/resumed inside the user's click
+    if (!this.usesForegroundAudio()) this.ctx(); // created/resumed inside the user's click; skipped for the iOS <audio> path
     this.state = 'playing'; this.onState?.('playing');
     this.mediaSession(true);
     getWorker(modelFor(this.opts.voiceGender, this.opts.variant)).then(() => this.speakCurrent(), e => this.fail('piper-' + (e.code || 'load-failed')));
@@ -147,16 +185,50 @@ export class PiperSpeaker extends Speaker {
     if (!m.audio.length) { this.i++; this.speakCurrent(); return; }   // nothing to say (e.g. punctuation only) – not a sleep-timer stop
     // 1.0.96: q.gap – seconds of silence after the chunk (the Gemara's pause at a comma / period), appended to the buffer
     const pad = Math.round((q.gap || 0) * m.sampleRate / (this.opts.rate || 1));
+    this.playPcm(m, pad, token);
+    this.chunkStarted = performance.now();
+    // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
+    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', havara: this.opts.havara || 'israeli', pitch: this.opts.pitch || 0, f0: f0Stats(m.audio, m.sampleRate).mean });
+  }
+  playPcm(m, pad, token) {
+    if (this.usesForegroundAudio()) {
+      const samples = pad ? new Float32Array(m.audio.length + pad) : m.audio;
+      if (pad) samples.set(m.audio, 0);
+      const blob = floatToWavBlob(samples, m.sampleRate);
+      if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+      this.audioUrl = URL.createObjectURL(blob);
+      const el = this.ensureAudioEl();
+      el.onended = null;
+      el.src = this.audioUrl;
+      el.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.advanceFromChunk(null); };
+      const p = el.play();
+      if (p && p.catch) p.catch(() => { if (this.token === token && this.state === 'playing') this.fail('piper-play-failed'); });
+      return;
+    }
     const ac = this.ctx(), buf = ac.createBuffer(1, m.audio.length + pad, m.sampleRate);
     buf.copyToChannel ? buf.copyToChannel(m.audio, 0) : buf.getChannelData(0).set(m.audio);
     const src = this.src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
     src.onended = () => { if (this.token !== token || this.state !== 'playing') return; this.advanceFromChunk(null); };
     src.start();
-    this.chunkStarted = performance.now();
-    // test hook only (the tests define __piperLog): what was played, incl. the timbre and its measured mean F0
-    if (globalThis.__piperLog) globalThis.__piperLog.push({ text: q.text, ipa: m.ipa, ms: m.ms, sec: m.audio.length / m.sampleRate, gender: ['female', 'deep', 'natural'].includes(this.opts.voiceGender) ? this.opts.voiceGender : 'male', havara: this.opts.havara || 'israeli', pitch: this.opts.pitch || 0, f0: f0Stats(m.audio, m.sampleRate).mean });
   }
-  cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; }
+  ensureAudioEl() {
+    if (!this.el) {
+      this.el = new Audio();
+      this.el.preload = 'auto';
+      try { this.el.setAttribute('playsinline', ''); } catch { /* not in DOM */ }
+      this.el.playsInline = true;
+    }
+    return this.el;
+  }
+  releaseAudio() {
+    if (this.el) {
+      this.el.onended = null;
+      try { this.el.pause(); this.el.removeAttribute('src'); this.el.load(); } catch { /* already released */ }
+    }
+    if (this.audioUrl) { URL.revokeObjectURL(this.audioUrl); this.audioUrl = null; }
+  }
+  cut() { this.token = null; try { this.src?.stop(); } catch { /* not started */ } this.src = null; this.releaseAudio(); }
+  finish() { this.releaseAudio(); super.finish(); }
   pause() {
     if (this.state !== 'playing') return;
     this.state = 'paused'; this.cut(); this.chunkStarted = 0; this.onState?.('paused');
