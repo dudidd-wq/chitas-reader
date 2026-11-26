@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { estimateF0, f0Stats, psola, resample, maleTimbre, TIMBRES } from '../site/js/voice-pitch.js';
 import { timbreFor } from '../site/js/piper.js';
 
-const SR = 22050;
+const SR = 22050, TWO_PI = 2 * Math.PI;
 // harmonic "vowel": F0 glide f0a→f0b, harmonics weighted by formant resonances (Hz)
 function vowel(f0a, f0b, sec = 1, formants = [[700, 90], [1200, 110], [2600, 160]]) {
   const N = Math.round(SR * sec), x = new Float32Array(N); let ph = 0;
@@ -44,8 +44,11 @@ test('PSOLA: −6 semitones lowers F0 by 2^(−1/2), keeps the length, the forma
   const a = f0Stats(x, SR).mean, b = f0Stats(y, SR).mean;
   assert.ok(Math.abs(b / a - r) < 0.02, `${a} → ${b} (ratio ${b / a})`);
   // first formant region (resonance at 700 Hz) stays where it was – unlike plain resampling, which moves it to ~495 Hz
-  assert.ok(Math.abs(peakHz(y, 450, 1000) - 700) <= 80, 'F1 kept: ' + peakHz(y, 450, 1000));
-  const pr = peakHz(resample(x, r), 350, 650); assert.ok(Math.abs(pr - 700 * r) <= 90, 'resampling moves F1: ' + pr);
+  // (A3: band energies instead of a single-bin peak – the peak sits on whichever harmonic happens to land near the resonance)
+  const bandE = (z, lo, hi) => { const n = 4096, o = Math.floor((z.length - n) / 2); let e = 0; for (let f = lo; f <= hi; f += 5) { let re = 0, im = 0; for (let i = 0; i < n; i++) { const w = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / n), a = 2 * Math.PI * f * i / SR; re += w * z[o + i] * Math.cos(a); im += w * z[o + i] * Math.sin(a); } e += re * re + im * im; } return e; };
+  const lowRatio = z => bandE(z, 300, 550) / bandE(z, 550, 850);   // F1 (700 Hz) stays above 550 Hz → small; moved to ~495 Hz → large
+  assert.ok(lowRatio(y) < 0.25, 'F1 kept: ' + lowRatio(y));
+  assert.ok(lowRatio(resample(x, r)) > 0.35, 'resampling moves F1: ' + lowRatio(resample(x, r)));
   const m = maleTimbre(x, SR, { semitones: -6 }); assert.ok(Math.abs(rms(m) / rms(x) - 1) < 0.02, 'RMS level kept');
   // time stretch option: 1.5× longer, same pitch
   const z = psola(x, SR, 1, { time: 1.5 }); assert.equal(z.length, Math.round(x.length * 1.5)); assert.ok(Math.abs(f0Stats(z, SR).mean - a) < 4);
@@ -93,4 +96,57 @@ test('PSOLA preserves unvoiced consonant/noise samples exactly at unchanged temp
 test('male register deepens formants without lowering pitch further', () => {
   assert.equal(TIMBRES.male.semitones, -6);
   assert.equal(TIMBRES.male.formant, 0.88);
+});
+
+// A3 (1.0.226 candidate): TD-PSOLA distortion fixes.
+// peak/valley ratio of the short-time RMS envelope (3 ms windows) inside a long steady vowel
+function envRatio(y) {
+  const w = Math.round(SR * 0.003), seg = y.subarray(Math.floor(y.length * 0.25), Math.floor(y.length * 0.75)), e = [];
+  for (let i = 0; i + w <= seg.length; i += w >> 1) e.push(rms(seg.subarray(i, i + w)));
+  e.sort((p, q) => p - q); const lo = e[Math.floor(e.length * 0.1)], hi = e[Math.floor(e.length * 0.9)];
+  return hi / lo;
+}
+const centroid = (x, lo = 500, hi = 10000) => {
+  const n = 2048; let num = 0, den = 0;
+  for (let o = 0; o + n <= x.length; o += 4096) for (let f = lo; f <= hi; f += 100) {
+    let re = 0, im = 0; for (let i = 0; i < n; i++) { const w = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / n), a = 2 * Math.PI * f * i / SR; re += w * x[o + i] * Math.cos(a); im += w * x[o + i] * Math.sin(a); }
+    const m = re * re + im * im; num += f * m; den += m;
+  }
+  return num / den;
+};
+function noise(sec, seed = 5) {   // sibilant-like: dense random-phase partials 5–8 kHz (band-limited, so a spectral shift moves the centroid cleanly)
+  const N = Math.round(SR * sec), x = new Float32Array(N), ph = [], fr = [];
+  for (let f = 5000; f <= 8000; f += 37) { seed = (1664525 * seed + 1013904223) >>> 0; ph.push(seed / 2 ** 32 * TWO_PI); fr.push(f); }
+  for (let k = 0; k < fr.length; k++) for (let i = 0; i < N; i++) x[i] += 0.004 * Math.sin(TWO_PI * fr[k] * i / SR + ph[k]);
+  return x;
+}
+
+test('A3: PSOLA at male ratio keeps a steady vowel\'s level envelope near-flat (no wsum<1 amplitude modulation)', () => {
+  const x = vowel(200, 200, 1.5), y = psola(x, SR, 2 ** (-6 / 12));
+  const rx = envRatio(x), ry = envRatio(y);
+  // a 3 ms window follows the glottal pulses themselves, so the original's own ratio is the floor; old code measured 5.15 vs the source's 2.44
+  assert.ok(ry < rx * 1.35 + 0.3, `envelope peak/valley ${rx.toFixed(2)} → ${ry.toFixed(2)}`);
+  assert.ok(Math.abs(f0Stats(y, SR).mean / 200 - 2 ** -0.5) < 0.02);
+});
+
+test('A3: formant 0.88 keeps unvoiced noise spectrum (centroid) close to the source; global resampling would not', () => {
+  const n = noise(1);
+  const v = vowel(190, 190, 0.5), xx = new Float32Array(v.length + n.length); xx.set(v); xx.set(n, v.length);
+  const y = maleTimbre(xx, SR, { semitones: -6, formant: 0.88 });
+  const c0 = centroid(n), cNew = centroid(y.subarray(Math.round((v.length + 4000) / 0.88), Math.round((xx.length - 4000) / 0.88)));
+  const cOld = centroid(resample(n, 0.88));
+  assert.ok(Math.abs(cNew / c0 - 1) < 0.04, `new ${cNew.toFixed(0)} vs source ${c0.toFixed(0)}`);
+  assert.ok(Math.abs(cOld / c0 - 1) > 0.08, `global resample would give ${cOld.toFixed(0)}`);
+});
+
+test('A3: male timbre on vowel+noise: length ÷ formant, RMS kept, F0 −6 st in the voiced part, no boundary click', () => {
+  const v = vowel(190, 190, 0.6), n = noise(0.4), x = new Float32Array(v.length + n.length); x.set(v); x.set(n, v.length);
+  const y = maleTimbre(x, SR, TIMBRES.male);
+  assert.ok(Math.abs(y.length - x.length / 0.88) < 3);
+  assert.ok(Math.abs(rms(y) / rms(x) - 1) < 0.02);
+  const f = f0Stats(y.subarray(0, Math.round(v.length / 0.88) - 2000), SR).mean;
+  assert.ok(Math.abs(f / (190 * 2 ** -0.5) - 1) < 0.03, String(f));
+  let mx = 0; for (let i = 1; i < y.length; i++) mx = Math.max(mx, Math.abs(y[i] - y[i - 1]));
+  let mxx = 0; for (let i = 1; i < x.length; i++) mxx = Math.max(mxx, Math.abs(x[i] - x[i - 1]));
+  assert.ok(mx < mxx * 2.5 + 0.05, `max step ${mx} vs ${mxx}`);
 });

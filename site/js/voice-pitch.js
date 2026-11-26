@@ -111,7 +111,9 @@ export function psola(x, sr, ratio, { time = 1, track } = {}) {
     const k = Math.floor(f), u = f - k;
     const voiced = (f0[k] > 0 ? 1 - u : 0) + (f0[Math.min(f0.length - 1, k + 1)] > 0 ? u : 0);
     const mix = voiced * Math.min(1, wsum[i] / 0.1);
-    y[i] = mix * (wsum[i] > 1 ? y[i] / wsum[i] : y[i]) + (1 - mix) * original;
+    // A3: normalise wherever grains cover the sample (wsum > 0.1). With ratio < 1 the grains are spaced wider than
+    // their length/2, so wsum dips below 1 between pitch peaks; skipping normalisation there amplitude-modulated the vowels.
+    y[i] = mix * (wsum[i] > 0.1 ? y[i] / wsum[i] : y[i]) + (1 - mix) * original;
   }
   return y;
 }
@@ -144,9 +146,50 @@ export function maleTimbre(x, sr, { semitones = -6, formant = 1 } = {}) {
   let a = formant < 1 ? resample(x, formant) : x;           // pitch and formants × formant, duration ÷ formant
   const r = total / (formant < 1 ? formant : 1);             // remaining pitch change, done with formant-preserving PSOLA
   a = Math.abs(r - 1) > 1e-3 ? psola(a, sr, r) : a;
+  if (formant < 1) a = keepUnvoiced(x, a, sr, formant);
   const g0 = rms(x), g1 = rms(a);
   if (g1 > 0) { const g = g0 / g1; let pk = 0; for (const v of a) pk = Math.max(pk, Math.abs(v)); const gg = Math.min(g, 0.97 / (pk || 1)); for (let i = 0; i < a.length; i++) a[i] *= gg; }
   return a;
+}
+
+/** A3: lengthen x by 1/step without shifting its spectrum (plain 50 %-overlap Hann OLA; for noise the grain phase does not matter). */
+function stretchOla(x, outLen, step, sr) {
+  const N = Math.max(16, Math.round(sr * 0.02)), H = N >> 1, y = new Float32Array(outLen), ws = new Float32Array(outLen);
+  for (let m = 0; m * H < outLen + N; m++) {
+    const src = Math.round(m * H * step);
+    for (let k = 0; k < N; k++) {
+      const si = src + k - H, oi = m * H + k - H;
+      if (si < 0 || si >= x.length || oi < 0 || oi >= outLen) continue;
+      const w = 0.5 - 0.5 * Math.cos(TAU * (k + 0.5) / N);
+      y[oi] += w * x[si]; ws[oi] += w;
+    }
+  }
+  for (let i = 0; i < outLen; i++) y[i] = ws[i] > 0.05 ? y[i] / ws[i] : x[Math.min(x.length - 1, Math.round(i * step))];
+  return y;
+}
+
+/** A3: unvoiced stretches (fricatives, bursts, silence) are taken from the original (time-stretched, not resampled), so ש/ס/צ keep
+ *  their high-frequency energy; only voiced stretches keep the formant-shifted signal. 12 ms crossfade at the boundaries. */
+function keepUnvoiced(x, a, sr, formant) {
+  const { f0, hop, offset } = estimateF0(x, sr), n = a.length;
+  if (!f0.length) return a;
+  let any = false; for (const v of f0) if (v <= 0) { any = true; break; }
+  if (!any) return a;
+  const v = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const f = Math.max(0, Math.min(f0.length - 1, (i * formant - offset) / hop)), k = Math.floor(f), u = f - k;
+    v[i] = (f0[k] > 0 ? 1 - u : 0) + (f0[Math.min(f0.length - 1, k + 1)] > 0 ? u : 0);
+  }
+  // box smoothing of the voicing mask (12 ms) = the crossfade
+  const W = Math.max(1, Math.round(sr * 0.012)), cs = new Float64Array(n + 1);
+  for (let i = 0; i < n; i++) cs[i + 1] = cs[i] + v[i];
+  const noise = stretchOla(x, n, formant, sr);
+  const out = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const lo = Math.max(0, i - (W >> 1)), hi = Math.min(n, i + (W >> 1) + 1), m = (cs[hi] - cs[lo]) / (hi - lo);
+    out[i] = m * a[i] + (1 - m) * noise[i];
+  }
+  return out;
 }
 
 /** The two voices offered in the settings. 'male' = the noa model shifted down (no extra download). */
