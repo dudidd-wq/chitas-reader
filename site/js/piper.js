@@ -7,6 +7,7 @@ import { pauseChunks } from './tts-prep.js';
 import { prepareSpeechForTTS } from './divine-tts.js';
 import { VOICE_FILES } from './voice-files.js';
 import { timbreFor, f0Stats } from './voice-pitch.js';
+import { markVoiceInstalled, markVoiceRemovedByUser } from './voice-ux.js';
 
 export const VOICE_CACHE = 'voice-v1';
 const COMMON = ['ort', 'wasm', 'stress'];
@@ -62,8 +63,9 @@ export async function installVoice(variant, onProgress = () => {}, signal) {
   const want = new Set(Object.values(VOICE_FILES).map(f => abs(f.url)));
   for (const req of await c.keys()) if (!want.has(req.url)) await c.delete(req);
   try { await navigator.storage?.persist?.(); } catch { /* optional */ }
+  markVoiceInstalled(variant);
 }
-export async function removeVoice() { worker?.terminate(); worker = null; workerVariant = null; await caches.delete(VOICE_CACHE); }
+export async function removeVoice() { worker?.terminate(); worker = null; workerVariant = null; await caches.delete(VOICE_CACHE); markVoiceRemovedByUser(); }
 
 // ---------------- worker (one per page, kept between lessons: loading the model takes a few seconds) ----------------
 let worker = null, workerVariant = null, ready = null, seq = 0;

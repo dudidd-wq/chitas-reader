@@ -15,6 +15,7 @@ import { buildSaidReport, renderSaidHtml, downloadSaidTsv, resolveSaidEngine, sp
 import { addWrongReport, loadWrongReports, removeWrongReport, clearWrongReports, renderWrongHtml, downloadWrongJson, importWrongJson } from './tts-wrong.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
+import { storageEstimate, storagePersisted, spaceWarning, spaceWarningText, voiceEvicted, persistStatusText, EVICTED_TEXT, DELETE_CONFIRM } from './voice-ux.js';
 import { VOICE_FILES } from './voice-files.js';
 import { applyGlosses, loadGlossary } from './gloss.js';
 import { pageGeometry } from './layout.js';
@@ -729,6 +730,7 @@ function qvForm() {
     <p class="row" id="qv-havara-prev"><span>שמע דוגמה:</span> ${HAVARA_CHOICES.map(([v, l]) => `<button type="button" class="btn ghost qv-prev" data-v="havara-${v}" aria-label="שמע דוגמה – הגייה ${l}">▶ ${l.replace(' (ברירת מחדל)', '')}</button>`).join(' ')}</p>
     <div id="qv-model"${prefs.ttsGender === 'natural' ? ' hidden' : ''}>${radio('ttsModel', prefs.ttsModel, [['full', `רגיל (${mb(voiceBytes('full'))} MB)`], ['int8', `קל, למכשירים חלשים (${mb(voiceBytes('int8'))} MB, איכות מעט נמוכה)`]])}</div>
     <p id="qv-st" role="status" aria-live="polite">בודק…</p>
+    <p id="qv-note" class="hint" hidden></p>
     <progress id="qv-prog" max="1" value="0" hidden></progress>
     <p class="row"><button type="button" class="btn" id="qv-dl" hidden>קול איכותי – הורדה</button> <button type="button" class="btn ghost" id="qv-del" hidden>מחיקת הקול מהמכשיר</button></p>
     <details class="set-more"><summary>פרטים על הקול המקומי</summary>
@@ -753,13 +755,25 @@ async function playSample(url) {
 async function bindQv(root) {
   const st = root.querySelector('#qv-st'); if (!st) return;
   const dl = root.querySelector('#qv-dl'), del = root.querySelector('#qv-del'), prog = root.querySelector('#qv-prog');
+  const note = root.querySelector('#qv-note');
   const refresh = async () => {
     const s = await voiceStatus(), v = modelFor(prefs.ttsGender, prefs.ttsModel), have = s[v], miss = have ? 0 : await voiceMissingBytes(v);
     if (!st.isConnected) return;
     dl.hidden = have; del.hidden = !(s.full || s.int8 || s.natural);
     dl.textContent = v === 'natural' ? `קול גברי טבעי – הורדה חד-פעמית (${mb(miss)} MB)` : `קול איכותי – הורדה חד-פעמית (${mb(voiceBytes(v))} MB)`;
-    st.textContent = have ? `${voiceName(v)} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
+    const evicted = voiceEvicted(s);
+    st.textContent = evicted ? EVICTED_TEXT
+      : have ? `${voiceName(v)} מותקן במכשיר.${prefs.ttsEngine === 'piper' ? ' ההקראה משתמשת בו.' : ' לבחירה: ״קול איכותי״ למעלה.'}`
       : `${voiceName(v)} אינו מותקן. ההורדה מתבצעת רק בלחיצה על הכפתור.`;
+    const extras = [];
+    const installed = ['full', 'int8', 'natural'].filter(k => s[k]).map(voiceName);
+    if (installed.length > 1) extras.push('מותקנים גם: ' + installed.join(', ') + '.');
+    if (have || evicted) {
+      const persisted = await storagePersisted();
+      const ptxt = persistStatusText(persisted);
+      if (ptxt) extras.push(ptxt);
+    }
+    if (note) { note.textContent = extras.join(' '); note.hidden = !extras.length; }
   };
   root.querySelectorAll('.qv-prev').forEach(b => { b.onclick = () => playSample(`voice-samples/${b.dataset.v}.mp3`); });
   const pin = root.querySelector('#qv-pitch-in'), pout = root.querySelector('#o-pitch'), preset = root.querySelector('#qv-pitch-reset');
@@ -785,7 +799,11 @@ async function bindQv(root) {
     }
   });
   dl.onclick = async () => {
-    const v = modelFor(prefs.ttsGender, prefs.ttsModel); dl.disabled = true; prog.hidden = false; prog.value = 0;
+    const v = modelFor(prefs.ttsGender, prefs.ttsModel);
+    const need = await voiceMissingBytes(v);
+    const warn = spaceWarning({ need, estimate: await storageEstimate(), int8Need: voiceBytes('int8'), alreadyInt8: v === 'int8' });
+    if (warn && !confirm(spaceWarningText(warn, { int8Mb: mb(voiceBytes('int8')) }))) return;
+    dl.disabled = true; prog.hidden = false; prog.value = 0;
     try {
       await installVoice(v, (d, t) => { prog.value = d / t; st.textContent = `מוריד… ${mb(d)} מתוך ${mb(t)} MB`; });
       setPref('ttsEngine', 'piper'); root.querySelectorAll('input[name=ttsEngine]').forEach(r => { r.checked = r.value === 'piper'; });
@@ -796,6 +814,7 @@ async function bindQv(root) {
     finally { dl.disabled = false; prog.hidden = true; }
   };
   del.onclick = async () => {
+    if (!confirm(DELETE_CONFIRM)) return;
     if (R.speaker instanceof PiperSpeaker) { R.speaker.stop(); R.speaker = null; }
     await removeVoice(); setPref('ttsEngine', 'web'); root.querySelectorAll('input[name=ttsEngine]').forEach(r => { r.checked = r.value === 'web'; });
     await refresh(); toast('הקול האיכותי נמחק מהמכשיר');
