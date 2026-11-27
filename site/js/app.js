@@ -11,7 +11,8 @@ import { persistStorage, persistMessage, verifyCacheFiles, fmtMb, renderOffline 
 import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetworkVoice } from './tts.js';
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { divineNamesForParts } from './divine-tts.js';
-import { buildSaidReport, renderSaidHtml, downloadSaidTsv, resolveSaidEngine, speechForSegment } from './tts-said.js';
+import { resolveSaidEngine, speechForSegment } from './tts-said.js';
+import { shouldFollow, nextPauseUntil } from './tts-live-hl.js';
 import { addWrongReport, loadWrongReports, removeWrongReport, clearWrongReports, renderWrongHtml, downloadWrongJson, importWrongJson } from './tts-wrong.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
@@ -841,10 +842,10 @@ async function bindQv(root) {
 }
 function lessonReaderOpen() { return !!(R.doc && !$('#reader')?.hidden); }
 function saidWrongHint() {
-  return '<p class="hint" id="said-wrong-hint">בזמן הקראה של שיעור, הכפתורים «הצג מה שהוקרא» ו«לא נשמע נכון» מופיעים בראש גיליון ההקראה. פתחו שיעור, התחילו הקראה, והקישו על גלגל ההגדרות בסרגל התחתון.</p>';
+  return '<p class="hint" id="said-wrong-hint">בזמן הקראה של שיעור, הכפתור «הדגשת המוקרא כעת» בראש גיליון ההקראה מדליק או מכבה הדגשה חזקה של הקטע שמוקרא עכשיו במסך. שם גם «לא נשמע נכון» ו«דיווחים שמורים». פתחו שיעור, התחילו הקראה, והקישו על גלגל ההגדרות בסרגל התחתון.</p>';
 }
 function saidWrongButtons() {
-  return '<div class="said-wrong-row" id="said-wrong-row"><button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="said-view" hidden></div><div id="wrong-view" hidden></div></div>';
+  return `<div class="said-wrong-row" id="said-wrong-row"><button type="button" class="btn" id="sh-said" aria-pressed="${prefs.ttsLiveHighlight ? 'true' : 'false'}">הדגשת המוקרא כעת</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="wrong-view" hidden></div></div>`;
 }
 function ttsForm() {
   const head = lessonReaderOpen() ? saidWrongButtons() : saidWrongHint();
@@ -1538,6 +1539,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   R.pendingSleepUntil = null;
   if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
   R.heardSi = null; R.saidComplete = false;
+  R.followPausedUntil = 0; R.userPtr = false; R.progScroll = 0;
   if (holdSleep) { clearSleepTimer(false); R.sleepUntil = holdSleep; }
   else clearSleepTimer(true);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
@@ -1545,6 +1547,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
   const plan = dayPlan(iso, { il: prefs.il });
   const el = $('#reader');
   el.hidden = false; document.body.style.overflow = 'hidden';
+  syncLiveHighlight();
   $('#app').hidden = true; // the home page is never visible or reachable behind the reader
   syncNav();
   R.unit = unit; R.iso = iso; R.sid = sid; R.lib = lpath; R.libInfo = lib?.info || null; R.page = 0; R.sidReady = false;
@@ -1980,7 +1983,28 @@ function setPage(n, save = true) {
 }
 // Keep the part of the segment being spoken (frac = share of the segment already read) inside the visible text area,
 // i.e. between the top bar and the player bar – also for long segments that run over several pages.
+function syncLiveHighlight() {
+  $('#reader')?.classList.toggle('live-hl', !!prefs.ttsLiveHighlight);
+  const btn = $('#sh-said');
+  if (btn) btn.setAttribute('aria-pressed', prefs.ttsLiveHighlight ? 'true' : 'false');
+}
+function pauseSpeechFollow() {
+  R.followPausedUntil = nextPauseUntil();
+  if (window.__ttsFollowTest) {
+    window.__followPausedUntil = R.followPausedUntil;
+    window.__shouldFollowNow = () => shouldFollow({ enabled: prefs.ttsLiveHighlight, now: Date.now(), pausedUntil: R.followPausedUntil || 0 });
+  }
+}
+function toggleLiveHighlight() {
+  setPref('ttsLiveHighlight', !prefs.ttsLiveHighlight);
+  syncLiveHighlight();
+  if (!prefs.ttsLiveHighlight) return;
+  R.followPausedUntil = 0;
+  const sp = R.segs?.find(s => s.classList.contains('speaking'));
+  if (sp) followSpeech(sp, R.speaker?.queue?.[R.speaker.i]?.frac || 0);
+}
 function followSpeech(el, frac) {
+  if (!shouldFollow({ enabled: prefs.ttsLiveHighlight, now: Date.now(), pausedUntil: R.followPausedUntil || 0 })) return;
   if (prefs.layout === 'pages') {
     const [p0, p1] = segSpan(el);
     const p = Math.min(p1, p0 + Math.floor(frac * (p1 - p0 + 1)));
@@ -1988,7 +2012,7 @@ function followSpeech(el, frac) {
   } else {
     const vp = $('#vp'), pad = chromePad(), e = el.getBoundingClientRect(), v = vp.getBoundingClientRect();
     const y = e.top + frac * e.height, lo = v.top + pad.top, hi = v.bottom - pad.bottom - 40;
-    if (y < lo || y > hi) vp.scrollBy({ top: y - lo - 20, behavior: scrollBeh() });
+    if (y < lo || y > hi) { R.progScroll = Date.now() + 400; vp.scrollBy({ top: y - lo - 20, behavior: 'auto' }); }
   }
 }
 function pageOf(el) {
@@ -2153,10 +2177,17 @@ function bindReaderUi() {
     bt.onclick = () => { if (long) { long = false; return; } ttsToggle(); }; }
   vp.addEventListener('scroll', () => {
     if (prefs.layout === 'scroll') updateProgress();
+    if (R.userPtr && !(Date.now() < (R.progScroll || 0)) && R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow();
   }, { passive: true });
+  vp.addEventListener('wheel', () => { if (R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow(); }, { passive: true });
   // tap zones & swipe (page mode); a tap on the text closes the nav overlay
   let sx = 0, sy = 0, st = 0;
-  vp.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; st = Date.now(); });
+  let userPtrT = 0;
+  const clearUserPtr = () => { clearTimeout(userPtrT); userPtrT = setTimeout(() => { R.userPtr = false; }, 400); };
+  vp.addEventListener('pointerdown', e => { clearTimeout(userPtrT); R.userPtr = true; sx = e.clientX; sy = e.clientY; st = Date.now(); });
+  vp.addEventListener('pointerup', clearUserPtr);
+  vp.addEventListener('pointercancel', clearUserPtr);
+  vp.addEventListener('pointerleave', clearUserPtr);
   vp.addEventListener('pointerup', e => {
     const dx = e.clientX - sx, dy = e.clientY - sy;
     if (e.target.closest('.gl, button, a')) return;
@@ -2179,6 +2210,7 @@ function bindReaderUi() {
 function turn(d) {
   R.setChrome?.(false, { auto: true });
   R.armAutoHide?.();
+  if (R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow();
   if (prefs.layout === 'pages') {
     if (d > 0 && R.page >= R.pages - 1) { setProgress(...pk(), { done: true, frac: 1 }); toast(R.lib ? 'סוף הפרק' : 'סוף השיעור'); return; }
     setPage(R.page + d);
@@ -2211,8 +2243,9 @@ document.addEventListener('keydown', e => {
   if (e.shiftKey && (k === 'ArrowLeft' || k === 'ArrowRight') && !R.sid && R.unit) { e.preventDefault(); goDay(k === 'ArrowLeft' ? 'next' : 'prev'); }
   else if (k === 'ArrowLeft' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) { e.preventDefault(); turn(1); }
   else if (k === 'ArrowRight' || k === 'PageUp' || (k === ' ' && e.shiftKey)) { e.preventDefault(); turn(-1); }
-  else if (k === 'Home') { e.preventDefault(); prefs.layout === 'pages' ? setPage(0) : $('#vp').scrollTo({ top: 0 }); }
-  else if (k === 'End') { e.preventDefault(); prefs.layout === 'pages' ? setPage(R.pages - 1) : $('#vp').scrollTo({ top: 1e9 }); }
+  else if ((k === 'ArrowUp' || k === 'ArrowDown') && prefs.layout === 'scroll') { if (R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow(); }
+  else if (k === 'Home') { e.preventDefault(); if (R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow(); prefs.layout === 'pages' ? setPage(0) : $('#vp').scrollTo({ top: 0 }); }
+  else if (k === 'End') { e.preventDefault(); if (R.speaker && R.speaker.state !== 'stopped') pauseSpeechFollow(); prefs.layout === 'pages' ? setPage(R.pages - 1) : $('#vp').scrollTo({ top: 1e9 }); }
   else if (k === 'p' || k === 'P' || k === 'פ') ttsToggle();
   else if (k === 'f' || k === 'F' || k === 'כ') $('#b-full').click();
 }, true); // capture: runs before gloss.js closes its pop-up, so one Esc closes one layer
@@ -2238,7 +2271,7 @@ function openSheet(kind, note = '') {
   $('#sh-x').onclick = closeSheet;
   $('#sh-x').focus();
   const sp = $('#sh-play'); if (sp) sp.onclick = () => { closeSheet(); ttsToggle(); };
-  $('#sh-said')?.addEventListener('click', ev => { ev.preventDefault(); showSaidView(); });
+  $('#sh-said')?.addEventListener('click', ev => { ev.preventDefault(); toggleLiveHighlight(); });
   $('#sh-wrong')?.addEventListener('click', ev => { ev.preventDefault(); saveWrongFromCurrent(); });
   $('#sh-wrong-list')?.addEventListener('click', ev => { ev.preventDefault(); showWrongView(); });
   bindForm(sh.querySelector('form'), async name => {
@@ -2373,31 +2406,6 @@ function saidLoadOpts() {
     preferPiper: prefs.ttsEngine === 'piper' && !R.piperBroken && piperSupported(),
   });
   return { engine, stress: prefs.ttsStress, skipCites: prefs.ttsSkipCites, divineName: prefs.ttsDivineOral, unit: R.unit };
-}
-async function showSaidView() {
-  const box = $('#said-view'); if (!box) return;
-  if (!R.doc || !R.segs?.length) { box.hidden = false; box.innerHTML = '<p class="hint">פתחו שיעור כדי לראות מה יוקרא.</p>'; return; }
-  if (needsAramForms()) await ensureAramForms();
-  const heardSi = R.heardSi instanceof Set ? R.heardSi : new Set();
-  const report = buildSaidReport({
-    segments: ttsSegments(),
-    opts: saidLoadOpts(),
-    playback: {
-      started: !!(R.speaker || heardSi.size || R.saidComplete),
-      playing: R.speaker?.state === 'playing',
-      complete: !!R.saidComplete,
-      currentSi: R.speaker?.queue?.[R.speaker.i]?.si,
-      heardSi,
-    },
-    learned: !!getProgress(...pk())?.done,
-  });
-  box.innerHTML = renderSaidHtml(report);
-  box.hidden = false;
-  $('#sh-said-export')?.addEventListener('click', ev => {
-    ev.preventDefault();
-    const name = `said-${String(R.unit || 'lesson').replace(/[^\w.-]+/g, '_')}-${String(R.iso || R.sid || 'local').replace(/[^\w.-]+/g, '_')}.tsv`;
-    downloadSaidTsv(report, name);
-  });
 }
 function currentWrongEntry() {
   const speaker = R.speaker;
@@ -2589,6 +2597,7 @@ function closeReader() {
   if (R.speaker) { saveSay(); R.speaker.stop(true); R.speaker = null; }
   clearSleepTimer(true);
   R.heardSi = null; R.saidComplete = false;
+  R.followPausedUntil = 0; R.userPtr = false; R.progScroll = 0;
   R.ttsShown = false; clearTimeout(R.hideT);
   if (R.doc && R.unit) { const a = anchor(); if (a) setProgress(...pk(), { sec: null, ...a }); }
   el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';

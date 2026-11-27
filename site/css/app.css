@@ -11,7 +11,7 @@
 
 :root {
   --paper: #f6f1e3; --paper2: #efe7d3; --ink: #2a251f; --muted: #6a5f50; --accent: #7a4e1d; --accent-ink: #fff;
-  --rule: #d9ccb0; --card: #fffaf0; --hl: rgba(230, 180, 60, .32); --gloss: #7a4e1d; --shadow: 0 1px 3px rgba(60, 40, 10, .12);
+  --rule: #d9ccb0; --card: #fffaf0; --hl: rgba(230, 180, 60, .32); --speak-bg: #f5c844; --speak-ring: #8a5a00; --speak-ink: #1a1408; --gloss: #7a4e1d; --shadow: 0 1px 3px rgba(60, 40, 10, .12);
   --texture: .55;
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Hebrew', Arial, sans-serif;
@@ -19,9 +19,9 @@
   --size: 24px; --lh: 1.9; --measure: 34em;
   color-scheme: light;
 }
-[data-theme="sepia"] { --paper: #eddcb9; --paper2: #e3cfa6; --ink: #3a2c1a; --muted: #6c5536; --card: #f6e9cd; --rule: #cdb48a; --hl: rgba(190, 120, 30, .28); }
-[data-theme="dark"] { --paper: #1e1d1b; --paper2: #262422; --ink: #e8e0d0; --muted: #a99d89; --accent: #e0b060; --accent-ink: #1e1d1b; --card: #2a2826; --rule: #45413b; --hl: rgba(224, 176, 96, .25); --gloss: #e0b060; --texture: .25; --shadow: none; color-scheme: dark; }
-[data-theme="night"] { --paper: #000; --paper2: #0d0b08; --ink: #d4b886; --muted: #9c8660; --accent: #d4a14a; --accent-ink: #000; --card: #110e0a; --rule: #3a2f1e; --hl: rgba(212, 161, 74, .22); --gloss: #d4a14a; --texture: 0; --shadow: none; color-scheme: dark; }
+[data-theme="sepia"] { --paper: #eddcb9; --paper2: #e3cfa6; --ink: #3a2c1a; --muted: #6c5536; --card: #f6e9cd; --rule: #cdb48a; --hl: rgba(190, 120, 30, .28); --speak-bg: #ecc15a; --speak-ring: #6a3f08; --speak-ink: #1a1408; }
+[data-theme="dark"] { --paper: #1e1d1b; --paper2: #262422; --ink: #e8e0d0; --muted: #a99d89; --accent: #e0b060; --accent-ink: #1e1d1b; --card: #2a2826; --rule: #45413b; --hl: rgba(224, 176, 96, .25); --gloss: #e0b060; --texture: .25; --shadow: none; color-scheme: dark; --speak-bg: #8a5a14; --speak-ring: #ffcc66; --speak-ink: #fff6df; }
+[data-theme="night"] { --paper: #000; --paper2: #0d0b08; --ink: #d4b886; --muted: #9c8660; --accent: #d4a14a; --accent-ink: #000; --card: #110e0a; --rule: #3a2f1e; --hl: rgba(212, 161, 74, .22); --gloss: #d4a14a; --texture: 0; --shadow: none; color-scheme: dark; --speak-bg: #6b4510; --speak-ring: #e0b04a; --speak-ink: #fff3d0; }
 [data-font="frank"] { --text-font: 'Frank Ruhl Libre', 'Noto Serif Hebrew', serif; }
 [data-font="ezra"] { --text-font: 'Ezra SIL', 'Noto Serif Hebrew', serif; }
 [data-font="ashkenaz"] { --text-font: 'Taamey Ashkenaz', 'Noto Serif Hebrew', serif; }
@@ -326,6 +326,23 @@ html[data-rashi-font="text"] .r-content .rashi { font-family: var(--text-font); 
 .r-content .pe { display: inline-block; width: 2em; } /* setuma: a gap inside the line, as in a Torah scroll */
 .r-content .pe-p { width: 3.5em; } /* petucha: a wider gap */
 .r-content .speaking { background: var(--hl); box-shadow: 0 0 0 .12em var(--hl); }
+/* t361u: strong live highlight of the current spoken segment, only when the toggle is on. */
+#reader.live-hl .r-content .speaking {
+  background: var(--speak-bg);
+  color: var(--speak-ink);
+  box-shadow: 0 0 0 3px var(--speak-ring);
+  outline: 2px solid var(--speak-ring);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+/* Children that sit on the same highlight must keep readable ink (they often set color: var(--muted) / gold). */
+#reader.live-hl .r-content .speaking :is(.t, .vn, .hn, .ketiv, .rashi, .rashi b, .biur, .sbiur, .lbl, .sb-lbl, small, .fn, .daf, .sid-rep, .sid-bound, .sid-in, .sid-mark, .sd-n, .sd-x, a),
+#reader.live-hl .r-content .speaking .sd-t-omer :is(.c0, .c2, .c3, .c4, .c5),
+#reader.live-hl .r-content .speaking .sbiur > summary,
+#reader.live-hl .r-content.gloss-inline .speaking .gl::after {
+  color: var(--speak-ink);
+}
+
 .r-content .gl { text-decoration: underline dotted var(--gloss); text-underline-offset: .3em; cursor: help; }
 .r-content.gloss-inline .gl { display: inline-flex; flex-direction: column-reverse; align-items: center; line-height: 1.1; vertical-align: bottom; text-decoration: none; }
 .r-content.gloss-inline .gl::after { content: attr(data-g); font-family: var(--ui); font-size: .42em; color: var(--gloss); white-space: nowrap; margin-bottom: .1em; }
@@ -823,7 +840,7 @@ html[data-bnav] #reader .r-bottom, html[data-bnav] #reader .lnav { padding-botto
   .btn, .card, .page, .set-card, .lib-card, .lib-grid a, .bnav, .r-chrome, .sheet, .warn, select, input { border: 1px solid ButtonText !important; }
   .btn.primary, .btn[aria-pressed="true"], .seg-ctl label:has(input:checked), .bnav a[aria-current="page"] { forced-color-adjust: none; background: Highlight !important; color: HighlightText !important; border-color: Highlight !important; }
   :focus-visible { outline: 3px solid Highlight !important; outline-offset: 2px; }
-  .r-content .speaking, .r-content .seg.seek-hit, .gs-hits p mark { outline: 2px solid Highlight; }
+  .r-content .speaking, #reader.live-hl .r-content .speaking, .r-content .seg.seek-hit, .gs-hits p mark { outline: 3px solid Highlight; outline-offset: 1px; }
 }
 
 /* ===================================================================================================================
@@ -1096,10 +1113,20 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .r-content h2.sd-sec { color: var(--c1); }
 [data-design="modern"] .sheet { border-radius: 24px 24px 0 0; border: 0; }
 
+/* t361u: modern panels/badges keep their own opaque ink, not --speak-ink */
+[data-design="modern"] #reader.live-hl .r-content .speaking :is(.vn, .hn) { color: #fff; }
+[data-design="modern"] #reader.live-hl .r-content .speaking .rashi .lbl { color: #fff; }
+[data-design="modern"] #reader.live-hl .r-content .speaking .rashi { color: var(--rashi-ink); }
+[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur),
+[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur) :is(.lbl, .sb-lbl, b, small) {
+  color: var(--ink);
+}
+
 /* ================================== לילי (nocturne) ================================== */
 :root[data-design="nocturne"] {
   --paper: #0d0c0a; --paper2: #16130f; --ink: #ece3cf; --muted: #9a8f7b; --accent: #c9a45c; --accent-ink: #1a140b;
   --rule: #3a3022; --card: #15120e; --hl: rgba(241, 215, 154, .1); --gloss: #c9a45c; --shadow: none; --texture: 1; color-scheme: dark; --err: #ff9a8f;
+  --speak-bg: #5c3d12; --speak-ring: #f1d79a; --speak-ink: #fff6df;
   --gold: #c9a45c; --gold2: #f1d79a; --line: rgba(201, 164, 92, .25);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .9  0 0 0 0 .7  0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url%28%23n%29'/%3E%3C/svg%3E");
   --ui: 'David Libre', 'Frank Ruhl Libre', 'Noto Serif Hebrew', serif; --display-font: 'Frank Ruhl Libre', serif;
@@ -1342,6 +1369,7 @@ html[data-rashi-font="text"][data-design] .r-content .rashi { font-family: var(-
 .wrong-speech { margin: .3rem 0 .4rem; font-size: .95rem; line-height: 1.6; }
 .wrong-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
 
+/* t361u: #sh-said is a live-highlight toggle (aria-pressed), not a past-speech list. */
 /* 1.0.236: said/wrong controls sit at the top of the TTS sheet, not buried under the form */
 .said-wrong-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1rem; }
 .said-wrong-row .btn { min-height: 44px; }

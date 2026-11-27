@@ -1,3 +1,5 @@
+> t361u: the first button is now the toggle «הדגשת המוקרא כעת» (see verification/LIVE-HIGHLIGHT.md). The list panel is gone. Discoverability (top of the TTS sheet, Settings hint) is unchanged.
+
 # Discoverability of «הצג מה שהוקרא» and «לא נשמע נכון»
 
 Dudi could not find the buttons (t360u). They used to render only at the bottom of `ttsForm()`, and only when a lesson was already open, so they were missing in general Settings and buried under a long form in the TTS sheet.

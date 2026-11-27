@@ -1,4 +1,5 @@
-// t360u: «הצג מה שהוקרא» and «לא נשמע נכון» must be findable — hint in Settings, buttons at the top of the TTS sheet.
+// t360u/t361u: said/wrong controls must be findable — hint in Settings, controls at the top of the TTS sheet.
+// t361u: #sh-said is the live-highlight toggle «הדגשת המוקרא כעת», not a past-speech list.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { serve, launch, pageWith, CHROME, openChrome } from './helpers.mjs';
@@ -13,7 +14,7 @@ test('Settings shows a hint and does not show the said/wrong buttons', { skip },
     await p.goto(srv.url + '#/settings');
     await p.waitForSelector('#set-tts');
     assert.equal(await p.locator('#said-wrong-hint').count(), 1);
-    assert.match(await p.locator('#said-wrong-hint').innerText(), /הצג מה שהוקרא/);
+    assert.match(await p.locator('#said-wrong-hint').innerText(), /הדגשת המוקרא כעת/);
     assert.match(await p.locator('#said-wrong-hint').innerText(), /לא נשמע נכון/);
     assert.equal(await p.locator('#sh-said, #sh-wrong, #sh-wrong-list').count(), 0);
     assert.equal(await p.locator('#set-ver-hint').count(), 1);
@@ -52,14 +53,16 @@ test('During a lesson the buttons sit at the top of the TTS sheet, above the voi
       };
     });
     assert.equal(m.hasAll, true);
-    assert.deepEqual(m.labels, ['הצג מה שהוקרא', 'לא נשמע נכון', 'דיווחים שמורים']);
+    assert.deepEqual(m.labels, ['הדגשת המוקרא כעת', 'לא נשמע נכון', 'דיווחים שמורים']);
     assert.equal(m.aboveVoice, true, 'buttons must sit above the long voice form');
     assert.equal(m.belowPlay, true);
     assert.equal(m.inView, true, 'buttons must be visible at the top of the sheet at 320px');
     assert.equal(m.hintInSheet, false, 'the settings hint is not a substitute for the buttons during a lesson');
     assert.equal(m.overflow, false);
+    assert.equal(await p.locator('#sh-said').getAttribute('aria-pressed'), 'true');
+    assert.equal(await p.locator('#said-view').count(), 0);
     await p.click('#sh-said');
-    await p.waitForSelector('#said-view:not([hidden])');
+    assert.equal(await p.locator('#sh-said').getAttribute('aria-pressed'), 'false');
     assert.deepEqual(p.errors, []);
   } finally { await b.close(); srv.close(); }
 });
