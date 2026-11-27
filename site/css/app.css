@@ -1341,3 +1341,9 @@ html[data-rashi-font="text"][data-design] .r-content .rashi { font-family: var(-
 .wrong-where { color: var(--muted); font-weight: 500; }
 .wrong-speech { margin: .3rem 0 .4rem; font-size: .95rem; line-height: 1.6; }
 .wrong-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
+
+/* 1.0.236: said/wrong controls sit at the top of the TTS sheet, not buried under the form */
+.said-wrong-row { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1rem; }
+.said-wrong-row .btn { min-height: 44px; }
+#said-wrong-hint { margin: 0 0 1rem; }
+#toast:has(#swReload) { pointer-events: auto; }

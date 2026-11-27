@@ -101,10 +101,28 @@ function applyPrefs() {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = getComputedStyle(r).getPropertyValue('--paper').trim() || '#f6f1e3';
 }
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600); }
+function toastIsUpdate() { return !!$('#swReload'); }
+function toast(msg) {
+  const t = $('#toast'); if (!t || toastIsUpdate()) return;
+  t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 2600);
+}
 let toastAfterNav = ''; // a message meant for the screen being navigated to
 /** a status message belongs to the screen it was shown on: drop it when the user navigates (review 3) */
-function clearToast() { const t = $('#toast'); if (!t) return; clearTimeout(toast.t); t.classList.remove('show'); t.textContent = ''; }
+function clearToast() {
+  const t = $('#toast'); if (!t || toastIsUpdate()) return;
+  clearTimeout(toast.t); t.classList.remove('show'); t.textContent = '';
+}
+function showSwUpdate() {
+  const t = $('#toast'); if (!t) return;
+  clearTimeout(toast.t); toast.t = null;
+  t.innerHTML = 'גרסה חדשה של היישומון מוכנה. <button type="button" class="btn small" id="swReload">רענון</button>';
+  t.classList.add('show');
+  $('#swReload').onclick = () => location.reload();
+}
+function checkSwUpdate(reg) {
+  try { reg?.update?.()?.catch(() => {}); } catch {}
+  if (reg?.waiting && navigator.serviceWorker.controller) showSwUpdate();
+}
 const todayIso = () => isoDate(new HDate(new Date()));
 setTextOptions({ get shnayimSplit() { return prefs.shnayimSplit; } });   // 1.0.98: Shnayim Mikra split (live prefs)
 const unitsFor = () => ['chumash', 'tehillim', 'tanya', 'hayomyom', ...(prefs.rambamTrack === '1' ? ['rambam1'] : prefs.rambamTrack === '3' ? ['rambam3'] : ['rambam3', 'rambam1']), ...(prefs.lessonMitzvot ? ['mitzvot'] : []), ...(prefs.lessonTolt ? ['tolt'] : []), ...(prefs.lessonRavYomi ? ['ravyomi'] : []), ...(prefs.lessonDaf ? ['dafyomi'] : []), ...(prefs.lessonAmud ? ['amudyomi'] : []), ...(prefs.lessonYer ? ['yerushalmi'] : []), ...(prefs.lessonMishna ? ['mishnayomit'] : []), ...(prefs.lessonNach ? ['nachyomi'] : []), ...(prefs.lessonShnayim ? ['shnayim'] : [])];
@@ -821,8 +839,17 @@ async function bindQv(root) {
   };
   refresh();
 }
+function lessonReaderOpen() { return !!(R.doc && !$('#reader')?.hidden); }
+function saidWrongHint() {
+  return '<p class="hint" id="said-wrong-hint">בזמן הקראה של שיעור, הכפתורים «הצג מה שהוקרא» ו«לא נשמע נכון» מופיעים בראש גיליון ההקראה. פתחו שיעור, התחילו הקראה, והקישו על גלגל ההגדרות בסרגל התחתון.</p>';
+}
+function saidWrongButtons() {
+  return '<div class="said-wrong-row" id="said-wrong-row"><button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="said-view" hidden></div><div id="wrong-view" hidden></div></div>';
+}
 function ttsForm() {
+  const head = lessonReaderOpen() ? saidWrongButtons() : saidWrongHint();
   return `
+  ${head}
   <h3 class="set-sub" id="tts-voice-h">קול</h3>
   ${qvForm()}
   <div id="voice-warn"></div>
@@ -847,8 +874,7 @@ function ttsForm() {
   ${check('ttsLockscreen', prefs.ttsLockscreen, 'פקדים במסך הנעילה והשמעה ברקע באייפון (לא נבדק במכשיר אמיתי)')}
   <small>באייפון, כשהאפשרות מסומנת, הקול המקומי מושמע באלמנט שמע רגיל כדי שיוכל להמשיך כשהמסך נעול. זה עדיין לא נבדק במכשיר אמיתי. בדפדפנים אחרים מסלול ההשמעה לא משתנה, ונוספים פקדים במסך הנעילה.</small>
   <label class="field"><span>טיימר שינה</span><select name="ttsSleep">${TTS_SLEEP.map(m => `<option value="${m}" ${prefs.ttsSleep === m ? 'selected' : ''}>${m ? m + ' דקות' : 'כבוי'}</option>`).join('')}</select></label>
-  <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>
-  ${R.doc && !$('#reader')?.hidden ? '<button type="button" class="btn" id="sh-said">הצג מה שהוקרא</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="said-view" hidden></div><div id="wrong-view" hidden></div>' : ''}`;
+  <small>כשמופעל, ההקראה נעצרת בסוף הקטע שאחרי הזמן שנבחר. השעון רץ גם בהשהיה. השיעור לא מסומן כנלמד. חזרה לקטע הנוכחי: בסרגל ההקראה, «קטע קודם» אחרי כשתי שניות בתוך הקטע.</small>`;
 }
 function bindForm(root, onChange) {
   root.addEventListener('input', e => {
@@ -920,6 +946,7 @@ function renderSettings() {
     <a class="btn" href="#/offline">הורד הכל לשימוש בלי אינטרנט</a>
     <button class="btn" type="button" id="rst">מחיקת כל הנתונים מהמכשיר</button></div>`)}
     ${setCard('set-about', `<p id="set-ver">גרסה <bdi dir="ltr" id="set-ver-n">…</bdi></p>
+    <p class="hint" id="set-ver-hint">אם אינכם רואים את הגרסה האחרונה, לחצו «רענון» כשמופיעה ההודעה, או רעננו את הדף.</p>
     <div class="set-actions"><a class="btn" href="#/about">אודות ומגבלות</a><a class="btn" href="#/sources">מקורות ורישיונות</a></div>
     <p class="hint">הנתונים נשמרים במכשיר בלבד · ללא מעקב</p>`)}
   </form>`);
@@ -929,6 +956,7 @@ function renderSettings() {
     const h = $('#' + b.dataset.jump + ' h2'); h.scrollIntoView({ block: 'start', behavior: scrollBeh() }); h.tabIndex = -1; h.focus({ preventScroll: true }); h.addEventListener('blur', () => h.removeAttribute('tabindex'), { once: true });
   }));
   fetch('sw.js').then(r => r.text()).then(t => { const m = t.match(/const VERSION = '([^']+)'/), n = $('#set-ver-n'); if (n) { if (m) n.textContent = m[1]; else $('#set-ver').hidden = true; } }).catch(() => { const v = $('#set-ver'); if (v) v.hidden = true; });
+  navigator.serviceWorker?.getRegistration?.().then(r => checkSwUpdate(r)).catch(() => {});
   const f = $('#sf'); bindForm(f);
   $('#exp').onclick = triggerBackupDownload;
   $('#imp').onchange = async e => {
@@ -2571,14 +2599,17 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!hadController) return; // first install, nothing to refresh
     if ($('#reader').hidden) { location.reload(); return; }
-    const t = $('#toast'); clearTimeout(toast.t);
-    t.innerHTML = 'גרסה חדשה של היישומון מוכנה. <button type="button" class="btn small" id="swReload">רענון</button>';
-    t.classList.add('show');
-    $('#swReload').onclick = () => location.reload();
+    showSwUpdate();
   });
   // 1.0.118: an installed app resumed from the background never reloads, so look for a new version on every return too
   navigator.serviceWorker.register('sw.js').then(r => {
-    r.update?.().catch(() => {});
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') r.update?.().catch(() => {}); });
+    checkSwUpdate(r);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkSwUpdate(r); });
+    r.addEventListener('updatefound', () => {
+      const w = r.installing;
+      w?.addEventListener('statechange', () => {
+        if (w.state === 'installed' && navigator.serviceWorker.controller) showSwUpdate();
+      });
+    });
   }).catch(() => {});
 }

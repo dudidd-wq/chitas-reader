@@ -49,6 +49,8 @@ for (const d of ['sefer', 'modern', 'nocturne']) test(`1.0.118: "${d}" – chang
 
 test('1.0.118: the service worker is asked for an update when the app returns to the foreground', () => {
   const app = fs.readFileSync(new URL('../site/js/app.js', import.meta.url), 'utf8');
-  assert.match(app, /visibilitychange[^\n]*visible[^\n]*r\.update/);
+  assert.match(app, /visibilitychange[^\n]*visible[^\n]*checkSwUpdate\(r\)/);
+  assert.match(app, /function checkSwUpdate/);
+  assert.match(app, /function showSwUpdate/);
   assert.match(fs.readFileSync(new URL('../site/sw.js', import.meta.url), 'utf8'), /skipWaiting/);
 });
