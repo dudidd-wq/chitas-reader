@@ -1,5 +1,5 @@
 import { nps1Speech } from './bavli-nps1.js';
-import { speechTextForBlock, primaryPartForSegment } from './gemara-speech.js';
+import { speechTextForBlock, primaryPartForSegment, ensureAramForms, tagGemaraBlocks } from './gemara-speech.js';
 import { CHOL } from './chol.js';
 import { dayPlan, isoDate, toHDate, HDate, Locale, gem, fmtDmy, parseDmy, formatDmyInput, gregLongHe, hashPinsDate } from './calendar.js';
 import { buildDoc, describe, filesFor, UNITS, data, LICENSE_URL, WIKISOURCE_DEED, WS_TANYA, licenseLabel, siddurIndex, siddurOrder, siddurFiles, buildSiddurBookDoc, markSectionLabels, GEMARA_UNITS, setTextOptions } from './texts.js';
@@ -884,7 +884,7 @@ function bindForm(root, onChange) {
     if (el.name === 'il') { v = v === 'true' || v === true; setPref('locationChosen', true); }
     setPref(el.name, v);
     if (el.name === 'ttsGemaraBiurOnly' && v === true) { setPref('ttsVocalizedGemara', false); const m = root.querySelector('input[name=ttsVocalizedGemara]'); if (m) m.checked = false; }
-    if (el.name === 'ttsVocalizedGemara' && v === true) { setPref('ttsGemaraBiurOnly', false); const m = root.querySelector('input[name=ttsGemaraBiurOnly]'); if (m) m.checked = false; }
+    if (el.name === 'ttsVocalizedGemara' && v === true) { setPref('ttsGemaraBiurOnly', false); const m = root.querySelector('input[name=ttsGemaraBiurOnly]'); if (m) m.checked = false; ensureAramForms(); }
     if (el.name === 'ttsSleep') {
       R.sleepUntil = null;
       if (!v && R.speaker) R.speaker.stopAfterCurrent = false;
@@ -1599,6 +1599,7 @@ async function openReader(unit, iso, sid = null, lib = null) {
     }
     else if (lpath) R.doc = lib?.makeDoc ? await lib.makeDoc() : (await libDoc(lpath)).doc;
     else R.doc = await buildDocPre(plan, unit);
+    if (R.doc?.blocks) tagGemaraBlocks(R.doc.blocks);
   } catch (e) {
     // round 5: outside the page columns (they are only sized once a text is laid out), so it reflows at any width; with a retry
     const rc = $('#rc'); rc.classList.add('r-error'); rc.style.cssText = '';
@@ -2270,6 +2271,11 @@ document.addEventListener('keydown', e => {
 });
 
 // ---------------- TTS in reader ----------------
+function needsAramForms() {
+  if (prefs.ttsVocalizedGemara) return true;
+  if (prefs.ttsGemaraBiurOnly) return false;
+  return !!R.doc?.blocks?.some(b => !b.say && b.text && (b.aramSource === 'yerushalmi' || b.aramSource === 'bavli'));
+}
 function ttsSegments() {
   const allById = new Map(R.doc.blocks.map(b => [String(b.id), b]));
   const byId = R.doc.tanakh ? allById : null;
@@ -2368,9 +2374,10 @@ function saidLoadOpts() {
   });
   return { engine, stress: prefs.ttsStress, skipCites: prefs.ttsSkipCites, divineName: prefs.ttsDivineOral, unit: R.unit };
 }
-function showSaidView() {
+async function showSaidView() {
   const box = $('#said-view'); if (!box) return;
   if (!R.doc || !R.segs?.length) { box.hidden = false; box.innerHTML = '<p class="hint">פתחו שיעור כדי לראות מה יוקרא.</p>'; return; }
+  if (needsAramForms()) await ensureAramForms();
   const heardSi = R.heardSi instanceof Set ? R.heardSi : new Set();
   const report = buildSaidReport({
     segments: ttsSegments(),
@@ -2401,6 +2408,7 @@ function currentWrongEntry() {
     const s = currentSeg();
     si = s && R.segs ? R.segs.indexOf(s) : -1;
   }
+  if (needsAramForms()) ensureAramForms();
   const segs = R.doc ? ttsSegments() : [];
   const seg = si >= 0 ? segs[si] : null;
   const opts = saidLoadOpts();
@@ -2493,6 +2501,8 @@ async function ttsToggle() {
   if (eng === 'web') await waitForVoices();
   // 1.0.224: local voices only. No local Hebrew voice (network voices are never used): say so and stop – nothing is sent to a vendor.
   if (eng === 'web' && !hebrewVoices().length) { openSheet('tts', TTS_ERR['no-voice']); return; }
+  if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
+  if (needsAramForms()) await ensureAramForms();
   if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
   R.speaker = new (eng === 'piper' ? PiperSpeaker : Speaker)({
     onSegment: (i, frac = 0) => {
