@@ -326,20 +326,38 @@ html[data-rashi-font="text"] .r-content .rashi { font-family: var(--text-font); 
 .r-content .pe { display: inline-block; width: 2em; } /* setuma: a gap inside the line, as in a Torah scroll */
 .r-content .pe-p { width: 3.5em; } /* petucha: a wider gap */
 .r-content .speaking { background: var(--hl); box-shadow: 0 0 0 .12em var(--hl); }
-/* t361u: strong live highlight of the current spoken segment, only when the toggle is on. */
-#reader.live-hl .r-content .speaking {
+/* t361u/t362u: strong live highlight of the current spoken chunk, only when the toggle is on.
+   When a .hl-now chunk exists (Rashi ~2-line packs, or the verse .t), only that chunk is painted
+   and enlarged; the rest of the paragraph stays at the reading size. */
+#reader.live-hl .r-content .speaking:not(:has(.hl-now)),
+#reader.live-hl .r-content .speaking .hl-now,
+#reader.live-hl .r-content .speaking.hl-now {
   background: var(--speak-bg);
   color: var(--speak-ink);
   box-shadow: 0 0 0 3px var(--speak-ring);
   outline: 2px solid var(--speak-ring);
   outline-offset: 1px;
   border-radius: 4px;
+  overflow-wrap: anywhere;
 }
+#reader.live-hl[data-speak-size="mid"] .r-content .speaking:not(:has(.hl-now)),
+#reader.live-hl[data-speak-size="mid"] .r-content .speaking .hl-now,
+#reader.live-hl[data-speak-size="mid"] .r-content .speaking.hl-now { font-size: 1.2em; }
+#reader.live-hl[data-speak-size="large"] .r-content .speaking:not(:has(.hl-now)),
+#reader.live-hl[data-speak-size="large"] .r-content .speaking .hl-now,
+#reader.live-hl[data-speak-size="large"] .r-content .speaking.hl-now { font-size: 1.35em; }
 /* Children that sit on the same highlight must keep readable ink (they often set color: var(--muted) / gold). */
-#reader.live-hl .r-content .speaking :is(.t, .vn, .hn, .ketiv, .rashi, .rashi b, .biur, .sbiur, .lbl, .sb-lbl, small, .fn, .daf, .sid-rep, .sid-bound, .sid-in, .sid-mark, .sd-n, .sd-x, a),
-#reader.live-hl .r-content .speaking .sd-t-omer :is(.c0, .c2, .c3, .c4, .c5),
-#reader.live-hl .r-content .speaking .sbiur > summary,
-#reader.live-hl .r-content.gloss-inline .speaking .gl::after {
+#reader.live-hl .r-content .speaking:not(:has(.hl-now)) :is(.t, .vn, .hn, .ketiv, .rashi, .rashi b, .biur, .sbiur, .lbl, .sb-lbl, small, .fn, .daf, .sid-rep, .sid-bound, .sid-in, .sid-mark, .sd-n, .sd-x, a),
+#reader.live-hl .r-content .speaking:not(:has(.hl-now)) .sd-t-omer :is(.c0, .c2, .c3, .c4, .c5),
+#reader.live-hl .r-content .speaking:not(:has(.hl-now)) .sbiur > summary,
+#reader.live-hl .r-content.gloss-inline .speaking:not(:has(.hl-now)) .gl::after,
+#reader.live-hl .r-content .speaking .hl-now,
+#reader.live-hl .r-content .speaking.hl-now,
+#reader.live-hl .r-content .speaking .hl-now :is(.t, .vn, .hn, .ketiv, .rashi, .rashi b, .biur, .sbiur, .lbl, .sb-lbl, small, .fn, .daf, .sid-rep, .sid-bound, .sid-in, .sid-mark, .sd-n, .sd-x, a, b),
+#reader.live-hl .r-content .speaking.hl-now :is(.t, .vn, .hn, .ketiv, .rashi, .rashi b, .biur, .sbiur, .lbl, .sb-lbl, small, .fn, .daf, .sid-rep, .sid-bound, .sid-in, .sid-mark, .sd-n, .sd-x, a, b),
+#reader.live-hl .r-content .speaking .hl-now .sd-t-omer :is(.c0, .c2, .c3, .c4, .c5),
+#reader.live-hl .r-content.gloss-inline .speaking .hl-now .gl::after,
+#reader.live-hl .r-content.gloss-inline .speaking .hl-now.gl::after {
   color: var(--speak-ink);
 }
 
@@ -840,7 +858,7 @@ html[data-bnav] #reader .r-bottom, html[data-bnav] #reader .lnav { padding-botto
   .btn, .card, .page, .set-card, .lib-card, .lib-grid a, .bnav, .r-chrome, .sheet, .warn, select, input { border: 1px solid ButtonText !important; }
   .btn.primary, .btn[aria-pressed="true"], .seg-ctl label:has(input:checked), .bnav a[aria-current="page"] { forced-color-adjust: none; background: Highlight !important; color: HighlightText !important; border-color: Highlight !important; }
   :focus-visible { outline: 3px solid Highlight !important; outline-offset: 2px; }
-  .r-content .speaking, #reader.live-hl .r-content .speaking, .r-content .seg.seek-hit, .gs-hits p mark { outline: 3px solid Highlight; outline-offset: 1px; }
+  .r-content .speaking, #reader.live-hl .r-content .speaking:not(:has(.hl-now)), #reader.live-hl .r-content .speaking .hl-now, #reader.live-hl .r-content .speaking.hl-now, .r-content .seg.seek-hit, .gs-hits p mark { outline: 3px solid Highlight; outline-offset: 1px; }
 }
 
 /* ===================================================================================================================
@@ -1114,11 +1132,19 @@ html[data-design="sefer"] body, html[data-design="sefer"] #reader { background: 
 [data-design="modern"] .sheet { border-radius: 24px 24px 0 0; border: 0; }
 
 /* t361u: modern panels/badges keep their own opaque ink, not --speak-ink */
-[data-design="modern"] #reader.live-hl .r-content .speaking :is(.vn, .hn) { color: #fff; }
-[data-design="modern"] #reader.live-hl .r-content .speaking .rashi .lbl { color: #fff; }
-[data-design="modern"] #reader.live-hl .r-content .speaking .rashi { color: var(--rashi-ink); }
-[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur),
-[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur) :is(.lbl, .sb-lbl, b, small) {
+[data-design="modern"] #reader.live-hl .r-content .speaking:not(:has(.hl-now)) :is(.vn, .hn),
+[data-design="modern"] #reader.live-hl .r-content .speaking .hl-now:is(.vn, .hn),
+[data-design="modern"] #reader.live-hl .r-content .speaking.hl-now:is(.vn, .hn),
+[data-design="modern"] #reader.live-hl .r-content .speaking .hl-now :is(.vn, .hn) { color: #fff; }
+[data-design="modern"] #reader.live-hl .r-content .speaking:not(:has(.hl-now)) .rashi .lbl,
+[data-design="modern"] #reader.live-hl .r-content .speaking .hl-now .lbl { color: #fff; }
+[data-design="modern"] #reader.live-hl .r-content .speaking:not(:has(.hl-now)) .rashi,
+[data-design="modern"] #reader.live-hl .r-content .speaking .rashi .hl-now,
+[data-design="modern"] #reader.live-hl .r-content .speaking.rashi.hl-now { color: var(--rashi-ink); }
+[data-design="modern"] #reader.live-hl .r-content .speaking:not(:has(.hl-now)) :is(.biur, .sbiur),
+[data-design="modern"] #reader.live-hl .r-content .speaking:not(:has(.hl-now)) :is(.biur, .sbiur) :is(.lbl, .sb-lbl, b, small),
+[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur) .hl-now,
+[data-design="modern"] #reader.live-hl .r-content .speaking :is(.biur, .sbiur) .hl-now :is(.lbl, .sb-lbl, b, small) {
   color: var(--ink);
 }
 

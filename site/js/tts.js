@@ -4,6 +4,7 @@
 // usable (local) voices only; allHebrewVoices() lists network voices too, solely so the UI can show them as unavailable.
 import { pauseChunks } from './tts-prep.js';
 import { prepareSpeechForTTS } from './divine-tts.js';
+import { followPauseChunks } from './tts-live-hl.js';
 import { webPitch, clampPitch } from './voice-pitch.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
@@ -74,11 +75,12 @@ export class Speaker {
       s.parts.forEach((html, pi) => {
         const prepared = prepareSpeechForTTS(html, { stress: opts.stress, divineName: s.divineNames?.[pi] ?? opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], unit: opts.unit });
         // 1.0.101: same comma/period pauses as the local voice; the gap is a delay after the utterance (tests may set __ttsPauseScale = 0)
-        for (const x of pauseChunks(prepared)) chunks.push(x);
+        // t362u: follow sub-utterances are slices of this already-prepared text (concat unchanged; mid-slice gap is 0).
+        for (const x of followPauseChunks([...pauseChunks(prepared)], s.hls?.[pi])) chunks.push(x);
       });
       // frac: share of the segment already spoken when this chunk starts (lets the view follow long segments)
       const total = chunks.reduce((a, x) => a + x.c.length, 0) || 1; let done = 0;
-      for (const { c, gap } of chunks) { this.queue.push({ si, text: c, gap, frac: done / total }); done += c.length; }
+      for (const { c, gap, hl } of chunks) { this.queue.push({ si, text: c, gap, hl, frac: done / total }); done += c.length; }
     });
     this.segCount = segments.length; this.bad = 0;
   }
@@ -114,7 +116,7 @@ export class Speaker {
     if (clampPitch(this.opts.pitch)) u.pitch = webPitch(this.opts.pitch);   // 1.0.92: only when the reader moved the slider
     const token = this.token = Symbol();
     let started = 0;
-    u.onstart = () => { if (this.token !== token) return; started = this.chunkStarted = performance.now(); this.onSegment?.(q.si, q.frac); };
+    u.onstart = () => { if (this.token !== token) return; started = this.chunkStarted = performance.now(); this.onSegment?.(q.si, q.frac, q); };
     u.onend = () => {
       if (this.token !== token || this.state !== 'playing') return;
       const min = q.text.length * (globalThis.__ttsMinMsPerChar ?? MIN_MS_PER_CHAR) / (u.rate || 1);
@@ -127,7 +129,7 @@ export class Speaker {
       if (e.error === 'interrupted' || e.error === 'canceled') return; // our own cancel() (pause/skip/rate)
       this.fail(e.error || 'error');                                      // real failure: stop, never advance
     };
-    this.onSegment?.(q.si, q.frac);
+    this.onSegment?.(q.si, q.frac, q);
     try { synth.speak(u); } catch (e) { this.fail('error'); }
   }
   pause() {
@@ -167,14 +169,14 @@ export class Speaker {
     this.i = k < 0 ? this.i : k;
     if (this.state === 'playing') { this.interruptPlayback(); this.speakCurrent(); }
     else if (this.state === 'paused') this.play();
-    else this.onSegment?.(this.queue[this.i]?.si, this.queue[this.i]?.frac);
+    else this.onSegment?.(this.queue[this.i]?.si, this.queue[this.i]?.frac, this.queue[this.i]);
   }
   skip(delta) {
     if (this.shouldRestartCurrent(delta)) { this.replay(); return; }
     const cur = this.queue[this.i]?.si ?? 0;
     const target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
     const k = this.queueIndexFor(target, delta);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.interruptPlayback(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.interruptPlayback(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si, this.queue[k].frac, this.queue[k]); }
   }
   /** First chunk of segment `target`; a segment with nothing to say (e.g. a skipped Kaddish, 1.0.90) gives the nearest
    *  spoken one in the direction of the skip. -1 if there is none. */

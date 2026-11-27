@@ -18,7 +18,7 @@ const GROUP = {
   'set-display': ['design', 'designFont', 'theme', 'size', 'lineHeight', 'layout', 'spread', 'wakeLock'],
   'set-fonts': ['font', 'readingBold'],
   'set-text': ['taamim', 'rashi', 'rashiFont', 'hayomNiqqud', 'mitzvotNiqqud', 'biurNiqqud', 'divine', 'gloss', 'studyNotes', 'shortBiur'],
-  'set-tts': ['ttsEngine', 'ttsGender', 'ttsPitch', 'ttsHavara', 'ttsModel', 'ttsVoice', 'ttsRate', 'ttsStress', 'ttsDivineScripture', 'ttsDivineOral', 'ttsRashi', 'ttsBiur', 'ttsVocalizedGemara', 'ttsGemaraBiurOnly', 'ttsSkipCites', 'ttsContinuous', 'ttsLockscreen', 'ttsSleep'],
+  'set-tts': ['ttsEngine', 'ttsGender', 'ttsPitch', 'ttsHavara', 'ttsModel', 'ttsVoice', 'ttsRate', 'ttsStress', 'ttsDivineScripture', 'ttsDivineOral', 'ttsRashi', 'ttsBiur', 'ttsVocalizedGemara', 'ttsGemaraBiurOnly', 'ttsSkipCites', 'ttsContinuous', 'ttsLockscreen', 'ttsSleep', 'ttsSpeakSize'],
   'set-siddur': ['siddurKaddish', 'hideSiddurInstructions', 'siddurLang', 'tachanunMode', 'shabbatMode'],
 };
 

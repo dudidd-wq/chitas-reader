@@ -12,7 +12,7 @@ import { Speaker, ttsSupported, hebrewVoices, onVoices, waitForVoices, isNetwork
 import { RE_TAAMIM, vowelHeadword, fillUnvocalFromVerse } from './tts-prep.js';
 import { divineNamesForParts } from './divine-tts.js';
 import { resolveSaidEngine, speechForSegment } from './tts-said.js';
-import { shouldFollow, nextPauseUntil } from './tts-live-hl.js';
+import { shouldFollow, nextPauseUntil, sanitizeSpeakSize, prepareFollowChunks, applyHlNow, clearHlNow, letterBudget, cloneWithoutFollowChunks } from './tts-live-hl.js';
 import { addWrongReport, loadWrongReports, removeWrongReport, clearWrongReports, renderWrongHtml, downloadWrongJson, importWrongJson } from './tts-wrong.js';
 import { maleTimbre, clampPitch, PITCH_MIN, PITCH_MAX, PITCH_STEP } from './voice-pitch.js';
 import { PiperSpeaker, piperSupported, voiceStatus, installVoice, removeVoice, voiceBytes, voiceMissingBytes, modelFor, mb } from './piper.js';
@@ -842,15 +842,19 @@ async function bindQv(root) {
 }
 function lessonReaderOpen() { return !!(R.doc && !$('#reader')?.hidden); }
 function saidWrongHint() {
-  return '<p class="hint" id="said-wrong-hint">בזמן הקראה של שיעור, הכפתור «הדגשת המוקרא כעת» בראש גיליון ההקראה מדליק או מכבה הדגשה חזקה של הקטע שמוקרא עכשיו במסך. שם גם «לא נשמע נכון» ו«דיווחים שמורים». פתחו שיעור, התחילו הקראה, והקישו על גלגל ההגדרות בסרגל התחתון.</p>';
+  return '<p class="hint" id="said-wrong-hint">בזמן הקראה של שיעור, הכפתור «הדגשת המוקרא כעת» בראש גיליון ההקראה מדליק או מכבה הדגשה חזקה של הקטע שמוקרא עכשיו במסך. לידו «הגדלת הטקסט המוקרא» (ללא / בינוני / גדול). בפירוש ארוך, כמו רש״י, מסומנות כשתי שורות בערך בכל פעם. שם גם «לא נשמע נכון» ו«דיווחים שמורים». פתחו שיעור, התחילו הקראה, והקישו על גלגל ההגדרות בסרגל התחתון.</p>';
 }
 function saidWrongButtons() {
   return `<div class="said-wrong-row" id="said-wrong-row"><button type="button" class="btn" id="sh-said" aria-pressed="${prefs.ttsLiveHighlight ? 'true' : 'false'}">הדגשת המוקרא כעת</button><button type="button" class="btn" id="sh-wrong">לא נשמע נכון</button><button type="button" class="btn ghost" id="sh-wrong-list">דיווחים שמורים</button><div id="wrong-view" hidden></div></div>`;
+}
+function speakSizeField() {
+  return `<fieldset class="speak-size-set" id="speak-size-set"><legend>הגדלת הטקסט המוקרא</legend>${radio('ttsSpeakSize', sanitizeSpeakSize(prefs.ttsSpeakSize), [['off', 'ללא'], ['mid', 'בינוני'], ['large', 'גדול']])}<small>הקטע שמוקרא עכשיו גדל במסך (כשההדגשה דלוקה). בפירוש ארוך, כמו רש״י, מסומנות כשתי שורות בערך בכל פעם, לפי דיבור המתחיל והמשפטים.</small></fieldset>`;
 }
 function ttsForm() {
   const head = lessonReaderOpen() ? saidWrongButtons() : saidWrongHint();
   return `
   ${head}
+  ${speakSizeField()}
   <h3 class="set-sub" id="tts-voice-h">קול</h3>
   ${qvForm()}
   <div id="voice-warn"></div>
@@ -1983,8 +1987,13 @@ function setPage(n, save = true) {
 }
 // Keep the part of the segment being spoken (frac = share of the segment already read) inside the visible text area,
 // i.e. between the top bar and the player bar – also for long segments that run over several pages.
+function syncSpeakSize() {
+  const r = $('#reader');
+  if (r) r.dataset.speakSize = sanitizeSpeakSize(prefs.ttsSpeakSize);
+}
 function syncLiveHighlight() {
   $('#reader')?.classList.toggle('live-hl', !!prefs.ttsLiveHighlight);
+  syncSpeakSize();
   const btn = $('#sh-said');
   if (btn) btn.setAttribute('aria-pressed', prefs.ttsLiveHighlight ? 'true' : 'false');
 }
@@ -2001,18 +2010,29 @@ function toggleLiveHighlight() {
   if (!prefs.ttsLiveHighlight) return;
   R.followPausedUntil = 0;
   const sp = R.segs?.find(s => s.classList.contains('speaking'));
-  if (sp) followSpeech(sp, R.speaker?.queue?.[R.speaker.i]?.frac || 0);
+  const ch = document.querySelector('.hl-now');
+  if (ch && prefs.layout === 'pages' && sanitizeSpeakSize(prefs.ttsSpeakSize) !== 'off' && $('#vp') && $('#rc')) layout();
+  if (sp) followSpeech(sp, R.speaker?.queue?.[R.speaker.i]?.frac || 0, ch);
 }
-function followSpeech(el, frac) {
+function followSpeech(el, frac, chunk) {
   if (!shouldFollow({ enabled: prefs.ttsLiveHighlight, now: Date.now(), pausedUntil: R.followPausedUntil || 0 })) return;
+  if (!$('#vp') || !$('#rc')) return;
+  const target = (chunk && chunk.isConnected) ? chunk : (el?.querySelector?.('.hl-now') || el);
+  if (!target) return;
   if (prefs.layout === 'pages') {
-    const [p0, p1] = segSpan(el);
-    const p = Math.min(p1, p0 + Math.floor(frac * (p1 - p0 + 1)));
+    const host = el || target.closest?.('.seg') || target;
+    const [p0, p1] = segSpan(host);
+    const p = chunk ? pageOf(target) : Math.min(p1, p0 + Math.floor(frac * (p1 - p0 + 1)));
     if (p !== R.page) setPage(p);
   } else {
-    const vp = $('#vp'), pad = chromePad(), e = el.getBoundingClientRect(), v = vp.getBoundingClientRect();
-    const y = e.top + frac * e.height, lo = v.top + pad.top, hi = v.bottom - pad.bottom - 40;
-    if (y < lo || y > hi) { R.progScroll = Date.now() + 400; vp.scrollBy({ top: y - lo - 20, behavior: 'auto' }); }
+    const vp = $('#vp'), pad = chromePad(), e = target.getBoundingClientRect(), v = vp.getBoundingClientRect();
+    const bar = $('#ttsctl'), rb = $('#rb');
+    const cover = Math.max(pad.bottom + 40,
+      (bar && !bar.hidden) ? Math.max(0, v.bottom - bar.getBoundingClientRect().top) + 8 : 0,
+      rb ? Math.max(0, v.bottom - rb.getBoundingClientRect().top) + 8 : 0);
+    const y = chunk ? e.top : e.top + frac * e.height, lo = v.top + pad.top, hi = v.bottom - cover;
+    const yBot = chunk ? e.bottom : y;
+    if (y < lo || yBot > hi) { R.progScroll = Date.now() + 400; vp.scrollBy({ top: y - lo - 20, behavior: 'auto' }); }
   }
 }
 function pageOf(el) {
@@ -2281,7 +2301,8 @@ function openSheet(kind, note = '') {
     else if (['taamim', 'rashi', 'gloss', 'font', 'divine', 'studyNotes', 'shortBiur', 'hayomNiqqud', 'biurNiqqud', 'mitzvotNiqqud'].includes(name)) { const a = anchor(); await renderDoc(); restore(a); }
     else if (['size', 'lineHeight', 'layout', 'spread', 'readingBold', 'design', 'designFont'].includes(name)) { const a = anchor(); layout(); restore(a); }
     else if (name === 'wakeLock') requestWake();
-    else if (name.startsWith('tts') && R.speaker && !['ttsRate', 'ttsPitch', 'ttsSleep'].includes(name)) { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
+    else if (name === 'ttsSpeakSize') { syncSpeakSize(); const ch = document.querySelector('.hl-now'); if (ch && prefs.layout === 'pages' && sanitizeSpeakSize(prefs.ttsSpeakSize) !== 'off' && $('#vp') && $('#rc')) layout(); if (ch) requestAnimationFrame(() => followSpeech(ch.closest('.seg') || ch, 0, ch)); }
+    else if (name.startsWith('tts') && R.speaker && !['ttsRate', 'ttsPitch', 'ttsSleep', 'ttsLiveHighlight', 'ttsSpeakSize'].includes(name)) { const st = R.speaker.state; R.speaker.stop(true); R.speaker = null; if (st === 'playing') ttsToggle(); }
     else if (name === 'ttsRate') { R.speaker?.setRate(prefs.ttsRate); const t = $('#t-rate'); if (t) t.value = String(prefs.ttsRate); }
   });
 }
@@ -2323,31 +2344,51 @@ function ttsSegments() {
     const srcBlock = allById.get(s.dataset.id);
     const primary = primaryPartForSegment(srcBlock, prefs, { ...sayOpts, displayedFallback: '' });
     if (primary.skip) return { el: s, parts: [], cites: [], acc: null, accParts: [], primaryParts: [], gemaraSkip: true };
-    const parts = [primary.text || unAbbr(ttsHtml(s.querySelector('.t'))).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '')];
-    // Speech-only Rashi keeps the display edition intact and supplies its own primary-stress metadata.
-    const block = byId?.get(s.dataset.id), accParts = [block?.text || primary.text || null], primaryParts = [!!primary.text];
-    // 1.0.98: Shnayim Mikra – the verse twice; Nach / Onkelos – the explanation / Targum after the verse (speech text)
-    for (let k = 1; k < (block?.repeat || 1); k++) { parts.push(parts[0]); accParts.push(accParts[0]); primaryParts.push(primaryParts[0]); }
-    for (const x of block?.biurSay || []) if (x) { parts.push(x); accParts.push(x); primaryParts.push(true); }
-    if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach((p, i) => {
-      const raw = block?.subSay?.[i];
-      parts.push(fillUnvocalFromVerse(raw || vowelHeadword(p.innerHTML, parts[0]), parts[0]));
-      accParts.push(raw || null); primaryParts.push(!!raw);
-    });
-    const sbv = sbm?.get(s.dataset.id); if (sbv) { parts.push(sbv); accParts.push(sbv); primaryParts.push(true); }
-    // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
-    const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
-    // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.
-    // prepareForTTS strips these before Web Speech; Piper must receive the original in parallel.
-    const acc = byId?.get(s.dataset.id)?.text || say.get(s.dataset.id) || null;
-    const divineNames = divineNamesForParts(R.unit, {
+    const tSrc = cloneWithoutFollowChunks(s.querySelector('.t')) || s.querySelector('.t');
+    const verseSpeech = primary.text || (tSrc ? unAbbr(ttsHtml(tSrc)).replace(/<span class="(vn|hn|ketiv|sr)[^>]*>.*?<\/span>/g, '') : '');
+    const parts = [], accParts = [], primaryParts = [], hls = [], divineNames = [];
+    const pushPart = (text, acc, isPrimary, hl, dname) => { parts.push(text); accParts.push(acc); primaryParts.push(isPrimary); hls.push(hl || null); divineNames.push(dname); };
+    const wrapHost = (el, prefix) => el ? prepareFollowChunks(el, { idPrefix: prefix, maxLetters: letterBudget(el) }) : null;
+    const tEl = s.querySelector('.t');
+    const block = byId?.get(s.dataset.id);
+    const sbv = sbm?.get(s.dataset.id);
+    const baseNames = divineNamesForParts(R.unit, {
       repeat: block?.repeat || 1,
       biurSay: (block?.biurSay || []).filter(Boolean),
       biurLabel: block?.biurLabel || '',
       rashiCount: prefs.ttsRashi ? s.querySelectorAll('.rashi p').length : 0,
       shortBiur: !!sbv,
     }, prefs);
-    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, divineNames, pause: true };
+    // One TTS part per verse / commentary item so prepareSpeechForTTS and pauseChunks
+    // run on the unsplitted text. Display is wrapped into ~2-line follow chunks; load()
+    // slices already-prepared speech onto those chunks without rewriting phonemes.
+    const tFollow = wrapHost(tEl, `s${s.dataset.id}-t`);
+    pushPart(verseSpeech, block?.text || primary.text || null, !!primary.text, tFollow, baseNames[0]);
+    let ni = 1;
+    for (let k = 1; k < (block?.repeat || 1); k++) {
+      const nm = baseNames[ni++] ?? baseNames[0];
+      pushPart(verseSpeech, block?.text || primary.text || null, !!primary.text, tFollow, nm);
+    }
+    const biurPs = [...s.querySelectorAll('.biur p')];
+    const sbiur = s.querySelector('.sbiur');
+    (block?.biurSay || []).filter(Boolean).forEach((x, i) => {
+      const nm = baseNames[ni++];
+      const host = biurPs[i] || (i === 0 ? sbiur : null);
+      pushPart(x, x, true, wrapHost(host, `s${s.dataset.id}-b${i}`), nm);
+    });
+    if (prefs.ttsRashi) s.querySelectorAll('.rashi p').forEach((rp, i) => {
+      const raw = block?.subSay?.[i];
+      const rpSrc = cloneWithoutFollowChunks(rp) || rp;
+      const speech = fillUnvocalFromVerse(raw || vowelHeadword(rpSrc.innerHTML, verseSpeech), verseSpeech);
+      pushPart(speech, raw || null, !!raw, wrapHost(rp, `s${s.dataset.id}-r${i}`), baseNames[ni++]);
+    });
+    if (sbv) pushPart(sbv, sbv, true, null, baseNames[ni++]);
+    // source citations in parentheses are skipped in Rashi and the Rambam (setting) – not in the verse, Tehillim or Tanya
+    const cites = parts.map((_, i) => i > 0 || R.unit.startsWith('rambam'));
+    // Raw stress metadata: Tanakh accents or Hayom Yom Dicta/curated primary-stress marks.
+    // prepareForTTS strips these before Web Speech; Piper must receive the original in parallel.
+    const acc = byId?.get(s.dataset.id)?.text || say.get(s.dataset.id) || null;
+    return { el: s, parts, chol: CHOL[s.dataset.ref], cites, acc, accParts, primaryParts, divineNames, hls, pause: true };
   });
 }
 const TTS_ERR = {
@@ -2417,7 +2458,9 @@ function currentWrongEntry() {
     si = s && R.segs ? R.segs.indexOf(s) : -1;
   }
   if (needsAramForms()) ensureAramForms();
+  const liveId = document.querySelector('.hl-now')?.dataset?.hl;
   const segs = R.doc ? ttsSegments() : [];
+  if (liveId) applyHlNow(liveId);
   const seg = si >= 0 ? segs[si] : null;
   const opts = saidLoadOpts();
   const speech = String(q?.text || (seg ? speechForSegment(seg, opts).text : '')).replace(/\s+/g, ' ').trim();
@@ -2513,11 +2556,17 @@ async function ttsToggle() {
   if (needsAramForms()) await ensureAramForms();
   if (R.unit !== unit || R.iso !== iso || R.doc !== doc || R.speaker) return;
   R.speaker = new (eng === 'piper' ? PiperSpeaker : Speaker)({
-    onSegment: (i, frac = 0) => {
+    onSegment: (i, frac = 0, q) => {
       const el = R.segs[i]; if (!el) return;
       (R.heardSi ||= new Set()).add(i);
       if (!el.classList.contains('speaking')) { R.segs.forEach(s => s.classList.remove('speaking')); el.classList.add('speaking'); }
-      followSpeech(el, frac);
+      const chunk = applyHlNow(q?.hl?.id, el) || applyHlNow(q?.hl?.id);
+      const go = () => {
+        if (chunk && prefs.layout === 'pages' && sanitizeSpeakSize(prefs.ttsSpeakSize) !== 'off' && $('#vp') && $('#rc')) layout();
+        followSpeech(el, frac, chunk);
+      };
+      go();
+      if (chunk && sanitizeSpeakSize(prefs.ttsSpeakSize) !== 'off') requestAnimationFrame(go);
       saveSay();
     },
     onState: st => {
@@ -2536,6 +2585,7 @@ async function ttsToggle() {
         // explicit stops (closeReader, end of last lesson, errors) still clear it.
         clearSleepTimer(false);
         R.segs.forEach(s => s.classList.remove('speaking'));
+        clearHlNow();
       }
     },
     // Only a run that really reached the end with every chunk spoken marks the lesson as read / moves on.

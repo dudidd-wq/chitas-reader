@@ -9,7 +9,7 @@ export const DEFAULT_PREFS = {
   theme: 'paper', design: 'classic', designFont: 'design', font: 'noto', readingBold: false, hideSiddurInstructions: false, size: 24, lineHeight: 1.9, layout: 'pages',
   taamim: true, rashi: true, rashiFont: 'rashi', hayomNiqqud: true, biurNiqqud: true, mitzvotNiqqud: true, lessonNach: false, lessonShnayim: false, shnayimSplit: 'day', gloss: 'tap', il: true, rambamTrack: 'both', lessonMitzvot: false, lessonTolt: false, lessonRavYomi: false, lessonDaf: false, lessonAmud: false, lessonYer: false, lessonMishna: false,
   ttsRate: 1, ttsVoice: '', ttsStress: true, ttsDivineScripture: 'hashem', ttsDivineOral: 'hashem', ttsRashi: true, ttsBiur: false, ttsVocalizedGemara: false, ttsGemaraBiurOnly: false, ttsSkipCites: true, ttsContinuous: true,
-  ttsLockscreen: true, ttsLiveHighlight: true, ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, ttsSleep: 0, wakeLock: true, spread: true, locationChosen: false,
+  ttsLockscreen: true, ttsLiveHighlight: true, ttsSpeakSize: 'mid', ttsEngine: 'web', ttsModel: 'full', ttsGender: 'male', ttsHavara: 'israeli', ttsPitch: 0, ttsSleep: 0, wakeLock: true, spread: true, locationChosen: false,
   zmanPlace: '', zmanGeo: null, kivunPlace: '', kivunGeo: null, kivunManual: null, candleMins: 0,
   divine: 'full', siddurLang: 'he', tachanunMode: 'off', shabbatMode: 'off', // 1.0.74 same three values
   siddurKaddish: 'read', // 1.0.90: 'read' | 'skip' (Kaddish in the siddur read-aloud)
@@ -48,6 +48,7 @@ export function normalizePrefs(raw) {
   for (const k of ['readingBold', 'hideSiddurInstructions', 'ttsVocalizedGemara', 'ttsGemaraBiurOnly']) if (typeof prefs[k] !== 'boolean') prefs[k] = false;
   if (prefs.font === 'cardo') prefs.font = 'noto'; // 1.0.139: Cardo removed – its Hebrew marks are misplaced
   if (typeof prefs.ttsLiveHighlight !== 'boolean') prefs.ttsLiveHighlight = true;
+  if (!['off', 'mid', 'large'].includes(prefs.ttsSpeakSize)) prefs.ttsSpeakSize = 'mid';
   if (typeof prefs.hayomNiqqud !== 'boolean') prefs.hayomNiqqud = true;
   if (typeof prefs.biurNiqqud !== 'boolean') prefs.biurNiqqud = true;
   if (typeof prefs.mitzvotNiqqud !== 'boolean') prefs.mitzvotNiqqud = true;

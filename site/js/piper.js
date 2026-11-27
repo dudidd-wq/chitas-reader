@@ -5,6 +5,7 @@
 import { Speaker } from './tts.js';
 import { pauseChunks } from './tts-prep.js';
 import { prepareSpeechForTTS } from './divine-tts.js';
+import { followPauseChunks } from './tts-live-hl.js';
 import { VOICE_FILES } from './voice-files.js';
 import { timbreFor, f0Stats } from './voice-pitch.js';
 import { markVoiceInstalled, markVoiceRemovedByUser } from './voice-ux.js';
@@ -143,12 +144,13 @@ export class PiperSpeaker extends Speaker {
         const primary = !!s.primaryParts?.[pi];
         const prepared = prepareSpeechForTTS(html, { stress: true, divineName: s.divineNames?.[pi] ?? opts.divineName, chol: pi === 0 ? s.chol : undefined, cites: opts.skipCites !== false && !!s.cites?.[pi], primaryStress: primary, unit: opts.unit });
         // 1.0.101: pauseChunks for every source (comma 0.18 s, sentence 0.38 s). Gemara already used this.
-        for (const { c, gap } of pauseChunks(prepared)) chunks.push(primary
-          ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c }, gap }
-          : { c, acc: s.accParts?.[pi] ?? (pi === 0 ? s.acc : null), gap });
+        // t362u: follow sub-utterances are slices of this already-prepared text (concat unchanged; mid-slice gap is 0).
+        for (const { c, gap, hl } of followPauseChunks([...pauseChunks(prepared)], s.hls?.[pi])) chunks.push(primary
+          ? { c: c.replace(/\u05AB/g, ''), acc: { primary: c }, gap, hl }
+          : { c, acc: s.accParts?.[pi] ?? (pi === 0 ? s.acc : null), gap, hl });
       });
       const total = chunks.reduce((a, x) => a + x.c.length, 0) || 1; let done = 0;
-      for (const { c, acc, gap } of chunks) { this.queue.push({ si, text: c, acc, gap, frac: done / total }); done += c.length; }
+      for (const { c, acc, gap, hl } of chunks) { this.queue.push({ si, text: c, acc, gap, hl, frac: done / total }); done += c.length; }
     });
     this.segCount = segments.length; this.bad = 0; this.audio = new Map();
   }
@@ -178,7 +180,7 @@ export class PiperSpeaker extends Speaker {
     this.chunkStarted = 0;
     if (this.i >= this.queue.length) { this.finish(); return; }
     const i = this.i, q = this.queue[i], token = this.token = Symbol();
-    this.onSegment?.(q.si, q.frac);
+    this.onSegment?.(q.si, q.frac, q);
     let m;
     try { m = await this.fetchChunk(i); } catch (e) { if (this.token === token) this.fail('piper-' + (e.code || 'synth-failed')); return; }
     for (const k of [1, 2]) this.fetchChunk(i + k);   // synthesise ahead while this chunk plays
@@ -243,7 +245,7 @@ export class PiperSpeaker extends Speaker {
     if (this.shouldRestartCurrent(delta)) { this.replay(); return; }
     const cur = this.queue[this.i]?.si ?? 0, target = Math.max(0, Math.min(this.segCount - 1, cur + delta));
     const k = this.queueIndexFor(target, delta);
-    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si); }
+    if (k >= 0) { this.i = k; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } else this.onSegment?.(this.queue[k].si, this.queue[k].frac, this.queue[k]); }
   }
   setRate(r) { this.opts.rate = r; if (this.state === 'playing') { this.cut(); this.speakCurrent(); } }
   /** 1.0.91: pronunciation tradition ('israeli' | 'chabad'); the current chunk is said again in the new one */

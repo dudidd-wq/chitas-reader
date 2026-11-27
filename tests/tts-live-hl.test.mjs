@@ -149,7 +149,7 @@ test('t361u r2: source pauses follow on pointercancel, ArrowUp/Down, and openRea
 
   const css = fs.readFileSync(new URL('../site/css/app.css', import.meta.url), 'utf8');
   assert.match(css, /:root\[data-design="nocturne"\][\s\S]{0,400}--speak-bg:/);
-  assert.match(css, /#reader\.live-hl \.r-content \.speaking :is\(/);
+  assert.match(css, /#reader\.live-hl[\s\S]*\.speaking[\s\S]*:is\(/);
 });
 
 
