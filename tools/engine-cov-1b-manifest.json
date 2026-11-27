@@ -11429,8 +11429,8 @@
     },
     {
       "path": "site/voice/stress-he.json",
-      "before_sha256": "e600aef22c5a868cbda3728c92761da9dd3cf71fda54298d910cde33a98b6052",
-      "after_sha256": "e600aef22c5a868cbda3728c92761da9dd3cf71fda54298d910cde33a98b6052"
+      "before_sha256": "c0aaec0a3b1d9c974ebafdf8eb23c6b9e52a29ae1e30dc002ebf5801ecf4f791",
+      "after_sha256": "c0aaec0a3b1d9c974ebafdf8eb23c6b9e52a29ae1e30dc002ebf5801ecf4f791"
     }
   ]
 }
